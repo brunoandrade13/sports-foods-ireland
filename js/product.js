@@ -777,6 +777,21 @@ function renderSimpleVariants(container, variants, product) {
         </div>`;
     }).join('');
 
+    // auto-select first option(s) so downstream groups appear without requiring click
+    const allGroups = container.querySelectorAll('.variant-group');
+    if (allGroups.length > 0) {
+        const firstBtn = allGroups[0].querySelector('.variant-option:not(.disabled)');
+        if (firstBtn) {
+            firstBtn.classList.add('selected');
+            updateVariantPrice(firstBtn, product);
+            // reveal next group immediately
+            if (allGroups.length > 1) {
+                const next = allGroups[1];
+                next.style.display = '';
+            }
+        }
+    }
+
     container.addEventListener('click', function handler(e) {
         const btn = e.target.closest('.variant-option');
         if (!btn || btn.disabled) return;

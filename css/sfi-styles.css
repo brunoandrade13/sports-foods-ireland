@@ -1809,12 +1809,13 @@ html.cart-modal-open {
   display: none !important;
 }
 
-/* Mobile - banner quadrado e imagem completa */
+/* Mobile - banner portrait 4:5 e imagem completa */
 @media (max-width: 767px) {
   .hero-carousel {
-    aspect-ratio: auto;
+    aspect-ratio: 4 / 5;
     min-height: unset;
     max-height: unset;
+    height: auto;
   }
   
   .slide-image {
@@ -3395,7 +3396,7 @@ footer > p {
   }
   
   .hero-carousel {
-    height: 160px;
+    height: auto;
     width: 100%;
     max-width: 100vw;
     overflow: hidden;
@@ -3675,8 +3676,8 @@ footer > p {
   }
   
   .hero-carousel {
-    height: 100vw;
-    max-height: 400px;
+    height: auto;
+    max-height: unset;
     width: 100% !important;
     max-width: 100vw !important;
     margin: 0 !important;
@@ -3720,7 +3721,7 @@ footer > p {
   .slide-image {
     width: 100% !important;
     max-width: 100% !important;
-    height: 100% !important;
+    height: auto !important;
     background-size: contain !important;
     background-position: center 0% !important;
   }

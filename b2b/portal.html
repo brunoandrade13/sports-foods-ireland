@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-GB">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,280 +15,1598 @@
     <link rel="icon" type="image/png" href="../img/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="../css/sfi-styles.min.css?v=18">
     <link rel="stylesheet" href="../css/cart-modal.css?v=2">
     <style>
-    /* ── B2B Portal Custom Styles ── */
-    .b2b-banner-wrapper { width:100%; overflow:hidden; line-height:0; }
-    .b2b-banner-img { width:100%; height:auto; display:block; }
-    .b2b-hero { background: linear-gradient(135deg,#2d6a4f 0%,#1a4731 100%); color:#fff; padding:20px 0; margin-bottom:32px; }
-    .b2b-hero .container { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
-    .b2b-hero h1 { font-size:1.6rem; margin:0; font-weight:700; }
-    .b2b-hero .company-badge { background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:20px; font-size:0.85rem; }
-    .b2b-hero .hero-actions { display:flex; gap:10px; }
-    .b2b-hero .btn-hero { padding:10px 20px; border-radius:8px; font-weight:600; font-size:0.85rem; text-decoration:none; transition:all 0.2s; }
-    .b2b-hero .btn-hero-primary { background:#fff; color:#2d6a4f; }
-    .b2b-hero .btn-hero-outline { background:transparent; border:2px solid rgba(255,255,255,0.4); color:#fff; }
-    .b2b-hero .btn-hero:hover { transform:translateY(-1px); opacity:0.9; }
+        /* ── B2B Portal Custom Styles ── */
+        .b2b-banner-wrapper {
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+        }
 
-    .b2b-tabs { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:28px; background:#f8f9fa; padding:6px; border-radius:12px; }
-    .b2b-tab { padding:10px 18px; border-radius:8px; border:none; background:transparent; cursor:pointer; font-size:0.85rem; font-weight:500; color:#636E72; transition:all 0.2s; white-space:nowrap; font-family:inherit; }
-    .b2b-tab:hover { background:#e9ecef; color:#1e293b; }
-    .b2b-tab.active { background:#2d6a4f; color:#fff; box-shadow:0 2px 8px rgba(45,106,79,0.3); }
+        .b2b-banner-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
 
-    .b2b-panel { display:none; animation:fadeIn 0.3s ease; }
-    .b2b-panel.active { display:block; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        .b2b-hero {
+            background: linear-gradient(135deg, #2d6a4f 0%, #1a4731 100%);
+            color: #fff;
+            padding: 20px 0;
+            margin-bottom: 32px;
+        }
 
-    /* Stats Grid */
-    .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
-    .stat-card { background:#fff; border:1px solid #e9ecef; border-radius:12px; padding:20px; text-align:center; }
-    .stat-card .stat-icon { font-size:1.5rem; margin-bottom:6px; }
-    .stat-card .stat-value { font-size:1.6rem; font-weight:700; color:#1e293b; }
-    .stat-card .stat-label { font-size:0.8rem; color:#636E72; margin-top:2px; }
-    .stat-card.highlight { background:linear-gradient(135deg,#2d6a4f,#40916c); color:#fff; border:none; }
-    .stat-card.highlight .stat-value, .stat-card.highlight .stat-label { color:#fff; }
-    .b2b-quick-actions { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px; }
-    .b2b-qa { display:flex; align-items:center; gap:8px; padding:10px 18px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; font-size:0.85rem; font-weight:600; color:#1e293b; text-decoration:none; transition:all 0.2s; position:relative; cursor:pointer; }
-    .b2b-qa:hover { background:#f0fdf4; border-color:#2D6A4F; color:#1B4332; transform:translateY(-1px); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
-    .b2b-qa-icon { font-size:1.1rem; }
-    .b2b-qa-badge { position:absolute; top:-6px; right:-6px; background:#ef4444; color:#fff; font-size:0.65rem; font-weight:700; min-width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+        .b2b-hero .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
 
-    /* Orders Table */
-    .b2b-table { width:100%; border-collapse:collapse; font-size:0.9rem; }
-    .b2b-table th { background:#f8f9fa; padding:12px 16px; text-align:left; font-weight:600; color:#636E72; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px; border-bottom:2px solid #e9ecef; }
-    .b2b-table td { padding:12px 16px; border-bottom:1px solid #f1f3f5; color:#1e293b; vertical-align:middle; }
-    .b2b-table tr:hover td { background:#f8f9fa; }
-    .b2b-table .status { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
-    .b2b-table .status.delivered { background:#d1fae5; color:#065f46; }
-    .b2b-table .status.processing { background:#dbeafe; color:#1e40af; }
-    .b2b-table .status.pending { background:#fef3c7; color:#92400e; }
-    .btn-sm { padding:6px 14px; border-radius:6px; border:1px solid #2d6a4f; background:#fff; color:#2d6a4f; font-size:0.8rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
-    .btn-sm:hover { background:#2d6a4f; color:#fff; }
+        .b2b-hero h1 {
+            font-size: 1.6rem;
+            margin: 0;
+            font-weight: 700;
+        }
 
-    /* Product Grid */
-    .top-products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
-    .top-prod-card { background:#fff; border:1px solid #e9ecef; border-radius:12px; padding:16px; text-align:center; transition:all 0.2s; position:relative; }
-    .top-prod-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); transform:translateY(-2px); }
-    .top-prod-card img { width:100%; height:140px; object-fit:contain; margin-bottom:10px; border-radius:8px; }
-    .top-prod-card .prod-brand { font-size:0.7rem; color:#636E72; text-transform:uppercase; letter-spacing:0.5px; }
-    .top-prod-card .prod-name { font-size:0.85rem; font-weight:600; color:#1e293b; margin:4px 0 8px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .top-prod-card .prod-price { font-size:1rem; font-weight:700; color:#2d6a4f; }
-    .top-prod-card .prod-orders { font-size:0.75rem; color:#636E72; }
-    .top-prod-card .btn-add { position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:50%; background:#2d6a4f; color:#fff; border:none; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s; }
-    .top-prod-card:hover .btn-add { opacity:1; }
+        .b2b-hero .company-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
 
-    /* Invoice List */
-    .invoice-item { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:#fff; border:1px solid #e9ecef; border-radius:10px; margin-bottom:8px; transition:background 0.15s; }
-    .invoice-item:hover { background:#f8f9fa; }
-    .invoice-info { display:flex; align-items:center; gap:14px; }
-    .invoice-icon { width:40px; height:40px; background:#f0fdf4; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+        .b2b-hero .hero-actions {
+            display: flex;
+            gap: 10px;
+        }
 
-    /* Company Info */
-    .info-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
-    .info-card { background:#fff; border:1px solid #e9ecef; border-radius:12px; padding:20px; }
-    .info-card h4 { font-size:0.85rem; color:#636E72; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px; }
-    .info-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f3f5; }
-    .info-row:last-child { border:none; }
-    .info-row .label { color:#636E72; font-size:0.85rem; }
-    .info-row .value { color:#1e293b; font-weight:600; font-size:0.85rem; }
+        .b2b-hero .btn-hero {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
 
-    /* Tier Progress */
-    .tier-section { background:#fff; border:1px solid #e9ecef; border-radius:12px; padding:24px; margin-top:20px; }
-    .tier-bar-wrap { position:relative; background:#e9ecef; border-radius:20px; height:16px; margin:20px 0 30px; }
-    .tier-bar-fill { height:100%; border-radius:20px; background:linear-gradient(90deg,#40916c,#2d6a4f); transition:width 0.6s ease; }
-    .tier-markers { display:flex; justify-content:space-between; margin-top:-8px; }
-    .tier-marker { text-align:center; font-size:0.7rem; color:#636E72; }
-    .tier-marker .dot { width:12px; height:12px; background:#d1d5db; border-radius:50%; margin:0 auto 4px; border:2px solid #fff; }
-    .tier-marker.reached .dot { background:#2d6a4f; }
-    .tier-marker.current .dot { background:#f0b429; box-shadow:0 0 0 3px rgba(240,180,41,0.3); }
+        .b2b-hero .btn-hero-primary {
+            background: #fff;
+            color: #2d6a4f;
+        }
 
-    /* Reorder Modal */
-    .reorder-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; }
-    .reorder-overlay.open { display:flex; }
-    .reorder-modal { background:#fff; border-radius:16px; max-width:600px; width:95%; max-height:80vh; overflow-y:auto; padding:28px; }
-    .reorder-modal h3 { margin:0 0 20px; font-size:1.2rem; color:#1e293b; }
-    .reorder-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f3f5; }
-    .reorder-item img { width:50px; height:50px; object-fit:contain; border-radius:6px; background:#f8f9fa; }
-    .reorder-item .ri-info { flex:1; }
-    .reorder-item .ri-name { font-weight:600; font-size:0.85rem; color:#1e293b; }
-    .reorder-item .ri-price { font-size:0.8rem; color:#636E72; }
-    .qty-controls { display:flex; align-items:center; gap:6px; }
-    .qty-controls button { width:28px; height:28px; border-radius:6px; border:1px solid #d1d5db; background:#fff; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
-    .qty-controls button:hover { background:#f0fdf4; border-color:#2d6a4f; }
-    .qty-controls span { min-width:24px; text-align:center; font-weight:600; }
+        .b2b-hero .btn-hero-outline {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: #fff;
+        }
 
-    /* Filters row */
-    .filters-row { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
-    .filters-row input, .filters-row select { padding:10px 14px; border:1px solid #d1d5db; border-radius:8px; font-size:0.85rem; font-family:inherit; }
-    .filters-row input { flex:1; min-width:200px; }
+        .b2b-hero .btn-hero:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
 
-    /* Toast */
-    .b2b-toast { position:fixed; bottom:24px; right:24px; background:#2d6a4f; color:#fff; padding:12px 20px; border-radius:10px; font-size:0.9rem; font-weight:500; z-index:99999; transform:translateY(80px); opacity:0; transition:all 0.3s ease; }
-    .b2b-toast.show { transform:translateY(0); opacity:1; }
+        .b2b-tabs {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+            background: #f8f9fa;
+            padding: 6px;
+            border-radius: 12px;
+        }
 
-    /* Empty state */
-    .empty-b2b { text-align:center; padding:48px 20px; color:#636E72; }
-    .empty-b2b .empty-icon { font-size:3rem; margin-bottom:12px; }
+        .b2b-tab {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #636E72;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-family: inherit;
+        }
 
-    /* Reorder banner */
-    .reorder-banner { background:linear-gradient(135deg,#fef3c7,#fff7ed); border:1px solid #fde68a; border-radius:12px; padding:20px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
-    .reorder-banner .rb-info h4 { margin:0 0 4px; color:#92400e; font-size:0.95rem; }
-    .reorder-banner .rb-info p { margin:0; font-size:0.8rem; color:#a16207; }
-    .reorder-thumbs { display:flex; gap:6px; }
-    .reorder-thumbs img { width:40px; height:40px; object-fit:contain; border-radius:6px; background:#fff; border:1px solid #e9ecef; }
-    .btn-reorder { padding:10px 20px; background:#e8742a; color:#fff; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.85rem; transition:background 0.2s; }
-    .btn-reorder:hover { background:#d4681f; }
+        .b2b-tab:hover {
+            background: #e9ecef;
+            color: #1e293b;
+        }
 
-    /* Quick Actions */
-    .quick-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:28px; }
-    .qa-card { background:#fff; border:1px solid #e9ecef; border-radius:10px; padding:18px; text-align:center; cursor:pointer; transition:all 0.2s; text-decoration:none; color:#1e293b; }
-    .qa-card:hover { border-color:#2d6a4f; box-shadow:0 2px 12px rgba(45,106,79,0.1); }
-    .qa-card .qa-icon { font-size:1.5rem; margin-bottom:6px; }
-    .qa-card .qa-label { font-size:0.8rem; font-weight:600; }
+        .b2b-tab.active {
+            background: #2d6a4f;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(45, 106, 79, 0.3);
+        }
 
-    /* Responsive */
-    @media(max-width:768px) {
-        .stats-grid { grid-template-columns:repeat(2,1fr); }
-        .info-grid { grid-template-columns:1fr; }
-        .quick-actions { grid-template-columns:1fr; }
-        .b2b-tabs { overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; }
-        .b2b-tab { flex-shrink:0; }
-        .b2b-hero h1 { font-size:1.3rem; }
-        .b2b-table { font-size:0.8rem; }
-        .b2b-table th, .b2b-table td { padding:8px 10px; }
-        .top-products-grid { grid-template-columns:repeat(2,1fr); }
-        #b2bProductModalContent { width:95%!important; max-height:90vh!important; }
-        #b2bProductModalContent div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr!important; }
-    }
-    .b2b-prod-desc ul { padding-left:18px; margin:8px 0; }
-    .b2b-prod-desc li { margin-bottom:4px; }
-    .b2b-prod-desc h4 { margin-top:14px; margin-bottom:6px; color:#1B4332; }
-    .b2b-prod-desc p { margin-bottom:8px; }
-    .fin-subtab { padding:8px 16px; border:none; background:transparent; cursor:pointer; font-size:0.8rem; font-weight:500; color:#636E72; border-radius:6px; transition:all 0.2s; white-space:nowrap; }
-    .fin-subtab:hover { background:#e2e8f0; color:#1e293b; }
-    .fin-subtab.active { background:#2d6a4f; color:#fff; }
-    .fin-panel { display:none; }
-    .fin-panel.active { display:block; }
-    .mkt-subtab { padding:8px 16px; border:none; background:transparent; cursor:pointer; font-size:0.8rem; font-weight:500; color:#636E72; border-radius:6px; transition:all 0.2s; white-space:nowrap; }
-    .mkt-subtab:hover { background:#e2e8f0; color:#1e293b; }
-    .mkt-subtab.active { background:#2d6a4f; color:#fff; }
-    .mkt-panel { display:none; }
-    .mkt-panel.active { display:block; }
-    .mkt-file-card { background:#f8faf9; border:1px solid #e2e8f0; border-radius:10px; padding:18px; }
-    .mkt-file-card .mkt-icon { font-size:1.4rem; margin-bottom:6px; }
-    .mkt-file-card h4 { font-size:0.9rem; color:#1B4332; margin-bottom:4px; }
-    .mkt-file-card p { font-size:0.8rem; color:#636E72; line-height:1.5; }
-    .mkt-link { display:inline-block; margin-top:8px; font-size:0.8rem; color:#2D6A4F; font-weight:600; text-decoration:none; }
-    .mkt-link:hover { text-decoration:underline; }
-    .mkt-kit-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px; position:relative; }
-    .mkt-kit-card h4 { font-size:0.95rem; color:#1B4332; margin-bottom:8px; }
-    .mkt-kit-card p { font-size:0.85rem; color:#636E72; line-height:1.5; }
-    .mkt-kit-badge { position:absolute; top:12px; right:12px; background:#f0fdf4; color:#166534; font-size:0.65rem; font-weight:700; padding:2px 8px; border-radius:4px; text-transform:uppercase; }
-    .mkt-kit-tip { margin-top:12px; padding:8px 12px; background:#fffbeb; border-radius:6px; font-size:0.8rem; color:#92400e; }
-    .mkt-video-card { display:flex; align-items:center; gap:14px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; cursor:pointer; transition:border-color 0.2s; }
-    .mkt-video-card:hover { border-color:#2D6A4F; }
-    .mkt-video-thumb { width:50px; height:50px; background:#f0fdf4; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
-    .mkt-video-card strong { font-size:0.85rem; color:#1e293b; }
-    .mkt-doc-card { display:flex; align-items:flex-start; gap:12px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; }
-    .mkt-doc-card strong { font-size:0.85rem; color:#1e293b; }
-    .sup-subtab { padding:8px 16px; border:none; background:transparent; cursor:pointer; font-size:0.8rem; font-weight:500; color:#636E72; border-radius:6px; transition:all 0.2s; white-space:nowrap; }
-    .sup-subtab:hover { background:#e2e8f0; color:#1e293b; }
-    .sup-subtab.active { background:#2d6a4f; color:#fff; }
-    .sup-panel { display:none; }
-    .sup-panel.active { display:block; }
-    .sup-faq-item { border-bottom:1px solid #f1f5f9; }
-    .sup-faq-q { display:flex; justify-content:space-between; align-items:center; padding:14px 0; cursor:pointer; font-weight:600; font-size:0.9rem; color:#1e293b; }
-    .sup-faq-q span { font-size:1.2rem; color:#2D6A4F; transition:transform 0.2s; }
-    .sup-faq-item.open .sup-faq-q span { transform:rotate(45deg); }
-    .sup-faq-a { max-height:0; overflow:hidden; transition:max-height 0.3s ease; font-size:0.85rem; color:#636E72; line-height:1.6; }
-    .sup-faq-item.open .sup-faq-a { max-height:200px; padding-bottom:14px; }
-    .sup-ticket-row { display:grid; grid-template-columns:80px 120px 1fr 100px 100px; gap:10px; padding:12px 0; border-bottom:1px solid #f1f5f9; align-items:center; font-size:0.85rem; }
-    .sup-ticket-row.header { font-weight:600; color:#636E72; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; border-bottom:2px solid #e2e8f0; }
-    @media(max-width:768px) { .sup-ticket-row { grid-template-columns:1fr 1fr; } }
-    .sub-account-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:18px; margin-bottom:10px; transition:border-color 0.2s; }
-    .sub-account-card:hover { border-color:#86efac; }
-    .sub-action-btn { padding:8px 16px; background:#f8f9fa; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem; font-weight:600; color:#1e293b; cursor:pointer; transition:all 0.2s; }
-    .sub-action-btn:hover { background:#f0fdf4; border-color:#2D6A4F; color:#1B4332; }
-    @media(max-width:480px) {
-        .stats-grid { grid-template-columns:1fr 1fr; gap:10px; }
-        .stat-card { padding:14px; }
-        .stat-card .stat-value { font-size:1.3rem; }
-        .reorder-banner { flex-direction:column; text-align:center; }
-    }
+        .b2b-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
 
-    /* Order Detail Modal */
-    .od-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:10000; align-items:center; justify-content:center; }
-    .od-overlay.active { display:flex; }
-    .od-modal { background:#fff; border-radius:14px; width:94%; max-width:680px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,.25); }
-    .od-header { display:flex; justify-content:space-between; align-items:flex-start; padding:22px 26px 14px; border-bottom:1px solid #E8ECEF; }
-    .od-title { font-size:1.15rem; font-weight:700; color:#1a1a2e; margin:0; }
-    .od-date { font-size:.8rem; color:#636E72; margin-top:2px; display:inline-block; }
-    .od-close { background:none; border:none; font-size:1.6rem; color:#636E72; cursor:pointer; padding:0 4px; line-height:1; }
-    .od-close:hover { color:#1a1a2e; }
-    .od-summary { display:flex; gap:16px; padding:14px 26px; background:#F8FAFE; border-bottom:1px solid #E8ECEF; }
-    .od-stat { display:flex; flex-direction:column; gap:2px; }
-    .od-stat-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.5px; color:#636E72; font-weight:600; }
-    .od-stat-val { font-size:1rem; font-weight:700; color:#1a1a2e; }
-    .od-total { color:#2D6A4F; }
-    .od-items { overflow-y:auto; flex:1; padding:8px 26px; }
-    .od-item { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid #F0F0F0; }
-    .od-item:last-child { border-bottom:none; }
-    .od-item-img { width:52px; height:52px; object-fit:contain; border-radius:8px; background:#F8F8F8; flex-shrink:0; }
-    .od-item-info { flex:1; min-width:0; }
-    .od-item-name { font-size:.88rem; font-weight:600; color:#1a1a2e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .od-item-meta { font-size:.78rem; color:#636E72; margin-top:2px; }
-    .od-item-total { font-size:.92rem; font-weight:700; color:#1a1a2e; white-space:nowrap; }
-    .od-footer { padding:16px 26px; border-top:1px solid #E8ECEF; text-align:center; }
-    .od-footer .btn-reorder { background:#2D6A4F; color:#fff; border:none; padding:10px 28px; border-radius:8px; font-weight:600; font-size:.9rem; cursor:pointer; }
-    .od-footer .btn-reorder:hover { background:#245a42; }
-    @media(max-width:600px) {
-        .od-summary { flex-wrap:wrap; }
-        .od-item-img { width:40px; height:40px; }
-    }
+        .b2b-panel.active {
+            display: block;
+        }
 
-    /* Invoice Document Modal */
-    .inv-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:10001; align-items:center; justify-content:center; overflow-y:auto; padding:24px; }
-    .inv-overlay.active { display:flex; }
-    .inv-modal { position:relative; width:100%; max-width:700px; max-height:90vh; overflow-y:auto; }
-    .inv-close { position:fixed; top:18px; right:24px; background:rgba(0,0,0,.6); color:#fff; border:none; width:36px; height:36px; border-radius:50%; font-size:1.4rem; cursor:pointer; z-index:10002; display:flex; align-items:center; justify-content:center; }
-    .inv-close:hover { background:rgba(0,0,0,.8); }
-    .inv-doc { background:#fff; border-radius:8px; padding:40px 44px; box-shadow:0 8px 40px rgba(0,0,0,.15); color:#1a1a2e; font-size:.88rem; }
-    .inv-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:30px; padding-bottom:20px; border-bottom:2px solid #2D6A4F; }
-    .inv-logo { max-height:48px; }
-    .inv-title { text-align:right; }
-    .inv-title h2 { font-size:1.5rem; color:#2D6A4F; font-weight:800; margin:0 0 4px; text-transform:uppercase; letter-spacing:1px; }
-    .inv-title .inv-num { font-size:1rem; color:#1a1a2e; font-weight:600; }
-    .inv-parties { display:flex; justify-content:space-between; gap:30px; margin-bottom:28px; }
-    .inv-party h4 { font-size:.72rem; text-transform:uppercase; letter-spacing:.8px; color:#636E72; margin:0 0 6px; font-weight:700; }
-    .inv-party p { margin:2px 0; line-height:1.5; color:#333; }
-    .inv-party strong { color:#1a1a2e; }
-    .inv-meta { display:flex; gap:30px; margin-bottom:24px; padding:12px 16px; background:#F8FAFE; border-radius:6px; }
-    .inv-meta-item { display:flex; flex-direction:column; }
-    .inv-meta-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.6px; color:#636E72; font-weight:700; }
-    .inv-meta-val { font-size:.9rem; font-weight:600; color:#1a1a2e; }
-    .inv-table { width:100%; border-collapse:collapse; margin-bottom:20px; }
-    .inv-table thead th { background:#F0F4F8; padding:10px 12px; text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#636E72; font-weight:700; border-bottom:1px solid #ddd; }
-    .inv-table thead th:nth-child(3), .inv-table thead th:nth-child(4) { text-align:right; }
-    .inv-table tbody td { padding:10px 12px; border-bottom:1px solid #F0F0F0; color:#333; }
-    .inv-table tbody td:nth-child(3), .inv-table tbody td:nth-child(4) { text-align:right; font-variant-numeric:tabular-nums; }
-    .inv-table tbody tr:last-child td { border-bottom:none; }
-    .inv-totals { margin-left:auto; width:260px; margin-bottom:20px; }
-    .inv-totals-row { display:flex; justify-content:space-between; padding:6px 0; font-size:.88rem; color:#333; }
-    .inv-totals-row.total { border-top:2px solid #1a1a2e; padding-top:10px; margin-top:6px; font-size:1.05rem; font-weight:800; color:#1a1a2e; }
-    .inv-totals-row.due { color:#E17055; font-weight:700; }
-    .inv-footer { margin-top:28px; padding-top:16px; border-top:1px solid #E8ECEF; text-align:center; font-size:.78rem; color:#999; }
-    @media(max-width:600px) {
-        .inv-doc { padding:24px 20px; }
-        .inv-header { flex-direction:column; gap:12px; }
-        .inv-title { text-align:left; }
-        .inv-parties { flex-direction:column; gap:16px; }
-        .inv-meta { flex-wrap:wrap; gap:16px; }
-        .inv-totals { width:100%; }
-    }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.8rem;
+            color: #636E72;
+            margin-top: 2px;
+        }
+
+        .stat-card.highlight {
+            background: linear-gradient(135deg, #2d6a4f, #40916c);
+            color: #fff;
+            border: none;
+        }
+
+        .stat-card.highlight .stat-value,
+        .stat-card.highlight .stat-label {
+            color: #fff;
+        }
+
+        .b2b-quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .b2b-qa {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .b2b-qa:hover {
+            background: #f0fdf4;
+            border-color: #2D6A4F;
+            color: #1B4332;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .b2b-qa-icon {
+            font-size: 1.1rem;
+        }
+
+        .b2b-qa-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Orders Table */
+        .b2b-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .b2b-table th {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #636E72;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .b2b-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f3f5;
+            color: #1e293b;
+            vertical-align: middle;
+        }
+
+        .b2b-table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        .b2b-table .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .b2b-table .status.delivered {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .b2b-table .status.processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .b2b-table .status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid #2d6a4f;
+            background: #fff;
+            color: #2d6a4f;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-sm:hover {
+            background: #2d6a4f;
+            color: #fff;
+        }
+
+        /* Product Grid */
+        .top-products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .top-prod-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .top-prod-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .top-prod-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .top-prod-card .prod-brand {
+            font-size: 0.7rem;
+            color: #636E72;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .top-prod-card .prod-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 4px 0 8px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .top-prod-card .prod-price {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #2d6a4f;
+        }
+
+        .top-prod-card .prod-orders {
+            font-size: 0.75rem;
+            color: #636E72;
+        }
+
+        .top-prod-card .btn-add {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #2d6a4f;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .top-prod-card:hover .btn-add {
+            opacity: 1;
+        }
+
+        /* Invoice List */
+        .invoice-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: background 0.15s;
+        }
+
+        .invoice-item:hover {
+            background: #f8f9fa;
+        }
+
+        .invoice-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .invoice-icon {
+            width: 40px;
+            height: 40px;
+            background: #f0fdf4;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* Company Info */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .info-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .info-card h4 {
+            font-size: 0.85rem;
+            color: #636E72;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .info-row:last-child {
+            border: none;
+        }
+
+        .info-row .label {
+            color: #636E72;
+            font-size: 0.85rem;
+        }
+
+        .info-row .value {
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* Tier Progress */
+        .tier-section {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .tier-bar-wrap {
+            position: relative;
+            background: #e9ecef;
+            border-radius: 20px;
+            height: 16px;
+            margin: 20px 0 30px;
+        }
+
+        .tier-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #40916c, #2d6a4f);
+            transition: width 0.6s ease;
+        }
+
+        .tier-markers {
+            display: flex;
+            justify-content: space-between;
+            margin-top: -8px;
+        }
+
+        .tier-marker {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #636E72;
+        }
+
+        .tier-marker .dot {
+            width: 12px;
+            height: 12px;
+            background: #d1d5db;
+            border-radius: 50%;
+            margin: 0 auto 4px;
+            border: 2px solid #fff;
+        }
+
+        .tier-marker.reached .dot {
+            background: #2d6a4f;
+        }
+
+        .tier-marker.current .dot {
+            background: #f0b429;
+            box-shadow: 0 0 0 3px rgba(240, 180, 41, 0.3);
+        }
+
+        /* Reorder Modal */
+        .reorder-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reorder-overlay.open {
+            display: flex;
+        }
+
+        .reorder-modal {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 95%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 28px;
+        }
+
+        .reorder-modal h3 {
+            margin: 0 0 20px;
+            font-size: 1.2rem;
+            color: #1e293b;
+        }
+
+        .reorder-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .reorder-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+
+        .reorder-item .ri-info {
+            flex: 1;
+        }
+
+        .reorder-item .ri-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1e293b;
+        }
+
+        .reorder-item .ri-price {
+            font-size: 0.8rem;
+            color: #636E72;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .qty-controls button {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-controls button:hover {
+            background: #f0fdf4;
+            border-color: #2d6a4f;
+        }
+
+        .qty-controls span {
+            min-width: 24px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Filters row */
+        .filters-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filters-row input,
+        .filters-row select {
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+
+        .filters-row input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Toast */
+        .b2b-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #2d6a4f;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 99999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .b2b-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Empty state */
+        .empty-b2b {
+            text-align: center;
+            padding: 48px 20px;
+            color: #636E72;
+        }
+
+        .empty-b2b .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        /* Reorder banner */
+        .reorder-banner {
+            background: linear-gradient(135deg, #fef3c7, #fff7ed);
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .reorder-banner .rb-info h4 {
+            margin: 0 0 4px;
+            color: #92400e;
+            font-size: 0.95rem;
+        }
+
+        .reorder-banner .rb-info p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #a16207;
+        }
+
+        .reorder-thumbs {
+            display: flex;
+            gap: 6px;
+        }
+
+        .reorder-thumbs img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #fff;
+            border: 1px solid #e9ecef;
+        }
+
+        .btn-reorder {
+            padding: 10px 20px;
+            background: #e8742a;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .btn-reorder:hover {
+            background: #d4681f;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .qa-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #1e293b;
+        }
+
+        .qa-card:hover {
+            border-color: #2d6a4f;
+            box-shadow: 0 2px 12px rgba(45, 106, 79, 0.1);
+        }
+
+        .qa-card .qa-icon {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .qa-card .qa-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media(max-width:768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .b2b-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .b2b-tab {
+                flex-shrink: 0;
+            }
+
+            .b2b-hero h1 {
+                font-size: 1.3rem;
+            }
+
+            .b2b-table {
+                font-size: 0.8rem;
+            }
+
+            .b2b-table th,
+            .b2b-table td {
+                padding: 8px 10px;
+            }
+
+            .top-products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            #b2bProductModalContent {
+                width: 95% !important;
+                max-height: 90vh !important;
+            }
+
+            #b2bProductModalContent div[style*="grid-template-columns:1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        .b2b-prod-desc ul {
+            padding-left: 18px;
+            margin: 8px 0;
+        }
+
+        .b2b-prod-desc li {
+            margin-bottom: 4px;
+        }
+
+        .b2b-prod-desc h4 {
+            margin-top: 14px;
+            margin-bottom: 6px;
+            color: #1B4332;
+        }
+
+        .b2b-prod-desc p {
+            margin-bottom: 8px;
+        }
+
+        .fin-subtab {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #636E72;
+            border-radius: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .fin-subtab:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .fin-subtab.active {
+            background: #2d6a4f;
+            color: #fff;
+        }
+
+        .fin-panel {
+            display: none;
+        }
+
+        .fin-panel.active {
+            display: block;
+        }
+
+        .mkt-subtab {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #636E72;
+            border-radius: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .mkt-subtab:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .mkt-subtab.active {
+            background: #2d6a4f;
+            color: #fff;
+        }
+
+        .mkt-panel {
+            display: none;
+        }
+
+        .mkt-panel.active {
+            display: block;
+        }
+
+        .mkt-file-card {
+            background: #f8faf9;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .mkt-file-card .mkt-icon {
+            font-size: 1.4rem;
+            margin-bottom: 6px;
+        }
+
+        .mkt-file-card h4 {
+            font-size: 0.9rem;
+            color: #1B4332;
+            margin-bottom: 4px;
+        }
+
+        .mkt-file-card p {
+            font-size: 0.8rem;
+            color: #636E72;
+            line-height: 1.5;
+        }
+
+        .mkt-link {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: #2D6A4F;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .mkt-link:hover {
+            text-decoration: underline;
+        }
+
+        .mkt-kit-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .mkt-kit-card h4 {
+            font-size: 0.95rem;
+            color: #1B4332;
+            margin-bottom: 8px;
+        }
+
+        .mkt-kit-card p {
+            font-size: 0.85rem;
+            color: #636E72;
+            line-height: 1.5;
+        }
+
+        .mkt-kit-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #f0fdf4;
+            color: #166534;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .mkt-kit-tip {
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: #fffbeb;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #92400e;
+        }
+
+        .mkt-video-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .mkt-video-card:hover {
+            border-color: #2D6A4F;
+        }
+
+        .mkt-video-thumb {
+            width: 50px;
+            height: 50px;
+            background: #f0fdf4;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .mkt-video-card strong {
+            font-size: 0.85rem;
+            color: #1e293b;
+        }
+
+        .mkt-doc-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .mkt-doc-card strong {
+            font-size: 0.85rem;
+            color: #1e293b;
+        }
+
+        .sup-subtab {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #636E72;
+            border-radius: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .sup-subtab:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .sup-subtab.active {
+            background: #2d6a4f;
+            color: #fff;
+        }
+
+        .sup-panel {
+            display: none;
+        }
+
+        .sup-panel.active {
+            display: block;
+        }
+
+        .sup-faq-item {
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .sup-faq-q {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1e293b;
+        }
+
+        .sup-faq-q span {
+            font-size: 1.2rem;
+            color: #2D6A4F;
+            transition: transform 0.2s;
+        }
+
+        .sup-faq-item.open .sup-faq-q span {
+            transform: rotate(45deg);
+        }
+
+        .sup-faq-a {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            font-size: 0.85rem;
+            color: #636E72;
+            line-height: 1.6;
+        }
+
+        .sup-faq-item.open .sup-faq-a {
+            max-height: 200px;
+            padding-bottom: 14px;
+        }
+
+        .sup-ticket-row {
+            display: grid;
+            grid-template-columns: 80px 120px 1fr 100px 100px;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .sup-ticket-row.header {
+            font-weight: 600;
+            color: #636E72;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        @media(max-width:768px) {
+            .sup-ticket-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .sub-account-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .sub-account-card:hover {
+            border-color: #86efac;
+        }
+
+        .sub-action-btn {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sub-action-btn:hover {
+            background: #f0fdf4;
+            border-color: #2D6A4F;
+            color: #1B4332;
+        }
+
+        @media(max-width:480px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 14px;
+            }
+
+            .stat-card .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .reorder-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Order Detail Modal */
+        .od-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .od-overlay.active {
+            display: flex;
+        }
+
+        .od-modal {
+            background: #fff;
+            border-radius: 14px;
+            width: 94%;
+            max-width: 680px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+        }
+
+        .od-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 22px 26px 14px;
+            border-bottom: 1px solid #E8ECEF;
+        }
+
+        .od-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 0;
+        }
+
+        .od-date {
+            font-size: .8rem;
+            color: #636E72;
+            margin-top: 2px;
+            display: inline-block;
+        }
+
+        .od-close {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: #636E72;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+        }
+
+        .od-close:hover {
+            color: #1a1a2e;
+        }
+
+        .od-summary {
+            display: flex;
+            gap: 16px;
+            padding: 14px 26px;
+            background: #F8FAFE;
+            border-bottom: 1px solid #E8ECEF;
+        }
+
+        .od-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .od-stat-label {
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #636E72;
+            font-weight: 600;
+        }
+
+        .od-stat-val {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .od-total {
+            color: #2D6A4F;
+        }
+
+        .od-items {
+            overflow-y: auto;
+            flex: 1;
+            padding: 8px 26px;
+        }
+
+        .od-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .od-item:last-child {
+            border-bottom: none;
+        }
+
+        .od-item-img {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #F8F8F8;
+            flex-shrink: 0;
+        }
+
+        .od-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .od-item-name {
+            font-size: .88rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .od-item-meta {
+            font-size: .78rem;
+            color: #636E72;
+            margin-top: 2px;
+        }
+
+        .od-item-total {
+            font-size: .92rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            white-space: nowrap;
+        }
+
+        .od-footer {
+            padding: 16px 26px;
+            border-top: 1px solid #E8ECEF;
+            text-align: center;
+        }
+
+        .od-footer .btn-reorder {
+            background: #2D6A4F;
+            color: #fff;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: .9rem;
+            cursor: pointer;
+        }
+
+        .od-footer .btn-reorder:hover {
+            background: #245a42;
+        }
+
+        @media(max-width:600px) {
+            .od-summary {
+                flex-wrap: wrap;
+            }
+
+            .od-item-img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* Invoice Document Modal */
+        .inv-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .inv-overlay.active {
+            display: flex;
+        }
+
+        .inv-modal {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .inv-close {
+            position: fixed;
+            top: 18px;
+            right: 24px;
+            background: rgba(0, 0, 0, .6);
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            cursor: pointer;
+            z-index: 10002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .inv-close:hover {
+            background: rgba(0, 0, 0, .8);
+        }
+
+        .inv-doc {
+            background: #fff;
+            border-radius: 8px;
+            padding: 40px 44px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, .15);
+            color: #1a1a2e;
+            font-size: .88rem;
+        }
+
+        .inv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #2D6A4F;
+        }
+
+        .inv-logo {
+            max-height: 48px;
+        }
+
+        .inv-title {
+            text-align: right;
+        }
+
+        .inv-title h2 {
+            font-size: 1.5rem;
+            color: #2D6A4F;
+            font-weight: 800;
+            margin: 0 0 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .inv-title .inv-num {
+            font-size: 1rem;
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        .inv-parties {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-bottom: 28px;
+        }
+
+        .inv-party h4 {
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: #636E72;
+            margin: 0 0 6px;
+            font-weight: 700;
+        }
+
+        .inv-party p {
+            margin: 2px 0;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .inv-party strong {
+            color: #1a1a2e;
+        }
+
+        .inv-meta {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 24px;
+            padding: 12px 16px;
+            background: #F8FAFE;
+            border-radius: 6px;
+        }
+
+        .inv-meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .inv-meta-label {
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: #636E72;
+            font-weight: 700;
+        }
+
+        .inv-meta-val {
+            font-size: .9rem;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .inv-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .inv-table thead th {
+            background: #F0F4F8;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #636E72;
+            font-weight: 700;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .inv-table thead th:nth-child(3),
+        .inv-table thead th:nth-child(4) {
+            text-align: right;
+        }
+
+        .inv-table tbody td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #F0F0F0;
+            color: #333;
+        }
+
+        .inv-table tbody td:nth-child(3),
+        .inv-table tbody td:nth-child(4) {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .inv-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .inv-totals {
+            margin-left: auto;
+            width: 260px;
+            margin-bottom: 20px;
+        }
+
+        .inv-totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: .88rem;
+            color: #333;
+        }
+
+        .inv-totals-row.total {
+            border-top: 2px solid #1a1a2e;
+            padding-top: 10px;
+            margin-top: 6px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #1a1a2e;
+        }
+
+        .inv-totals-row.due {
+            color: #E17055;
+            font-weight: 700;
+        }
+
+        .inv-footer {
+            margin-top: 28px;
+            padding-top: 16px;
+            border-top: 1px solid #E8ECEF;
+            text-align: center;
+            font-size: .78rem;
+            color: #999;
+        }
+
+        @media(max-width:600px) {
+            .inv-doc {
+                padding: 24px 20px;
+            }
+
+            .inv-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .inv-title {
+                text-align: left;
+            }
+
+            .inv-parties {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .inv-meta {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+
+            .inv-totals {
+                width: 100%;
+            }
+        }
     </style>
 </head>
+
 <body>
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <header>
@@ -309,13 +1628,21 @@
             </nav>
             <div class="header-right">
                 <div class="search-wrapper icon-wrapper">
-                    <input type="text" placeholder="Search products..." class="busca padded-right" id="busca" aria-label="Search products">
+                    <input type="text" placeholder="Search products..." class="busca padded-right" id="busca"
+                        aria-label="Search products">
                     <button type="button" id="searchBtn" aria-label="Search" class="close-btn-abs">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
                     </button>
                 </div>
-                <a href="../wishlist.html" class="header-icon wishlist-link" aria-label="My Wishlist" title="Wishlist"><img src="../img/heart-icon.svg" alt="Wishlist" class="header-svg-icon icon-svg"></a>
-                <a href="../account.html" class="header-icon" aria-label="My account" title="Account"><img src="../img/account-icon.svg" alt="Account" class="header-svg-icon"></a>
+                <a href="../wishlist.html" class="header-icon wishlist-link" aria-label="My Wishlist"
+                    title="Wishlist"><img src="../img/heart-icon.svg" alt="Wishlist"
+                        class="header-svg-icon icon-svg"></a>
+                <a href="../account.html" class="header-icon" aria-label="My account" title="Account"><img
+                        src="../img/account-icon.svg" alt="Account" class="header-svg-icon"></a>
                 <div class="cart-wrapper">
                     <button class="header-icon cart-icon" id="cartIcon" aria-label="Shopping cart">
                         <img src="../img/cart-icon.svg" alt="Cart" class="header-svg-icon">
@@ -337,7 +1664,11 @@
 
     <!-- B2B Banner Image -->
     <div class="b2b-banner-wrapper">
-        <img src="../img/b2b-banner.png" alt="Sports Foods Ireland - Wholesale Partner Portal" class="b2b-banner-img">
+        <picture>
+            <source media="(max-width: 768px)" srcset="../img/b2b-banner-mobile.png" width="640" height="800">
+            <img src="../img/b2b-banner.png" alt="Sports Foods Ireland - Wholesale Partner Portal"
+                class="b2b-banner-img">
+        </picture>
     </div>
 
     <!-- B2B Hero Banner -->
@@ -347,7 +1678,8 @@
                 <h1>🏢 <span id="heroCompany">B2B Account</span></h1>
                 <span class="company-badge" id="heroBadge">Wholesale Customer</span>
             </div>
-            <div id="heroCustomerInfo" style="color:rgba(255,255,255,0.9);font-size:14px;line-height:1.8;text-align:right;">
+            <div id="heroCustomerInfo"
+                style="color:rgba(255,255,255,0.9);font-size:14px;line-height:1.8;text-align:right;">
             </div>
         </div>
     </div>
@@ -365,7 +1697,9 @@
                 <div style="font-size:3rem;margin-bottom:12px;">🔒</div>
                 <h2 style="color:#1e293b;">B2B Access Required</h2>
                 <p style="color:#636E72;margin:12px 0 24px;">You need an approved B2B account to access this page.</p>
-                <a href="../account.html" style="display:inline-block;background:#2d6a4f;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;">Go to My Account</a>
+                <a href="../account.html"
+                    style="display:inline-block;background:#2d6a4f;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;">Go
+                    to My Account</a>
             </div>
 
             <!-- Dashboard Content (hidden until loaded) -->
@@ -373,13 +1707,17 @@
 
                 <!-- Tab Navigation -->
                 <div class="b2b-tabs" id="b2bTabs">
-                    <button class="b2b-tab active" data-tab="dashboard" onclick="B2B.showTab('dashboard')">📊 Dashboard</button>
+                    <button class="b2b-tab active" data-tab="dashboard" onclick="B2B.showTab('dashboard')">📊
+                        Dashboard</button>
                     <button class="b2b-tab" data-tab="orders" onclick="B2B.showTab('orders')">📦 Orders</button>
                     <button class="b2b-tab" data-tab="shop" onclick="B2B.showTab('shop')">🛒 B2B Shop</button>
-                    <button class="b2b-tab" data-tab="financial" onclick="B2B.showTab('financial')">💰 Financial</button>
-                    <button class="b2b-tab" data-tab="marketing" onclick="B2B.showTab('marketing')">📣 Marketing</button>
+                    <button class="b2b-tab" data-tab="financial" onclick="B2B.showTab('financial')">💰
+                        Financial</button>
+                    <button class="b2b-tab" data-tab="marketing" onclick="B2B.showTab('marketing')">📣
+                        Marketing</button>
                     <button class="b2b-tab" data-tab="support" onclick="B2B.showTab('support')">🎧 Support</button>
-                    <button class="b2b-tab" data-tab="subaccounts" onclick="B2B.showTab('subaccounts')">👥 Sub-Accounts</button>
+                    <button class="b2b-tab" data-tab="subaccounts" onclick="B2B.showTab('subaccounts')">👥
+                        Sub-Accounts</button>
                     <button class="b2b-tab" data-tab="company" onclick="B2B.showTab('company')">👤 My Account</button>
                 </div>
 
@@ -446,7 +1784,8 @@
                     </div>
 
                     <!-- Notices Panel (hidden by default) -->
-                    <div id="noticesPanel" style="display:none;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:20px;margin-bottom:24px;">
+                    <div id="noticesPanel"
+                        style="display:none;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:20px;margin-bottom:24px;">
                         <h4 style="color:#92400e;margin-bottom:12px;">📢 Important Notices</h4>
                         <div id="noticesList">
                             <p style="color:#636E72;font-size:14px;">No notices at this time.</p>
@@ -457,13 +1796,18 @@
                     <div id="favouritesPanel" style="display:none;margin-bottom:24px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                             <h3 style="color:#1e293b;">⭐ Favourite Products</h3>
-                            <button onclick="B2B.toggleFavourites()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;" title="Close">✕</button>
+                            <button onclick="B2B.toggleFavourites()"
+                                style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;"
+                                title="Close">✕</button>
                         </div>
-                        <div id="favouritesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+                        <div id="favouritesGrid"
+                            style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
                             <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:#94a3b8;">
                                 <div style="font-size:2rem;margin-bottom:8px;">⭐</div>
                                 <p style="font-size:14px;">No favourite products yet.</p>
-                                <p style="font-size:13px;margin-top:6px;">Browse the <a href="shop.html" style="color:#2D6A4F;font-weight:600;">B2B Shop</a> and click the ⭐ on any product to save it here.</p>
+                                <p style="font-size:13px;margin-top:6px;">Browse the <a href="shop.html"
+                                        style="color:#2D6A4F;font-weight:600;">B2B Shop</a> and click the ⭐ on any
+                                    product to save it here.</p>
                             </div>
                         </div>
                     </div>
@@ -472,10 +1816,14 @@
                     <div id="recommendedPanel" style="display:none;margin-bottom:24px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                             <h3 style="color:#1e293b;">💡 Recommended For You</h3>
-                            <button onclick="B2B.toggleRecommended()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;" title="Close">✕</button>
+                            <button onclick="B2B.toggleRecommended()"
+                                style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;"
+                                title="Close">✕</button>
                         </div>
-                        <div id="recommendedGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
-                            <p style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">Loading recommendations...</p>
+                        <div id="recommendedGrid"
+                            style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+                            <p style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">Loading
+                                recommendations...</p>
                         </div>
                     </div>
 
@@ -484,31 +1832,47 @@
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                             <h3 style="color:#1e293b;">🛒 New Order</h3>
                             <div style="display:flex;gap:10px;align-items:center;">
-                                <input type="text" id="inlineShopSearch" placeholder="Search products..." oninput="B2B.searchInlineShop()" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;width:220px;">
-                                <select id="inlineShopCat" onchange="B2B.loadInlineShop()" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
+                                <input type="text" id="inlineShopSearch" placeholder="Search products..."
+                                    oninput="B2B.searchInlineShop()"
+                                    style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;width:220px;">
+                                <select id="inlineShopCat" onchange="B2B.loadInlineShop()"
+                                    style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
                                     <option value="">All Categories</option>
                                     <option value="Nutrition">Nutrition</option>
                                     <option value="Swimming">Swimming</option>
                                     <option value="Cycling">Cycling</option>
                                     <option value="Running">Running</option>
                                 </select>
-                                <button onclick="B2B.toggleInlineShop()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;" title="Close">✕</button>
+                                <button onclick="B2B.toggleInlineShop()"
+                                    style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;"
+                                    title="Close">✕</button>
                             </div>
                         </div>
-                        <div id="inlineShopGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
-                            <p style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">Loading products...</p>
+                        <div id="inlineShopGrid"
+                            style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+                            <p style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">Loading
+                                products...</p>
                         </div>
                     </div>
 
                     <!-- Recent Orders (hidden when inline shop is open) -->
                     <div id="recentOrdersSection">
-                    <h3 style="margin-bottom:16px;color:#1e293b;">Recent Orders</h3>
-                    <div style="overflow-x:auto;">
-                        <table class="b2b-table" id="recentOrdersTable">
-                            <thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead>
-                            <tbody id="recentOrdersBody"></tbody>
-                        </table>
-                    </div>
+                        <h3 style="margin-bottom:16px;color:#1e293b;">Recent Orders</h3>
+                        <div style="overflow-x:auto;">
+                            <table class="b2b-table" id="recentOrdersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Order</th>
+                                        <th>Date</th>
+                                        <th>Items</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentOrdersBody"></tbody>
+                            </table>
+                        </div>
                     </div><!-- /recentOrdersSection -->
                 </div>
 
@@ -534,31 +1898,49 @@
                     </div>
 
                     <h3 style="margin-bottom:16px;color:#1e293b;">Order History</h3>
-                    <div class="filters-row" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;">
-                        <input type="text" id="orderSearch" placeholder="Search order number or amount..." oninput="B2B.filterOrders()" style="flex:1;min-width:180px;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:0.85rem;">
-                        <select id="orderFilter" onchange="B2B.filterOrders()" style="padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:0.85rem;">
+                    <div class="filters-row"
+                        style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;">
+                        <input type="text" id="orderSearch" placeholder="Search order number or amount..."
+                            oninput="B2B.filterOrders()"
+                            style="flex:1;min-width:180px;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:0.85rem;">
+                        <select id="orderFilter" onchange="B2B.filterOrders()"
+                            style="padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:0.85rem;">
                             <option value="">All Status</option>
                             <option value="delivered">Delivered</option>
                             <option value="processing">Processing</option>
                             <option value="pending">Pending</option>
                         </select>
-                        <select id="orderSubAccount" onchange="B2B.filterOrders()" style="padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:0.85rem;">
+                        <select id="orderSubAccount" onchange="B2B.filterOrders()"
+                            style="padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:0.85rem;">
                             <option value="">All Accounts</option>
                         </select>
                         <div style="display:flex;align-items:center;gap:6px;">
                             <label style="font-size:0.8rem;color:#636E72;white-space:nowrap;">From:</label>
-                            <input type="date" id="orderDateFrom" onchange="B2B.filterOrders()" style="padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:0.85rem;">
+                            <input type="date" id="orderDateFrom" onchange="B2B.filterOrders()"
+                                style="padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:0.85rem;">
                         </div>
                         <div style="display:flex;align-items:center;gap:6px;">
                             <label style="font-size:0.8rem;color:#636E72;white-space:nowrap;">To:</label>
-                            <input type="date" id="orderDateTo" onchange="B2B.filterOrders()" style="padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:0.85rem;">
+                            <input type="date" id="orderDateTo" onchange="B2B.filterOrders()"
+                                style="padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:0.85rem;">
                         </div>
-                        <button onclick="B2B.clearOrderFilters()" style="padding:8px 14px;background:#f1f5f9;border:1px solid #d1d5db;border-radius:8px;font-size:0.8rem;cursor:pointer;color:#636E72;">✕ Clear</button>
+                        <button onclick="B2B.clearOrderFilters()"
+                            style="padding:8px 14px;background:#f1f5f9;border:1px solid #d1d5db;border-radius:8px;font-size:0.8rem;cursor:pointer;color:#636E72;">✕
+                            Clear</button>
                     </div>
                     <div style="margin-bottom:12px;font-size:0.85rem;color:#636E72;" id="orderResultCount"></div>
                     <div style="overflow-x:auto;">
                         <table class="b2b-table">
-                            <thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
                             <tbody id="allOrdersBody"></tbody>
                         </table>
                     </div>
@@ -567,21 +1949,27 @@
 
                 <!-- ═══ B2B SHOP (inline) ═══ -->
                 <div class="b2b-panel" id="tab-shop">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+                    <div
+                        style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
                         <h3 style="color:#1e293b;">🛒 B2B Wholesale Shop</h3>
                         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                            <input type="text" id="portalShopSearch" placeholder="Search products..." oninput="B2B.searchPortalShop()" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;width:200px;">
-                            <select id="portalShopCat" onchange="B2B.loadPortalShop()" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
+                            <input type="text" id="portalShopSearch" placeholder="Search products..."
+                                oninput="B2B.searchPortalShop()"
+                                style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;width:200px;">
+                            <select id="portalShopCat" onchange="B2B.loadPortalShop()"
+                                style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
                                 <option value="">All Categories</option>
                                 <option value="Nutrition">Nutrition</option>
                                 <option value="Swimming">Swimming</option>
                                 <option value="Cycling">Cycling</option>
                                 <option value="Running">Running</option>
                             </select>
-                            <select id="portalShopBrand" onchange="B2B.filterPortalShop()" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
+                            <select id="portalShopBrand" onchange="B2B.filterPortalShop()"
+                                style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
                                 <option value="">All Brands</option>
                             </select>
-                            <select id="portalShopSort" onchange="B2B.filterPortalShop()" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
+                            <select id="portalShopSort" onchange="B2B.filterPortalShop()"
+                                style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
                                 <option value="freq">Most Ordered</option>
                                 <option value="name_asc">Name A–Z</option>
                                 <option value="name_desc">Name Z–A</option>
@@ -591,91 +1979,139 @@
                         </div>
                     </div>
                     <div style="margin-bottom:12px;font-size:0.85rem;color:#636E72;" id="portalShopCount"></div>
-                    <div id="portalShopGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
-                        <p style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">Click the tab to load products...</p>
+                    <div id="portalShopGrid"
+                        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+                        <p style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">Click the tab to load
+                            products...</p>
                     </div>
                 </div>
 
                 <!-- ═══ TOP PRODUCTS ═══ -->
                 <div class="b2b-panel" id="tab-products">
                     <h3 style="margin-bottom:6px;color:#1e293b;">Most Purchased Products</h3>
-                    <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Your most frequently ordered items — click + to add to cart.</p>
+                    <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Your most frequently ordered items —
+                        click + to add to cart.</p>
                     <div class="top-products-grid" id="topProductsGrid">
-                        <div class="empty-b2b"><div class="empty-icon">⏳</div><p>Loading products...</p></div>
+                        <div class="empty-b2b">
+                            <div class="empty-icon">⏳</div>
+                            <p>Loading products...</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- ═══ FINANCIAL ═══ -->
                 <div class="b2b-panel" id="tab-financial">
                     <!-- Financial Sub-tabs -->
-                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:#f1f5f9;padding:4px;border-radius:8px;">
-                        <button class="fin-subtab active" data-fin="overview" onclick="B2B.showFinTab('overview')">📊 Overview</button>
-                        <button class="fin-subtab" data-fin="invoices" onclick="B2B.showFinTab('invoices')">📄 Invoices</button>
-                        <button class="fin-subtab" data-fin="payments" onclick="B2B.showFinTab('payments')">💳 Payments</button>
-                        <button class="fin-subtab" data-fin="statement" onclick="B2B.showFinTab('statement')">📋 Order Statement</button>
+                    <div
+                        style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:#f1f5f9;padding:4px;border-radius:8px;">
+                        <button class="fin-subtab active" data-fin="overview" onclick="B2B.showFinTab('overview')">📊
+                            Overview</button>
+                        <button class="fin-subtab" data-fin="invoices" onclick="B2B.showFinTab('invoices')">📄
+                            Invoices</button>
+                        <button class="fin-subtab" data-fin="payments" onclick="B2B.showFinTab('payments')">💳
+                            Payments</button>
+                        <button class="fin-subtab" data-fin="statement" onclick="B2B.showFinTab('statement')">📋 Order
+                            Statement</button>
                     </div>
 
                     <!-- FIN: Overview -->
                     <div class="fin-panel active" id="fin-overview">
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;">
-                            <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:24px;text-align:center;">
-                                <div style="font-size:0.75rem;text-transform:uppercase;color:#636E72;letter-spacing:0.5px;margin-bottom:6px;">Open Balance</div>
-                                <div style="font-size:1.8rem;font-weight:700;color:#166534;" id="finOpenBalance">€0.00</div>
+                        <div
+                            style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;">
+                            <div
+                                style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:24px;text-align:center;">
+                                <div
+                                    style="font-size:0.75rem;text-transform:uppercase;color:#636E72;letter-spacing:0.5px;margin-bottom:6px;">
+                                    Open Balance</div>
+                                <div style="font-size:1.8rem;font-weight:700;color:#166534;" id="finOpenBalance">€0.00
+                                </div>
                             </div>
-                            <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:24px;text-align:center;">
-                                <div style="font-size:0.75rem;text-transform:uppercase;color:#636E72;letter-spacing:0.5px;margin-bottom:6px;">Overdue</div>
+                            <div
+                                style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:24px;text-align:center;">
+                                <div
+                                    style="font-size:0.75rem;text-transform:uppercase;color:#636E72;letter-spacing:0.5px;margin-bottom:6px;">
+                                    Overdue</div>
                                 <div style="font-size:1.8rem;font-weight:700;color:#991b1b;" id="finOverdue">€0.00</div>
                             </div>
-                            <div style="background:#f8f9fa;border:1px solid #e2e8f0;border-radius:12px;padding:24px;text-align:center;">
-                                <div style="font-size:0.75rem;text-transform:uppercase;color:#636E72;letter-spacing:0.5px;margin-bottom:6px;">Credit Limit</div>
+                            <div
+                                style="background:#f8f9fa;border:1px solid #e2e8f0;border-radius:12px;padding:24px;text-align:center;">
+                                <div
+                                    style="font-size:0.75rem;text-transform:uppercase;color:#636E72;letter-spacing:0.5px;margin-bottom:6px;">
+                                    Credit Limit</div>
                                 <div style="font-size:1.8rem;font-weight:700;color:#1e293b;" id="finCreditLimit">—</div>
                             </div>
-                            <div style="background:#f8f9fa;border:1px solid #e2e8f0;border-radius:12px;padding:24px;text-align:center;">
-                                <div style="font-size:0.75rem;text-transform:uppercase;color:#636E72;letter-spacing:0.5px;margin-bottom:6px;">Next Due Date</div>
+                            <div
+                                style="background:#f8f9fa;border:1px solid #e2e8f0;border-radius:12px;padding:24px;text-align:center;">
+                                <div
+                                    style="font-size:0.75rem;text-transform:uppercase;color:#636E72;letter-spacing:0.5px;margin-bottom:6px;">
+                                    Next Due Date</div>
                                 <div style="font-size:1.8rem;font-weight:700;color:#1e293b;" id="finNextDue">—</div>
                             </div>
                         </div>
                         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:20px;">
                             <h4 style="color:#1e293b;margin-bottom:12px;">Account Summary</h4>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:0.9rem;">
-                                <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;"><span style="color:#636E72;">Total Purchased (All Time)</span><strong id="finTotalSpent">€0.00</strong></div>
-                                <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;"><span style="color:#636E72;">Total Orders</span><strong id="finTotalOrders">0</strong></div>
-                                <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;"><span style="color:#636E72;">Last 12 Months Spend</span><strong id="finYearSpent">€0.00</strong></div>
-                                <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;"><span style="color:#636E72;">Average Order Value</span><strong id="finAvgOrder">€0.00</strong></div>
+                                <div
+                                    style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;">
+                                    <span style="color:#636E72;">Total Purchased (All Time)</span><strong
+                                        id="finTotalSpent">€0.00</strong></div>
+                                <div
+                                    style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;">
+                                    <span style="color:#636E72;">Total Orders</span><strong
+                                        id="finTotalOrders">0</strong></div>
+                                <div
+                                    style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;">
+                                    <span style="color:#636E72;">Last 12 Months Spend</span><strong
+                                        id="finYearSpent">€0.00</strong></div>
+                                <div
+                                    style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;">
+                                    <span style="color:#636E72;">Average Order Value</span><strong
+                                        id="finAvgOrder">€0.00</strong></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- FIN: Invoices & Notes -->
                     <div class="fin-panel" id="fin-invoices" style="display:none;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+                        <div
+                            style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
                             <h3 style="color:#1e293b;">📄 Invoices</h3>
                             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                                <input type="text" id="finInvoiceSearch" placeholder="Search invoices..." oninput="B2B.filterFinInvoices()" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;width:160px;">
-                                <select id="finInvoiceSubAccount" onchange="B2B.filterFinInvoices()" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
+                                <input type="text" id="finInvoiceSearch" placeholder="Search invoices..."
+                                    oninput="B2B.filterFinInvoices()"
+                                    style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;width:160px;">
+                                <select id="finInvoiceSubAccount" onchange="B2B.filterFinInvoices()"
+                                    style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
                                     <option value="">All Accounts</option>
                                 </select>
                                 <div style="display:flex;align-items:center;gap:4px;">
                                     <label style="font-size:0.8rem;color:#636E72;">From:</label>
-                                    <input type="date" id="finInvoiceDateFrom" onchange="B2B.filterFinInvoices()" style="padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
+                                    <input type="date" id="finInvoiceDateFrom" onchange="B2B.filterFinInvoices()"
+                                        style="padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
                                 </div>
                                 <div style="display:flex;align-items:center;gap:4px;">
                                     <label style="font-size:0.8rem;color:#636E72;">To:</label>
-                                    <input type="date" id="finInvoiceDateTo" onchange="B2B.filterFinInvoices()" style="padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
+                                    <input type="date" id="finInvoiceDateTo" onchange="B2B.filterFinInvoices()"
+                                        style="padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
                                 </div>
-                                <button onclick="B2B.clearFinInvoiceFilters()" style="padding:6px 12px;background:#f1f5f9;border:1px solid #d1d5db;border-radius:6px;font-size:0.8rem;cursor:pointer;color:#636E72;">✕ Clear</button>
+                                <button onclick="B2B.clearFinInvoiceFilters()"
+                                    style="padding:6px 12px;background:#f1f5f9;border:1px solid #d1d5db;border-radius:6px;font-size:0.8rem;cursor:pointer;color:#636E72;">✕
+                                    Clear</button>
                             </div>
                         </div>
                         <div style="margin-bottom:10px;font-size:0.85rem;color:#636E72;" id="finInvoiceCount"></div>
                         <div id="finInvoicesList">
-                            <div style="text-align:center;padding:40px;color:#94a3b8;"><p>Loading invoices...</p></div>
+                            <div style="text-align:center;padding:40px;color:#94a3b8;">
+                                <p>Loading invoices...</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- FIN: Payments -->
                     <div class="fin-panel" id="fin-payments" style="display:none;">
                         <h3 style="color:#1e293b;margin-bottom:16px;">💳 Payment Information</h3>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px;">
+                        <div
+                            style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px;">
                             <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:24px;">
                                 <h4 style="color:#1B4332;margin-bottom:10px;">Bank Transfer</h4>
                                 <div style="font-size:0.9rem;color:#495057;line-height:1.8;">
@@ -688,14 +2124,22 @@
                             </div>
                             <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
                                 <h4 style="color:#1B4332;margin-bottom:10px;">Online Payment</h4>
-                                <p style="font-size:0.9rem;color:#636E72;margin-bottom:16px;">Pay outstanding invoices securely online using your credit/debit card or PayPal.</p>
-                                <a href="mailto:accounts@sportsfoodsireland.ie?subject=B2B%20Payment%20Request" style="display:inline-block;padding:12px 24px;background:#2D6A4F;color:#fff;border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;">Request Payment Link</a>
+                                <p style="font-size:0.9rem;color:#636E72;margin-bottom:16px;">Pay outstanding invoices
+                                    securely online using your credit/debit card or PayPal.</p>
+                                <a href="mailto:accounts@sportsfoodsireland.ie?subject=B2B%20Payment%20Request"
+                                    style="display:inline-block;padding:12px 24px;background:#2D6A4F;color:#fff;border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;">Request
+                                    Payment Link</a>
                             </div>
                             <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
                                 <h4 style="color:#1B4332;margin-bottom:10px;">Payment Terms</h4>
-                                <p style="font-size:0.9rem;color:#636E72;line-height:1.6;">Standard payment terms are Net 30 days from invoice date. For queries about payment terms or to discuss alternative arrangements, please contact our accounts team.</p>
-                                <div style="margin-top:12px;font-size:0.85rem;"><strong>📧</strong> <a href="mailto:accounts@sportsfoodsireland.ie" style="color:#2D6A4F;">accounts@sportsfoodsireland.ie</a></div>
-                                <div style="font-size:0.85rem;"><strong>📞</strong> <a href="tel:+35318400403" style="color:#2D6A4F;">+353 1 840 0403</a></div>
+                                <p style="font-size:0.9rem;color:#636E72;line-height:1.6;">Standard payment terms are
+                                    Net 30 days from invoice date. For queries about payment terms or to discuss
+                                    alternative arrangements, please contact our accounts team.</p>
+                                <div style="margin-top:12px;font-size:0.85rem;"><strong>📧</strong> <a
+                                        href="mailto:accounts@sportsfoodsireland.ie"
+                                        style="color:#2D6A4F;">accounts@sportsfoodsireland.ie</a></div>
+                                <div style="font-size:0.85rem;"><strong>📞</strong> <a href="tel:+35318400403"
+                                        style="color:#2D6A4F;">+353 1 840 0403</a></div>
                             </div>
                         </div>
                     </div>
@@ -703,10 +2147,12 @@
                     <!-- FIN: Order Statement -->
                     <div class="fin-panel" id="fin-statement" style="display:none;">
                         <h3 style="color:#1e293b;margin-bottom:16px;">📋 Order Statement</h3>
-                        <p style="color:#636E72;font-size:0.9rem;margin-bottom:20px;">A detailed statement of all your orders and their payment status. Coming soon.</p>
+                        <p style="color:#636E72;font-size:0.9rem;margin-bottom:20px;">A detailed statement of all your
+                            orders and their payment status. Coming soon.</p>
                         <div style="text-align:center;padding:60px 20px;background:#f8f9fa;border-radius:10px;">
                             <div style="font-size:2rem;margin-bottom:8px;">🚧</div>
-                            <p style="color:#94a3b8;">This feature is being developed. Contact accounts@sportsfoodsireland.ie for a manual statement.</p>
+                            <p style="color:#94a3b8;">This feature is being developed. Contact
+                                accounts@sportsfoodsireland.ie for a manual statement.</p>
                         </div>
                     </div>
                 </div>
@@ -714,55 +2160,114 @@
                 <!-- ═══ MARKETING ═══ -->
                 <div class="b2b-panel" id="tab-marketing">
                     <h3 style="margin-bottom:4px;color:#1e293b;">📣 Marketing Resources</h3>
-                    <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Everything you need to promote our products in your business.</p>
+                    <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Everything you need to promote our
+                        products in your business.</p>
 
                     <!-- Marketing Sub-tabs -->
-                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:#f1f5f9;padding:4px;border-radius:8px;">
-                        <button class="mkt-subtab active" data-mkt="files" onclick="B2B.showMktTab('files')">📁 Files</button>
+                    <div
+                        style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:#f1f5f9;padding:4px;border-radius:8px;">
+                        <button class="mkt-subtab active" data-mkt="files" onclick="B2B.showMktTab('files')">📁
+                            Files</button>
                         <button class="mkt-subtab" data-mkt="kits" onclick="B2B.showMktTab('kits')">🎁 Kits</button>
-                        <button class="mkt-subtab" data-mkt="training" onclick="B2B.showMktTab('training')">🎓 Training</button>
+                        <button class="mkt-subtab" data-mkt="training" onclick="B2B.showMktTab('training')">🎓
+                            Training</button>
                     </div>
 
                     <!-- MKT: Files -->
                     <div class="mkt-panel active" id="mkt-files">
                         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">
-                            <div class="mkt-file-card"><div class="mkt-icon">📸</div><h4>Photos</h4><p>High-resolution product photos for your website, catalogues and e-commerce.</p><a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Photos%20Request" class="mkt-link">Request Photos →</a></div>
-                            <div class="mkt-file-card"><div class="mkt-icon">🖼️</div><h4>Banners</h4><p>Web banners, homepage sliders and promotional banners in various sizes.</p><a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Banners%20Request" class="mkt-link">Request Banners →</a></div>
-                            <div class="mkt-file-card"><div class="mkt-icon">📋</div><h4>Technical Sheets</h4><p>Detailed product specifications, ingredients, nutritional info and certifications.</p><a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Technical%20Sheets" class="mkt-link">Request Sheets →</a></div>
-                            <div class="mkt-file-card"><div class="mkt-icon">📖</div><h4>Lookbook</h4><p>Seasonal lookbooks and lifestyle imagery to inspire your customers.</p><a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Lookbook%20Request" class="mkt-link">Request Lookbook →</a></div>
-                            <div class="mkt-file-card"><div class="mkt-icon">🏪</div><h4>Window Display</h4><p>Point-of-sale materials, window display graphics and in-store signage.</p><a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Window%20Display%20Materials" class="mkt-link">Request Materials →</a></div>
-                            <div class="mkt-file-card"><div class="mkt-icon">🗂️</div><h4>Display Stands</h4><p>Counter displays, shelf talkers and product stand designs.</p><a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Display%20Stand%20Request" class="mkt-link">Request Displays →</a></div>
-                            <div class="mkt-file-card"><div class="mkt-icon">🏷️</div><h4>Stickers</h4><p>Product stickers, price labels and promotional sticker designs.</p><a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Stickers%20Request" class="mkt-link">Request Stickers →</a></div>
-                            <div class="mkt-file-card"><div class="mkt-icon">📱</div><h4>Social Media</h4><p>Ready-to-post graphics, stories templates, captions and campaign kits for Instagram, Facebook and TikTok.</p><a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Social%20Media%20Content" class="mkt-link">Request Content →</a></div>
+                            <div class="mkt-file-card">
+                                <div class="mkt-icon">📸</div>
+                                <h4>Photos</h4>
+                                <p>High-resolution product photos for your website, catalogues and e-commerce.</p><a
+                                    href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Photos%20Request"
+                                    class="mkt-link">Request Photos →</a>
+                            </div>
+                            <div class="mkt-file-card">
+                                <div class="mkt-icon">🖼️</div>
+                                <h4>Banners</h4>
+                                <p>Web banners, homepage sliders and promotional banners in various sizes.</p><a
+                                    href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Banners%20Request"
+                                    class="mkt-link">Request Banners →</a>
+                            </div>
+                            <div class="mkt-file-card">
+                                <div class="mkt-icon">📋</div>
+                                <h4>Technical Sheets</h4>
+                                <p>Detailed product specifications, ingredients, nutritional info and certifications.
+                                </p><a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Technical%20Sheets"
+                                    class="mkt-link">Request Sheets →</a>
+                            </div>
+                            <div class="mkt-file-card">
+                                <div class="mkt-icon">📖</div>
+                                <h4>Lookbook</h4>
+                                <p>Seasonal lookbooks and lifestyle imagery to inspire your customers.</p><a
+                                    href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Lookbook%20Request"
+                                    class="mkt-link">Request Lookbook →</a>
+                            </div>
+                            <div class="mkt-file-card">
+                                <div class="mkt-icon">🏪</div>
+                                <h4>Window Display</h4>
+                                <p>Point-of-sale materials, window display graphics and in-store signage.</p><a
+                                    href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Window%20Display%20Materials"
+                                    class="mkt-link">Request Materials →</a>
+                            </div>
+                            <div class="mkt-file-card">
+                                <div class="mkt-icon">🗂️</div>
+                                <h4>Display Stands</h4>
+                                <p>Counter displays, shelf talkers and product stand designs.</p><a
+                                    href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Display%20Stand%20Request"
+                                    class="mkt-link">Request Displays →</a>
+                            </div>
+                            <div class="mkt-file-card">
+                                <div class="mkt-icon">🏷️</div>
+                                <h4>Stickers</h4>
+                                <p>Product stickers, price labels and promotional sticker designs.</p><a
+                                    href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Stickers%20Request"
+                                    class="mkt-link">Request Stickers →</a>
+                            </div>
+                            <div class="mkt-file-card">
+                                <div class="mkt-icon">📱</div>
+                                <h4>Social Media</h4>
+                                <p>Ready-to-post graphics, stories templates, captions and campaign kits for Instagram,
+                                    Facebook and TikTok.</p><a
+                                    href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Social%20Media%20Content"
+                                    class="mkt-link">Request Content →</a>
+                            </div>
                         </div>
                     </div>
 
                     <!-- MKT: Kits -->
                     <div class="mkt-panel" id="mkt-kits" style="display:none;">
                         <h4 style="color:#1e293b;margin-bottom:6px;">🎁 Suggested Combo Kits</h4>
-                        <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Cross-sell suggestions and bundle ideas to increase your average order value.</p>
+                        <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Cross-sell suggestions and bundle
+                            ideas to increase your average order value.</p>
                         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
                             <div class="mkt-kit-card">
                                 <div class="mkt-kit-badge">Best Seller</div>
                                 <h4>🏃 Runner's Essentials Kit</h4>
-                                <p>Tailwind Endurance Fuel + SaltStick Fastchews + Clif Bars. Perfect combo for marathon runners and clubs.</p>
+                                <p>Tailwind Endurance Fuel + SaltStick Fastchews + Clif Bars. Perfect combo for marathon
+                                    runners and clubs.</p>
                                 <div class="mkt-kit-tip">💡 Average margin: 35% — great for checkout upsell</div>
                             </div>
                             <div class="mkt-kit-card">
                                 <div class="mkt-kit-badge">Popular</div>
                                 <h4>🏊 Swimmer's Recovery Pack</h4>
-                                <p>Tailwind Recovery Mix + PowerBar Protein Soft Layer + High5 Electrolyte Drink. Ideal for swim clubs.</p>
-                                <div class="mkt-kit-tip">💡 Bundle discount suggestion: 10% off when bought together</div>
+                                <p>Tailwind Recovery Mix + PowerBar Protein Soft Layer + High5 Electrolyte Drink. Ideal
+                                    for swim clubs.</p>
+                                <div class="mkt-kit-tip">💡 Bundle discount suggestion: 10% off when bought together
+                                </div>
                             </div>
                             <div class="mkt-kit-card">
                                 <div class="mkt-kit-badge">New</div>
                                 <h4>🚴 Cyclist's Energy Bundle</h4>
-                                <p>PowerBar PowerGel + PowerBar Energize Bar + PowerBar 5 Electrolytes. All-in-one cycling fuel.</p>
+                                <p>PowerBar PowerGel + PowerBar Energize Bar + PowerBar 5 Electrolytes. All-in-one
+                                    cycling fuel.</p>
                                 <div class="mkt-kit-tip">💡 Perfect for bike shop counter display</div>
                             </div>
                             <div class="mkt-kit-card">
                                 <h4>🏆 Triathlon Starter Pack</h4>
-                                <p>Tailwind Endurance + Clif Shot Bloks + SaltStick Capsules + Nuun Sport Electrolyte. Complete race-day nutrition.</p>
+                                <p>Tailwind Endurance + Clif Shot Bloks + SaltStick Capsules + Nuun Sport Electrolyte.
+                                    Complete race-day nutrition.</p>
                                 <div class="mkt-kit-tip">💡 Suggest to triathlon clubs as a team deal</div>
                             </div>
                         </div>
@@ -771,55 +2276,75 @@
                     <!-- MKT: Training -->
                     <div class="mkt-panel" id="mkt-training" style="display:none;">
                         <h4 style="color:#1e293b;margin-bottom:6px;">🎓 Training & Product Knowledge</h4>
-                        <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Videos and documents to help your team know and sell our products better.</p>
+                        <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Videos and documents to help your
+                            team know and sell our products better.</p>
 
                         <h4 style="color:#1B4332;font-size:0.9rem;margin-bottom:12px;">🎬 Product Videos</h4>
-                        <p style="color:#636E72;font-size:0.85rem;margin-bottom:16px;">Short videos about each product — perfect for training your sales team.</p>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:28px;">
+                        <p style="color:#636E72;font-size:0.85rem;margin-bottom:16px;">Short videos about each product —
+                            perfect for training your sales team.</p>
+                        <div
+                            style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:28px;">
                             <div class="mkt-video-card">
                                 <div class="mkt-video-thumb">▶️</div>
-                                <div><strong>Tailwind Endurance Fuel</strong><p style="font-size:12px;color:#636E72;">2 min — What it is, how to use, who it's for</p></div>
+                                <div><strong>Tailwind Endurance Fuel</strong>
+                                    <p style="font-size:12px;color:#636E72;">2 min — What it is, how to use, who it's
+                                        for</p>
+                                </div>
                             </div>
                             <div class="mkt-video-card">
                                 <div class="mkt-video-thumb">▶️</div>
-                                <div><strong>SaltStick Range Overview</strong><p style="font-size:12px;color:#636E72;">3 min — Capsules vs Fastchews, when to use each</p></div>
+                                <div><strong>SaltStick Range Overview</strong>
+                                    <p style="font-size:12px;color:#636E72;">3 min — Capsules vs Fastchews, when to use
+                                        each</p>
+                                </div>
                             </div>
                             <div class="mkt-video-card">
                                 <div class="mkt-video-thumb">▶️</div>
-                                <div><strong>PowerBar Product Range</strong><p style="font-size:12px;color:#636E72;">4 min — Bars, gels, drinks and recovery</p></div>
+                                <div><strong>PowerBar Product Range</strong>
+                                    <p style="font-size:12px;color:#636E72;">4 min — Bars, gels, drinks and recovery</p>
+                                </div>
                             </div>
                             <div class="mkt-video-card">
                                 <div class="mkt-video-thumb">▶️</div>
-                                <div><strong>Zone3 Wetsuits Guide</strong><p style="font-size:12px;color:#636E72;">3 min — Sizing, care and selling tips</p></div>
+                                <div><strong>Zone3 Wetsuits Guide</strong>
+                                    <p style="font-size:12px;color:#636E72;">3 min — Sizing, care and selling tips</p>
+                                </div>
                             </div>
                         </div>
 
                         <h4 style="color:#1B4332;font-size:0.9rem;margin-bottom:12px;">📄 Sales Training Documents</h4>
-                        <p style="color:#636E72;font-size:0.85rem;margin-bottom:16px;">Downloadable guides for product knowledge and selling techniques.</p>
+                        <p style="color:#636E72;font-size:0.85rem;margin-bottom:16px;">Downloadable guides for product
+                            knowledge and selling techniques.</p>
                         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
                             <div class="mkt-doc-card">
                                 <span style="font-size:1.3rem;">📄</span>
                                 <div>
                                     <strong>Product Sales Guide 2026</strong>
-                                    <p style="font-size:12px;color:#636E72;">Complete guide: product features, USPs, FAQs, objection handling and cross-sell tips.</p>
+                                    <p style="font-size:12px;color:#636E72;">Complete guide: product features, USPs,
+                                        FAQs, objection handling and cross-sell tips.</p>
                                 </div>
-                                <a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Sales%20Training%20Guide" class="mkt-link">Request →</a>
+                                <a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Sales%20Training%20Guide"
+                                    class="mkt-link">Request →</a>
                             </div>
                             <div class="mkt-doc-card">
                                 <span style="font-size:1.3rem;">📄</span>
                                 <div>
                                     <strong>Nutrition Science Basics</strong>
-                                    <p style="font-size:12px;color:#636E72;">Understanding sports nutrition: when to use gels, electrolytes, recovery drinks.</p>
+                                    <p style="font-size:12px;color:#636E72;">Understanding sports nutrition: when to use
+                                        gels, electrolytes, recovery drinks.</p>
                                 </div>
-                                <a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Nutrition%20Science%20Guide" class="mkt-link">Request →</a>
+                                <a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Nutrition%20Science%20Guide"
+                                    class="mkt-link">Request →</a>
                             </div>
                             <div class="mkt-doc-card">
                                 <span style="font-size:1.3rem;">📄</span>
                                 <div>
                                     <strong>Brand Comparison Sheet</strong>
-                                    <p style="font-size:12px;color:#636E72;">Side-by-side comparison of our brands vs competitors — key differentiators.</p>
+                                    <p style="font-size:12px;color:#636E72;">Side-by-side comparison of our brands vs
+                                        competitors — key differentiators.</p>
                                 </div>
-                                <a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Brand%20Comparison%20Sheet" class="mkt-link">Request →</a>
+                                <a href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Brand%20Comparison%20Sheet"
+                                    class="mkt-link">Request →</a>
                             </div>
                         </div>
                     </div>
@@ -828,45 +2353,138 @@
                 <!-- ═══ SUPPORT ═══ -->
                 <div class="b2b-panel" id="tab-support">
                     <h3 style="margin-bottom:4px;color:#1e293b;">🎧 B2B Support</h3>
-                    <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Need help? Our dedicated B2B support team is available on weekdays.</p>
+                    <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Need help? Our dedicated B2B support
+                        team is available on weekdays.</p>
 
-                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:#f1f5f9;padding:4px;border-radius:8px;">
-                        <button class="sup-subtab active" data-sup="faq" onclick="B2B.showSupTab('faq')">❓ Frequent Questions</button>
-                        <button class="sup-subtab" data-sup="tickets" onclick="B2B.showSupTab('tickets')">📋 My Tickets</button>
-                        <button class="sup-subtab" data-sup="new-ticket" onclick="B2B.showSupTab('new-ticket')">🆕 Open Ticket</button>
-                        <button class="sup-subtab" data-sup="contacts" onclick="B2B.showSupTab('contacts')">📞 Contacts</button>
+                    <div
+                        style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:#f1f5f9;padding:4px;border-radius:8px;">
+                        <button class="sup-subtab active" data-sup="faq" onclick="B2B.showSupTab('faq')">❓ Frequent
+                            Questions</button>
+                        <button class="sup-subtab" data-sup="tickets" onclick="B2B.showSupTab('tickets')">📋 My
+                            Tickets</button>
+                        <button class="sup-subtab" data-sup="new-ticket" onclick="B2B.showSupTab('new-ticket')">🆕 Open
+                            Ticket</button>
+                        <button class="sup-subtab" data-sup="contacts" onclick="B2B.showSupTab('contacts')">📞
+                            Contacts</button>
                     </div>
 
                     <!-- SUP: FAQ -->
                     <div class="sup-panel active" id="sup-faq">
                         <div class="sup-faq-list">
                             <h4 style="color:#1B4332;margin-bottom:12px;">📦 Orders</h4>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">How do I place a B2B order?<span>+</span></div><div class="sup-faq-a">Log in to your B2B portal, go to the B2B Shop tab, add products to your cart, and proceed to checkout. You can also use the "New Order" shortcut on the dashboard.</div></div>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What is the minimum order value?<span>+</span></div><div class="sup-faq-a">There is no fixed minimum order value for B2B customers. However, free delivery applies to orders over €150.</div></div>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I modify or cancel an order after placing it?<span>+</span></div><div class="sup-faq-a">Contact our team as soon as possible. We can modify or cancel orders that haven't been dispatched yet. Once dispatched, you'll need to follow our returns process.</div></div>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I place a backorder for out-of-stock items?<span>+</span></div><div class="sup-faq-a">Yes! B2B customers can backorder any out-of-stock product. We'll fulfil the order as soon as stock arrives and notify you by email.</div></div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">How do I
+                                    place a B2B order?<span>+</span></div>
+                                <div class="sup-faq-a">Log in to your B2B portal, go to the B2B Shop tab, add products
+                                    to your cart, and proceed to checkout. You can also use the "New Order" shortcut on
+                                    the dashboard.</div>
+                            </div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What is the
+                                    minimum order value?<span>+</span></div>
+                                <div class="sup-faq-a">There is no fixed minimum order value for B2B customers. However,
+                                    free delivery applies to orders over €150.</div>
+                            </div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I
+                                    modify or cancel an order after placing it?<span>+</span></div>
+                                <div class="sup-faq-a">Contact our team as soon as possible. We can modify or cancel
+                                    orders that haven't been dispatched yet. Once dispatched, you'll need to follow our
+                                    returns process.</div>
+                            </div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I place
+                                    a backorder for out-of-stock items?<span>+</span></div>
+                                <div class="sup-faq-a">Yes! B2B customers can backorder any out-of-stock product. We'll
+                                    fulfil the order as soon as stock arrives and notify you by email.</div>
+                            </div>
 
                             <h4 style="color:#1B4332;margin:20px 0 12px;">🚚 Delivery & Shipping</h4>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What are the delivery times?<span>+</span></div><div class="sup-faq-a">Standard delivery is 1–3 business days within Ireland. Express and next-day delivery options are available at checkout.</div></div>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What is the delivery cost for B2B?<span>+</span></div><div class="sup-faq-a">Free delivery on B2B orders over €150. Standard shipping of €9.04 applies for orders under €150.</div></div>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Do you deliver outside Ireland?<span>+</span></div><div class="sup-faq-a">Yes, we deliver across the UK and EU. Contact our team for international shipping rates and estimated delivery times.</div></div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What are
+                                    the delivery times?<span>+</span></div>
+                                <div class="sup-faq-a">Standard delivery is 1–3 business days within Ireland. Express
+                                    and next-day delivery options are available at checkout.</div>
+                            </div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What is the
+                                    delivery cost for B2B?<span>+</span></div>
+                                <div class="sup-faq-a">Free delivery on B2B orders over €150. Standard shipping of €9.04
+                                    applies for orders under €150.</div>
+                            </div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Do you
+                                    deliver outside Ireland?<span>+</span></div>
+                                <div class="sup-faq-a">Yes, we deliver across the UK and EU. Contact our team for
+                                    international shipping rates and estimated delivery times.</div>
+                            </div>
 
                             <h4 style="color:#1B4332;margin:20px 0 12px;">🔄 Returns & Exchanges</h4>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What is the returns policy for B2B?<span>+</span></div><div class="sup-faq-a">We accept returns within 30 days of delivery for unopened products in original packaging. Contact our team to initiate a return and receive a return authorisation number.</div></div>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I exchange a product for a different size/flavour?<span>+</span></div><div class="sup-faq-a">Yes, exchanges are available for unopened products. Contact us with your order number and the replacement item you'd like.</div></div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What is the
+                                    returns policy for B2B?<span>+</span></div>
+                                <div class="sup-faq-a">We accept returns within 30 days of delivery for unopened
+                                    products in original packaging. Contact our team to initiate a return and receive a
+                                    return authorisation number.</div>
+                            </div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I
+                                    exchange a product for a different size/flavour?<span>+</span></div>
+                                <div class="sup-faq-a">Yes, exchanges are available for unopened products. Contact us
+                                    with your order number and the replacement item you'd like.</div>
+                            </div>
 
                             <h4 style="color:#1B4332;margin:20px 0 12px;">🛡️ Warranty</h4>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What products are covered by warranty?<span>+</span></div><div class="sup-faq-a">All wetsuits (Openwater and Triathlon) and electronics (bike computers, sensors, lights) come with a 12-month manufacturer warranty covering manufacturing defects.</div></div>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">How do I make a warranty claim?<span>+</span></div><div class="sup-faq-a">Open a Support ticket with photos of the defect, your order number, and date of purchase. Our team will review and process the claim within 5 business days.</div></div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What
+                                    products are covered by warranty?<span>+</span></div>
+                                <div class="sup-faq-a">All wetsuits (Openwater and Triathlon) and electronics (bike
+                                    computers, sensors, lights) come with a 12-month manufacturer warranty covering
+                                    manufacturing defects.</div>
+                            </div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">How do I
+                                    make a warranty claim?<span>+</span></div>
+                                <div class="sup-faq-a">Open a Support ticket with photos of the defect, your order
+                                    number, and date of purchase. Our team will review and process the claim within 5
+                                    business days.</div>
+                            </div>
 
                             <h4 style="color:#1B4332;margin:20px 0 12px;">💳 Payments</h4>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What payment methods do you accept for B2B?<span>+</span></div><div class="sup-faq-a">We accept Stripe (Visa, Mastercard, Amex, Apple Pay, Google Pay), PayPal, and bank transfer. All prices in the B2B portal are shown ex-VAT.</div></div>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What are the payment terms?<span>+</span></div><div class="sup-faq-a">Standard payment terms are Net 30 days from invoice date. For alternative arrangements, contact our accounts team at accounts@sportsfoodsireland.ie.</div></div>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I get a VAT invoice?<span>+</span></div><div class="sup-faq-a">Yes, all B2B orders automatically generate a VAT invoice which you can download from the Financial section of your portal.</div></div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What
+                                    payment methods do you accept for B2B?<span>+</span></div>
+                                <div class="sup-faq-a">We accept Stripe (Visa, Mastercard, Amex, Apple Pay, Google Pay),
+                                    PayPal, and bank transfer. All prices in the B2B portal are shown ex-VAT.</div>
+                            </div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">What are
+                                    the payment terms?<span>+</span></div>
+                                <div class="sup-faq-a">Standard payment terms are Net 30 days from invoice date. For
+                                    alternative arrangements, contact our accounts team at
+                                    accounts@sportsfoodsireland.ie.</div>
+                            </div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I get a
+                                    VAT invoice?<span>+</span></div>
+                                <div class="sup-faq-a">Yes, all B2B orders automatically generate a VAT invoice which
+                                    you can download from the Financial section of your portal.</div>
+                            </div>
 
                             <h4 style="color:#1B4332;margin:20px 0 12px;">ℹ️ General B2B</h4>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">How do I update my company information?<span>+</span></div><div class="sup-faq-a">Go to the "My Account" tab in your B2B portal to update your company details, address, and contact information.</div></div>
-                            <div class="sup-faq-item"><div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I add multiple users to my B2B account?<span>+</span></div><div class="sup-faq-a">Currently each B2B account has one login. Contact us if you need multiple user access and we'll set up additional accounts linked to your company.</div></div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">How do I
+                                    update my company information?<span>+</span></div>
+                                <div class="sup-faq-a">Go to the "My Account" tab in your B2B portal to update your
+                                    company details, address, and contact information.</div>
+                            </div>
+                            <div class="sup-faq-item">
+                                <div class="sup-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I add
+                                    multiple users to my B2B account?<span>+</span></div>
+                                <div class="sup-faq-a">Currently each B2B account has one login. Contact us if you need
+                                    multiple user access and we'll set up additional accounts linked to your company.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -884,24 +2502,38 @@
                     <!-- SUP: Open Ticket -->
                     <div class="sup-panel" id="sup-new-ticket" style="display:none;">
                         <h4 style="color:#1e293b;margin-bottom:16px;">🆕 Open a Support Ticket</h4>
-                        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:24px;max-width:600px;">
+                        <div
+                            style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:24px;max-width:600px;">
                             <div style="margin-bottom:16px;">
-                                <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Ticket Type</label>
-                                <select id="supTicketType" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
-                                    <option value="commercial">🏢 Commercial Support — Orders, pricing, products</option>
+                                <label
+                                    style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Ticket
+                                    Type</label>
+                                <select id="supTicketType"
+                                    style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
+                                    <option value="commercial">🏢 Commercial Support — Orders, pricing, products
+                                    </option>
                                     <option value="financial">💰 Financial Support — Invoices, payments, credit</option>
-                                    <option value="technical">🔧 Technical Support — Account issues, website, returns</option>
+                                    <option value="technical">🔧 Technical Support — Account issues, website, returns
+                                    </option>
                                 </select>
                             </div>
                             <div style="margin-bottom:16px;">
-                                <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Subject</label>
-                                <input type="text" id="supTicketSubject" placeholder="Brief description of your issue..." style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
+                                <label
+                                    style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Subject</label>
+                                <input type="text" id="supTicketSubject"
+                                    placeholder="Brief description of your issue..."
+                                    style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
                             </div>
                             <div style="margin-bottom:16px;">
-                                <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Description</label>
-                                <textarea id="supTicketMessage" rows="5" placeholder="Please describe in detail what happened, including any order numbers or relevant information..." style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;resize:vertical;"></textarea>
+                                <label
+                                    style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Description</label>
+                                <textarea id="supTicketMessage" rows="5"
+                                    placeholder="Please describe in detail what happened, including any order numbers or relevant information..."
+                                    style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;resize:vertical;"></textarea>
                             </div>
-                            <button onclick="B2B.submitTicket()" style="padding:12px 28px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;">📩 Submit Ticket</button>
+                            <button onclick="B2B.submitTicket()"
+                                style="padding:12px 28px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;">📩
+                                Submit Ticket</button>
                         </div>
                     </div>
 
@@ -913,16 +2545,20 @@
                                 <div style="font-size:1.5rem;margin-bottom:10px;">📧</div>
                                 <h4 style="font-size:15px;color:#1B4332;margin-bottom:8px;">Email</h4>
                                 <div style="font-size:0.9rem;color:#495057;line-height:1.8;">
-                                    <div><strong>B2B Support:</strong> <a href="mailto:b2b@sportsfoodsireland.ie" style="color:#2D6A4F;">b2b@sportsfoodsireland.ie</a></div>
-                                    <div><strong>Accounts:</strong> <a href="mailto:accounts@sportsfoodsireland.ie" style="color:#2D6A4F;">accounts@sportsfoodsireland.ie</a></div>
-                                    <div><strong>General:</strong> <a href="mailto:info@sportsfoodsireland.ie" style="color:#2D6A4F;">info@sportsfoodsireland.ie</a></div>
+                                    <div><strong>B2B Support:</strong> <a href="mailto:b2b@sportsfoodsireland.ie"
+                                            style="color:#2D6A4F;">b2b@sportsfoodsireland.ie</a></div>
+                                    <div><strong>Accounts:</strong> <a href="mailto:accounts@sportsfoodsireland.ie"
+                                            style="color:#2D6A4F;">accounts@sportsfoodsireland.ie</a></div>
+                                    <div><strong>General:</strong> <a href="mailto:info@sportsfoodsireland.ie"
+                                            style="color:#2D6A4F;">info@sportsfoodsireland.ie</a></div>
                                 </div>
                             </div>
                             <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:24px;">
                                 <div style="font-size:1.5rem;margin-bottom:10px;">📞</div>
                                 <h4 style="font-size:15px;color:#1B4332;margin-bottom:8px;">Phone</h4>
                                 <div style="font-size:0.9rem;color:#495057;line-height:1.8;">
-                                    <div><strong>Phone:</strong> <a href="tel:+35318400403" style="color:#2D6A4F;">+353 1 840 0403</a></div>
+                                    <div><strong>Phone:</strong> <a href="tel:+35318400403" style="color:#2D6A4F;">+353
+                                            1 840 0403</a></div>
                                     <div><strong>Hours:</strong> Mon–Fri 9am–6pm</div>
                                 </div>
                             </div>
@@ -930,14 +2566,19 @@
                                 <div style="font-size:1.5rem;margin-bottom:10px;">📍</div>
                                 <h4 style="font-size:15px;color:#1B4332;margin-bottom:8px;">Address</h4>
                                 <div style="font-size:0.9rem;color:#495057;line-height:1.6;">
-                                    Sports Foods Ireland Ltd<br>Unit 12 Northwest Centre<br>Northwest Business Park, Blanchardstown<br>Dublin D15 YC53, Ireland
+                                    Sports Foods Ireland Ltd<br>Unit 12 Northwest Centre<br>Northwest Business Park,
+                                    Blanchardstown<br>Dublin D15 YC53, Ireland
                                 </div>
                             </div>
                             <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:24px;">
                                 <div style="font-size:1.5rem;margin-bottom:10px;">👤</div>
                                 <h4 style="font-size:15px;color:#1B4332;margin-bottom:8px;">Your Account Manager</h4>
-                                <p style="font-size:0.9rem;color:#495057;line-height:1.6;">Your dedicated account manager is available for bulk orders, custom pricing, logistics and any B2B queries.</p>
-                                <a href="mailto:b2b@sportsfoodsireland.ie?subject=B2B%20Account%20Manager%20Request" style="display:inline-block;margin-top:8px;font-size:0.85rem;color:#2D6A4F;font-weight:600;">Contact Account Manager →</a>
+                                <p style="font-size:0.9rem;color:#495057;line-height:1.6;">Your dedicated account
+                                    manager is available for bulk orders, custom pricing, logistics and any B2B queries.
+                                </p>
+                                <a href="mailto:b2b@sportsfoodsireland.ie?subject=B2B%20Account%20Manager%20Request"
+                                    style="display:inline-block;margin-top:8px;font-size:0.85rem;color:#2D6A4F;font-weight:600;">Contact
+                                    Account Manager →</a>
                             </div>
                         </div>
                     </div>
@@ -946,19 +2587,32 @@
                 <!-- ═══ SUB-ACCOUNTS ═══ -->
                 <div class="b2b-panel" id="tab-subaccounts">
                     <h3 style="margin-bottom:4px;color:#1e293b;">👥 Sub-Accounts</h3>
-                    <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Manage linked accounts within your company. Each sub-account can place orders independently.</p>
+                    <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Manage linked accounts within your
+                        company. Each sub-account can place orders independently.</p>
 
                     <!-- Main account summary -->
-                    <div id="subMainAccount" style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:20px;margin-bottom:24px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                    <div id="subMainAccount"
+                        style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:20px;margin-bottom:24px;">
+                        <div
+                            style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
                             <div>
-                                <div style="font-size:0.7rem;text-transform:uppercase;color:#166534;font-weight:700;letter-spacing:0.5px;margin-bottom:4px;">⭐ Main Account (You)</div>
+                                <div
+                                    style="font-size:0.7rem;text-transform:uppercase;color:#166534;font-weight:700;letter-spacing:0.5px;margin-bottom:4px;">
+                                    ⭐ Main Account (You)</div>
                                 <div style="font-weight:700;font-size:1.1rem;color:#1B4332;" id="subMainName">—</div>
                                 <div style="font-size:0.85rem;color:#636E72;" id="subMainEmail">—</div>
                             </div>
                             <div style="display:grid;grid-template-columns:auto auto;gap:20px;text-align:center;">
-                                <div><div style="font-size:0.7rem;color:#94a3b8;text-transform:uppercase;">Orders</div><div style="font-weight:700;color:#1e293b;" id="subMainOrders">0</div></div>
-                                <div><div style="font-size:0.7rem;color:#94a3b8;text-transform:uppercase;">Total Spent</div><div style="font-weight:700;font-size:1.2rem;color:#1B4332;" id="subMainSpent">€0</div></div>
+                                <div>
+                                    <div style="font-size:0.7rem;color:#94a3b8;text-transform:uppercase;">Orders</div>
+                                    <div style="font-weight:700;color:#1e293b;" id="subMainOrders">0</div>
+                                </div>
+                                <div>
+                                    <div style="font-size:0.7rem;color:#94a3b8;text-transform:uppercase;">Total Spent
+                                    </div>
+                                    <div style="font-weight:700;font-size:1.2rem;color:#1B4332;" id="subMainSpent">€0
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -966,10 +2620,14 @@
                     <!-- Sub-accounts list -->
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                         <h4 style="color:#1e293b;">Linked Sub-Accounts</h4>
-                        <button onclick="B2B.showAddSubAccount()" style="padding:8px 16px;background:#2D6A4F;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.85rem;cursor:pointer;">+ Add Sub-Account</button>
+                        <button onclick="B2B.showAddSubAccount()"
+                            style="padding:8px 16px;background:#2D6A4F;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.85rem;cursor:pointer;">+
+                            Add Sub-Account</button>
                     </div>
                     <div id="subAccountsList">
-                        <div style="text-align:center;padding:40px;color:#94a3b8;"><p>Loading sub-accounts...</p></div>
+                        <div style="text-align:center;padding:40px;color:#94a3b8;">
+                            <p>Loading sub-accounts...</p>
+                        </div>
                     </div>
 
                     <!-- Add Sub-Account Form (hidden) -->
@@ -981,28 +2639,41 @@
                     <div class="info-grid">
                         <div class="info-card">
                             <h4>🏢 Company Information</h4>
-                            <div class="info-row"><span class="label">Company Name</span><span class="value" id="infoCompany">—</span></div>
-                            <div class="info-row"><span class="label">VAT Number</span><span class="value" id="infoVat">—</span></div>
-                            <div class="info-row"><span class="label">Business Type</span><span class="value" id="infoBizType">—</span></div>
-                            <div class="info-row"><span class="label">Website</span><span class="value" id="infoWebsite">—</span></div>
+                            <div class="info-row"><span class="label">Company Name</span><span class="value"
+                                    id="infoCompany">—</span></div>
+                            <div class="info-row"><span class="label">VAT Number</span><span class="value"
+                                    id="infoVat">—</span></div>
+                            <div class="info-row"><span class="label">Business Type</span><span class="value"
+                                    id="infoBizType">—</span></div>
+                            <div class="info-row"><span class="label">Website</span><span class="value"
+                                    id="infoWebsite">—</span></div>
                         </div>
                         <div class="info-card">
                             <h4>👤 Primary Contact</h4>
-                            <div class="info-row"><span class="label">Name</span><span class="value" id="infoContact">—</span></div>
-                            <div class="info-row"><span class="label">Email</span><span class="value" id="infoEmail">—</span></div>
-                            <div class="info-row"><span class="label">Phone</span><span class="value" id="infoPhone">—</span></div>
+                            <div class="info-row"><span class="label">Name</span><span class="value"
+                                    id="infoContact">—</span></div>
+                            <div class="info-row"><span class="label">Email</span><span class="value"
+                                    id="infoEmail">—</span></div>
+                            <div class="info-row"><span class="label">Phone</span><span class="value"
+                                    id="infoPhone">—</span></div>
                         </div>
                         <div class="info-card">
                             <h4>📊 Account Summary</h4>
-                            <div class="info-row"><span class="label">Customer Since</span><span class="value" id="infoSince">—</span></div>
-                            <div class="info-row"><span class="label">Total Orders</span><span class="value" id="infoTotalOrders">—</span></div>
-                            <div class="info-row"><span class="label">Lifetime Spend</span><span class="value" id="infoLifetime">—</span></div>
+                            <div class="info-row"><span class="label">Customer Since</span><span class="value"
+                                    id="infoSince">—</span></div>
+                            <div class="info-row"><span class="label">Total Orders</span><span class="value"
+                                    id="infoTotalOrders">—</span></div>
+                            <div class="info-row"><span class="label">Lifetime Spend</span><span class="value"
+                                    id="infoLifetime">—</span></div>
                         </div>
                         <div class="info-card">
                             <h4>💳 Payment & Credit</h4>
-                            <div class="info-row"><span class="label">Payment Terms</span><span class="value" id="infoTerms">Net 30</span></div>
-                            <div class="info-row"><span class="label">Credit Limit</span><span class="value" id="infoCreditLimit">—</span></div>
-                            <div class="info-row"><span class="label">Currency</span><span class="value">EUR (€)</span></div>
+                            <div class="info-row"><span class="label">Payment Terms</span><span class="value"
+                                    id="infoTerms">Net 30</span></div>
+                            <div class="info-row"><span class="label">Credit Limit</span><span class="value"
+                                    id="infoCreditLimit">—</span></div>
+                            <div class="info-row"><span class="label">Currency</span><span class="value">EUR (€)</span>
+                            </div>
                         </div>
                     </div>
 
@@ -1011,7 +2682,8 @@
                     <div class="info-grid" id="addressesGrid">
                         <div class="info-card">
                             <h4>📍 Default Address</h4>
-                            <div id="defaultAddress" style="color:#636E72;font-size:0.9rem;line-height:1.6;">No address on file</div>
+                            <div id="defaultAddress" style="color:#636E72;font-size:0.9rem;line-height:1.6;">No address
+                                on file</div>
                         </div>
                     </div>
                 </div>
@@ -1019,10 +2691,12 @@
                 <!-- ═══ VOLUME DISCOUNTS (disabled — re-enable later) ═══ -->
                 <div class="b2b-panel" id="tab-discounts" style="display:none !important;">
                     <h3 style="margin-bottom:6px;color:#1e293b;">Volume Discount Program</h3>
-                    <p style="color:#636E72;font-size:0.85rem;margin-bottom:24px;">The more you order, the more you save. Your tier is based on annual spend.</p>
+                    <p style="color:#636E72;font-size:0.85rem;margin-bottom:24px;">The more you order, the more you
+                        save. Your tier is based on annual spend.</p>
 
                     <div class="tier-section">
-                        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px;">
+                        <div
+                            style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px;">
                             <div>
                                 <span style="font-size:0.8rem;color:#636E72;">Current Tier:</span>
                                 <strong style="font-size:1.1rem;color:#2d6a4f;margin-left:6px;" id="tierName">—</strong>
@@ -1038,12 +2712,34 @@
                     <!-- Tier Table -->
                     <div style="overflow-x:auto;margin-top:24px;">
                         <table class="b2b-table">
-                            <thead><tr><th>Tier</th><th>Annual Spend</th><th>Discount</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>Tier</th>
+                                    <th>Annual Spend</th>
+                                    <th>Discount</th>
+                                </tr>
+                            </thead>
                             <tbody>
-                                <tr><td>🥉 Bronze</td><td>€0 – €9,999</td><td><strong>5%</strong></td></tr>
-                                <tr><td>🥈 Silver</td><td>€10,000 – €49,999</td><td><strong>10%</strong></td></tr>
-                                <tr><td>🥇 Gold</td><td>€50,000 – €99,999</td><td><strong>15%</strong></td></tr>
-                                <tr><td>💎 Platinum</td><td>€100,000+</td><td><strong>20%</strong></td></tr>
+                                <tr>
+                                    <td>🥉 Bronze</td>
+                                    <td>€0 – €9,999</td>
+                                    <td><strong>5%</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>🥈 Silver</td>
+                                    <td>€10,000 – €49,999</td>
+                                    <td><strong>10%</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>🥇 Gold</td>
+                                    <td>€50,000 – €99,999</td>
+                                    <td><strong>15%</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>💎 Platinum</td>
+                                    <td>€100,000+</td>
+                                    <td><strong>20%</strong></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -1055,22 +2751,31 @@
 
     <!-- Product Detail Modal -->
     <div id="b2bProductModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;">
-        <div onclick="B2B.closeProductModal()" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);"></div>
-        <div id="b2bProductModalContent" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:90%;max-width:800px;max-height:85vh;overflow-y:auto;padding:0;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-            <button onclick="B2B.closeProductModal()" style="position:sticky;top:12px;float:right;margin:12px 16px 0 0;background:#f1f5f9;border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;">✕</button>
+        <div onclick="B2B.closeProductModal()"
+            style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);"></div>
+        <div id="b2bProductModalContent"
+            style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:90%;max-width:800px;max-height:85vh;overflow-y:auto;padding:0;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <button onclick="B2B.closeProductModal()"
+                style="position:sticky;top:12px;float:right;margin:12px 16px 0 0;background:#f1f5f9;border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;">✕</button>
             <div id="b2bProductModalBody" style="padding:32px;">Loading...</div>
         </div>
     </div>
 
     <!-- Invoice Detail Modal -->
     <div id="b2bInvoiceModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;">
-        <div onclick="B2B.closeInvoiceModal()" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);"></div>
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:90%;max-width:700px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-            <div style="position:sticky;top:0;background:#fff;border-radius:16px 16px 0 0;padding:20px 24px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;z-index:2;">
+        <div onclick="B2B.closeInvoiceModal()"
+            style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);"></div>
+        <div
+            style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:90%;max-width:700px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <div
+                style="position:sticky;top:0;background:#fff;border-radius:16px 16px 0 0;padding:20px 24px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;z-index:2;">
                 <h3 style="color:#1e293b;font-size:1.1rem;" id="invModalTitle">Invoice</h3>
                 <div style="display:flex;gap:10px;align-items:center;">
-                    <button onclick="B2B.downloadInvoicePDF()" id="invModalDownloadBtn" style="padding:8px 16px;background:#2D6A4F;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.85rem;cursor:pointer;">⬇ Download</button>
-                    <button onclick="B2B.closeInvoiceModal()" style="background:#f1f5f9;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+                    <button onclick="B2B.downloadInvoicePDF()" id="invModalDownloadBtn"
+                        style="padding:8px 16px;background:#2D6A4F;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.85rem;cursor:pointer;">⬇
+                        Download</button>
+                    <button onclick="B2B.closeInvoiceModal()"
+                        style="background:#f1f5f9;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
                 </div>
             </div>
             <div id="invModalBody" style="padding:24px;">Loading...</div>
@@ -1079,45 +2784,63 @@
 
     <!-- Add Sub-Account Modal -->
     <div id="addSubAccountModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;">
-        <div onclick="B2B.closeAddSubModal()" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);"></div>
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:90%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden;">
-            <div style="background:#f0fdf4;padding:24px 28px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
+        <div onclick="B2B.closeAddSubModal()"
+            style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);"></div>
+        <div
+            style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:90%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden;">
+            <div
+                style="background:#f0fdf4;padding:24px 28px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
                 <div>
                     <h3 style="color:#1B4332;font-size:1.1rem;">👥 Add New Sub-Account</h3>
-                    <p style="font-size:0.8rem;color:#636E72;margin-top:4px;">Create a new user linked to your company account.</p>
+                    <p style="font-size:0.8rem;color:#636E72;margin-top:4px;">Create a new user linked to your company
+                        account.</p>
                 </div>
-                <button onclick="B2B.closeAddSubModal()" style="background:#fff;border:1px solid #e2e8f0;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+                <button onclick="B2B.closeAddSubModal()"
+                    style="background:#fff;border:1px solid #e2e8f0;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
             </div>
             <div style="padding:28px;">
                 <div style="margin-bottom:16px;">
-                    <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Full Name *</label>
-                    <input type="text" id="newSubName" placeholder="e.g. John Smith" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+                    <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Full
+                        Name *</label>
+                    <input type="text" id="newSubName" placeholder="e.g. John Smith"
+                        style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
                 </div>
                 <div style="margin-bottom:16px;">
-                    <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Email Address *</label>
-                    <input type="email" id="newSubEmail" placeholder="e.g. john@yourcompany.ie" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+                    <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Email
+                        Address *</label>
+                    <input type="email" id="newSubEmail" placeholder="e.g. john@yourcompany.ie"
+                        style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
                 </div>
                 <div style="margin-bottom:16px;">
-                    <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Phone (optional)</label>
-                    <input type="tel" id="newSubPhone" placeholder="e.g. 087 123 4567" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+                    <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Phone
+                        (optional)</label>
+                    <input type="tel" id="newSubPhone" placeholder="e.g. 087 123 4567"
+                        style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
                 </div>
                 <div style="margin-bottom:16px;">
-                    <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Role *</label>
-                    <select id="newSubRole" onchange="B2B.updateSubRolePerms()" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+                    <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Role
+                        *</label>
+                    <select id="newSubRole" onchange="B2B.updateSubRolePerms()"
+                        style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
                         <option value="buyer">🛒 Buyer — Can browse and place orders</option>
                         <option value="viewer">👁️ Viewer — View only, no ordering</option>
                         <option value="admin">⚙️ Admin — Full access to portal</option>
                     </select>
                 </div>
                 <div style="margin-bottom:20px;background:#f8f9fa;border-radius:8px;padding:14px;">
-                    <h5 style="font-size:12px;color:#636E72;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Permissions for this role:</h5>
+                    <h5
+                        style="font-size:12px;color:#636E72;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">
+                        Permissions for this role:</h5>
                     <div id="subRolePerms" style="font-size:13px;color:#495057;line-height:1.8;">
                         ✓ View Dashboard &nbsp; ✓ Browse Products &nbsp; ✓ Place Orders<br>
                         ✕ View Financial &nbsp; ✕ Manage Sub-Accounts &nbsp; ✕ Edit Company
                     </div>
                 </div>
-                <button onclick="B2B.addSubAccount()" style="width:100%;padding:14px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;transition:background 0.2s;">📩 Send Invitation</button>
-                <p style="font-size:0.75rem;color:#94a3b8;margin-top:12px;text-align:center;">An invitation email will be sent to set up their account and password.</p>
+                <button onclick="B2B.addSubAccount()"
+                    style="width:100%;padding:14px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;transition:background 0.2s;">📩
+                    Send Invitation</button>
+                <p style="font-size:0.75rem;color:#94a3b8;margin-top:12px;text-align:center;">An invitation email will
+                    be sent to set up their account and password.</p>
             </div>
         </div>
     </div>
@@ -1127,11 +2850,14 @@
         <div class="reorder-modal">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
                 <h3 style="margin:0;color:#1e293b;">🔄 Review & Reorder</h3>
-                <button onclick="B2B.closeReorder()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#636E72;">&times;</button>
+                <button onclick="B2B.closeReorder()"
+                    style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#636E72;">&times;</button>
             </div>
             <div id="reorderItems"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:2px solid #e9ecef;">
-                <div><span style="color:#636E72;">Total:</span> <strong style="font-size:1.2rem;color:#1e293b;" id="reorderTotal">€0.00</strong></div>
+            <div
+                style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:2px solid #e9ecef;">
+                <div><span style="color:#636E72;">Total:</span> <strong style="font-size:1.2rem;color:#1e293b;"
+                        id="reorderTotal">€0.00</strong></div>
                 <button class="btn-reorder" onclick="B2B.addReorderToCart()">🛒 Add All to Cart</button>
             </div>
         </div>
@@ -1180,18 +2906,30 @@
                 <div class="footer-col footer-social">
                     <h4>Connect With Us</h4>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook"><img loading="lazy" src="../img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook" class="social-icon"></a>
-                        <a href="#" aria-label="Instagram"><img loading="lazy" src="../img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram" class="social-icon"></a>
-                        <a href="#" aria-label="Twitter/X"><img loading="lazy" src="../img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
-                        <a href="#" aria-label="TikTok"><img loading="lazy" src="../img/socialmedia-icons/icons8-tiktok-50.svg" alt="TikTok" class="social-icon"></a>
+                        <a href="#" aria-label="Facebook"><img loading="lazy"
+                                src="../img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook"
+                                class="social-icon"></a>
+                        <a href="#" aria-label="Instagram"><img loading="lazy"
+                                src="../img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram"
+                                class="social-icon"></a>
+                        <a href="#" aria-label="Twitter/X"><img loading="lazy"
+                                src="../img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
+                        <a href="#" aria-label="TikTok"><img loading="lazy"
+                                src="../img/socialmedia-icons/icons8-tiktok-50.svg" alt="TikTok"
+                                class="social-icon"></a>
                     </div>
                     <h4>Secure Payment</h4>
                     <div class="payment-icons">
-                        <img loading="lazy" src="../img/payment-icons/card_visa.svg" alt="Visa" class="payment-icon-img">
-                        <img loading="lazy" src="../img/payment-icons/card_mastercard.svg" alt="Mastercard" class="payment-icon-img">
-                        <img loading="lazy" src="../img/payment-icons/card_paypal.svg" alt="PayPal" class="payment-icon-img">
-                        <img loading="lazy" src="../img/payment-icons/card_apple_pay.svg" alt="Apple Pay" class="payment-icon-img">
-                        <img loading="lazy" src="../img/payment-icons/card_google_pay.svg" alt="Google Pay" class="payment-icon-img">
+                        <img loading="lazy" src="../img/payment-icons/card_visa.svg" alt="Visa"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="../img/payment-icons/card_mastercard.svg" alt="Mastercard"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="../img/payment-icons/card_paypal.svg" alt="PayPal"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="../img/payment-icons/card_apple_pay.svg" alt="Apple Pay"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="../img/payment-icons/card_google_pay.svg" alt="Google Pay"
+                            class="payment-icon-img">
                     </div>
                 </div>
             </div>
@@ -1219,9 +2957,11 @@
                 <button class="od-close" onclick="B2B.closeOrderDetail()">&times;</button>
             </div>
             <div class="od-summary">
-                <div class="od-stat"><span class="od-stat-label">Items</span><span class="od-stat-val" id="odItems">0</span></div>
+                <div class="od-stat"><span class="od-stat-label">Items</span><span class="od-stat-val"
+                        id="odItems">0</span></div>
                 <div class="od-stat"><span class="od-stat-label">Status</span><span id="odStatus"></span></div>
-                <div class="od-stat"><span class="od-stat-label">Total</span><span class="od-stat-val od-total" id="odTotal">€0.00</span></div>
+                <div class="od-stat"><span class="od-stat-label">Total</span><span class="od-stat-val od-total"
+                        id="odTotal">€0.00</span></div>
             </div>
             <div class="od-items" id="odItemsList"></div>
             <div class="od-footer">
@@ -1239,7 +2979,8 @@
     </div>
 
     <!-- Cart Modal -->
-    <div class="cart-modal-overlay" id="cartModalOverlay" role="dialog" aria-modal="true" aria-labelledby="cart-modal-title" aria-hidden="true" inert>
+    <div class="cart-modal-overlay" id="cartModalOverlay" role="dialog" aria-modal="true"
+        aria-labelledby="cart-modal-title" aria-hidden="true" inert>
         <div class="cart-modal" id="cartModal">
             <div class="cart-modal-header">
                 <h2 id="cart-modal-title">Shopping Cart</h2>
@@ -1277,4 +3018,5 @@
     <script src="../js/sfi-fixes.min.js?v=2" defer></script>
     <script src="b2b-portal.js?v=44" defer></script>
 </body>
+
 </html>
