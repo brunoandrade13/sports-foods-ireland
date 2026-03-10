@@ -1,0 +1,21 @@
+{
+  "name": "Sports Foods Ireland",
+  "short_name": "SFI",
+  "description": "Professional sports nutrition, swimming, cycling and running gear",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2D6A4F",
+  "icons": [
+    {
+      "src": "img/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

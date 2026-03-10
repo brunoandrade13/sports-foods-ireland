@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" id="cart">
+  <g>
+    <path fill="none" stroke="#000" stroke-miterlimit="10" d="M6 12.50109a1.97559 1.97559 0 0 0 .69 1.5H4a1.5 1.5 0 1 1 0-3H6.69A1.97559 1.97559 0 0 0 6 12.50109zM22 12.50109a1.97559 1.97559 0 0 0 .69 1.5H9.31a1.97543 1.97543 0 0 0 0-3H22.69A1.97559 1.97559 0 0 0 22 12.50109zM29.5 12.50109a1.498 1.498 0 0 1-1.5 1.5H25.31a1.97543 1.97543 0 0 0 0-3H28A1.498 1.498 0 0 1 29.5 12.50109z"></path>
+    <path fill="none" stroke="#000" stroke-miterlimit="10" d="M26,12.50109a1.97559,1.97559,0,0,1-.69,1.5,1.96609,1.96609,0,0,1-2.62,0,1.97543,1.97543,0,0,1,0-3,1.96609,1.96609,0,0,1,2.62,0A1.97559,1.97559,0,0,1,26,12.50109Z"></path>
+    <path fill="none" stroke="#000" stroke-miterlimit="10" d="M28.5,14.00109l-3,12H6.5l-3-12H6.69a1.96609,1.96609,0,0,0,2.62,0H22.69a1.96609,1.96609,0,0,0,2.62,0Z"></path>
+    <line x1="16" x2="16" y1="26.001" y2="14.001" fill="none" stroke="#000" stroke-miterlimit="10"></line>
+    <line x1="12" x2="12" y1="26.001" y2="14.001" fill="none" stroke="#000" stroke-miterlimit="10"></line>
+    <line x1="8" x2="8" y1="26.001" y2="14.001" fill="none" stroke="#000" stroke-miterlimit="10"></line>
+    <line x1="20" x2="20" y1="26.001" y2="14.001" fill="none" stroke="#000" stroke-miterlimit="10"></line>
+    <line x1="24" x2="24" y1="26.001" y2="14.001" fill="none" stroke="#000" stroke-miterlimit="10"></line>
+    <line x1="8" x2="14.429" y1="12.501" y2="6.001" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"></line>
+    <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" d="M10,12.50109a1.97559,1.97559,0,0,1-.69,1.5,1.96609,1.96609,0,0,1-2.62,0,1.97543,1.97543,0,0,1,0-3,1.96609,1.96609,0,0,1,2.62,0A1.97559,1.97559,0,0,1,10,12.50109Z"></path>
+    <line x1="24" x2="17.569" y1="12.501" y2="5.999" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"></line>
+    <line x1="4.5" x2="27.5" y1="18.001" y2="18.001" fill="none" stroke="#000" stroke-miterlimit="10"></line>
+    <line x1="5.441" x2="26.5" y1="22.001" y2="22.001" fill="none" stroke="#000" stroke-miterlimit="10"></line>
+  </g>
+</svg>

@@ -1,0 +1,69 @@
+<header>
+        <div class="container">
+            <button class="mobile-menu-toggle" aria-label="Menu" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="index.html" class="logo">
+                <img src="img/logo.png" alt="Sports Foods Ireland" class="logo-img">
+            </a>
+            <nav class="menu" id="mainMenu" role="navigation" aria-label="Main navigation">
+                <a href="index.html">Home</a>
+                <a href="shop.html">Shop</a>
+                <a href="categories.html">Categories</a>
+                <a href="brands.html">Brands</a>
+                <a href="offers.html">Offers</a>
+                <a href="about.html">About</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-wrapper" style="position:relative;display:inline-flex;align-items:center;">
+                    <input type="text" placeholder="Search products..." class="busca" id="busca" aria-label="Search products" aria-describedby="search-description" style="padding-right:35px;">
+                    <button type="button" id="searchBtn" aria-label="Search" style="position:absolute;right:8px;background:none;border:none;cursor:pointer;padding:5px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                    </button>
+                </div>
+                <span id="search-description" class="sr-only">Search for products by name</span>
+                <a href="wishlist.html" class="header-icon wishlist-link" aria-label="My Wishlist" title="Wishlist"><img src="img/heart-icon.svg" alt="Wishlist" class="header-svg-icon icon-svg"></a>
+                <a href="account.html" class="header-icon" aria-label="My account" title="Account"><img src="img/account-icon.svg" alt="Account" class="header-svg-icon"></a>
+                <div class="cart-wrapper">
+                    <a href="#" class="cart" aria-label="Shopping cart" id="cartIcon"><img src="img/cart-icon.svg" alt="Cart" class="header-svg-icon icon-svg"> <span class="cart-count">0</span></a>
+                </div>
+                
+                <!-- Cart Modal -->
+                <div class="cart-modal-overlay" id="cartModalOverlay" role="dialog" aria-modal="true" aria-labelledby="cart-modal-title" aria-hidden="true">
+                    <div class="cart-modal" id="cartModal">
+                        <div class="cart-modal-header">
+                            <h2 id="cart-modal-title">Shopping Cart</h2>
+                            <button class="cart-modal-close" aria-label="Close cart" type="button">×</button>
+                        </div>
+                        <div class="cart-modal-content">
+                            <div class="cart-modal-items" id="cartModalItems">
+                                <div class="cart-modal-empty">Your cart is empty</div>
+                            </div>
+                        </div>
+                        <div class="cart-modal-footer" id="cartModalFooter" style="display: none;">
+                            <div class="cart-modal-total">
+                                <div class="cart-modal-total-row">
+                                    <span>Subtotal:</span>
+                                    <span id="cartModalSubtotal">€0.00</span>
+                                </div>
+                                <div class="cart-modal-total-row">
+                                    <span>Delivery:</span>
+                                    <span id="cartModalDelivery">€0.00</span>
+                                </div>
+                                <div class="cart-modal-total-row cart-modal-total-final">
+                                    <span>Total:</span>
+                                    <span id="cartModalTotal">€0.00</span>
+                                </div>
+                            </div>
+                            <div class="cart-modal-buttons">
+                                <a href="cart.html" class="cart-modal-button cart-modal-button-primary">View Cart</a>
+                                <a href="checkout.html" class="cart-modal-button cart-modal-button-secondary">Checkout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>

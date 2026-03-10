@@ -1,0 +1,29 @@
+# Sports Foods Ireland - robots.txt
+# https://sportsfoodsireland.ie
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://sportsfoodsireland.ie/sitemap.xml
+
+# Block dev/internal files
+Disallow: /dev-archive/
+Disallow: /admin/
+Disallow: /templates/
+
+# Block utility pages from indexing
+Disallow: /checkout.html
+Disallow: /account.html
+Disallow: /cart.html
+
+# Block scripts and data files
+Disallow: /*.py$
+Disallow: /*.json$
+Disallow: /*.md$
+Disallow: /*.zip$
+
+# Allow CSS/JS/images for rendering
+Allow: /css/
+Allow: /js/
+Allow: /img/

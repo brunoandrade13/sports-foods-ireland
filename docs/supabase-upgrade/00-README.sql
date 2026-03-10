@@ -1,0 +1,25 @@
+-- ============================================================
+-- SFI SUPABASE UPGRADE - MASTER EXECUTION ORDER
+-- Sports Foods Ireland - February 2026
+-- ============================================================
+-- 
+-- Execute each file IN ORDER in the Supabase SQL Editor:
+-- https://supabase.com/dashboard/project/styynhgzrkyoioqjssuw/sql
+--
+-- ORDER:
+-- 1. 01-customers-addresses.sql      → Customer enhancements + addresses + groups
+-- 2. 02-products-enhancement.sql     → Product fields + images + collections + metafields
+-- 3. 03-orders-financial.sql         → Orders + fulfillments + refunds + payments + invoices
+-- 4. 04-marketing-coupons.sql        → Coupons + gift cards + abandoned carts + email log
+-- 5. 05-analytics-tracking.sql       → Page views + clicks + search + wishlists + cart + funnel
+-- 6. 06-reviews-inventory-shipping.sql → Reviews + inventory log + shipping + tax
+-- 7. 07-report-views.sql             → 16 report views (sales, financial, inventory, analytics)
+-- 8. 08-triggers-functions.sql       → Auto-update triggers (stock, ratings, notifications)
+-- 9. 09-rls-policies.sql             → Row Level Security + permissions
+--
+-- NOTES:
+-- - All scripts use IF NOT EXISTS / IF EXISTS to be safe to re-run
+-- - Existing tables (products, orders, customers) are only ALTER-ed (no data loss)
+-- - New tables are created fresh
+-- - Views can be recreated anytime (CREATE OR REPLACE)
+-- ============================================================

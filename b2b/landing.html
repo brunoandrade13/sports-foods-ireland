@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Become a Sports Foods Ireland wholesale partner. Exclusive B2B pricing for gyms, sports clubs and retailers.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="B2B Wholesale — Sports Foods Ireland">
+<meta property="og:description" content="Exclusive wholesale pricing for gyms, clubs and retailers across Ireland.">
+<meta property="og:url" content="https://www.sportsfoodsireland.ie/b2b/landing.html">
+<meta property="og:image" content="https://www.sportsfoodsireland.ie/img/og-home.jpg">
+<title>B2B Wholesale — Sports Foods Ireland</title>
+<link rel="canonical" href="https://www.sportsfoodsireland.ie/b2b/landing.html">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/sfi-styles.min.css?v=18">
+<style>
+.b2b-land { font-family: 'Inter', sans-serif; color: #1e293b; }
+.b2b-hero { background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%); color: #fff; padding: 80px 24px; text-align: center; }
+.b2b-hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 2.4rem; margin-bottom: 16px; line-height: 1.2; }
+.b2b-hero p { font-size: 1.1rem; opacity: 0.9; max-width: 560px; margin: 0 auto 32px; }
+.btn-cta { display: inline-block; padding: 14px 36px; background: #fff; color: #1B4332; font-weight: 700; font-size: 1rem; border-radius: 8px; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; }
+.btn-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+.btn-cta-green { background: #2D6A4F; color: #fff; }
+.btn-cta-green:hover { background: #1B4332; }
+.section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; color: #1B4332; text-align: center; margin-bottom: 12px; }
+.section-sub { text-align: center; color: #636E72; font-size: 0.95rem; margin-bottom: 40px; max-width: 480px; margin-left: auto; margin-right: auto; }
+.b2b-section { padding: 64px 24px; max-width: 960px; margin: 0 auto; }
+.b2b-section.alt-bg { background: #f8faf9; }
+.benefits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+.benefit-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 28px 24px; text-align: center; }
+.benefit-card .icon { font-size: 2rem; margin-bottom: 12px; }
+.benefit-card h3 { font-size: 1rem; color: #1B4332; margin-bottom: 8px; font-family: 'Space Grotesk', sans-serif; }
+.benefit-card p { font-size: 0.85rem; color: #636E72; line-height: 1.5; }
+.steps-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; text-align: center; }
+.step-item { position: relative; }
+.step-num { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #2D6A4F; color: #fff; font-weight: 700; font-size: 1.1rem; margin-bottom: 12px; }
+.step-item h3 { font-size: 1rem; color: #1B4332; margin-bottom: 6px; }
+.step-item p { font-size: 0.85rem; color: #636E72; }
+.who-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.who-item { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; font-size: 0.9rem; }
+.who-item .icon { font-size: 1.3rem; flex-shrink: 0; }
+.faq-list { max-width: 640px; margin: 0 auto; }
+.faq-item { border-bottom: 1px solid #e2e8f0; }
+.faq-q { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; cursor: pointer; font-weight: 600; font-size: 0.95rem; color: #1B4332; }
+.faq-q::after { content: "+"; font-size: 1.3rem; color: #2D6A4F; transition: transform 0.2s; }
+.faq-item.open .faq-q::after { content: "−"; }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; font-size: 0.9rem; color: #636E72; line-height: 1.6; }
+.faq-item.open .faq-a { max-height: 300px; padding-bottom: 18px; }
+.cta-final { background: #1B4332; color: #fff; text-align: center; padding: 64px 24px; }
+.cta-final h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; margin-bottom: 12px; }
+.cta-final p { opacity: 0.85; margin-bottom: 28px; font-size: 1rem; }
+.b2b-menu-link { display:flex; align-items:center; gap:10px; padding:14px 18px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; font-weight:600; font-size:0.95rem; color:#1e293b; text-decoration:none; transition:all 0.2s; }
+.b2b-menu-link:hover { background:#f0fdf4; border-color:#2D6A4F; color:#1B4332; transform:translateX(4px); }
+@media (max-width: 600px) { .b2b-hero h1 { font-size: 1.7rem; } .b2b-hero { padding: 50px 20px; } }
+</style>
+</head>
+<body class="b2b-land">
+
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>    <header>
+        <div class="container">
+            <button class="mobile-menu-toggle" aria-label="Menu" id="mobileMenuToggle">
+                <div class="hamburger-lines">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span class="hamburger-label">Menu</span>
+            </button>
+            <a href="../index.html" class="logo">
+                <img src="../img/logo.webp" alt="Sports Foods Ireland" class="logo-img">
+            </a>
+            <nav class="menu" id="mainMenu" role="navigation" aria-label="Main navigation">
+                <a href="../index.html">Home</a>
+                <a href="../shop.html">Shop</a>
+                <a href="../categories.html">Categories</a>
+                <a href="../brands.html">Brands</a>
+                <a href="../offers.html">Offers</a>
+                <a href="../about.html">About</a>
+                <a href="landing.html" class="nav-b2b">B2B Portal</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-wrapper icon-wrapper">
+                    <input type="text" placeholder="Search products..." class="busca padded-right" id="busca" aria-label="Search products" aria-describedby="search-description">
+                    <button type="button" id="searchBtn" aria-label="Search" class="close-btn-abs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                    </button>
+                </div>
+                <span id="search-description" class="sr-only">Search for products by name</span>
+                <a href="../wishlist.html" class="header-icon wishlist-link" aria-label="My Wishlist" title="Wishlist"><img src="../img/heart-icon.svg" alt="Wishlist" class="header-svg-icon icon-svg"></a>
+                <a href="../account.html" class="header-icon" aria-label="My account" title="Account"><img src="../img/account-icon.svg" alt="Account" class="header-svg-icon"></a>
+                <div class="cart-wrapper">
+                    <a href="#" class="cart" aria-label="Shopping cart" id="cartIcon"><img src="../img/cart-icon.svg" alt="Cart" class="header-svg-icon icon-svg"> <span class="cart-count">0</span></a>
+                </div>
+                
+                <!-- Cart Modal -->
+                <div class="cart-modal-overlay" id="cartModalOverlay" role="dialog" aria-modal="true" aria-labelledby="cart-modal-title" aria-hidden="true">
+                    <div class="cart-modal" id="cartModal">
+                        <div class="cart-modal-header">
+                            <h2 id="cart-modal-title">Shopping Cart</h2>
+                            <button class="cart-modal-close" aria-label="Close cart" type="button">×</button>
+                        </div>
+                        <div class="cart-modal-content">
+                            <div class="cart-modal-items" id="cartModalItems">
+                                <div class="cart-modal-empty">Your cart is empty</div>
+                            </div>
+                        </div>
+                        <div class="cart-modal-footer" id="cartModalFooter" style="display: none;">
+                            <div class="cart-modal-total">
+                                <div class="cart-modal-total-row">
+                                    <span>Subtotal:</span>
+                                    <span id="cartModalSubtotal">€0.00</span>
+                                </div>
+                                <div class="cart-modal-total-row">
+                                    <span>Delivery:</span>
+                                    <span id="cartModalDelivery">€0.00</span>
+                                </div>
+                                <div class="cart-modal-total-row cart-modal-total-final">
+                                    <span>Total:</span>
+                                    <span id="cartModalTotal">€0.00</span>
+                                </div>
+                            </div>
+                            <div class="cart-modal-buttons">
+                                <a href="../cart.html" class="cart-modal-button cart-modal-button-primary">View Cart</a>
+                                <a href="../checkout.html" class="cart-modal-button cart-modal-button-secondary">Checkout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    
+    <!-- Mobile Menu -->
+    <nav class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="../index.html" class="mobile-menu-item">Home</a>
+            <a href="../shop.html" class="mobile-menu-item">Shop</a>
+            
+            <!-- Nutrition Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="nutrition">
+                    <span>Nutrition</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-nutrition">
+                    <a href="../shop.html#nutrition#gels" class="mobile-menu-subcategory">Energy Gels</a>
+                    <a href="../shop.html#nutrition#shots" class="mobile-menu-subcategory">Energy Shots</a>
+                    <a href="../shop.html#nutrition#drinks" class="mobile-menu-subcategory">Sports Drinks</a>
+                    <a href="../shop.html#nutrition#amino" class="mobile-menu-subcategory">Amino Acids</a>
+                    <a href="../shop.html#nutrition#minerals" class="mobile-menu-subcategory">Minerals</a>
+                    <a href="../shop.html#nutrition" class="mobile-menu-subcategory">View All Nutrition</a>
+                </div>
+            </div>
+            
+            <!-- Cycling Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="cycling">
+                    <span>Cycling</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-cycling">
+                    <a href="../shop.html#cycling#baselayers" class="mobile-menu-subcategory">Baselayers</a>
+                    <a href="../shop.html#cycling#jerseys" class="mobile-menu-subcategory">Jerseys & Gilets</a>
+                    <a href="../shop.html#cycling#gloves" class="mobile-menu-subcategory">Gloves</a>
+                    <a href="../shop.html#cycling#overshoes" class="mobile-menu-subcategory">Overshoes</a>
+                    <a href="../shop.html#cycling#socks" class="mobile-menu-subcategory">Socks</a>
+                    <a href="../shop.html#cycling" class="mobile-menu-subcategory">View All Cycling</a>
+                </div>
+            </div>
+            
+            <!-- Swimming Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="swimming">
+                    <span>Swimming</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-swimming">
+                    <a href="../shop.html#swimming#wetsuits" class="mobile-menu-subcategory">Wetsuits</a>
+                    <a href="../shop.html#swimming#swimwear" class="mobile-menu-subcategory">Swimwear</a>
+                    <a href="../shop.html#swimming#goggles" class="mobile-menu-subcategory">Goggles</a>
+                    <a href="../shop.html#swimming#safety" class="mobile-menu-subcategory">Safety Buoys</a>
+                    <a href="../shop.html#swimming#accessories" class="mobile-menu-subcategory">Neoprene Accessories</a>
+                    <a href="../shop.html#swimming#caps" class="mobile-menu-subcategory">Caps & Headwear</a>
+                    <a href="../shop.html#swimming" class="mobile-menu-subcategory">View All Swimming</a>
+                </div>
+            </div>
+            
+            <!-- Running Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="running">
+                    <span>Running</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-running">
+                    <a href="../shop.html#running#accessories" class="mobile-menu-subcategory">Accessories</a>
+                    <a href="../shop.html#running" class="mobile-menu-subcategory">View All Running</a>
+                </div>
+            </div>
+            
+            <!-- Price Filter -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="price">
+                    <span>💰 Price Range</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-price">
+                    <div class="mobile-price-filter">
+                        <div class="mobile-price-inputs">
+                            <input type="number" id="mobilePriceMin" placeholder="Min €" min="0" class="mobile-price-input">
+                            <span>-</span>
+                            <input type="number" id="mobilePriceMax" placeholder="Max €" min="0" class="mobile-price-input">
+                        </div>
+                        <button class="mobile-price-apply-btn" onclick="applyMobilePriceFilter()">Apply Filter</button>
+                    </div>
+                </div>
+            </div>
+            
+            <a href="../brands.html" class="mobile-menu-item">Brands</a>
+            <a href="../offers.html" class="mobile-menu-item">Offers</a>
+            <a href="../about.html" class="mobile-menu-item">About</a>
+            <a href="../contact.html" class="mobile-menu-item">Contact</a>
+            <a href="../faq.html" class="mobile-menu-item">FAQ</a>
+        </div>
+    </nav>
+    
+    <main>
+<!-- Hero Banner -->
+<div class="b2b-hero" style="padding:0; background:none;">
+  <img src="../img/b2b-banner.png" alt="Sports Foods Ireland - Wholesale Partner Portal" style="width:100%; height:auto; display:block;">
+</div>
+
+<!-- B2B Login Section -->
+<div class="b2b-section" id="b2b-login" style="max-width:520px;">
+  <h2 class="section-title">🔐 B2B Customer Login</h2>
+  <p class="section-sub">Already an approved wholesale customer? Sign in to access your portal.</p>
+  <div id="b2bLoginBox" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,0.05);">
+    <div id="b2bLoginForm">
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Email</label>
+        <input type="email" id="b2bEmail" placeholder="your@business.com" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Password</label>
+        <input type="password" id="b2bPassword" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;">
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:#636E72;cursor:pointer;">
+        <input type="checkbox" id="b2bRemember" checked style="accent-color:#2D6A4F;width:16px;height:16px;">
+        Keep me logged in
+      </label>
+      <button onclick="b2bLogin()" id="b2bLoginBtn" style="width:100%;padding:14px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;transition:background 0.2s;">Sign In to B2B Portal</button>
+      <div id="b2bLoginMsg" style="margin-top:12px;font-size:13px;text-align:center;display:none;"></div>
+      <div style="text-align:center;margin:16px 0 12px;display:flex;align-items:center;gap:12px;">
+        <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+        <span style="font-size:12px;color:#94a3b8;">or continue with</span>
+        <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="sfiSocialLogin('google')" style="flex:1;padding:10px;background:#fff;border:1px solid #d1d5db;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:#1e293b;display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#4285F4'" onmouseout="this.style.borderColor='#d1d5db'">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </button>
+        <button onclick="sfiSocialLogin('facebook')" style="flex:1;padding:10px;background:#fff;border:1px solid #d1d5db;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:#1e293b;display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#1877F2'" onmouseout="this.style.borderColor='#d1d5db'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+      </div>
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:#636E72;">
+        <a href="../account.html" style="color:#2D6A4F;font-weight:500;">Forgot password?</a>
+        <span style="margin:0 8px;">·</span>
+        <a href="../register-b2b.html" style="color:#2D6A4F;font-weight:500;">Apply for B2B account</a>
+      </div>
+    </div>
+    <div id="b2bLoggedIn" style="display:none;">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:2.5rem;margin-bottom:12px;">✅</div>
+        <h3 style="color:#1B4332;margin-bottom:4px;" id="b2bWelcomeName">Welcome back!</h3>
+        <p style="color:#636E72;font-size:14px;">You're signed in as a B2B wholesale customer.</p>
+      </div>
+      <nav style="display:flex;flex-direction:column;gap:8px;">
+        <a href="portal.html" class="b2b-menu-link">📊 Dashboard</a>
+        <a href="shop.html" class="b2b-menu-link">🛒 Shop</a>
+        <a href="portal.html?tab=orders" class="b2b-menu-link">📦 My Orders</a>
+        <a href="portal.html?tab=financial" class="b2b-menu-link">💰 Financial</a>
+        <a href="portal.html?tab=marketing" class="b2b-menu-link">📣 Marketing</a>
+        <a href="portal.html?tab=support" class="b2b-menu-link">🎧 Support</a>
+        <a href="portal.html?tab=company" class="b2b-menu-link">👤 My Account</a>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Benefits -->
+<div class="b2b-section">
+  <h2 class="section-title">Why Partner With Us?</h2>
+  <p class="section-sub">We make it easy for fitness businesses to stock the best sports nutrition brands.</p>
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="icon">💰</div>
+      <h3>Wholesale Pricing</h3>
+      <p>Exclusive B2B prices on all 255+ products. Access wholesale pricing across Nutrition, Swimming, Cycling and Running.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="icon">👤</div>
+      <h3>Dedicated Account Manager</h3>
+      <p>A personal point of contact to help with orders, product questions and recommendations.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="icon">🚚</div>
+      <h3>Free Delivery over €150</h3>
+      <p>Free shipping on wholesale orders over €150. Next-day delivery across Ireland available.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="icon">📋</div>
+      <h3>Backorder Available</h3>
+      <p>Out of stock? No problem. B2B customers can place backorders and we'll fulfil as soon as stock arrives.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="icon">📊</div>
+      <h3>B2B Portal</h3>
+      <p>Full self-service portal: order history, invoices, company profile, and reorder with one click.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="icon">💳</div>
+      <h3>Flexible Payment</h3>
+      <p>Pay via Stripe or PayPal. All prices shown ex-VAT. Irish VAT-registered customers can claim back VAT.</p>
+    </div>
+  </div>
+</div>
+<!-- How It Works -->
+<div class="b2b-section alt-bg" style="max-width:100%;"><div style="max-width:960px;margin:0 auto;">
+  <h2 class="section-title">How It Works</h2>
+  <p class="section-sub">Three simple steps to start ordering at wholesale prices.</p>
+  <div class="steps-row">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <h3>Apply Online</h3>
+      <p>Fill in a short form with your business details. Takes less than 2 minutes.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <h3>Get Approved</h3>
+      <p>Our team reviews your application within 24–48 hours and sends you a confirmation email.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <h3>Start Ordering</h3>
+      <p>Access the wholesale portal with exclusive B2B pricing and place your first order.</p>
+    </div>
+  </div>
+</div></div>
+
+<!-- Who Can Apply -->
+<div class="b2b-section">
+  <h2 class="section-title">Who Can Apply?</h2>
+  <p class="section-sub">We work with fitness and sports businesses across Ireland and the UK.</p>
+  <div class="who-list">
+    <div class="who-item"><span class="icon">🏋️</span> Gyms & Fitness Centres</div>
+    <div class="who-item"><span class="icon">⚽</span> Sports Clubs & Teams</div>
+    <div class="who-item"><span class="icon">🏪</span> Retail Stores</div>
+    <div class="who-item"><span class="icon">🛒</span> Online Stores</div>
+    <div class="who-item"><span class="icon">💪</span> Personal Trainers</div>
+    <div class="who-item"><span class="icon">🩺</span> Physiotherapists & Clinics</div>
+    <div class="who-item"><span class="icon">🏊</span> Swimming Clubs</div>
+    <div class="who-item"><span class="icon">🚴</span> Cycling Clubs & Shops</div>
+  </div>
+</div>
+
+<!-- Key B2B Info -->
+<div class="b2b-section alt-bg" style="max-width:100%;"><div style="max-width:960px;margin:0 auto;">
+  <h2 class="section-title">Key B2B Information</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:32px;">
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
+      <h3 style="font-size:15px;color:#1B4332;margin-bottom:10px;">🚚 Shipping Policy</h3>
+      <p style="font-size:14px;color:#636E72;line-height:1.6;">Free delivery on B2B orders over €150. Standard shipping €9.04 for orders under €150. Next-day and express options available.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
+      <h3 style="font-size:15px;color:#1B4332;margin-bottom:10px;">💳 Payment Terms</h3>
+      <p style="font-size:14px;color:#636E72;line-height:1.6;">Pay securely via Stripe (Card, Apple Pay, Google Pay) or PayPal. All prices displayed ex-VAT in the wholesale portal.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
+      <h3 style="font-size:15px;color:#1B4332;margin-bottom:10px;">🛡️ Product Warranty</h3>
+      <p style="font-size:14px;color:#636E72;line-height:1.6;">12-month manufacturer warranty on all wetsuits and electronics. 30-day returns on all other products.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
+      <h3 style="font-size:15px;color:#1B4332;margin-bottom:10px;">📦 Backorders</h3>
+      <p style="font-size:14px;color:#636E72;line-height:1.6;">Out-of-stock items available for backorder — exclusively for B2B customers. We'll fulfil your order as soon as stock arrives.</p>
+    </div>
+  </div>
+</div></div>
+
+<!-- Brands -->
+<div class="b2b-section">
+  <h2 class="section-title">Brands We Carry</h2>
+  <p class="section-sub">Ireland's most trusted sports nutrition and equipment brands — all available at wholesale pricing.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-items:center;">
+    <img src="../img/Brands/Zone3_id_1eF7UrV_0.webp" alt="Zone3" style="height:45px;opacity:0.8;" onerror="this.style.display='none'">
+    <img src="../img/Brands/Tailwind Nutrition_id_ou4Zmbg_0.webp" alt="Tailwind Nutrition" style="height:45px;opacity:0.8;" onerror="this.style.display='none'">
+    <img src="../img/Brands/PowerBar_id_SePsO-n_0.webp" alt="PowerBar" style="height:45px;opacity:0.8;" onerror="this.style.display='none'">
+    <img src="../img/Brands/High5_id_GWuMPYn_0.webp" alt="High5" style="height:45px;opacity:0.8;" onerror="this.style.display='none'">
+    <img src="../img/Brands/Clif_id_c-1Oq0s_0.webp" alt="Clif" style="height:45px;opacity:0.8;" onerror="this.style.display='none'">
+    <img src="../img/Brands/iGPSPORT_id_Zz3gA_y_0.webp" alt="iGPSPORT" style="height:45px;opacity:0.8;" onerror="this.style.display='none'">
+    <img src="../img/Brands/Spatzwear_id_P6geLqO_0.webp" alt="Spatzwear" style="height:45px;opacity:0.8;" onerror="this.style.display='none'">
+    <img src="../img/Brands/Swim Secure_id_Bi3OdAt_0.webp" alt="Swim Secure" style="height:45px;opacity:0.8;" onerror="this.style.display='none'">
+  </div>
+</div>
+<!-- FAQ -->
+<div class="b2b-section alt-bg" style="max-width:100%;"><div style="max-width:960px;margin:0 auto;">
+  <h2 class="section-title">Frequently Asked Questions</h2>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What is the minimum order value?</div>
+      <div class="faq-a">There is no fixed minimum order value. However, some products have minimum quantity requirements which are clearly displayed in the wholesale portal.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How long does approval take?</div>
+      <div class="faq-a">Most applications are reviewed within 24–48 business hours. You'll receive an email notification once your account has been approved.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Are B2B prices exclusive of VAT?</div>
+      <div class="faq-a">Yes, all prices shown in the B2B wholesale portal are exclusive of VAT. VAT will be calculated at checkout based on your location and VAT registration.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What is the delivery policy for B2B?</div>
+      <div class="faq-a">Free delivery on wholesale orders over €150. Standard shipping of €9.04 applies for orders under €150. Next-day and express delivery options are also available.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I backorder out-of-stock items?</div>
+      <div class="faq-a">Yes! B2B customers can place backorders on any out-of-stock item. We'll fulfil the order as soon as stock arrives and notify you by email.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What payment methods do you accept?</div>
+      <div class="faq-a">We accept Stripe (Visa, Mastercard, Amex, Apple Pay, Google Pay) and PayPal for B2B orders. All transactions are processed securely.</div>
+    </div>
+  </div>
+</div></div>
+
+<!-- Final CTA -->
+<div class="cta-final">
+  <h2>Ready to Partner With Us?</h2>
+  <p>Join fitness businesses across Ireland who trust Sports Foods Ireland for their wholesale needs.</p>
+  <a href="../register-b2b.html" class="btn-cta">Apply for B2B Access</a>
+  <p style="margin-top:20px;font-size:13px;opacity:0.7;">Questions? Contact us at <a href="mailto:info@sportsfoodsireland.ie" style="color:#86efac;">info@sportsfoodsireland.ie</a> or call <a href="tel:+35318400403" style="color:#86efac;">+353 1 840 0403</a></p>
+</div>
+    </main>
+        <footer class="main-footer">
+            <div class="container">
+            <div class="footer-grid">
+                    <div class="footer-col footer-about">
+                        <img loading="lazy" src="../img/logo.webp" alt="Sports Foods Ireland" class="footer-logo">
+                        <p>Ireland's trusted source for professional sports nutrition and equipment. Fueling athletes since 2020.</p>
+                        <div class="footer-contact-info">
+                            <p><strong>📍</strong> Unit 12 Northwest Centre, Northwest Business Park, Blanchardstown, Dublin D15 YC53</p>
+                            <p><strong>📞</strong> <a href="tel:+35318400403" style="color:inherit;text-decoration:none;">+353 1 840 0403</a></p>
+                            <p><strong>📧</strong> info@sportsfoodsireland.ie</p>
+                            <p><strong>🕐</strong> Mon-Fri: 9am-6pm</p>
+                        </div>
+                    </div>
+                <div class="footer-col">
+                        <h4>Shop</h4>
+                        <ul>
+                            <li><a href="../shop.html#nutrition">Nutrition</a></li>
+                            <li><a href="../shop.html#cycling">Cycling</a></li>
+                            <li><a href="../shop.html#swimming">Swimming</a></li>
+                            <li><a href="../shop.html#running">Running</a></li>
+                            <li><a href="../offers.html">Offers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                        <h4>Customer Service</h4>
+                        <ul>
+                            <li><a href="../contact.html">Contact Us</a></li>
+                            <li><a href="../faq.html">FAQs</a></li>
+                            <li><a href="../shipping.html">Shipping Info</a></li>
+                            <li><a href="../returns.html">Returns & Refunds</a></li>
+                            <li><a href="#">Track Order</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="../about.html">About Us</a></li>
+                            <li><a href="../blog.html">Blog</a></li>
+                            <li><a href="#">Careers</a></li>
+                            <li><a href="../privacy.html">Privacy Policy</a></li>
+                            <li><a href="../terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col footer-social">
+                        <h4>Connect With Us</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><img loading="lazy" src="../img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook" class="social-icon"></a>
+                        <a href="#" aria-label="Instagram"><img loading="lazy" src="../img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram" class="social-icon"></a>
+                        <a href="#" aria-label="Twitter/X"><img loading="lazy" src="../img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
+                        <a href="#" aria-label="TikTok"><img loading="lazy" src="../img/socialmedia-icons/icons8-tiktok-50.svg" alt="TikTok" class="social-icon"></a>
+                        <a href="#" aria-label="Pinterest"><img loading="lazy" src="../img/socialmedia-icons/icons8-pinterest-50.svg" alt="Pinterest" class="social-icon"></a>
+                    </div>
+                        <h4>Secure Payment</h4>
+                        <div class="payment-icons">
+                            <img loading="lazy" src="../img/payment-icons/card_visa.svg" alt="Visa" class="payment-icon-img">
+                            <img loading="lazy" src="../img/payment-icons/card_mastercard.svg" alt="Mastercard" class="payment-icon-img">
+                            <img loading="lazy" src="../img/payment-icons/card_paypal.svg" alt="PayPal" class="payment-icon-img">
+                            <img loading="lazy" src="../img/payment-icons/card_apple_pay.svg" alt="Apple Pay" class="payment-icon-img">
+                            <img loading="lazy" src="../img/payment-icons/card_google_pay.svg" alt="Google Pay" class="payment-icon-img">
+                            <img loading="lazy" src="../img/payment-icons/card_klarna.svg" alt="Klarna" class="payment-icon-img">
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2026 Sports Foods Ireland. All rights reserved.</p>
+                    <div class="footer-bottom-links">
+                        <a href="../privacy.html">Privacy</a>
+                        <a href="../terms.html">Terms</a>
+                        <a href="../cookies.html">Cookies</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+<script src="../js/sfi-api.min.js?v=12" defer></script>
+<script src="../js/sfi-data-loader.min.js?v=4" defer></script>
+<script src="../js/cart.min.js?v=6" defer></script>
+<script src="../js/product-card.min.js?v=5" defer></script>
+<script src="../js/main.min.js?v=7" defer></script>
+<script src="../js/sfi-fixes.min.js?v=2" defer></script>
+<script src="../js/sfi-enhancements.min.js?v=2" defer></script>
+<script>
+// B2B Login
+// Social login
+function sfiSocialLogin(provider) {
+  waitForSfi().then(function() {
+    sfi.auth.signInWithOAuth(provider);
+  });
+}
+// Handle OAuth callback on this page
+if (window.location.hash && window.location.hash.includes('access_token')) {
+  document.addEventListener('DOMContentLoaded', function() {
+    waitForSfi().then(function() {
+      var ok = sfi.auth.handleOAuthCallback();
+      if (ok) setTimeout(function() { window.location.reload(); }, 500);
+    });
+  });
+}
+async function b2bLogin() {
+  const email = document.getElementById('b2bEmail').value.trim();
+  const pass = document.getElementById('b2bPassword').value;
+  const btn = document.getElementById('b2bLoginBtn');
+  if (!email || !pass) { showMsg('Please enter your email and password.', '#ef4444'); return; }
+  btn.textContent = 'Signing in...'; btn.disabled = true;
+  try {
+    await waitForSfi();
+    const result = await sfi.auth.signIn(email, pass);
+    if (!result || !result.access_token) {
+      throw new Error(result?.error_description || result?.error?.message || result?.msg || 'Invalid email or password');
+    }
+    // Check B2B access
+    const hasAccess = await sfi.b2b.checkAccess();
+    if (!hasAccess) {
+      const profile = await sfi.b2b.getProfile();
+      if (profile && profile.b2b_status === 'pending') {
+        showMsg('Your B2B application is pending review. We will notify you by email within 48 hours.', '#92400e');
+      } else {
+        showMsg('This account does not have B2B access. <a href="../register-b2b.html" style="color:#2D6A4F;font-weight:600;">Apply here</a>', '#ef4444');
+      }
+      btn.textContent = 'Sign In to B2B Portal'; btn.disabled = false;
+      return;
+    }
+    // Success
+    const profile = await sfi.b2b.getProfile();
+    var cName = (profile && profile.b2b_company_name) || (profile && profile.first_name) || 'Partner';
+    document.getElementById('b2bWelcomeName').textContent = 'Welcome back, ' + cName + '!';
+    document.getElementById('b2bLoginForm').style.display = 'none';
+    document.getElementById('b2bLoggedIn').style.display = 'block';
+  } catch(e) {
+    showMsg(e.message || 'Login failed. Please check your credentials.', '#ef4444');
+    btn.textContent = 'Sign In to B2B Portal'; btn.disabled = false;
+  }
+}
+function showMsg(html, color) {
+  const msg = document.getElementById('b2bLoginMsg');
+  msg.innerHTML = html; msg.style.color = color; msg.style.display = 'block';
+}
+function waitForSfi() {
+  return new Promise(resolve => {
+    if (window.sfi?.auth) return resolve();
+    let tries = 0;
+    const iv = setInterval(() => { tries++; if (window.sfi?.auth || tries > 50) { clearInterval(iv); resolve(); } }, 100);
+  });
+}
+// Auto-detect if already logged in
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    await waitForSfi();
+    if (sfi.auth.isLoggedIn()) {
+      const hasAccess = await sfi.b2b.checkAccess();
+      if (hasAccess) {
+        const profile = await sfi.b2b.getProfile();
+        const name = profile?.b2b_company_name || profile?.first_name || 'Partner';
+        document.getElementById('b2bWelcomeName').textContent = 'Welcome back, ' + name + '!';
+        document.getElementById('b2bLoginForm').style.display = 'none';
+        document.getElementById('b2bLoggedIn').style.display = 'block';
+      }
+    }
+  } catch(e) {}
+});
+// Enter key support
+document.addEventListener('DOMContentLoaded', function() {
+  ['b2bEmail','b2bPassword'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') b2bLogin(); });
+  });
+});
+</script>
+</body>
+</html>

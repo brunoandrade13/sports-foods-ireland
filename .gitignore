@@ -1,0 +1,79 @@
+# === Dependencies ===
+node_modules/
+.venv/
+test-pw/node_modules/
+
+# === Environment & Secrets ===
+.env
+.env.local
+.env.production
+
+# === Supabase Local ===
+supabase-bin
+supabase.tar.gz
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
+
+# === IDE ===
+.vscode/
+.cursor/
+.idea/
+
+# === Dev Archive ===
+dev-archive/
+
+# === Python scripts (dev tools) ===
+*.py
+__pycache__/
+*.pyc
+
+# === Test files ===
+test-pw/
+test-qb.js
+test-qb.ts
+test-sfi.js
+test_db.py
+
+# === Debug/temp JSON ===
+orders_debug.json
+qb_sync_output.json
+tmp.json
+woo_only.json
+woo_orders.json
+
+# === Backups ===
+*.backup*
+*.bak
+*.zip
+js/dados_backup*.json
+
+# === SQL migrations (dev) ===
+migrate_tables.sql
+
+# === Agent/Claude metadata ===
+.agent/
+.claude/
+
+# === Logs ===
+*.log
+
+# === Research docs (not part of site) ===
+delivery-research-dublin.md
+
+# === More backups in js/ ===
+js/dados.json.bak-before-images
+js/*.bak*
+
+# === Dev query scripts at root ===
+query_orders.js
+query_woo_orders.js
+
+# === Supabase temp ===
+supabase/.temp/
+
+# === Internal reports (not public site) ===
+auditoria_custos.html
+relatorio_investimento_marketing.html
+relatorio_roi_consolidado.html

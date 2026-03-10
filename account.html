@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Login or Create Account - Sports Foods Ireland">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="My Account - Sports Foods Ireland">
+    <meta property="og:description" content="Manage your Sports Foods Ireland account.">
+    <meta property="og:url" content="https://www.sportsfoodsireland.ie/account.html">
+    <meta property="og:image" content="https://www.sportsfoodsireland.ie/img/og-home.jpg">
+    <meta property="og:site_name" content="Sports Foods Ireland">
+
+    <title>My Account - Sports Foods Ireland</title>
+    <link rel="canonical" href="https://www.sportsfoodsireland.ie/account.html">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="preload" href="css/sfi-styles.min.css?v=18" as="style">
+    <link rel="stylesheet" href="css/sfi-styles.min.css?v=18">
+
+    <!-- Country Phone Selector Styles -->
+    <style>
+    .phone-input-wrapper {
+        display: flex;
+        align-items: stretch;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        overflow: visible;
+        background: #fff;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .phone-input-wrapper:focus-within {
+        border-color: #2d6a4f;
+        box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+    }
+    .country-selector {
+        position: relative;
+        flex-shrink: 0;
+    }
+    .country-selector-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 10px 10px 12px;
+        background: #f8f9fa;
+        border: none;
+        border-right: 1px solid #d1d5db;
+        cursor: pointer;
+        color: #1e293b;
+        font-size: 0.9rem;
+        height: 100%;
+        border-radius: 7px 0 0 7px;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+    .country-selector-btn:hover {
+        background: #e9ecef;
+    }
+    .country-flag {
+        font-size: 1.3rem;
+        line-height: 1;
+    }
+    .country-code {
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        font-size: 0.85rem;
+        color: #495057;
+    }
+    .dropdown-arrow {
+        color: #6c757d;
+        transition: transform 0.2s;
+        margin-left: 2px;
+    }
+    .country-selector.open .dropdown-arrow {
+        transform: rotate(180deg);
+    }
+    .country-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        width: 280px;
+        max-height: 260px;
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        z-index: 1000;
+        overflow: hidden;
+        flex-direction: column;
+    }
+    .country-selector.open .country-dropdown {
+        display: flex;
+    }
+    .country-search {
+        width: 100%;
+        padding: 10px 14px;
+        border: none;
+        border-bottom: 1px solid #e9ecef;
+        background: transparent;
+        color: #1e293b;
+        font-size: 0.85rem;
+        outline: none;
+    }
+    .country-search::placeholder {
+        color: #9ca3af;
+    }
+    .country-list {
+        overflow-y: auto;
+        flex: 1;
+        max-height: 200px;
+    }
+    .country-list::-webkit-scrollbar { width: 6px; }
+    .country-list::-webkit-scrollbar-track { background: transparent; }
+    .country-list::-webkit-scrollbar-thumb { background: #c1c7cd; border-radius: 3px; }
+    .country-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 14px;
+        cursor: pointer;
+        transition: background 0.15s;
+        font-size: 0.85rem;
+    }
+    .country-item:hover {
+        background: #f0fdf4;
+    }
+    .country-item.active {
+        background: #e8f5ee;
+    }
+    .country-item .ci-flag { font-size: 1.2rem; flex-shrink: 0; }
+    .country-item .ci-name { flex: 1; color: #1e293b; }
+    .country-item .ci-code { color: #6c757d; font-family: 'Inter', monospace; font-size: 0.8rem; }
+    .phone-number-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 10px 14px;
+        color: #1e293b;
+        font-size: 0.95rem;
+        outline: none;
+        min-width: 0;
+    }
+    .phone-number-input::placeholder {
+        color: #9ca3af;
+    }
+    /* Override any parent form-group styles on the inner input */
+    .phone-input-wrapper .phone-number-input {
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        height: auto;
+    }
+    .phone-input-wrapper input[type="tel"] {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #1e293b !important;
+    }
+    @media (max-width: 480px) {
+        .country-dropdown { width: 260px; }
+        .country-code { display: none; }
+        .country-selector-btn { padding: 10px 8px; }
+    }
+    </style>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@sportsfoodsie">
+    <meta name="twitter:title" content="My Account - Sports Foods Ireland">
+    <meta name="twitter:description" content="Manage your Sports Foods Ireland account.">
+    <meta name="twitter:image" content="https://www.sportsfoodsireland.ie/img/og-home.jpg">
+
+    <!-- Security -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+    <!-- PWA / Mobile -->
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="apple-touch-icon" href="img/logo.png">
+    <meta name="theme-color" content="#2D6A4F">
+</head>
+
+<body>
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+    <header>
+        <div class="container">
+            <button class="mobile-menu-toggle" aria-label="Menu" id="mobileMenuToggle">
+                <div class="hamburger-lines">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span class="hamburger-label">Menu</span>
+            </button>
+            <a href="index.html" class="logo">
+                <img src="img/logo.webp" alt="Sports Foods Ireland" class="logo-img">
+            </a>
+            <nav class="menu" id="mainMenu" role="navigation" aria-label="Main navigation">
+                <a href="index.html">Home</a>
+                <a href="shop.html">Shop</a>
+                <a href="categories.html">Categories</a>
+                <a href="brands.html">Brands</a>
+                <a href="offers.html">Offers</a>
+                <a href="about.html">About</a>
+                <a href="b2b/landing.html" class="nav-b2b">B2B Portal</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-wrapper icon-wrapper">
+                    <input type="text" placeholder="Search products..." class="busca padded-right" id="busca"
+                        aria-label="Search products" aria-describedby="search-description">
+                    <button type="button" id="searchBtn" aria-label="Search" class="close-btn-abs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                </div>
+                <span id="search-description" class="sr-only">Search for products by name</span>
+                <a href="wishlist.html" class="header-icon wishlist-link" aria-label="My Wishlist" title="Wishlist"><img
+                        src="img/heart-icon.svg" alt="Wishlist" class="header-svg-icon icon-svg"></a>
+                <a href="account.html" class="header-icon" aria-label="My account" title="Account"><img
+                        src="img/account-icon.svg" alt="Account" class="header-svg-icon"></a>
+                <div class="cart-wrapper">
+                    <a href="#" class="cart" aria-label="Shopping cart" id="cartIcon"><img src="img/cart-icon.svg"
+                            alt="Cart" class="header-svg-icon icon-svg"> <span class="cart-count">0</span></a>
+                </div>
+
+                <!-- Cart Modal -->
+                <div class="cart-modal-overlay" id="cartModalOverlay" role="dialog" aria-modal="true"
+                    aria-labelledby="cart-modal-title" aria-hidden="true">
+                    <div class="cart-modal" id="cartModal">
+                        <div class="cart-modal-header">
+                            <h2 id="cart-modal-title">Shopping Cart</h2>
+                            <button class="cart-modal-close" aria-label="Close cart" type="button">×</button>
+                        </div>
+                        <div class="cart-modal-content">
+                            <div class="cart-modal-items" id="cartModalItems">
+                                <div class="cart-modal-empty">Your cart is empty</div>
+                            </div>
+                        </div>
+                        <div class="cart-modal-footer" id="cartModalFooter" style="display: none;">
+                            <div class="cart-modal-total">
+                                <div class="cart-modal-total-row">
+                                    <span>Subtotal:</span>
+                                    <span id="cartModalSubtotal">€0.00</span>
+                                </div>
+                                <div class="cart-modal-total-row">
+                                    <span>Delivery:</span>
+                                    <span id="cartModalDelivery">€0.00</span>
+                                </div>
+                                <div class="cart-modal-total-row cart-modal-total-final">
+                                    <span>Total:</span>
+                                    <span id="cartModalTotal">€0.00</span>
+                                </div>
+                            </div>
+                            <div class="cart-modal-buttons">
+                                <a href="cart.html" class="cart-modal-button cart-modal-button-primary">View Cart</a>
+                                <a href="checkout.html"
+                                    class="cart-modal-button cart-modal-button-secondary">Checkout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Mobile Menu -->
+    <nav class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="index.html" class="mobile-menu-item">Home</a>
+            <a href="shop.html" class="mobile-menu-item">Shop</a>
+
+            <!-- Nutrition Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="nutrition">
+                    <span>Nutrition</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-nutrition">
+                    <a href="shop.html#nutrition#gels" class="mobile-menu-subcategory">Energy Gels</a>
+                    <a href="shop.html#nutrition#shots" class="mobile-menu-subcategory">Energy Shots</a>
+                    <a href="shop.html#nutrition#drinks" class="mobile-menu-subcategory">Sports Drinks</a>
+                    <a href="shop.html#nutrition#amino" class="mobile-menu-subcategory">Amino Acids</a>
+                    <a href="shop.html#nutrition#minerals" class="mobile-menu-subcategory">Minerals</a>
+                    <a href="shop.html#nutrition" class="mobile-menu-subcategory">View All Nutrition</a>
+                </div>
+            </div>
+
+            <!-- Cycling Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="cycling">
+                    <span>Cycling</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-cycling">
+                    <a href="shop.html#cycling#baselayers" class="mobile-menu-subcategory">Baselayers</a>
+                    <a href="shop.html#cycling#jerseys" class="mobile-menu-subcategory">Jerseys & Gilets</a>
+                    <a href="shop.html#cycling#gloves" class="mobile-menu-subcategory">Gloves</a>
+                    <a href="shop.html#cycling#overshoes" class="mobile-menu-subcategory">Overshoes</a>
+                    <a href="shop.html#cycling#socks" class="mobile-menu-subcategory">Socks</a>
+                    <a href="shop.html#cycling" class="mobile-menu-subcategory">View All Cycling</a>
+                </div>
+            </div>
+
+            <!-- Swimming Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="swimming">
+                    <span>Swimming</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-swimming">
+                    <a href="shop.html#swimming#wetsuits" class="mobile-menu-subcategory">Wetsuits</a>
+                    <a href="shop.html#swimming#swimwear" class="mobile-menu-subcategory">Swimwear</a>
+                    <a href="shop.html#swimming#goggles" class="mobile-menu-subcategory">Goggles</a>
+                    <a href="shop.html#swimming#safety" class="mobile-menu-subcategory">Safety Buoys</a>
+                    <a href="shop.html#swimming#accessories" class="mobile-menu-subcategory">Neoprene Accessories</a>
+                    <a href="shop.html#swimming#caps" class="mobile-menu-subcategory">Caps & Headwear</a>
+                    <a href="shop.html#swimming" class="mobile-menu-subcategory">View All Swimming</a>
+                </div>
+            </div>
+
+            <!-- Running Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="running">
+                    <span>Running</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-running">
+                    <a href="shop.html#running#accessories" class="mobile-menu-subcategory">Accessories</a>
+                    <a href="shop.html#running" class="mobile-menu-subcategory">View All Running</a>
+                </div>
+            </div>
+
+            <!-- Price Filter -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="price">
+                    <span>💰 Price Range</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-price">
+                    <div class="mobile-price-filter">
+                        <div class="mobile-price-inputs">
+                            <input type="number" id="mobilePriceMin" placeholder="Min €" min="0"
+                                class="mobile-price-input">
+                            <span>-</span>
+                            <input type="number" id="mobilePriceMax" placeholder="Max €" min="0"
+                                class="mobile-price-input">
+                        </div>
+                        <button class="mobile-price-apply-btn" onclick="applyMobilePriceFilter()">Apply Filter</button>
+                    </div>
+                </div>
+            </div>
+
+            <a href="brands.html" class="mobile-menu-item">Brands</a>
+            <a href="offers.html" class="mobile-menu-item">Offers</a>
+            <a href="about.html" class="mobile-menu-item">About</a>
+            <a href="contact.html" class="mobile-menu-item">Contact</a>
+            <a href="faq.html" class="mobile-menu-item">FAQ</a>
+        </div>
+    </nav>
+
+    <!-- Benefits Bar -->
+    <section class="benefits-bar">
+        <div class="container">
+            <div class="benefits-carousel">
+                <div class="benefits-track">
+                    <div class="benefit-item">
+                        <img src="img/delivery-icon.svg" alt="Delivery" class="benefit-svg-icon icon-svg">
+                        <span>Free Delivery over €60</span>
+                    </div>
+                    <div class="benefit-item">
+                        <img src="img/returns-icon.svg" alt="Returns" class="benefit-svg-icon icon-svg">
+                        <span>30-Day Returns</span>
+                    </div>
+                    <div class="benefit-item">
+                        <img src="img/secure-payment-icon.svg" alt="Secure Payment" class="benefit-svg-icon icon-svg">
+                        <span>Secure Payment</span>
+                    </div>
+                    <div class="benefit-item">
+                        <img src="img/support-icon.svg" alt="Support" class="benefit-svg-icon icon-svg">
+                        <span>Weekday Support</span>
+                    </div>
+                    <!-- Duplicados exatos para loop infinito contínuo - devem ser idênticos -->
+                    <div class="benefit-item benefit-item-duplicate">
+                        <img src="img/delivery-icon.svg" alt="Delivery" class="benefit-svg-icon icon-svg">
+                        <span>Free Delivery over €60</span>
+                    </div>
+                    <div class="benefit-item benefit-item-duplicate">
+                        <img src="img/returns-icon.svg" alt="Returns" class="benefit-svg-icon icon-svg">
+                        <span>30-Day Returns</span>
+                    </div>
+                    <div class="benefit-item benefit-item-duplicate">
+                        <img src="img/secure-payment-icon.svg" alt="Secure Payment" class="benefit-svg-icon icon-svg">
+                        <span>Secure Payment</span>
+                    </div>
+                    <div class="benefit-item benefit-item-duplicate">
+                        <img src="img/support-icon.svg" alt="Support" class="benefit-svg-icon icon-svg">
+                        <span>Weekday Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <section class="page-hero">
+            <div class="container">
+                <h1>My Account</h1>
+                <p>Sign in to your account or create a new one</p>
+            </div>
+        </section>
+
+        <div class="container">
+            <div class="account-wrapper">
+                <!-- Login Form -->
+                <div class="account-card" id="loginCard">
+                    <h2>Sign In</h2>
+                    <p class="account-subtitle">Welcome back! Please enter your details.</p>
+
+                    <form id="loginForm" class="account-form">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" name="email" required placeholder="you@example.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" name="password" required placeholder="••••••••">
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="remember"> Remember me
+                            </label>
+                            <a href="#" class="forgot-link">Forgot password?</a>
+                        </div>
+
+                        <button type="submit" class="btn-account-primary">Sign In</button>
+
+                        <div class="divider">
+                            <span>or continue with</span>
+                        </div>
+
+                        <div class="social-login">
+                            <button type="button" class="btn-social btn-google" onclick="sfiSocialLogin('google')">
+                                <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px;vertical-align:middle;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                                Continue with Google
+                            </button>
+                            <button type="button" class="btn-social btn-facebook" onclick="sfiSocialLogin('facebook')">
+                                <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px;vertical-align:middle;" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                Continue with Facebook
+                            </button>
+                        </div>
+                    </form>
+
+                    <p class="account-switch">
+                        Don't have an account? <a href="#" onclick="showRegister(); return false;">Create one</a>
+                    </p>
+                </div>
+
+                <!-- Register Form -->
+                <div class="account-card" id="registerCard" style="display: none;">
+                    <h2>Create Account</h2>
+                    <p class="account-subtitle">Join us and start shopping!</p>
+
+                    <form id="registerForm" class="account-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="registerFirstName">First Name</label>
+                                <input type="text" id="registerFirstName" name="firstName" required placeholder="John">
+                            </div>
+                            <div class="form-group">
+                                <label for="registerLastName">Last Name</label>
+                                <input type="text" id="registerLastName" name="lastName" required placeholder="Doe">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registerEmail">Email Address</label>
+                            <input type="email" id="registerEmail" name="email" required placeholder="you@example.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registerPhone">Phone Number (optional)</label>
+                            <div class="phone-input-wrapper">
+                                <div class="country-selector" id="registerCountrySelector">
+                                    <button type="button" class="country-selector-btn" id="registerCountryBtn" onclick="toggleCountryDropdown('register')">
+                                        <span class="country-flag" id="registerFlag">🇮🇪</span>
+                                        <span class="country-code" id="registerCode">+353</span>
+                                        <svg class="dropdown-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                                    </button>
+                                    <div class="country-dropdown" id="registerDropdown">
+                                        <input type="text" class="country-search" placeholder="Search country..." oninput="filterCountries('register', this.value)">
+                                        <div class="country-list" id="registerCountryList"></div>
+                                    </div>
+                                </div>
+                                <input type="tel" id="registerPhone" name="phone" placeholder="XX XXX XXXX" class="phone-number-input">
+                                <input type="hidden" id="registerPhoneCode" name="phoneCode" value="+353">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registerPassword">Password</label>
+                            <input type="password" id="registerPassword" name="password" required
+                                placeholder="Min. 8 characters">
+                            <small class="password-hint">Must be at least 8 characters with 1 number</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registerConfirmPassword">Confirm Password</label>
+                            <input type="password" id="registerConfirmPassword" name="confirmPassword" required
+                                placeholder="••••••••">
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="newsletter"> Subscribe to newsletter for exclusive offers
+                            </label>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="terms" required> I agree to the <a href="terms.html">Terms
+                                    & Conditions</a> and <a href="privacy.html">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn-account-primary">Create Account</button>
+                    </form>
+
+                    <p class="account-switch">
+                        Already have an account? <a href="#" onclick="showLogin(); return false;">Sign in</a>
+                    </p>
+                </div>
+
+                <!-- Guest Checkout Option -->
+                <div class="guest-checkout-card">
+                    <h3>🛒 Continue as Guest</h3>
+                    <p>You don't need an account to place an order. Checkout as a guest and create an account later if
+                        you wish.</p>
+                    <a href="checkout.html" class="btn-guest">Continue to Checkout</a>
+                </div>
+
+                <!-- ===== ACCOUNT DASHBOARD (shown when logged in) ===== -->
+                <div id="accountDashboard" style="display:none; width:100%;">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Welcome back, <span id="dashName">Customer</span>!</h2>
+                            <p class="account-subtitle" id="dashEmail"></p>
+                        </div>
+                        <button class="btn-account-outline" onclick="handleSignOut()">Sign Out</button>
+                    </div>
+
+                    <div class="dash-tabs">
+                        <button class="dash-tab active" data-tab="profile">👤 Profile</button>
+                        <button class="dash-tab" data-tab="orders">📦 Orders</button>
+                        <button class="dash-tab" data-tab="addresses">📍 Addresses</button>
+                        <button class="dash-tab" data-tab="settings">⚙️ Settings</button>
+                    </div>
+
+                    <!-- B2B Pending Badge (hidden by default) -->
+                    <div id="b2bPendingBadge" style="display:none; background:#fffbeb; border:1px solid #fde68a; color:#92400e; padding:12px 18px; border-radius:8px; margin-bottom:16px; font-size:0.9rem;">
+                        ⏳ <strong>B2B Application Pending</strong> — We'll notify you by email within 48 hours once your wholesale account is reviewed.
+                    </div>
+
+                    <!-- B2B Access Button (hidden by default) -->
+                    <a id="b2bAccessBtn" href="b2b/portal.html" style="display:none; background:#2D6A4F; color:#fff; padding:14px 24px; border-radius:8px; text-decoration:none; font-weight:600; font-size:0.95rem; margin-bottom:12px; text-align:center; width:100%; max-width:360px;">
+                        📊 My B2B Account & Orders
+                    </a>
+                    <a id="b2bShopBtn" href="b2b/shop.html" style="display:none; background:transparent; border:2px solid #2D6A4F; color:#2D6A4F; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600; font-size:0.9rem; margin-bottom:16px; text-align:center; width:100%; max-width:360px;">
+                        🏢 Browse B2B Wholesale Shop
+                    </a>
+
+                    <!-- B2B Apply Link (shown to non-B2B customers) -->
+                    <div id="b2bApplyLink" style="display:none; margin-bottom:16px; font-size:0.85rem; color:#636E72;">
+                        Not a B2B customer yet? <a href="register-b2b.html" style="color:#2D6A4F; font-weight:500;">Apply for wholesale access →</a>
+                    </div>
+
+                    <!-- PROFILE TAB -->
+                    <div class="dash-panel active" id="tab-profile">
+                        <h3>Personal Information</h3>
+                        <form id="profileForm" class="account-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>First Name</label>
+                                    <input type="text" id="profFirstName" placeholder="John">
+                                </div>
+                                <div class="form-group">
+                                    <label>Last Name</label>
+                                    <input type="text" id="profLastName" placeholder="Doe">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <div class="phone-input-wrapper">
+                                    <div class="country-selector" id="profCountrySelector">
+                                        <button type="button" class="country-selector-btn" id="profCountryBtn" onclick="toggleCountryDropdown('prof')">
+                                            <span class="country-flag" id="profFlag">🇮🇪</span>
+                                            <span class="country-code" id="profCode">+353</span>
+                                            <svg class="dropdown-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                                        </button>
+                                        <div class="country-dropdown" id="profDropdown">
+                                            <input type="text" class="country-search" placeholder="Search country..." oninput="filterCountries('prof', this.value)">
+                                            <div class="country-list" id="profCountryList"></div>
+                                        </div>
+                                    </div>
+                                    <input type="tel" id="profPhone" placeholder="XX XXX XXXX" class="phone-number-input">
+                                    <input type="hidden" id="profPhoneCode" name="profilePhoneCode" value="+353">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-account-primary">Save Changes</button>
+                            <span id="profileMsg" class="form-msg"></span>
+                        </form>
+                    </div>
+
+                    <!-- ORDERS TAB -->
+                    <div class="dash-panel" id="tab-orders">
+                        <h3>Order History</h3>
+                        <div id="ordersList">
+                            <p class="empty-state">You haven't placed any orders yet. <a href="shop.html">Start
+                                    shopping</a></p>
+                        </div>
+                    </div>
+
+                    <!-- ADDRESSES TAB -->
+                    <div class="dash-panel" id="tab-addresses">
+                        <h3>Saved Addresses</h3>
+                        <div id="addressesList">
+                            <p class="empty-state">No saved addresses yet.</p>
+                        </div>
+                        <button class="btn-account-outline" onclick="toggleAddressForm()" style="margin-top:16px">+ Add
+                            Address</button>
+                        <form id="addressForm" class="account-form" style="display:none;margin-top:16px">
+                            <div class="form-group">
+                                <label>Address Label</label>
+                                <input type="text" id="addrLabel" placeholder="Home / Work">
+                            </div>
+                            <div class="form-group">
+                                <label>Address Line 1</label>
+                                <input type="text" id="addrLine1" required placeholder="123 Main Street">
+                            </div>
+                            <div class="form-group">
+                                <label>Address Line 2</label>
+                                <input type="text" id="addrLine2" placeholder="Apt, Suite (optional)">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>City</label>
+                                    <input type="text" id="addrCity" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>County / Eircode</label>
+                                    <input type="text" id="addrPostcode" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Country</label>
+                                <select id="addrCountry">
+                                    <option value="IE">Ireland</option>
+                                    <option value="GB">United Kingdom</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-account-primary">Save Address</button>
+                        </form>
+                    </div>
+
+                    <!-- SETTINGS TAB -->
+                    <div class="dash-panel" id="tab-settings">
+                        <h3>Change Password</h3>
+                        <form id="changePasswordForm" class="account-form">
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" id="newPassword" required placeholder="Min. 8 characters">
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm New Password</label>
+                                <input type="password" id="confirmNewPassword" required placeholder="••••••••">
+                            </div>
+                            <button type="submit" class="btn-account-primary">Update Password</button>
+                            <span id="passwordMsg" class="form-msg"></span>
+                        </form>
+
+                        <h3 style="margin-top:32px">Newsletter</h3>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="newsletterPref"> Receive promotional emails and offers
+                        </label>
+
+                        <h3 style="margin-top:32px;color:#f87171">Delete Account</h3>
+                        <p class="account-subtitle">Permanently delete your account and all associated data.</p>
+                        <button class="btn-account-danger" onclick="confirmDeleteAccount()">Delete My Account</button>
+                    </div>
+
+                    <!-- FORGOT PASSWORD OVERLAY -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <!-- FOOTER PADRÃO -->
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col footer-about">
+                    <img loading="lazy" src="img/logo.webp" alt="Sports Foods Ireland" class="footer-logo">
+                    <p>Ireland's trusted source for professional sports nutrition and equipment. Fueling athletes since
+                        2020.</p>
+                    <div class="footer-contact-info">
+                        <p><strong>📍</strong> Unit 12 Northwest Centre, Northwest Business Park, Blanchardstown, Dublin D15 YC53</p>
+                        <p><strong>📞</strong> <a href="tel:+35318400403" style="color:inherit;text-decoration:none;">+353 1 840 0403</a></p>
+                        <p><strong>📧</strong> info@sportsfoodsireland.ie</p>
+                        <p><strong>🕐</strong> Mon-Fri: 9am-6pm</p>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <ul>
+                        <li><a href="shop.html#nutrition">Nutrition</a></li>
+                        <li><a href="shop.html#cycling">Cycling</a></li>
+                        <li><a href="shop.html#swimming">Swimming</a></li>
+                        <li><a href="shop.html#running">Running</a></li>
+                        <li><a href="offers.html">Offers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Customer Service</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="faq.html">FAQs</a></li>
+                        <li><a href="shipping.html">Shipping Info</a></li>
+                        <li><a href="returns.html">Returns & Refunds</a></li>
+                        <li><a href="#">Track Order</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col footer-social">
+                    <h4>Connect With Us</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><img loading="lazy"
+                                src="img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook"
+                                class="social-icon"></a>
+                        <a href="#" aria-label="Instagram"><img loading="lazy"
+                                src="img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram"
+                                class="social-icon"></a>
+                        <a href="#" aria-label="Twitter/X"><img loading="lazy"
+                                src="img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
+                        <a href="#" aria-label="TikTok"><img loading="lazy"
+                                src="img/socialmedia-icons/icons8-tiktok-50.svg" alt="TikTok" class="social-icon"></a>
+                        <a href="#" aria-label="Pinterest"><img loading="lazy"
+                                src="img/socialmedia-icons/icons8-pinterest-50.svg" alt="Pinterest"
+                                class="social-icon"></a>
+                    </div>
+                    <h4>Secure Payment</h4>
+                    <div class="payment-icons">
+                        <img loading="lazy" src="img/payment-icons/card_visa.svg" alt="Visa" class="payment-icon-img">
+                        <img loading="lazy" src="img/payment-icons/card_mastercard.svg" alt="Mastercard"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="img/payment-icons/card_paypal.svg" alt="PayPal"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="img/payment-icons/card_apple_pay.svg" alt="Apple Pay"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="img/payment-icons/card_google_pay.svg" alt="Google Pay"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="img/payment-icons/card_klarna.svg" alt="Klarna"
+                            class="payment-icon-img">
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Sports Foods Ireland. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                    <a href="cookies.html">Cookies</a>
+                </div>
+            </div>
+        </div>
+        </main>
+
+        <footer>
+
+            <!-- Back to Top Button -->
+            <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+            <!-- Quick View Modal -->
+            <div class="quick-view-modal" id="quickViewModal">
+                <div class="quick-view-overlay" onclick="closeQuickView()"></div>
+                <div class="quick-view-content">
+                    <button class="quick-view-close" onclick="closeQuickView()" aria-label="Close">&times;</button>
+                    <div class="quick-view-grid">
+                        <div class="quick-view-image">
+                            <img loading="lazy" src="" alt="" id="qvImage">
+                        </div>
+                        <div class="quick-view-info">
+                            <span class="qv-brand" id="qvBrand"></span>
+                            <h2 id="qvTitle"></h2>
+                            <div class="qv-rating" id="qvRating">
+                                <span class="stars">★★★★★</span>
+                                <span class="count">(0 reviews)</span>
+                            </div>
+                            <div class="qv-price">
+                                <span class="qv-current-price" id="qvPrice">€0.00</span>
+                                <span class="qv-old-price" id="qvOldPrice"></span>
+                                <span class="qv-discount" id="qvDiscount"></span>
+                            </div>
+                            <p class="qv-description" id="qvDescription"></p>
+                            <div class="qv-stock" id="qvStock">
+                                <span class="stock-dot"></span>
+                                <span class="stock-text">In Stock</span>
+                            </div>
+                            <div class="qv-quantity">
+                                <label>Quantity:</label>
+                                <div class="quantity-selector">
+                                    <button class="qty-btn minus" onclick="updateQvQuantity(-1)">−</button>
+                                    <input type="number" value="1" min="1" id="qvQuantity" readonly>
+                                    <button class="qty-btn plus" onclick="updateQvQuantity(1)">+</button>
+                                </div>
+                            </div>
+                            <div class="qv-actions">
+                                <button class="btn-qv-add-cart" id="qvAddToCart" onclick="addToCartFromQuickView()">
+                                    🛒 Add to Cart
+                                </button>
+                                <button class="btn-qv-wishlist" id="qvWishlist" onclick="toggleWishlistFromQuickView()">
+                                    ♡
+                                </button>
+                            </div>
+                            <a href="" class="qv-full-link" id="qvFullLink">View Full Details →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dark Mode Toggle Button -->
+            <button class="theme-toggle" id="darkModeToggleHTML" onclick="toggleDarkModeHTML()"
+                aria-label="Toggle dark mode" title="Alternar modo escuro/claro">🌙</button>
+            <script>
+                function toggleDarkModeHTML() {
+                    var html = document.documentElement;
+                    var btn = document.getElementById('darkModeToggleHTML');
+                    if (html.getAttribute('data-theme') === 'dark') {
+                        html.removeAttribute('data-theme');
+                        localStorage.setItem('sfi-theme', 'light');
+                        btn.innerHTML = '🌙';
+                        btn.style.background = '#ffffff';
+                        btn.style.borderColor = '#2D6A4F';
+                    } else {
+                        html.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('sfi-theme', 'dark');
+                        btn.innerHTML = '☀️';
+                        btn.style.background = '#333333';
+                        btn.style.borderColor = '#FF883E';
+                    }
+                }
+                // Aplicar tema salvo ao carregar
+                (function () {
+                    var saved = localStorage.getItem('sfi-theme');
+                    var btn = document.getElementById('darkModeToggleHTML');
+                    if (saved === 'dark') {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        if (btn) { btn.innerHTML = '☀️'; btn.style.background = '#333333'; btn.style.borderColor = '#FF883E'; }
+                    }
+                })();
+            </script>
+
+            <!-- AI Chatbot Widget -->
+            <div class="chatbot-widget" id="chatbot">
+                <button class="chatbot-toggle" onclick="toggleChatbot()">
+                    <svg class="chat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <svg class="close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                    <span class="chatbot-badge">1</span>
+                </button>
+                <div class="chatbot-window">
+                    <div class="chatbot-header">
+                        <div class="chatbot-header-title">
+                            <div class="chatbot-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                                    <line x1="9" y1="9" x2="9.01" y2="9" />
+                                    <line x1="15" y1="9" x2="15.01" y2="9" />
+                                </svg></div>
+                            <div>
+                                <div class="chatbot-name">Sports Foods Assistant</div>
+                                <div class="chatbot-status">Online now</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chatbot-messages" id="chatMessages">
+                        <div class="chat-message bot">👋 Hi! Welcome to Sports Foods Ireland. How can I help you today?
+                        </div>
+                    </div>
+                    <div class="chatbot-quick-actions">
+                        <button class="quick-action-btn" onclick="sendQuickMessage('Best protein')">💪 Best
+                            Protein</button>
+                        <button class="quick-action-btn" onclick="sendQuickMessage('Shipping')">🚚 Shipping</button>
+                        <button class="quick-action-btn" onclick="openQuiz()">📋 Take Quiz</button>
+                    </div>
+                    <div class="chatbot-input">
+                        <input type="text" id="chatInput" placeholder="Type your message..."
+                            onkeypress="handleChatKeypress(event)">
+                        <button class="chatbot-send-btn" onclick="sendMessage()" aria-label="Send message"><svg
+                                width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13" />
+                                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                            </svg></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Supplement Quiz Modal -->
+            <div class="quiz-modal" id="quizModal">
+                <div class="quiz-container">
+                    <div class="quiz-header">
+                        <h3>🎯 Find Your Perfect Stack</h3><button class="quiz-close" onclick="closeQuiz()">✕</button>
+                    </div>
+                    <div class="quiz-progress">
+                        <div class="quiz-progress-bar">
+                            <div class="quiz-progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="quiz-progress-text" id="progressText">Question 1 of 5</div>
+                    </div>
+                    <div class="quiz-content" id="quizContent">
+                        <div class="quiz-question active" data-question="1">
+                            <h4>What's your primary fitness goal?</h4>
+                            <div class="quiz-options"><label class="quiz-option"
+                                    onclick="selectOption(this,'muscle')"><input type="radio" name="q1"
+                                        value="muscle"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">💪</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">Build Muscle</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'weight-loss')"><input
+                                        type="radio" name="q1"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">🔥</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">Lose Weight</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'performance')"><input
+                                        type="radio" name="q1"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">⚡</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">Improve Performance</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'health')"><input
+                                        type="radio" name="q1"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">❤️</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">General Health</div>
+                                    </div>
+                                </label></div>
+                        </div>
+                        <div class="quiz-question" data-question="2">
+                            <h4>How often do you train?</h4>
+                            <div class="quiz-options"><label class="quiz-option"
+                                    onclick="selectOption(this,'1-2')"><input type="radio" name="q2"><span
+                                        class="quiz-option-radio"></span><span class="quiz-option-icon">🚶</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">1-2 times/week</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'3-4')"><input
+                                        type="radio" name="q2"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">🏃</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">3-4 times/week</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'5+')"><input type="radio"
+                                        name="q2"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">🏋️</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">5+ times/week</div>
+                                    </div>
+                                </label></div>
+                        </div>
+                        <div class="quiz-question" data-question="3">
+                            <h4>Dietary restrictions?</h4>
+                            <div class="quiz-options"><label class="quiz-option"
+                                    onclick="selectOption(this,'none')"><input type="radio" name="q3"><span
+                                        class="quiz-option-radio"></span><span class="quiz-option-icon">🍽️</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">None</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'vegan')"><input
+                                        type="radio" name="q3"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">🌱</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">Vegan</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'lactose')"><input
+                                        type="radio" name="q3"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">🥛</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">Lactose-free</div>
+                                    </div>
+                                </label></div>
+                        </div>
+                        <div class="quiz-question" data-question="4">
+                            <h4>Monthly budget?</h4>
+                            <div class="quiz-options"><label class="quiz-option"
+                                    onclick="selectOption(this,'budget')"><input type="radio" name="q4"><span
+                                        class="quiz-option-radio"></span><span class="quiz-option-icon">💰</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">€30-50</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'moderate')"><input
+                                        type="radio" name="q4"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">💎</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">€50-80</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'premium')"><input
+                                        type="radio" name="q4"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">👑</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">€80+</div>
+                                    </div>
+                                </label></div>
+                        </div>
+                        <div class="quiz-question" data-question="5">
+                            <h4>Current supplements?</h4>
+                            <div class="quiz-options"><label class="quiz-option"
+                                    onclick="selectOption(this,'none')"><input type="radio" name="q5"><span
+                                        class="quiz-option-radio"></span><span class="quiz-option-icon">🆕</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">None yet</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'basic')"><input
+                                        type="radio" name="q5"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">📦</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">Basics</div>
+                                    </div>
+                                </label><label class="quiz-option" onclick="selectOption(this,'advanced')"><input
+                                        type="radio" name="q5"><span class="quiz-option-radio"></span><span
+                                        class="quiz-option-icon">🧪</span>
+                                    <div class="quiz-option-text">
+                                        <div class="quiz-option-label">Full stack</div>
+                                    </div>
+                                </label></div>
+                        </div>
+                        <div class="quiz-results" id="quizResults" style="display:none">
+                            <div class="quiz-results-icon">✅</div>
+                            <h4>Your Stack is Ready! 🎉</h4>
+                            <p>Based on your goals:</p>
+                            <div class="quiz-recommendations" id="recommendations"></div>
+                        </div>
+                    </div>
+                    <div class="quiz-footer" id="quizFooter"><button class="quiz-btn quiz-btn-secondary" id="prevBtn"
+                            onclick="prevQuestion()" style="visibility:hidden">← Back</button><button
+                            class="quiz-btn quiz-btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Next
+                            →</button></div>
+                </div>
+            </div>
+            <!-- dados-embed.js removido: 578KB blocking. sfi-data-loader handles all -->
+            <!-- <script src="js/dados-embed.js"></script> -->
+            <script src="js/sfi-api.min.js?v=12" defer></script>
+            <script src="js/sfi-data-loader.min.js?v=2" defer></script>
+            <script src="js/cart.min.js?v=6" defer></script>
+            <script src="js/product-card.min.js?v=5" defer></script>
+            <script src="js/main.min.js?v=7" defer></script>
+            <script src="js/sfi-fixes.min.js?v=2" defer></script>
+            <script src="js/sfi-enhancements.min.js?v=2" defer></script>
+            <script src="js/account.min.js?v=4" defer></script>
+
+<!-- Country Phone Selector Script -->
+<script>
+(function() {
+const countries = [
+    { name: "Ireland", code: "+353", flag: "🇮🇪", iso: "IE" },
+    { name: "United Kingdom", code: "+44", flag: "🇬🇧", iso: "GB" },
+    { name: "United States", code: "+1", flag: "🇺🇸", iso: "US" },
+    { name: "Germany", code: "+49", flag: "🇩🇪", iso: "DE" },
+    { name: "France", code: "+33", flag: "🇫🇷", iso: "FR" },
+    { name: "Spain", code: "+34", flag: "🇪🇸", iso: "ES" },
+    { name: "Italy", code: "+39", flag: "🇮🇹", iso: "IT" },
+    { name: "Portugal", code: "+351", flag: "🇵🇹", iso: "PT" },
+    { name: "Netherlands", code: "+31", flag: "🇳🇱", iso: "NL" },
+    { name: "Belgium", code: "+32", flag: "🇧🇪", iso: "BE" },
+    { name: "Poland", code: "+48", flag: "🇵🇱", iso: "PL" },
+    { name: "Sweden", code: "+46", flag: "🇸🇪", iso: "SE" },
+    { name: "Norway", code: "+47", flag: "🇳🇴", iso: "NO" },
+    { name: "Denmark", code: "+45", flag: "🇩🇰", iso: "DK" },
+    { name: "Finland", code: "+358", flag: "🇫🇮", iso: "FI" },
+    { name: "Austria", code: "+43", flag: "🇦🇹", iso: "AT" },
+    { name: "Switzerland", code: "+41", flag: "🇨🇭", iso: "CH" },
+    { name: "Australia", code: "+61", flag: "🇦🇺", iso: "AU" },
+    { name: "Canada", code: "+1", flag: "🇨🇦", iso: "CA" },
+    { name: "Brazil", code: "+55", flag: "🇧🇷", iso: "BR" },
+    { name: "India", code: "+91", flag: "🇮🇳", iso: "IN" },
+    { name: "China", code: "+86", flag: "🇨🇳", iso: "CN" },
+    { name: "Japan", code: "+81", flag: "🇯🇵", iso: "JP" },
+    { name: "South Korea", code: "+82", flag: "🇰🇷", iso: "KR" },
+    { name: "Mexico", code: "+52", flag: "🇲🇽", iso: "MX" },
+    { name: "Argentina", code: "+54", flag: "🇦🇷", iso: "AR" },
+    { name: "South Africa", code: "+27", flag: "🇿🇦", iso: "ZA" },
+    { name: "New Zealand", code: "+64", flag: "🇳🇿", iso: "NZ" },
+    { name: "Czech Republic", code: "+420", flag: "🇨🇿", iso: "CZ" },
+    { name: "Romania", code: "+40", flag: "🇷🇴", iso: "RO" },
+    { name: "Hungary", code: "+36", flag: "🇭🇺", iso: "HU" },
+    { name: "Greece", code: "+30", flag: "🇬🇷", iso: "GR" },
+    { name: "Croatia", code: "+385", flag: "🇭🇷", iso: "HR" },
+    { name: "Lithuania", code: "+370", flag: "🇱🇹", iso: "LT" },
+    { name: "Latvia", code: "+371", flag: "🇱🇻", iso: "LV" },
+    { name: "Estonia", code: "+372", flag: "🇪🇪", iso: "EE" },
+    { name: "Luxembourg", code: "+352", flag: "🇱🇺", iso: "LU" },
+    { name: "Iceland", code: "+354", flag: "🇮🇸", iso: "IS" },
+    { name: "Turkey", code: "+90", flag: "🇹🇷", iso: "TR" },
+    { name: "United Arab Emirates", code: "+971", flag: "🇦🇪", iso: "AE" },
+    { name: "Saudi Arabia", code: "+966", flag: "🇸🇦", iso: "SA" },
+    { name: "Singapore", code: "+65", flag: "🇸🇬", iso: "SG" },
+    { name: "Malaysia", code: "+60", flag: "🇲🇾", iso: "MY" },
+    { name: "Thailand", code: "+66", flag: "🇹🇭", iso: "TH" },
+    { name: "Philippines", code: "+63", flag: "🇵🇭", iso: "PH" },
+    { name: "Nigeria", code: "+234", flag: "🇳🇬", iso: "NG" },
+    { name: "Egypt", code: "+20", flag: "🇪🇬", iso: "EG" },
+    { name: "Colombia", code: "+57", flag: "🇨🇴", iso: "CO" },
+    { name: "Chile", code: "+56", flag: "🇨🇱", iso: "CL" },
+    { name: "Peru", code: "+51", flag: "🇵🇪", iso: "PE" }
+];
+
+function buildCountryList(prefix) {
+    const list = document.getElementById(prefix + 'CountryList');
+    if (!list) return;
+    list.innerHTML = '';
+    countries.forEach(c => {
+        const el = document.createElement('div');
+        el.className = 'country-item' + (c.iso === 'IE' ? ' active' : '');
+        el.dataset.code = c.code;
+        el.dataset.flag = c.flag;
+        el.dataset.iso = c.iso;
+        el.innerHTML = '<span class="ci-flag">' + c.flag + '</span>'
+            + '<span class="ci-name">' + c.name + '</span>'
+            + '<span class="ci-code">' + c.code + '</span>';
+        el.addEventListener('click', function() { selectCountry(prefix, c); });
+        list.appendChild(el);
+    });
+}
+
+window.selectCountry = function(prefix, c) {
+    document.getElementById(prefix + 'Flag').textContent = c.flag;
+    document.getElementById(prefix + 'Code').textContent = c.code;
+    document.getElementById(prefix + 'PhoneCode').value = c.code;
+    // Update active state
+    const list = document.getElementById(prefix + 'CountryList');
+    list.querySelectorAll('.country-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.iso === c.iso);
+    });
+    toggleCountryDropdown(prefix, true);
+    document.getElementById(prefix + 'Phone').focus();
+};
+
+window.toggleCountryDropdown = function(prefix, forceClose) {
+    const sel = document.getElementById(prefix + 'CountrySelector');
+    if (forceClose === true) {
+        sel.classList.remove('open');
+    } else {
+        sel.classList.toggle('open');
+        if (sel.classList.contains('open')) {
+            const searchInput = sel.querySelector('.country-search');
+            searchInput.value = '';
+            filterCountries(prefix, '');
+            setTimeout(() => searchInput.focus(), 50);
+        }
+    }
+};
+
+window.filterCountries = function(prefix, query) {
+    const list = document.getElementById(prefix + 'CountryList');
+    const q = query.toLowerCase();
+    list.querySelectorAll('.country-item').forEach(el => {
+        const name = el.querySelector('.ci-name').textContent.toLowerCase();
+        const code = el.querySelector('.ci-code').textContent;
+        el.style.display = (name.includes(q) || code.includes(q)) ? '' : 'none';
+    });
+};
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    document.querySelectorAll('.country-selector.open').forEach(sel => {
+        if (!sel.contains(e.target)) sel.classList.remove('open');
+    });
+});
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    buildCountryList('register');
+    buildCountryList('prof');
+    // Handle OAuth callback (Google/Facebook redirect back)
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+        var waitSfi = setInterval(function() {
+            if (window.sfi && window.sfi.auth) {
+                clearInterval(waitSfi);
+                var ok = sfi.auth.handleOAuthCallback();
+                if (ok) {
+                    setTimeout(function() { window.location.reload(); }, 500);
+                }
+            }
+        }, 100);
+        setTimeout(function() { clearInterval(waitSfi); }, 8000);
+    }
+});
+
+// Social login handler
+window.sfiSocialLogin = function(provider) {
+    var waitSfi = setInterval(function() {
+        if (window.sfi && window.sfi.auth) {
+            clearInterval(waitSfi);
+            sfi.auth.signInWithOAuth(provider);
+        }
+    }, 100);
+    setTimeout(function() { clearInterval(waitSfi); }, 5000);
+};
+})();
+</script>
+</body>
+
+</html>

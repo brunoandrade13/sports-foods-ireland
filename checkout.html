@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Checkout - Sports Foods Ireland">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Checkout - Sports Foods Ireland">
+    <meta property="og:description" content="Complete your purchase securely.">
+    <meta property="og:url" content="https://www.sportsfoodsireland.ie/checkout.html">
+    <meta property="og:image" content="https://www.sportsfoodsireland.ie/img/og-home.jpg">
+    <meta property="og:site_name" content="Sports Foods Ireland">
+
+    <title>Checkout - Sports Foods Ireland</title>
+    <link rel="canonical" href="https://www.sportsfoodsireland.ie/checkout.html">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="preload" href="css/sfi-styles.min.css?v=18" as="style">
+    <link rel="stylesheet" href="css/sfi-styles.min.css?v=18">
+    <style>
+        .checkout-page {
+            padding: 48px 0;
+            min-height: 60vh;
+        }
+
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .checkout-header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .checkout-header h1 {
+            font-family: var(--font-title);
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .checkout-header p {
+            color: var(--color-text-muted);
+        }
+
+        .checkout-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 32px;
+        }
+
+        .checkout-form-section {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--color-border-light);
+        }
+
+        .checkout-form-section h2 {
+            font-family: var(--font-title);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .order-summary {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .order-summary h2 {
+            font-family: var(--font-title);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .order-items {
+            margin-bottom: 24px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .order-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .order-item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .order-item-info {
+            flex: 1;
+        }
+
+        .order-item-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .order-item-quantity {
+            font-size: 13px;
+            color: var(--color-text-muted);
+        }
+
+        .order-item-price {
+            font-family: var(--font-title);
+            font-weight: 700;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid var(--color-text);
+            margin-top: 12px;
+            padding-top: 16px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .checkout-empty {
+            text-align: center;
+            padding: 48px;
+            background: #fff;
+            border-radius: 16px;
+        }
+
+        .checkout-empty h2 {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .checkout-empty .btn-cta {
+            display: inline-block;
+            padding: 14px 32px;
+            background: var(--gradient-primary);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 1023px) {
+            .checkout-content {
+                grid-template-columns: 1fr;
+            }
+
+            .order-summary {
+                position: static;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@sportsfoodsie">
+    <meta name="twitter:title" content="Checkout - Sports Foods Ireland">
+    <meta name="twitter:description" content="Complete your purchase securely.">
+    <meta name="twitter:image" content="https://www.sportsfoodsireland.ie/img/og-home.jpg">
+
+    <!-- Security -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+    <!-- PWA / Mobile -->
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="apple-touch-icon" href="img/logo.png">
+    <meta name="theme-color" content="#2D6A4F">
+</head>
+
+<body>
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+    <header>
+        <div class="container">
+            <button class="mobile-menu-toggle" aria-label="Menu" id="mobileMenuToggle">
+                <div class="hamburger-lines">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span class="hamburger-label">Menu</span>
+            </button>
+            <a href="index.html" class="logo">
+                <img src="img/logo.webp" alt="Sports Foods Ireland" class="logo-img">
+            </a>
+            <nav class="menu" id="mainMenu" role="navigation" aria-label="Main navigation">
+                <a href="index.html">Home</a>
+                <a href="shop.html">Shop</a>
+                <a href="categories.html">Categories</a>
+                <a href="brands.html">Brands</a>
+                <a href="offers.html">Offers</a>
+                <a href="about.html">About</a>
+                <a href="b2b/landing.html" class="nav-b2b">B2B Portal</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-wrapper icon-wrapper">
+                    <input type="text" placeholder="Search products..." class="busca padded-right" id="busca"
+                        aria-label="Search products" aria-describedby="search-description">
+                    <button type="button" id="searchBtn" aria-label="Search" class="close-btn-abs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                </div>
+                <span id="search-description" class="sr-only">Search for products by name</span>
+                <a href="wishlist.html" class="header-icon wishlist-link" aria-label="My Wishlist" title="Wishlist"><img
+                        src="img/heart-icon.svg" alt="Wishlist" class="header-svg-icon icon-svg"></a>
+                <a href="account.html" class="header-icon" aria-label="My account" title="Account"><img
+                        src="img/account-icon.svg" alt="Account" class="header-svg-icon"></a>
+                <div class="cart-wrapper">
+                    <a href="#" class="cart" aria-label="Shopping cart" id="cartIcon"><img src="img/cart-icon.svg"
+                            alt="Cart" class="header-svg-icon icon-svg"> <span class="cart-count">0</span></a>
+                </div>
+
+                <!-- Cart Modal -->
+                <div class="cart-modal-overlay" id="cartModalOverlay" role="dialog" aria-modal="true"
+                    aria-labelledby="cart-modal-title" aria-hidden="true">
+                    <div class="cart-modal" id="cartModal">
+                        <div class="cart-modal-header">
+                            <h2 id="cart-modal-title">Shopping Cart</h2>
+                            <button class="cart-modal-close" aria-label="Close cart" type="button">×</button>
+                        </div>
+                        <div class="cart-modal-content">
+                            <div class="cart-modal-items" id="cartModalItems">
+                                <div class="cart-modal-empty">Your cart is empty</div>
+                            </div>
+                        </div>
+                        <div class="cart-modal-footer" id="cartModalFooter" style="display: none;">
+                            <div class="cart-modal-total">
+                                <div class="cart-modal-total-row">
+                                    <span>Subtotal:</span>
+                                    <span id="cartModalSubtotal">€0.00</span>
+                                </div>
+                                <div class="cart-modal-total-row">
+                                    <span>Delivery:</span>
+                                    <span id="cartModalDelivery">€0.00</span>
+                                </div>
+                                <div class="cart-modal-total-row cart-modal-total-final">
+                                    <span>Total:</span>
+                                    <span id="cartModalTotal">€0.00</span>
+                                </div>
+                            </div>
+                            <div class="cart-modal-buttons">
+                                <a href="cart.html" class="cart-modal-button cart-modal-button-primary">View Cart</a>
+                                <a href="checkout.html"
+                                    class="cart-modal-button cart-modal-button-secondary">Checkout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Mobile Menu -->
+    <nav class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="index.html" class="mobile-menu-item">Home</a>
+            <a href="shop.html" class="mobile-menu-item">Shop</a>
+
+            <!-- Nutrition Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="nutrition">
+                    <span>Nutrition</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-nutrition">
+                    <a href="shop.html#nutrition#gels" class="mobile-menu-subcategory">Energy Gels</a>
+                    <a href="shop.html#nutrition#shots" class="mobile-menu-subcategory">Energy Shots</a>
+                    <a href="shop.html#nutrition#drinks" class="mobile-menu-subcategory">Sports Drinks</a>
+                    <a href="shop.html#nutrition#amino" class="mobile-menu-subcategory">Amino Acids</a>
+                    <a href="shop.html#nutrition#minerals" class="mobile-menu-subcategory">Minerals</a>
+                    <a href="shop.html#nutrition" class="mobile-menu-subcategory">View All Nutrition</a>
+                </div>
+            </div>
+
+            <!-- Cycling Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="cycling">
+                    <span>Cycling</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-cycling">
+                    <a href="shop.html#cycling#baselayers" class="mobile-menu-subcategory">Baselayers</a>
+                    <a href="shop.html#cycling#jerseys" class="mobile-menu-subcategory">Jerseys & Gilets</a>
+                    <a href="shop.html#cycling#gloves" class="mobile-menu-subcategory">Gloves</a>
+                    <a href="shop.html#cycling#overshoes" class="mobile-menu-subcategory">Overshoes</a>
+                    <a href="shop.html#cycling#socks" class="mobile-menu-subcategory">Socks</a>
+                    <a href="shop.html#cycling" class="mobile-menu-subcategory">View All Cycling</a>
+                </div>
+            </div>
+
+            <!-- Swimming Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="swimming">
+                    <span>Swimming</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-swimming">
+                    <a href="shop.html#swimming#wetsuits" class="mobile-menu-subcategory">Wetsuits</a>
+                    <a href="shop.html#swimming#swimwear" class="mobile-menu-subcategory">Swimwear</a>
+                    <a href="shop.html#swimming#goggles" class="mobile-menu-subcategory">Goggles</a>
+                    <a href="shop.html#swimming#safety" class="mobile-menu-subcategory">Safety Buoys</a>
+                    <a href="shop.html#swimming#accessories" class="mobile-menu-subcategory">Neoprene Accessories</a>
+                    <a href="shop.html#swimming#caps" class="mobile-menu-subcategory">Caps & Headwear</a>
+                    <a href="shop.html#swimming" class="mobile-menu-subcategory">View All Swimming</a>
+                </div>
+            </div>
+
+            <!-- Running Category -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="running">
+                    <span>Running</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-running">
+                    <a href="shop.html#running#accessories" class="mobile-menu-subcategory">Accessories</a>
+                    <a href="shop.html#running" class="mobile-menu-subcategory">View All Running</a>
+                </div>
+            </div>
+
+            <!-- Price Filter -->
+            <div class="mobile-menu-category">
+                <button class="mobile-menu-category-toggle" data-category="price">
+                    <span>💰 Price Range</span>
+                    <span class="mobile-menu-arrow">▼</span>
+                </button>
+                <div class="mobile-menu-subcategories" id="subcategory-price">
+                    <div class="mobile-price-filter">
+                        <div class="mobile-price-inputs">
+                            <input type="number" id="mobilePriceMin" placeholder="Min €" min="0"
+                                class="mobile-price-input">
+                            <span>-</span>
+                            <input type="number" id="mobilePriceMax" placeholder="Max €" min="0"
+                                class="mobile-price-input">
+                        </div>
+                        <button class="mobile-price-apply-btn" onclick="applyMobilePriceFilter()">Apply Filter</button>
+                    </div>
+                </div>
+            </div>
+
+            <a href="brands.html" class="mobile-menu-item">Brands</a>
+            <a href="offers.html" class="mobile-menu-item">Offers</a>
+            <a href="about.html" class="mobile-menu-item">About</a>
+            <a href="contact.html" class="mobile-menu-item">Contact</a>
+            <a href="faq.html" class="mobile-menu-item">FAQ</a>
+        </div>
+    </nav>
+
+    <!-- Benefits Bar -->
+    <section class="benefits-bar">
+        <div class="container">
+            <div class="benefits-carousel">
+                <div class="benefits-track">
+                    <div class="benefit-item">
+                        <img src="img/delivery-icon.svg" alt="Delivery" class="benefit-svg-icon icon-svg">
+                        <span>Free Delivery over €60</span>
+                    </div>
+                    <div class="benefit-item">
+                        <img src="img/returns-icon.svg" alt="Returns" class="benefit-svg-icon icon-svg">
+                        <span>30-Day Returns</span>
+                    </div>
+                    <div class="benefit-item">
+                        <img src="img/secure-payment-icon.svg" alt="Secure Payment" class="benefit-svg-icon icon-svg">
+                        <span>Secure Payment</span>
+                    </div>
+                    <div class="benefit-item">
+                        <img src="img/support-icon.svg" alt="Support" class="benefit-svg-icon icon-svg">
+                        <span>Weekday Support</span>
+                    </div>
+                    <!-- Duplicados exatos para loop infinito contínuo - devem ser idênticos -->
+                    <div class="benefit-item benefit-item-duplicate">
+                        <img src="img/delivery-icon.svg" alt="Delivery" class="benefit-svg-icon icon-svg">
+                        <span>Free Delivery over €60</span>
+                    </div>
+                    <div class="benefit-item benefit-item-duplicate">
+                        <img src="img/returns-icon.svg" alt="Returns" class="benefit-svg-icon icon-svg">
+                        <span>30-Day Returns</span>
+                    </div>
+                    <div class="benefit-item benefit-item-duplicate">
+                        <img src="img/secure-payment-icon.svg" alt="Secure Payment" class="benefit-svg-icon icon-svg">
+                        <span>Secure Payment</span>
+                    </div>
+                    <div class="benefit-item benefit-item-duplicate">
+                        <img src="img/support-icon.svg" alt="Support" class="benefit-svg-icon icon-svg">
+                        <span>Weekday Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <div class="checkout-page">
+            <div class="checkout-container">
+                <div class="checkout-header">
+                    <h1>🔒 Secure Checkout</h1>
+                    <p>Complete your order safely with encrypted checkout</p>
+                </div>
+                <div id="checkoutContent"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chatbot Widget -->
+    <div class="chatbot-widget" id="chatbot">
+        <button class="chatbot-toggle" onclick="toggleChatbot()">
+            <svg class="chat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <svg class="close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+            <span class="chatbot-badge">1</span>
+        </button>
+        <div class="chatbot-window">
+            <div class="chatbot-header">
+                <div class="chatbot-header-title">
+                    <div class="chatbot-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                            <line x1="9" y1="9" x2="9.01" y2="9" />
+                            <line x1="15" y1="9" x2="15.01" y2="9" />
+                        </svg></div>
+                    <div>
+                        <div class="chatbot-name">Sports Foods Assistant</div>
+                        <div class="chatbot-status">Online now</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-messages" id="chatMessages">
+                <div class="chat-message bot">👋 Need help with checkout? I can assist with payment options or shipping
+                    questions.</div>
+            </div>
+            <div class="chatbot-quick-actions">
+                <button class="quick-action-btn" onclick="sendQuickMessage('Payment options')">💳 Payments</button>
+                <button class="quick-action-btn" onclick="sendQuickMessage('Shipping info')">🚚 Shipping</button>
+                <button class="quick-action-btn" onclick="sendQuickMessage('Klarna')">💗 Klarna</button>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatInput" placeholder="Type your message..."
+                    onkeypress="handleChatKeypress(event)">
+                <button class="chatbot-send-btn" onclick="sendMessage()"><svg width="20" height="20" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13" />
+                        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                    </svg></button>
+            </div>
+        </div>
+    </div>
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col footer-about">
+                    <img loading="lazy" src="img/logo.webp" alt="Sports Foods Ireland" class="footer-logo">
+                    <p>Ireland's trusted source for professional sports nutrition and equipment. Fueling athletes since
+                        2020.</p>
+                    <div class="footer-contact-info">
+                        <p><strong>📍</strong> Unit 12 Northwest Centre, Northwest Business Park, Blanchardstown, Dublin D15 YC53</p>
+                        <p><strong>📞</strong> <a href="tel:+35318400403" style="color:inherit;text-decoration:none;">+353 1 840 0403</a></p>
+                        <p><strong>📧</strong> info@sportsfoodsireland.ie</p>
+                        <p><strong>🕐</strong> Mon-Fri: 9am-6pm</p>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <ul>
+                        <li><a href="shop.html#nutrition">Nutrition</a></li>
+                        <li><a href="shop.html#cycling">Cycling</a></li>
+                        <li><a href="shop.html#swimming">Swimming</a></li>
+                        <li><a href="shop.html#running">Running</a></li>
+                        <li><a href="offers.html">Offers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Customer Service</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="faq.html">FAQs</a></li>
+                        <li><a href="shipping.html">Shipping Info</a></li>
+                        <li><a href="returns.html">Returns & Refunds</a></li>
+                        <li><a href="#">Track Order</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col footer-social">
+                    <h4>Connect With Us</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><img loading="lazy"
+                                src="img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook"
+                                class="social-icon"></a>
+                        <a href="#" aria-label="Instagram"><img loading="lazy"
+                                src="img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram"
+                                class="social-icon"></a>
+                        <a href="#" aria-label="Twitter/X"><img loading="lazy"
+                                src="img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
+                        <a href="#" aria-label="TikTok"><img loading="lazy"
+                                src="img/socialmedia-icons/icons8-tiktok-50.svg" alt="TikTok" class="social-icon"></a>
+                        <a href="#" aria-label="Pinterest"><img loading="lazy"
+                                src="img/socialmedia-icons/icons8-pinterest-50.svg" alt="Pinterest"
+                                class="social-icon"></a>
+                    </div>
+                    <h4>Secure Payment</h4>
+                    <div class="payment-icons">
+                        <img loading="lazy" src="img/payment-icons/card_visa.svg" alt="Visa" class="payment-icon-img">
+                        <img loading="lazy" src="img/payment-icons/card_mastercard.svg" alt="Mastercard"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="img/payment-icons/card_paypal.svg" alt="PayPal"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="img/payment-icons/card_apple_pay.svg" alt="Apple Pay"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="img/payment-icons/card_google_pay.svg" alt="Google Pay"
+                            class="payment-icon-img">
+                        <img loading="lazy" src="img/payment-icons/card_klarna.svg" alt="Klarna"
+                            class="payment-icon-img">
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Sports Foods Ireland. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                    <a href="cookies.html">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+    <!-- Quick View Modal -->
+    <div class="quick-view-modal" id="quickViewModal">
+        <div class="quick-view-overlay" onclick="closeQuickView()"></div>
+        <div class="quick-view-content">
+            <button class="quick-view-close" onclick="closeQuickView()" aria-label="Close">&times;</button>
+            <div class="quick-view-grid">
+                <div class="quick-view-image">
+                    <img loading="lazy" src="" alt="" id="qvImage">
+                </div>
+                <div class="quick-view-info">
+                    <span class="qv-brand" id="qvBrand"></span>
+                    <h2 id="qvTitle"></h2>
+                    <div class="qv-rating" id="qvRating">
+                        <span class="stars">★★★★★</span>
+                        <span class="count">(0 reviews)</span>
+                    </div>
+                    <div class="qv-price">
+                        <span class="qv-current-price" id="qvPrice">€0.00</span>
+                        <span class="qv-old-price" id="qvOldPrice"></span>
+                        <span class="qv-discount" id="qvDiscount"></span>
+                    </div>
+                    <p class="qv-description" id="qvDescription"></p>
+                    <div class="qv-stock" id="qvStock">
+                        <span class="stock-dot"></span>
+                        <span class="stock-text">In Stock</span>
+                    </div>
+                    <div class="qv-quantity">
+                        <label>Quantity:</label>
+                        <div class="quantity-selector">
+                            <button class="qty-btn minus" onclick="updateQvQuantity(-1)">−</button>
+                            <input type="number" value="1" min="1" id="qvQuantity" readonly>
+                            <button class="qty-btn plus" onclick="updateQvQuantity(1)">+</button>
+                        </div>
+                    </div>
+                    <div class="qv-actions">
+                        <button class="btn-qv-add-cart" id="qvAddToCart" onclick="addToCartFromQuickView()">
+                            🛒 Add to Cart
+                        </button>
+                        <button class="btn-qv-wishlist" id="qvWishlist" onclick="toggleWishlistFromQuickView()">
+                            ♡
+                        </button>
+                    </div>
+                    <a href="" class="qv-full-link" id="qvFullLink">View Full Details →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dark Mode Toggle Button -->
+    <button class="theme-toggle" id="darkModeToggleHTML" onclick="toggleDarkModeHTML()" aria-label="Toggle dark mode"
+        title="Alternar modo escuro/claro">🌙</button>
+    <script>
+        function toggleDarkModeHTML() {
+            var html = document.documentElement;
+            var btn = document.getElementById('darkModeToggleHTML');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('sfi-theme', 'light');
+                btn.innerHTML = '🌙';
+                btn.style.background = '#ffffff';
+                btn.style.borderColor = '#2D6A4F';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('sfi-theme', 'dark');
+                btn.innerHTML = '☀️';
+                btn.style.background = '#333333';
+                btn.style.borderColor = '#FF883E';
+            }
+        }
+        // Aplicar tema salvo ao carregar
+        (function () {
+            var saved = localStorage.getItem('sfi-theme');
+            var btn = document.getElementById('darkModeToggleHTML');
+            if (saved === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                if (btn) { btn.innerHTML = '☀️'; btn.style.background = '#333333'; btn.style.borderColor = '#FF883E'; }
+            }
+        })();
+    </script>
+
+
+
+    <!-- Supplement Quiz Modal -->
+    <div class="quiz-modal" id="quizModal">
+        <div class="quiz-container">
+            <div class="quiz-header">
+                <h3>🎯 Find Your Perfect Stack</h3><button class="quiz-close" onclick="closeQuiz()">✕</button>
+            </div>
+            <div class="quiz-progress">
+                <div class="quiz-progress-bar">
+                    <div class="quiz-progress-fill" id="progressFill"></div>
+                </div>
+                <div class="quiz-progress-text" id="progressText">Question 1 of 5</div>
+            </div>
+            <div class="quiz-content" id="quizContent">
+                <div class="quiz-question active" data-question="1">
+                    <h4>What's your primary fitness goal?</h4>
+                    <div class="quiz-options"><label class="quiz-option" onclick="selectOption(this,'muscle')"><input
+                                type="radio" name="q1" value="muscle"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">💪</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">Build Muscle</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'weight-loss')"><input
+                                type="radio" name="q1"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">🔥</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">Lose Weight</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'performance')"><input
+                                type="radio" name="q1"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">⚡</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">Improve Performance</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'health')"><input type="radio"
+                                name="q1"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">❤️</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">General Health</div>
+                            </div>
+                        </label></div>
+                </div>
+                <div class="quiz-question" data-question="2">
+                    <h4>How often do you train?</h4>
+                    <div class="quiz-options"><label class="quiz-option" onclick="selectOption(this,'1-2')"><input
+                                type="radio" name="q2"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">🚶</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">1-2 times/week</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'3-4')"><input type="radio"
+                                name="q2"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">🏃</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">3-4 times/week</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'5+')"><input type="radio"
+                                name="q2"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">🏋️</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">5+ times/week</div>
+                            </div>
+                        </label></div>
+                </div>
+                <div class="quiz-question" data-question="3">
+                    <h4>Dietary restrictions?</h4>
+                    <div class="quiz-options"><label class="quiz-option" onclick="selectOption(this,'none')"><input
+                                type="radio" name="q3"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">🍽️</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">None</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'vegan')"><input type="radio"
+                                name="q3"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">🌱</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">Vegan</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'lactose')"><input type="radio"
+                                name="q3"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">🥛</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">Lactose-free</div>
+                            </div>
+                        </label></div>
+                </div>
+                <div class="quiz-question" data-question="4">
+                    <h4>Monthly budget?</h4>
+                    <div class="quiz-options"><label class="quiz-option" onclick="selectOption(this,'budget')"><input
+                                type="radio" name="q4"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">💰</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">€30-50</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'moderate')"><input type="radio"
+                                name="q4"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">💎</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">€50-80</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'premium')"><input type="radio"
+                                name="q4"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">👑</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">€80+</div>
+                            </div>
+                        </label></div>
+                </div>
+                <div class="quiz-question" data-question="5">
+                    <h4>Current supplements?</h4>
+                    <div class="quiz-options"><label class="quiz-option" onclick="selectOption(this,'none')"><input
+                                type="radio" name="q5"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">🆕</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">None yet</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'basic')"><input type="radio"
+                                name="q5"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">📦</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">Basics</div>
+                            </div>
+                        </label><label class="quiz-option" onclick="selectOption(this,'advanced')"><input type="radio"
+                                name="q5"><span class="quiz-option-radio"></span><span
+                                class="quiz-option-icon">🧪</span>
+                            <div class="quiz-option-text">
+                                <div class="quiz-option-label">Full stack</div>
+                            </div>
+                        </label></div>
+                </div>
+                <div class="quiz-results" id="quizResults" style="display:none">
+                    <div class="quiz-results-icon">✅</div>
+                    <h4>Your Stack is Ready! 🎉</h4>
+                    <p>Based on your goals:</p>
+                    <div class="quiz-recommendations" id="recommendations"></div>
+                </div>
+            </div>
+            <div class="quiz-footer" id="quizFooter"><button class="quiz-btn quiz-btn-secondary" id="prevBtn"
+                    onclick="prevQuestion()" style="visibility:hidden">← Back</button><button
+                    class="quiz-btn quiz-btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Next →</button>
+            </div>
+        </div>
+    </div>
+    <!-- dados-embed.js removido: 578KB blocking. sfi-data-loader handles all -->
+    <!-- <script src="js/dados-embed.js"></script> -->
+    <script src="js/sfi-api.min.js?v=2" defer></script>
+    <script src="js/sfi-data-loader.min.js?v=2" defer></script>
+    <script src="js/cart.min.js?v=6" defer></script>
+    <script src="js/product-card.min.js?v=5" defer></script>
+    <script src="js/main.min.js?v=7" defer></script>
+    <script src="js/sfi-fixes.min.js?v=2" defer></script>
+    <script src="js/sfi-enhancements.min.js?v=2" defer></script>
+    <script src="js/checkout.min.js?v=7" defer></script>
+    <script src="js/sfi-analytics.js" defer></script>
+</body>
+
+</html>

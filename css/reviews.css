@@ -1,0 +1,310 @@
+/* ============================================
+   PRODUCT REVIEWS - Sports Foods Ireland
+   ============================================ */
+
+/* Badge */
+.review-count-badge {
+    background: var(--color-primary, #2D6A4F);
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+    font-weight: 700;
+}
+
+/* Summary */
+.reviews-summary {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 0 20px;
+    border-bottom: 1px solid var(--color-border, #e5e5e5);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.reviews-avg-score {
+    text-align: center;
+    min-width: 80px;
+}
+.reviews-avg-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--color-text, #1a1a2e);
+    line-height: 1;
+}
+.reviews-avg-stars {
+    color: #f59e0b;
+    font-size: 16px;
+    margin: 4px 0;
+}
+.reviews-avg-count {
+    font-size: 12px;
+    color: var(--color-text-muted, #6b7280);
+}
+.reviews-bars {
+    flex: 1;
+    min-width: 200px;
+}
+.review-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+.review-bar-label {
+    width: 14px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--color-text-muted, #6b7280);
+}
+.review-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--color-bg-alt, #f3f4f6);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.review-bar-fill {
+    height: 100%;
+    background: #f59e0b;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+.review-bar-count {
+    width: 28px;
+    font-size: 12px;
+    color: var(--color-text-muted, #6b7280);
+}
+
+/* Review List */
+.reviews-list { margin-bottom: 24px; }
+.reviews-loading { color: var(--color-text-muted, #6b7280); font-style: italic; }
+.review-card {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border, #e5e5e5);
+}
+.review-card:last-child { border-bottom: none; }
+.review-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.review-author {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--color-text, #1a1a2e);
+}
+.review-verified {
+    background: #dcfce7;
+    color: #166534;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.review-date {
+    font-size: 12px;
+    color: var(--color-text-muted, #6b7280);
+}
+.review-stars {
+    color: #f59e0b;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+.review-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;
+    color: var(--color-text, #1a1a2e);
+}
+.review-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-secondary, #4b5563);
+}
+.review-helpful {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--color-text-muted, #6b7280);
+}
+.btn-helpful {
+    background: none;
+    border: 1px solid var(--color-border, #d1d5db);
+    border-radius: 4px;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--color-text-muted, #6b7280);
+    transition: all 0.2s;
+}
+.btn-helpful:hover {
+    border-color: var(--color-primary, #2D6A4F);
+    color: var(--color-primary, #2D6A4F);
+}
+.no-reviews-yet {
+    text-align: center;
+    padding: 24px;
+    color: var(--color-text-muted, #6b7280);
+}
+
+/* Load More */
+.btn-load-more-reviews {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: var(--color-bg-alt, #f3f4f6);
+    border: 1px solid var(--color-border, #d1d5db);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text, #1a1a2e);
+    margin-bottom: 24px;
+    transition: all 0.2s;
+}
+.btn-load-more-reviews:hover {
+    background: var(--color-primary, #2D6A4F);
+    color: #fff;
+    border-color: var(--color-primary, #2D6A4F);
+}
+
+/* Write Review Form */
+.write-review-section {
+    border-top: 2px solid var(--color-border, #e5e5e5);
+    padding-top: 20px;
+}
+.write-review-section h4 {
+    margin-bottom: 16px;
+    font-size: 18px;
+    color: var(--color-text, #1a1a2e);
+}
+.review-form .form-row {
+    margin-bottom: 14px;
+}
+.review-form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--color-text, #1a1a2e);
+}
+.review-form input[type="text"],
+.review-form input[type="email"],
+.review-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border, #d1d5db);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--background, #fff);
+    color: var(--color-text, #1a1a2e);
+    transition: border-color 0.2s;
+}
+.review-form input:focus,
+.review-form textarea:focus {
+    outline: none;
+    border-color: var(--color-primary, #2D6A4F);
+    box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+}
+
+/* Star Rating Input */
+.star-rating-input {
+    display: flex;
+    gap: 4px;
+    font-size: 28px;
+    cursor: pointer;
+}
+.star-input {
+    color: #d1d5db;
+    transition: color 0.15s;
+    user-select: none;
+}
+.star-input.active,
+.star-input.hover {
+    color: #f59e0b;
+}
+
+/* Submit Button */
+.btn-submit-review {
+    background: var(--color-primary, #2D6A4F);
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+.btn-submit-review:hover {
+    background: var(--color-primary-dark, #1b4332);
+    transform: translateY(-1px);
+}
+.btn-submit-review:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+.review-form-note {
+    font-size: 12px;
+    color: var(--color-text-muted, #6b7280);
+    margin-top: 8px;
+}
+.review-form-message {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+.review-form-message.success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+.review-form-message.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* Dark Mode */
+[data-theme="dark"] .review-verified {
+    background: #064e3b;
+    color: #6ee7b7;
+}
+[data-theme="dark"] .review-form-message.success {
+    background: #064e3b;
+    color: #6ee7b7;
+    border-color: #065f46;
+}
+[data-theme="dark"] .review-form-message.error {
+    background: #450a0a;
+    color: #fca5a5;
+    border-color: #7f1d1d;
+}
+
+/* Admin Reply */
+.review-admin-reply {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--color-bg-alt, #f9fafb);
+    border-left: 3px solid var(--color-primary, #2D6A4F);
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+}
+.review-admin-reply strong {
+    color: var(--color-primary, #2D6A4F);
+    font-size: 12px;
+    text-transform: uppercase;
+}

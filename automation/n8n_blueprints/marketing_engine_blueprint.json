@@ -1,0 +1,103 @@
+{
+    "name": "Sports Foods Ireland - Marketing Engine",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 9 * * 1"
+                        }
+                    ]
+                }
+            },
+            "id": "schedule-trigger",
+            "name": "Schedule Trigger",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "command": "python3 /Users/test/Desktop/sport/website-sfi-novo/automation/scripts/ai_content_gen.py --platform instagram --topic 'Lançamento do novo site e benefícios da Whey Protein'"
+            },
+            "id": "gen-content-node",
+            "name": "Generate Content",
+            "type": "n8n-nodes-base.executeCommand",
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "command": "python3 /Users/test/Desktop/sport/website-sfi-novo/automation/scripts/ai_image_gen.py --prompt {{ $node[\"Generate Content\"].json[\"media_prompt\"] }}"
+            },
+            "id": "gen-image-node",
+            "name": "Generate Image",
+            "type": "n8n-nodes-base.executeCommand",
+            "position": [
+                700,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "append",
+                "application": "appYOURAIRTABLEID",
+                "table": "Marketing_Queue",
+                "columns": {
+                    "Title": "={{ $node[\"Generate Content\"].json[\"title\"] }}",
+                    "Body": "={{ $node[\"Generate Content\"].json[\"body\"] }}",
+                    "Image_Path": "={{ $node[\"Generate Image\"].json[\"image_paths\"][0] }}",
+                    "Status": "Pending Approval"
+                }
+            },
+            "id": "write-to-airtable",
+            "name": "Airtable Queue",
+            "type": "n8n-nodes-base.airtable",
+            "position": [
+                950,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Schedule Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Generate Content",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Generate Content": {
+            "main": [
+                [
+                    {
+                        "node": "Generate Image",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Generate Image": {
+            "main": [
+                [
+                    {
+                        "node": "Airtable Queue",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
