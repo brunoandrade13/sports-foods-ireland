@@ -1249,9 +1249,6 @@
       <button class="btn-login" onclick="doLogin()">Sign In</button>
       <p style="color:var(--text-dim);font-size:0.75rem;margin-top:16px;text-align:center">Access restricted to
         authorized staff</p>
-      <p style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);text-align:center">
-        <button type="button" class="btn-login" onclick="doDevLogin()" style="background:var(--surface-2);color:var(--text-muted);font-size:0.9rem">Entrar sem login (modo desenvolvimento)</button>
-      </p>
     </div>
   </div>
 
@@ -3829,7 +3826,7 @@
     const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDQyODg3NywiZXhwIjoyMDg2MDA0ODc3fQ.YMd5_2axb5QFrMu5x-nOvRNiIQMjAbGwvkYdBVoAdug';
 
-    const DEV_MODE = true; // Set false for production
+    const DEV_MODE = false; // Set false for production
 
     // State
     let allProducts = [], filteredProducts = [];
