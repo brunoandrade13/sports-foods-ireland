@@ -1028,14 +1028,14 @@
 
     .variant-row {
       display: grid;
-      grid-template-columns: 120px 1fr 90px 80px 36px 36px 36px;
+      grid-template-columns: 120px 180px 120px 80px 60px 36px 36px;
       gap: 6px;
       align-items: center;
       padding: 8px 0;
       border-bottom: 1px solid var(--border);
     }
     .variant-row.child-variant {
-      grid-template-columns: 20px 120px 1fr 90px 80px 36px 1px 36px;
+      grid-template-columns: 20px 120px 180px 120px 80px 36px 1px 36px;
       padding-left: 10px;
       background: var(--surface-2);
       border-radius: 4px;
@@ -1986,7 +1986,9 @@
         <div class="page-header">
           <h1>Orders</h1>
           <div class="actions">
-            <button class="btn btn-outline" onclick="syncWooOrders()" id="btnSyncWoo">🔄 Sync WooCommerce</button>
+            <button class="btn btn-primary" type="button" onclick="openManualOrderModal()">+ Create Manual Order</button>
+            <button class="btn btn-outline" onclick="syncWooOrders()" id="btnSyncWoo">🔄 Sync WooCommerce Orders</button>
+            <button class="btn btn-outline" onclick="syncWooSkus()" id="btnSyncWooSkus">🔤 Sync Woo SKUs → Supabase</button>
             <button class="btn btn-outline" onclick="syncQBOrders()" id="btnSyncQB">🔄 Sync QuickBooks</button>
             <span id="syncStatus" style="font-size:0.8rem;color:var(--text-muted);margin-left:8px"></span>
           </div>
@@ -2085,6 +2087,141 @@
           </div>
           <div class="table-footer"><span id="ordersInfo">Loading...</span>
             <div class="pagination" id="ordersPagination"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANUAL ORDER MODAL -->
+      <div class="modal-overlay" id="manualOrderModal" style="display:none">
+        <div class="modal" style="max-width:640px">
+          <div class="modal-header">
+            <h3 id="moTitle">Create Manual Order</h3>
+            <button class="modal-close" onclick="closeManualOrderModal()">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-grid">
+              <div class="form-group full">
+                <label>Customer *</label>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                  <select id="moCustomer">
+                    <option value="">Select customer…</option>
+                  </select>
+                  <label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;color:var(--text-muted);cursor:pointer">
+                    <input type="checkbox" id="moOnlyB2B" checked style="width:14px;height:14px">
+                    Only B2B customers
+                  </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Currency</label>
+                <select id="moCurrency">
+                  <option value="EUR">EUR €</option>
+                  <option value="GBP">GBP £</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Financial status</label>
+                <select id="moFinancial">
+                  <option value="pending">Pending</option>
+                  <option value="paid">Paid</option>
+                  <option value="authorized">Authorized</option>
+                  <option value="partially_paid">Partially paid</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Fulfillment status</label>
+                <select id="moFulfillment">
+                  <option value="unfulfilled">Unfulfilled</option>
+                  <option value="partial">Partial</option>
+                  <option value="fulfilled">Fulfilled</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-grid" style="margin-top:12px">
+              <div class="form-group">
+                <label>Subtotal €</label>
+                <input type="number" id="moSubtotal" step="0.01" min="0" oninput="recalcManualOrderTotal()">
+              </div>
+              <div class="form-group">
+                <label>Order discount €</label>
+                <input type="number" id="moDiscount" step="0.01" min="0" oninput="recalcManualOrderTotal()">
+                <div class="hint">Discount applied to the whole order</div>
+              </div>
+              <div class="form-group">
+                <label>Shipping €</label>
+                <input type="number" id="moShipping" step="0.01" min="0" oninput="recalcManualOrderTotal()">
+              </div>
+              <div class="form-group">
+                <label>Tax €</label>
+                <input type="number" id="moTax" step="0.01" min="0" oninput="recalcManualOrderTotal()">
+              </div>
+              <div class="form-group">
+                <label>Total €</label>
+                <input type="number" id="moTotal" step="0.01" min="0">
+                <div class="hint">Auto-calculated but editable if needed</div>
+              </div>
+            </div>
+            <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border-color)">
+              <h4 style="margin-bottom:8px;font-size:0.95rem">Products in this order (B2B prices)</h4>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:flex-end">
+                <div class="form-group">
+                  <label>Filter by brand</label>
+                  <select id="moBrandFilter">
+                    <option value="">All brands</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Filter by category</label>
+                  <select id="moCategoryFilter">
+                    <option value="">All categories</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Search product</label>
+                  <input type="text" id="moProductSearch" placeholder="Name or SKU..." oninput="renderManualOrderProductPicker()">
+                </div>
+              </div>
+              <div class="table-wrap" style="max-height:220px;overflow-y:auto;margin-bottom:10px">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Brand</th>
+                      <th style="text-align:right">B2B €</th>
+                      <th style="width:110px;text-align:right">Qty</th>
+                      <th style="width:70px"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="moProductPickerBody">
+                    <tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">Select a B2B customer first.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-wrap" style="max-height:200px;overflow-y:auto">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th style="text-align:right">Unit €</th>
+                      <th style="text-align:right">Qty</th>
+                      <th style="text-align:right">Total €</th>
+                      <th style="width:60px"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="moItemsBody">
+                    <tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">No items added yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="form-group full" style="margin-top:12px">
+              <label>Internal notes</label>
+              <textarea id="moNotes" rows="2" placeholder="Notes about this manual order, PO number, etc."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeManualOrderModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveManualOrder()">Save Order</button>
           </div>
         </div>
       </div>
@@ -3112,7 +3249,7 @@
 
   <!-- PRODUCT MODAL -->
   <div class="modal-overlay" id="productModal">
-    <div class="modal">
+    <div class="modal" style="max-width:1000px;width:96%">
       <div class="modal-header">
         <h3 id="productModalTitle">Add Product</h3><button class="modal-close" onclick="closeProductModal()">✕</button>
       </div>
@@ -3216,7 +3353,7 @@
             placeholder="Full product description"></textarea></div>
 
         <!-- NUTRITION & DIETARY INFO -->
-        <div style="margin-top:16px; padding:16px; background:var(--surface-2); border-radius:8px; border:1px solid var(--border);">
+        <div id="nutritionBlock" style="margin-top:16px; padding:16px; background:var(--surface-2); border-radius:8px; border:1px solid var(--border); display:none">
           <h4 style="margin-bottom:12px; color:var(--accent); font-size:0.95rem; display:flex; align-items:center; gap:6px;">🥗 Nutrition & Dietary Info</h4>
           <div class="form-grid">
             <div class="form-group full"><label>Ingredients</label><textarea id="editIngredients" rows="2" placeholder="e.g. Maltodextrin, Fructose, Citric Acid, Sodium Citrate..."></textarea>
@@ -3273,8 +3410,46 @@
       <div class="variants-section">
         <h4>Variants <span class="count" id="variantCountLabel">No variants</span></h4>
         <div class="variant-type-tabs" id="variantTypeTabs"></div>
-        <div class="variant-row header"><span>Type</span><span>Value</span><span>Price €</span><span>Stock</span><span>Def</span><span></span><span></span></div>
+        <div class="variant-row header">
+          <span>Type</span>
+          <span>Value</span>
+          <span>SKU</span>
+          <span>Price €</span>
+          <span>Stock</span>
+          <span>Def</span>
+          <span></span>
+          <span></span>
+        </div>
         <div id="variantRows"></div>
+      </div>
+
+      <!-- Special Customer Prices -->
+      <div style="margin-top:16px; padding:16px; background:var(--surface-2); border-radius:8px; border:1px solid var(--border);">
+        <h4 style="margin-bottom:10px; display:flex;align-items:center;gap:8px;font-size:0.95rem;">
+          <span>🤝 Special Prices per Customer</span>
+          <span class="hint" style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">Negotiate custom prices for specific customers</span>
+        </h4>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <select id="spCustomerSelect" style="min-width:220px">
+            <option value="">Select customer…</option>
+          </select>
+          <input type="number" id="spPriceEur" step="0.01" min="0" placeholder="Price €" style="width:130px">
+          <button class="btn-sm btn-primary" type="button" onclick="addOrUpdateSpecialPrice()">Save Price</button>
+        </div>
+        <div class="table-wrap" style="max-height:200px;overflow-y:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th style="text-align:right">Price €</th>
+                <th style="width:70px"></th>
+              </tr>
+            </thead>
+            <tbody id="spListBody">
+              <tr><td colspan="3" style="color:var(--text-muted);font-size:0.85rem;">No special prices yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Sales History -->
@@ -3338,9 +3513,11 @@
           </table>
         </div>
       </div>
+      <div class="modal-footer" style="border-top:1px solid var(--border);margin-top:16px;padding-top:12px;display:flex;justify-content:flex-end;gap:10px">
+        <button class="btn btn-ghost" onclick="closeProductModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+      </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeProductModal()">Cancel</button><button
-        class="btn btn-primary" onclick="saveProduct()">Save Product</button></div>
   </div>
 
   <!-- DISCOUNT MODAL -->
@@ -3826,7 +4003,7 @@
     const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDQyODg3NywiZXhwIjoyMDg2MDA0ODc3fQ.YMd5_2axb5QFrMu5x-nOvRNiIQMjAbGwvkYdBVoAdug';
 
-    const DEV_MODE = false; // Set false for production
+    const DEV_MODE = true; // Usar sempre service_role no admin
 
     // State
     let allProducts = [], filteredProducts = [];
@@ -6148,7 +6325,7 @@
         });
 
         // New tables - load in parallel, catch individually
-        const [custs, ords, revs, coups, gcs, aban, shipZones, vends, pos, supps, invs] = await Promise.all([
+        const [custs, ords, revs, coups, gcs, aban, shipZones, vends, pos, supps, invs, custPrices] = await Promise.all([
           supaGetAll('customers', '?parent_customer_id=is.null&order=created_at.desc').catch(() => []),
           supaGetAll('orders', '?order=created_at.desc').catch(() => []),
           supaGet('reviews', '?select=*,products(name)&order=created_at.desc').catch(() => []),
@@ -6159,10 +6336,19 @@
           supaGetAll('vendors', '?order=name').catch(() => []),
           supaGetAll('purchase_orders', '?order=order_date.desc').catch(() => []),
           supaGetAll('suppliers', '?order=name').catch(() => []),
-          supaGet('v_all_sales', '?order=txn_date.desc&limit=1000').catch(() => [])
+          supaGet('v_all_sales', '?order=txn_date.desc&limit=1000').catch(() => []),
+          supaGetAll('customer_product_prices', '?order=created_at.desc').catch(() => [])
         ]);
 
         allCustomers = (custs || []).sort((a,b) => (b.total_spent_eur||0) - (a.total_spent_eur||0)); filteredCustomers = [...allCustomers];
+
+        // Build customer-specific price cache by product
+        window.customerProductPricesCache = {};
+        (custPrices || []).forEach(function(row) {
+          if (!row || !row.product_id) return;
+          if (!window.customerProductPricesCache[row.product_id]) window.customerProductPricesCache[row.product_id] = [];
+          window.customerProductPricesCache[row.product_id].push(row);
+        });
 
         // Mark group parents and aggregate group totals (parent + all subsidiaries) for list/KPIs
         try {
@@ -6280,11 +6466,36 @@
       const brandFilter = document.getElementById('productBrandFilter');
       const editBrand = document.getElementById('editBrand');
       const editCat = document.getElementById('editCategory');
+      // Preserve current selections while rebuilding option lists, to avoid
+      // fields "apagarem" quando o modal é aberto pela primeira vez.
+      const currentCatFilter = catFilter?.value || '';
+      const currentBrandFilter = brandFilter?.value || '';
+      const currentEditBrand = editBrand?.value || '';
+      const currentEditCat = editCat?.value || '';
 
-      catFilter.innerHTML = '<option value="">All Categories</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-      brandFilter.innerHTML = '<option value="">All Brands</option>' + brands.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
-      editBrand.innerHTML = '<option value="">Select brand...</option>' + brands.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
-      editCat.innerHTML = '<option value="">Select category...</option>' + categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      if (catFilter) {
+        catFilter.innerHTML = '<option value="">All Categories</option>' +
+          categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        catFilter.value = currentCatFilter;
+      }
+
+      if (brandFilter) {
+        brandFilter.innerHTML = '<option value="">All Brands</option>' +
+          brands.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+        brandFilter.value = currentBrandFilter;
+      }
+
+      if (editBrand) {
+        editBrand.innerHTML = '<option value="">Select brand...</option>' +
+          brands.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+        editBrand.value = currentEditBrand;
+      }
+
+      if (editCat) {
+        editCat.innerHTML = '<option value="">Select category...</option>' +
+          categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        editCat.value = currentEditCat;
+      }
 
       // SEO character counters
       const metaTitleEl = document.getElementById('editMetaTitle');
@@ -6298,6 +6509,13 @@
       const sel = document.getElementById('editSubcategory');
       const filtered = catId ? subcategories.filter(s => s.category_id === catId) : subcategories;
       sel.innerHTML = '<option value="">Select subcategory...</option>' + filtered.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      // Show nutrition block only when category name contains "Nutrition"
+      try {
+        const cat = categories.find(c => c.id === catId);
+        const isNutrition = cat && (String(cat.name || '').toLowerCase().includes('nutrition'));
+        const nb = document.getElementById('nutritionBlock');
+        if (nb) nb.style.display = isNutrition ? '' : 'none';
+      } catch (e) {}
     }
 
     // ============================================================
@@ -6598,6 +6816,20 @@
       document.getElementById('variantRows').innerHTML = '';
       renderVariantTypeTabs();
 
+      // Reset special prices UI
+      const spSelect = document.getElementById('spCustomerSelect');
+      const spBody = document.getElementById('spListBody');
+      const spPrice = document.getElementById('spPriceEur');
+      if (spSelect) {
+        spSelect.innerHTML = '<option value="">Select customer…</option>' +
+          (allCustomers || []).slice(0, 200).map(function(c) {
+            const name = c.display_name || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.company || c.email || '—';
+            return `<option value="${c.id}">${esc(name)}${c.email ? ' — ' + esc(c.email) : ''}</option>`;
+          }).join('');
+      }
+      if (spBody) spBody.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted);font-size:0.85rem;">No special prices yet.</td></tr>';
+      if (spPrice) spPrice.value = '';
+
       if (product) {
         document.getElementById('productModalTitle').textContent = 'Edit Product';
         document.getElementById('editProductId').value = product.id;
@@ -6666,6 +6898,26 @@
           kids.forEach(cv => addVariantRow(cv, null, pIdx));
         });
 
+        // Load customer-specific prices for this product
+        if (spBody) {
+          const rows = (window.customerProductPricesCache && window.customerProductPricesCache[product.id]) || [];
+          if (!rows.length) {
+            spBody.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted);font-size:0.85rem;">No special prices yet.</td></tr>';
+          } else {
+            spBody.innerHTML = rows.map(function(r) {
+              const cust = (allCustomers || []).find(function(c) { return c.id === r.customer_id; }) || {};
+              const name = cust.display_name || [cust.first_name, cust.last_name].filter(Boolean).join(' ') || cust.company || cust.email || '—';
+              return `<tr data-cpp-id="${r.id}">
+                <td>${esc(name)}</td>
+                <td class="price">€${parseFloat(r.price_eur || 0).toFixed(2)}</td>
+                <td style="text-align:right">
+                  <button class="btn-sm btn-ghost" type="button" onclick="editSpecialPriceRow('${r.id}')">Edit</button>
+                </td>
+              </tr>`;
+            }).join('');
+          }
+        }
+
         document.getElementById('salesHistorySection').style.display = 'block';
         loadSalesHistory(product.id);
         loadBatches(product.id);
@@ -6707,6 +6959,11 @@
       document.getElementById('uploadProgress').style.display = 'none';
       document.getElementById('imageFileInput').value = '';
       updateVariantCountLabel();
+      const bodyEl = modal.querySelector('.modal-body');
+      if (bodyEl) bodyEl.scrollTop = 0;
+      if (typeof window !== 'undefined' && window.scrollTo) {
+        window.scrollTo({ top: 0, behavior: 'instant' || 'auto' });
+      }
       modal.classList.add('open');
     }
 
@@ -6911,6 +7168,60 @@
       }
     }
 
+    function addOrUpdateSpecialPrice() {
+      const select = document.getElementById('spCustomerSelect');
+      const priceInput = document.getElementById('spPriceEur');
+      const body = document.getElementById('spListBody');
+      if (!select || !priceInput || !body) return;
+      const customerId = select.value;
+      const price = parseFloat(priceInput.value || '0');
+      if (!customerId) { toast('Select a customer', 'error'); return; }
+      if (!(price > 0)) { toast('Enter a valid price', 'error'); return; }
+
+      const existingRow = body.querySelector(`tr[data-customer-id="${customerId}"]`);
+      if (existingRow) {
+        existingRow.setAttribute('data-price-eur', String(price));
+        existingRow.setAttribute('data-cpp-pending', '1');
+        const priceCell = existingRow.querySelector('td.price');
+        if (priceCell) priceCell.textContent = '€' + price.toFixed(2);
+      } else {
+        const cust = (allCustomers || []).find(function(c) { return c.id === customerId; }) || {};
+        const name = cust.display_name || [cust.first_name, cust.last_name].filter(Boolean).join(' ') || cust.company || cust.email || '—';
+        const rowHtml = `<tr data-cpp-id="new" data-customer-id="${customerId}" data-price-eur="${price}" data-cpp-pending="1">
+          <td>${esc(name)}</td>
+          <td class="price">€${price.toFixed(2)}</td>
+          <td style="text-align:right">
+            <button class="btn-sm btn-ghost" type="button" onclick="editSpecialPriceRow(this)">Edit</button>
+          </td>
+        </tr>`;
+        if (body.querySelector('tr') && body.querySelector('tr').getAttribute('data-customer-id') == null) {
+          body.innerHTML = rowHtml;
+        } else {
+          body.insertAdjacentHTML('beforeend', rowHtml);
+        }
+      }
+      priceInput.value = '';
+      toast('Special price staged — will be saved with product', 'success');
+    }
+
+    function editSpecialPriceRow(btnOrId) {
+      const body = document.getElementById('spListBody');
+      const select = document.getElementById('spCustomerSelect');
+      const priceInput = document.getElementById('spPriceEur');
+      if (!body || !select || !priceInput) return;
+      let row = null;
+      if (typeof btnOrId === 'string') {
+        row = body.querySelector(`tr[data-cpp-id="${btnOrId}"]`);
+      } else if (btnOrId && btnOrId.closest) {
+        row = btnOrId.closest('tr');
+      }
+      if (!row) return;
+      const customerId = row.getAttribute('data-customer-id');
+      const price = parseFloat(row.getAttribute('data-price-eur') || '0');
+      if (customerId) select.value = customerId;
+      if (price > 0) priceInput.value = price.toFixed(2);
+    }
+
     async function saveProduct() {
       const id = document.getElementById('editProductId').value;
       const name = document.getElementById('editName').value.trim();
@@ -6965,6 +7276,7 @@
         if (savedId) {
           await saveVariants(savedId);
           await syncProductImages(savedId);
+          await saveSpecialPrices(savedId);
         }
         toast(id ? 'Product updated' : 'Product created');
         const state = saveProductListState();
@@ -6972,6 +7284,39 @@
         await loadAllData();
         restoreProductListState(state);
       } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    async function saveSpecialPrices(productId) {
+      const body = document.getElementById('spListBody');
+      if (!body || !productId) return;
+      const rows = [...body.querySelectorAll('tr[data-cpp-pending="1"]')];
+      if (!rows.length) return;
+      for (const tr of rows) {
+        const customerId = tr.getAttribute('data-customer-id');
+        const priceStr = tr.getAttribute('data-price-eur');
+        const existingId = tr.getAttribute('data-cpp-id') || null;
+        const price = parseFloat(priceStr || '0');
+        if (!customerId || !(price > 0)) continue;
+        const payload = {
+          product_id: productId,
+          customer_id: customerId,
+          price_eur: price,
+          is_active: true
+        };
+        try {
+          if (existingId && existingId !== 'new') {
+            await supaUpdate('customer_product_prices', existingId, payload);
+          } else {
+            const created = await supaInsert('customer_product_prices', payload);
+            const newId = Array.isArray(created) && created[0] ? created[0].id : null;
+            if (newId) tr.setAttribute('data-cpp-id', newId);
+          }
+          tr.removeAttribute('data-cpp-pending');
+        } catch (e) {
+          console.error('Error saving special price', e);
+          toast('Error saving special price', 'error');
+        }
+      }
     }
 
     async function deleteProduct(id, name) {
@@ -7021,12 +7366,14 @@
       row.dataset.parentVariantId = existing?.parent_variant_id || '';
 
       const label = existing?.label || existing?.value || '';
+      const existingSku = existing?.sku || existing?.variant_sku || '';
       const typeOpts = variantTypes.map(vt => `<option value="${vt.id}" ${vt.id === vtId ? 'selected' : ''}>${vt.name}</option>`).join('');
 
       if (isChild) {
         row.innerHTML = `<span class="child-indent">↳</span>
     <select id="vtype-${idx}">${typeOpts}</select>
     <input type="text" id="vval-${idx}" placeholder="e.g. 30 Serv Bag..." value="${esc(label)}">
+    <input type="text" id="vsku-${idx}" placeholder="SKU" value="${esc(existingSku || '')}">
     <input type="number" id="vprice-${idx}" step="0.01" min="0" placeholder="€" value="${existing?.price || ''}">
     <input type="number" id="vstock-${idx}" min="0" placeholder="0" value="${existing?.stock || 0}">
     <input type="radio" name="vdefault" class="variant-default-radio" id="vdef-${idx}" ${existing?.is_default ? 'checked' : ''}>
@@ -7036,6 +7383,7 @@
         row.classList.add('parent-variant');
         row.innerHTML = `<select id="vtype-${idx}">${typeOpts}</select>
     <input type="text" id="vval-${idx}" placeholder="e.g. Berry, Blue..." value="${esc(label)}">
+    <input type="text" id="vsku-${idx}" placeholder="SKU" value="${esc(existingSku || '')}">
     <input type="number" id="vprice-${idx}" step="0.01" min="0" placeholder="€" value="${existing?.price || ''}">
     <input type="number" id="vstock-${idx}" min="0" placeholder="0" value="${existing?.stock || 0}">
     <input type="radio" name="vdefault" class="variant-default-radio" id="vdef-${idx}" ${existing?.is_default ? 'checked' : ''}>
@@ -7099,11 +7447,13 @@
         if (!val) return;
         const isChild = row.classList.contains('child-variant');
         const parentRowIdx = row.dataset.parentRowIdx || '';
+        const skuVal = (document.getElementById(`vsku-${idx}`)?.value || '').trim();
 
         const data = {
           existingId: row.dataset.existingId || null,
           variant_type_id: document.getElementById(`vtype-${idx}`)?.value,
           value: val,
+          sku: skuVal || null,
           price_eur: parseFloat(document.getElementById(`vprice-${idx}`)?.value) || null,
           stock_quantity: parseInt(document.getElementById(`vstock-${idx}`)?.value) || 0,
           is_default: document.getElementById(`vdef-${idx}`)?.checked || false,
@@ -7134,7 +7484,7 @@
       for (let i = 0; i < variants.length; i++) {
         const v = variants[i];
         if (v.is_child) continue;
-        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, price: v.price_eur, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: null };
+        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: null };
         try {
           if (v.existingId) {
             await supaUpdate('product_variants', v.existingId, data);
@@ -7151,7 +7501,7 @@
         const v = variants[i];
         if (!v.is_child) continue;
         const parentUUID = parentIdMap[v.parent_row_idx] || v.existingId ? (existing.find(e => e.id === v.existingId)?.parent_variant_id || null) : null;
-        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, price: v.price_eur, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: parentUUID };
+        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: parentUUID };
         try {
           if (v.existingId) await supaUpdate('product_variants', v.existingId, data);
           else await supaInsert('product_variants', data);
@@ -8016,6 +8366,37 @@
       } finally {
         btn.disabled = false;
         btn.textContent = '🔄 Sync WooCommerce';
+      }
+    }
+
+    async function syncWooSkus() {
+      const btn = document.getElementById('btnSyncWooSkus');
+      const status = document.getElementById('syncStatus');
+      if (!btn) return;
+      btn.disabled = true;
+      btn.textContent = '⏳ Syncing Woo SKUs...';
+      if (status) status.textContent = 'Calling WooCommerce SKU sync...';
+
+      try {
+        const resp = await fetch(`${SUPA_URL}/functions/v1/woo-sync-skus`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPA_KEY}` }
+        });
+        const result = await resp.json();
+        if (!resp.ok || !result.success) throw new Error(result.error || 'WooCommerce SKU sync failed');
+
+        const s = result.stats || {};
+        if (status) status.textContent = `✅ Woo SKUs: processed ${s.processed||0}, matched ${s.matched||0}, updated ${s.updated||0}`;
+        toast(`Woo SKUs synced: ${s.updated||0} products updated`, 'success');
+
+        // Reload products to reflect new SKUs
+        await loadAllData();
+      } catch (err) {
+        if (status) status.textContent = `❌ Woo SKUs Error: ${err.message}`;
+        toast('WooCommerce SKU sync failed: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔤 Sync Woo SKUs → Supabase';
       }
     }
 
@@ -9882,7 +10263,22 @@
       const isActive = cust.is_active !== false;
       const statusCls = isActive ? 'in' : 'out';
       const statusLabel = isActive ? 'Active' : 'Inactive';
-      document.getElementById('cpStatusToggle').innerHTML = `<span class="stock-badge ${statusCls}">${statusLabel}</span> <button class="btn-sm btn-outline" onclick="toggleCustomerStatus()" style="margin-left:8px">${isActive ? '⏸ Deactivate' : '▶ Activate'}</button>`;
+      const isBlocked = cust.is_blocked === true;
+      const blockedBadge = isBlocked
+        ? '<span class="stock-badge out" style="background:#b91c1c;color:#fff;margin-left:6px;" title="This customer is blocked from purchasing">Blocked</span>'
+        : '';
+      document.getElementById('cpStatusToggle').innerHTML =
+        `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:6px">
+          <span class="stock-badge ${statusCls}">${statusLabel}</span>
+          ${blockedBadge}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+          <button class="btn-sm btn-outline" onclick="toggleCustomerStatus()">${isActive ? '⏸ Deactivate' : '▶ Activate'}</button>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text-muted);cursor:pointer">
+            <input type="checkbox" id="cpBlockedToggle" ${isBlocked ? 'checked' : ''} onchange="toggleCustomerBlocked()" style="width:16px;height:16px">
+            Block this customer from new orders
+          </label>
+        </div>`;
       currentProfileCustomerId = id;
 
       // Reset chart
@@ -10284,6 +10680,385 @@
       }
     }
 
+    function getB2BPriceForCustomer(product, customerId) {
+      // 1) Special price por cliente+produto, se existir
+      const byProd = window.customerProductPricesCache && window.customerProductPricesCache[product.id];
+      if (byProd && customerId) {
+        const row = byProd.find(function (r) { return r.customer_id === customerId && r.is_active !== false; });
+        if (row && row.price_eur != null) return parseFloat(row.price_eur) || 0;
+      }
+      // 2) wholesale_price_eur se definido, senão price_eur
+      if (product.wholesale_price_eur != null && Number(product.wholesale_price_eur) > 0) {
+        return parseFloat(product.wholesale_price_eur) || 0;
+      }
+      return parseFloat(product.price_eur) || 0;
+    }
+
+    function openManualOrderModal() {
+      const modal = document.getElementById('manualOrderModal');
+      if (!modal) return;
+      const sel = document.getElementById('moCustomer');
+      const onlyB2B = document.getElementById('moOnlyB2B');
+      if (sel) {
+        const onlyB2BVal = !onlyB2B || onlyB2B.checked;
+        const list = (allCustomers || []).filter(function (c) {
+          return !onlyB2BVal || c.customer_type === 'b2b';
+        }).slice(0, 500);
+        sel.innerHTML = '<option value="">Select customer…</option>' +
+          list.map(function (c) {
+            const name = c.display_name || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.company || c.email || '—';
+            return `<option value="${c.id}">${esc(name)}${c.email ? ' — ' + esc(c.email) : ''}</option>`;
+          }).join('');
+      }
+      const brandSel = document.getElementById('moBrandFilter');
+      const catSel = document.getElementById('moCategoryFilter');
+      if (brandSel) {
+        const brandNames = Array.from(new Set((allProducts || []).map(function (p) { return p.brands && p.brands.name; }).filter(Boolean))).sort();
+        brandSel.innerHTML = '<option value="">All brands</option>' + brandNames.map(function (b) {
+          return `<option value="${esc(b)}">${esc(b)}</option>`;
+        }).join('');
+      }
+      if (catSel) {
+        const catNames = Array.from(new Set((allProducts || []).map(function (p) { return p.categories && p.categories.name; }).filter(Boolean))).sort();
+        catSel.innerHTML = '<option value="">All categories</option>' + catNames.map(function (c) {
+          return `<option value="${esc(c)}">${esc(c)}</option>`;
+        }).join('');
+      }
+      const itemsBody = document.getElementById('moItemsBody');
+      if (itemsBody) itemsBody.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">No items added yet.</td></tr>';
+      const pickerBody = document.getElementById('moProductPickerBody');
+      if (pickerBody) pickerBody.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">Use the filters above to find products.</td></tr>';
+      document.getElementById('moCurrency').value = 'EUR';
+      document.getElementById('moFinancial').value = 'paid';
+      document.getElementById('moFulfillment').value = 'unfulfilled';
+      ['moSubtotal', 'moDiscount', 'moShipping', 'moTax', 'moTotal'].forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; });
+      const notesEl = document.getElementById('moNotes'); if (notesEl) notesEl.value = '';
+      modal.style.display = 'flex';
+      modal.style.zIndex = '220';
+    }
+
+    function closeManualOrderModal() {
+      const modal = document.getElementById('manualOrderModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function recalcManualOrderTotal() {
+      const sub = parseFloat(document.getElementById('moSubtotal').value || '0') || 0;
+      const disc = parseFloat(document.getElementById('moDiscount').value || '0') || 0;
+      const ship = parseFloat(document.getElementById('moShipping').value || '0') || 0;
+      const tax = parseFloat(document.getElementById('moTax').value || '0') || 0;
+      const total = sub - disc + ship + tax;
+      const totalEl = document.getElementById('moTotal');
+      if (totalEl && !isNaN(total)) totalEl.value = total.toFixed(2);
+    }
+
+    function renderManualOrderProductPicker() {
+      const body = document.getElementById('moProductPickerBody');
+      if (!body) return;
+      const customerId = document.getElementById('moCustomer')?.value || null;
+      if (!customerId) {
+        body.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">Select a B2B customer first.</td></tr>';
+        return;
+      }
+      const brand = document.getElementById('moBrandFilter')?.value || '';
+      const cat = document.getElementById('moCategoryFilter')?.value || '';
+      const search = (document.getElementById('moProductSearch')?.value || '').toLowerCase();
+      const list = (allProducts || []).filter(function (p) {
+        if (p.is_active === false) return false;
+        if (brand && (!p.brands || p.brands.name !== brand)) return false;
+        if (cat && (!p.categories || p.categories.name !== cat)) return false;
+        if (search) {
+          const s = (p.name || '').toLowerCase();
+          const sku = (p.sku || '').toLowerCase();
+          if (!s.includes(search) && !sku.includes(search)) return false;
+        }
+        return true;
+      }).slice(0, 100);
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">No products match your filters.</td></tr>';
+        return;
+      }
+      body.innerHTML = list.map(function (p) {
+        const unit = getB2BPriceForCustomer(p, customerId);
+        return `<tr data-product-id="${p.id}">
+          <td>${esc(p.name)}</td>
+          <td>${p.brands && p.brands.name ? esc(p.brands.name) : '—'}</td>
+          <td style="text-align:right">€${unit.toFixed(2)}</td>
+          <td style="text-align:right"><input type="number" min="1" step="1" value="1" style="width:80px;text-align:right" onkeydown="if(event.key==='Enter'){event.preventDefault(); addManualOrderItemFromRow(this);}"></td>
+          <td style="text-align:right"><button class="btn-sm btn-outline" type="button" onclick="addManualOrderItemFromRow(this)">Add</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function addManualOrderItemFromRow(el) {
+      const row = el.closest('tr');
+      if (!row) return;
+      const productId = row.getAttribute('data-product-id');
+      const qtyInput = row.querySelector('input[type="number"]');
+      let qty = parseInt(qtyInput && qtyInput.value || '1', 10);
+      if (!qty || qty <= 0) qty = 1;
+      const p = (allProducts || []).find(function (x) { return x.id === productId; });
+      const customerId = document.getElementById('moCustomer')?.value || null;
+      if (!p || !customerId) return;
+      const unit = getB2BPriceForCustomer(p, customerId);
+      const body = document.getElementById('moItemsBody');
+      if (!body) return;
+      let existing = body.querySelector(`tr[data-product-id="${productId}"]`);
+      if (existing) {
+        const qtyCell = existing.querySelector('td[data-role="qty"]');
+        const totalCell = existing.querySelector('td[data-role="total"]');
+        let curQty = parseInt(existing.getAttribute('data-qty') || '0', 10) || 0;
+        curQty += qty;
+        existing.setAttribute('data-qty', String(curQty));
+        if (qtyCell) qtyCell.textContent = curQty;
+        if (totalCell) totalCell.textContent = '€' + (curQty * unit).toFixed(2);
+      } else {
+        const html = `<tr data-product-id="${productId}" data-qty="${qty}" data-unit="${unit.toFixed(2)}">
+          <td>${esc(p.name)}</td>
+          <td style="text-align:right">€${unit.toFixed(2)}</td>
+          <td style="text-align:right" data-role="qty">${qty}</td>
+          <td style="text-align:right" data-role="total">€${(qty * unit).toFixed(2)}</td>
+          <td style="text-align:right"><button class="btn-sm btn-ghost" type="button" onclick="removeManualOrderItem(this)">✕</button></td>
+        </tr>`;
+        if (body.querySelector('tr') && !body.querySelector('tr').hasAttribute('data-product-id')) {
+          body.innerHTML = html;
+        } else {
+          body.insertAdjacentHTML('beforeend', html);
+        }
+      }
+      recalcManualOrderSubtotalFromItems();
+    }
+
+    function removeManualOrderItem(btn) {
+      const row = btn.closest('tr');
+      const body = document.getElementById('moItemsBody');
+      if (row && body) {
+        row.remove();
+        if (!body.querySelector('tr')) {
+          body.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">No items added yet.</td></tr>';
+        }
+      }
+      recalcManualOrderSubtotalFromItems();
+    }
+
+    function recalcManualOrderSubtotalFromItems() {
+      const body = document.getElementById('moItemsBody');
+      if (!body) return;
+      let subtotal = 0;
+      body.querySelectorAll('tr[data-product-id]').forEach(function (tr) {
+        const qty = parseInt(tr.getAttribute('data-qty') || '0', 10) || 0;
+        const unit = parseFloat(tr.getAttribute('data-unit') || '0') || 0;
+        subtotal += qty * unit;
+      });
+      const subEl = document.getElementById('moSubtotal');
+      if (subEl) subEl.value = subtotal.toFixed(2);
+      recalcManualOrderTotal();
+    }
+
+    let manualOrderItems = [];
+
+    function getB2BPriceForProduct(prod, customerId) {
+      let price = parseFloat(prod.wholesale_price_eur) || parseFloat(prod.price_eur) || 0;
+      if (window.customerProductPricesCache && customerId && prod.id) {
+        const list = window.customerProductPricesCache[prod.id] || [];
+        const row = list.find(function (r) { return r.customer_id === customerId && r.is_active !== false; });
+        if (row && row.price_eur != null) {
+          const sp = parseFloat(row.price_eur);
+          if (!isNaN(sp) && sp > 0) price = sp;
+        }
+      }
+      return price;
+    }
+
+    function renderManualOrderProductPicker() {
+      const body = document.getElementById('moProductPickerBody');
+      const custId = document.getElementById('moCustomer').value || null;
+      const brandId = document.getElementById('moBrandFilter').value || '';
+      const catId = document.getElementById('moCategoryFilter').value || '';
+      const search = (document.getElementById('moProductSearch').value || '').toLowerCase().trim();
+      if (!body) return;
+      if (!custId) {
+        body.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">Select a B2B customer first.</td></tr>';
+        return;
+      }
+      let list = (allProducts || []).filter(function (p) {
+        if (p.is_active === false) return false;
+        if (brandId && p.brand_id !== brandId) return false;
+        if (catId && p.category_id !== catId) return false;
+        if (search) {
+          const txt = (p.name || '').toLowerCase() + ' ' + (p.sku || '').toLowerCase();
+          if (!txt.includes(search)) return false;
+        }
+        return true;
+      }).slice(0, 100);
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">No products match these filters.</td></tr>';
+        return;
+      }
+      body.innerHTML = list.map(function (p) {
+        const brand = (p.brands && p.brands.name) || '';
+        const price = getB2BPriceForProduct(p, custId);
+        return `<tr data-product-id="${p.id}">
+          <td>${esc(p.name || '')}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(p.sku || '')}</div></td>
+          <td>${esc(brand || '')}</td>
+          <td style="text-align:right">€${price.toFixed(2)}</td>
+          <td style="text-align:right"><input type="number" min="1" value="1" style="width:70px;text-align:right" onchange="if(this.value<1)this.value=1"></td>
+          <td style="text-align:right"><button class="btn-sm btn-primary" type="button" onclick="addManualOrderItemFromRow(this)">Add</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function refreshManualOrderFilters() {
+      const brandSel = document.getElementById('moBrandFilter');
+      const catSel = document.getElementById('moCategoryFilter');
+      if (brandSel && (!brandSel.dataset._filled || brandSel.options.length <= 1)) {
+        brandSel.innerHTML = '<option value="">All brands</option>' +
+          (brands || []).map(function (b) { return `<option value="${b.id}">${esc(b.name || '')}</option>`; }).join('');
+        brandSel.dataset._filled = '1';
+      }
+      if (catSel && (!catSel.dataset._filled || catSel.options.length <= 1)) {
+        catSel.innerHTML = '<option value="">All categories</option>' +
+          (categories || []).map(function (c) { return `<option value="${c.id}">${esc(c.name || '')}</option>`; }).join('');
+        catSel.dataset._filled = '1';
+      }
+    }
+
+    function addManualOrderItemFromRow(btn) {
+      const tr = btn.closest('tr');
+      if (!tr) return;
+      const prodId = tr.getAttribute('data-product-id');
+      const qtyInput = tr.querySelector('input[type="number"]');
+      let qty = parseInt(qtyInput && qtyInput.value || '1', 10);
+      if (!qty || qty < 1) qty = 1;
+      const prod = (allProducts || []).find(function (p) { return p.id === prodId; });
+      const custId = document.getElementById('moCustomer').value || null;
+      if (!prod || !custId) return;
+      const unit = getB2BPriceForProduct(prod, custId);
+      const existing = manualOrderItems.find(function (i) { return i.product_id === prodId; });
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        manualOrderItems.push({
+          product_id: prodId,
+          name: prod.name || '',
+          sku: prod.sku || '',
+          unit_price: unit,
+          qty: qty
+        });
+      }
+      renderManualOrderItems();
+    }
+
+    function renderManualOrderItems() {
+      const body = document.getElementById('moItemsBody');
+      if (!body) return;
+      if (!manualOrderItems.length) {
+        body.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">No items added yet.</td></tr>';
+      } else {
+        body.innerHTML = manualOrderItems.map(function (i, idx) {
+          const line = i.unit_price * i.qty;
+          return `<tr data-idx="${idx}">
+            <td>${esc(i.name)}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div></td>
+            <td style="text-align:right">€${i.unit_price.toFixed(2)}</td>
+            <td style="text-align:right">${i.qty}</td>
+            <td style="text-align:right">€${line.toFixed(2)}</td>
+            <td style="text-align:right"><button class="btn-sm btn-ghost" type="button" onclick="removeManualOrderItem(${idx})">✕</button></td>
+          </tr>`;
+        }).join('');
+      }
+      const subtotal = manualOrderItems.reduce(function (s, i) { return s + i.unit_price * i.qty; }, 0);
+      const subEl = document.getElementById('moSubtotal');
+      if (subEl) subEl.value = subtotal.toFixed(2);
+      recalcManualOrderTotal();
+    }
+
+    function removeManualOrderItem(idx) {
+      manualOrderItems.splice(idx, 1);
+      renderManualOrderItems();
+    }
+
+    async function saveManualOrder() {
+      const customerId = document.getElementById('moCustomer').value || null;
+      const currency = document.getElementById('moCurrency').value || 'EUR';
+      const financial = document.getElementById('moFinancial').value || 'paid';
+      const fulfill = document.getElementById('moFulfillment').value || 'unfulfilled';
+      let subtotal = parseFloat(document.getElementById('moSubtotal').value || '0') || 0;
+      const discount = parseFloat(document.getElementById('moDiscount').value || '0') || 0;
+      const shipping = parseFloat(document.getElementById('moShipping').value || '0') || 0;
+      const tax = parseFloat(document.getElementById('moTax').value || '0') || 0;
+      let total = parseFloat(document.getElementById('moTotal').value || '0');
+      const notes = document.getElementById('moNotes').value.trim() || null;
+
+      if (!customerId) { toast('Select a customer for this order', 'error'); return; }
+      if (!manualOrderItems.length) { toast('Add at least one product to this order', 'error'); return; }
+
+      // Subtotal always from items
+      subtotal = manualOrderItems.reduce(function (s, i) { return s + i.unit_price * i.qty; }, 0);
+      if (!total || isNaN(total)) total = subtotal - discount + shipping + tax;
+      if (total < 0) total = 0;
+
+      const cust = (allCustomers || []).find(function (c) { return c.id === customerId; }) || {};
+      const customer_email = cust.email || null;
+      const customer_phone = cust.phone || null;
+      const customer_name = cust.display_name || [cust.first_name, cust.last_name].filter(Boolean).join(' ') || cust.company || cust.name || cust.email || null;
+
+      const itemsCount = manualOrderItems.reduce(function (s, i) { return s + i.qty; }, 0);
+      let totalWeight = 0;
+      manualOrderItems.forEach(function (i) {
+        const p = (allProducts || []).find(function (x) { return x.id === i.product_id; });
+        if (p && p.weight_grams) totalWeight += (parseInt(p.weight_grams, 10) || 0) * i.qty;
+      });
+
+      const payload = {
+        customer_id: customerId,
+        currency,
+        subtotal,
+        discount_total: discount,
+        shipping_total: shipping,
+        tax_total: tax,
+        total,
+        financial_status: financial,
+        fulfillment_status: fulfill,
+        notes,
+        source: 'admin',
+        customer_email,
+        customer_phone,
+        customer_name,
+        item_count: itemsCount,
+        total_weight_grams: totalWeight
+      };
+
+      try {
+        const created = await supaInsert('orders', payload);
+        const ord = Array.isArray(created) && created[0] ? created[0] : created;
+        if (ord && ord.id) {
+          for (const i of manualOrderItems) {
+            const p = (allProducts || []).find(function (x) { return x.id === i.product_id; }) || {};
+            const lineTotal = i.unit_price * i.qty;
+            await supaInsert('order_items', {
+              order_id: ord.id,
+              product_id: i.product_id,
+              quantity: i.qty,
+              unit_price: i.unit_price,
+              total: lineTotal,
+              total_price: lineTotal,
+              sku: i.sku || null,
+              product_name: p.name || i.name || null,
+              product_image_url: p.image_url || null,
+              requires_shipping: true
+            });
+          }
+        }
+        toast('Manual order created');
+        closeManualOrderModal();
+        manualOrderItems = [];
+        await loadAllData();
+      } catch (e) {
+        console.error('Manual order error', e);
+        toast('Error creating manual order: ' + e.message, 'error');
+      }
+    }
+
     function closeOrderModal() {
       document.getElementById('orderModal').style.display = 'none';
     }
@@ -10472,11 +11247,60 @@
         cust.is_active = newStatus;
         const label = newStatus ? 'Active' : 'Inactive';
         const cls = newStatus ? 'in' : 'out';
-        document.getElementById('cpStatusToggle').innerHTML = `<span class="stock-badge ${cls}">${label}</span> <button class="btn-sm btn-outline" onclick="toggleCustomerStatus()" style="margin-left:8px">${newStatus ? '⏸ Deactivate' : '▶ Activate'}</button>`;
+        const isBlocked = cust.is_blocked === true;
+        const blockedBadge = isBlocked
+          ? '<span class="stock-badge out" style="background:#b91c1c;color:#fff;margin-left:6px;" title="This customer is blocked from purchasing">Blocked</span>'
+          : '';
+        document.getElementById('cpStatusToggle').innerHTML =
+          `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:6px">
+            <span class="stock-badge ${cls}">${label}</span>
+            ${blockedBadge}
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+            <button class="btn-sm btn-outline" onclick="toggleCustomerStatus()">${newStatus ? '⏸ Deactivate' : '▶ Activate'}</button>
+            <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text-muted);cursor:pointer">
+              <input type="checkbox" id="cpBlockedToggle" ${isBlocked ? 'checked' : ''} onchange="toggleCustomerBlocked()" style="width:16px;height:16px">
+              Block this customer from new orders
+            </label>
+          </div>`;
         renderCustomers();
         toast(`Customer ${newStatus ? 'activated' : 'deactivated'} `);
       } catch (e) {
         toast('Error updating status', 'error');
+      }
+    }
+
+    async function toggleCustomerBlocked() {
+      if (!currentProfileCustomerId) return;
+      const cust = allCustomers.find(c => c.id === currentProfileCustomerId);
+      if (!cust) return;
+      const input = document.getElementById('cpBlockedToggle');
+      const newBlocked = !!(input && input.checked);
+      try {
+        await supaUpdate('customers', currentProfileCustomerId, { is_blocked: newBlocked });
+        cust.is_blocked = newBlocked;
+        const isActive = cust.is_active !== false;
+        const cls = isActive ? 'in' : 'out';
+        const label = isActive ? 'Active' : 'Inactive';
+        const blockedBadge = newBlocked
+          ? '<span class="stock-badge out" style="background:#b91c1c;color:#fff;margin-left:6px;" title="This customer is blocked from purchasing">Blocked</span>'
+          : '';
+        document.getElementById('cpStatusToggle').innerHTML =
+          `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:6px">
+            <span class="stock-badge ${cls}">${label}</span>
+            ${blockedBadge}
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+            <button class="btn-sm btn-outline" onclick="toggleCustomerStatus()">${isActive ? '⏸ Deactivate' : '▶ Activate'}</button>
+            <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text-muted);cursor:pointer">
+              <input type="checkbox" id="cpBlockedToggle" ${newBlocked ? 'checked' : ''} onchange="toggleCustomerBlocked()" style="width:16px;height:16px">
+              Block this customer from new orders
+            </label>
+          </div>`;
+        toast(newBlocked ? 'Customer blocked for new orders' : 'Customer unblocked');
+      } catch (e) {
+        if (input) input.checked = !newBlocked;
+        toast('Error updating blocked flag', 'error');
       }
     }
 

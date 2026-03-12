@@ -93,6 +93,8 @@
     }
   };
 
+  const EXVAT = v => Number(v||0) / 1.23;  // Remove 23% VAT for B2B display
+
   function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!products.length) {
@@ -102,11 +104,10 @@
     const currency = sfi.currency === 'GBP' ? '£' : '€';
     grid.innerHTML = products.map(p => {
       const imgSrc = p.imagem ? (p.imagem.startsWith('http') ? p.imagem : '../' + p.imagem) : '../img/placeholder.webp';
-      const b2bPrice = p.b2b_price != null ? currency + p.b2b_price.toFixed(2) : 'N/A';
-      const retailPrice = p.retail_price != null ? currency + Number(p.retail_price).toFixed(2) : '';
+      const b2bPrice = p.b2b_price != null ? currency + EXVAT(p.b2b_price).toFixed(2) : 'N/A';
+      const retailPrice = p.retail_price != null ? currency + EXVAT(p.retail_price).toFixed(2) : '';
       const brandName = p.brands?.name || p.marca || '';
       const hasDiscount = p.has_wholesale && p.retail_price && p.b2b_price < p.retail_price;
-      const savePct = hasDiscount ? Math.round((1 - p.b2b_price / p.retail_price) * 100) : 0;
       const inStock = p.em_stock !== false;
       const stockQty = p._stock_qty;
 
@@ -118,7 +119,7 @@
           : '<div class="b2b-stock-badge in">In Stock</div>';
         actionBtn = `<button class="btn-add" onclick="addB2BToCart(${p.id}, '${(p.nome||'').replace(/'/g,"\\'")}', ${p.b2b_price || 0}, false)">Add to Cart</button>`;
       } else {
-        stockBadge = '<div class="b2b-stock-badge out">Out of Stock</div>';
+        stockBadge = '<div class="b2b-stock-badge backorder">📋 Backorder</div>';
         actionBtn = `<button class="btn-backorder" onclick="addB2BToCart(${p.id}, '${(p.nome||'').replace(/'/g,"\\'")}', ${p.b2b_price || 0}, true)">📋 Backorder</button>`;
       }
 
@@ -126,14 +127,14 @@
       const isFav = favs.some(f => f.id === p.id);
       const favBtn = `<button class="b2b-fav-btn${isFav ? ' active' : ''}" onclick="event.stopPropagation();toggleFav(${p.id}, '${(p.nome||'').replace(/'/g,"\\'")}', ${p.b2b_price || 0}, '${(imgSrc||'').replace(/'/g,"\\'")}', '${(brandName||'').replace(/'/g,"\\'")}', this)" title="${isFav ? 'Remove from favourites' : 'Add to favourites'}">${isFav ? '★' : '☆'}</button>`;
 
-      return `<div class="b2b-card${!inStock ? ' out-of-stock' : ''}">
+      return `<div class="b2b-card${!inStock ? ' b2b-backorder' : ''}">
         ${favBtn}
         <img src="${imgSrc}" alt="${p.nome}" loading="lazy" onerror="this.src='../img/placeholder.webp'">
         <div class="b2b-card-body">
           <div class="brand">${brandName}</div>
           <div class="name">${p.nome}</div>
           ${stockBadge}
-          ${hasDiscount ? '<span class="b2b-badge-sm">B2B Price — Save ' + savePct + '%</span>' : '<span class="b2b-badge-sm" style="background:#f1f5f9;color:#94a3b8;">Retail Price</span>'}
+          
           <div class="b2b-price-row">
             <span class="b2b-price">${b2bPrice}</span>
             ${hasDiscount ? '<span class="retail-price">RRP ' + retailPrice + '</span>' : ''}
@@ -236,7 +237,7 @@
       if (existing) {
         existing.quantity += 1;
       } else {
-        cart.push({ id, name, price, quantity: 1, b2b: true, backorder: !!isBackorder });
+        cart.push({ id, name, price: price / 1.23, quantity: 1, b2b: true, backorder: !!isBackorder });
       }
       localStorage.setItem('sfi_cart', JSON.stringify(cart));
       const badge = document.querySelector('.cart-count, .cart-badge, #cartCount');

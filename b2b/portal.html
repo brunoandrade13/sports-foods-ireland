@@ -18,7 +18,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../css/sfi-styles.min.css?v=18">
+    <link rel="stylesheet" href="../css/sfi-styles.min.css?v=23">
     <link rel="stylesheet" href="../css/cart-modal.css?v=2">
     <style>
         /* ── B2B Portal Custom Styles ── */
@@ -942,48 +942,6 @@
             text-decoration: underline;
         }
 
-        .mkt-kit-card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 20px;
-            position: relative;
-        }
-
-        .mkt-kit-card h4 {
-            font-size: 0.95rem;
-            color: #1B4332;
-            margin-bottom: 8px;
-        }
-
-        .mkt-kit-card p {
-            font-size: 0.85rem;
-            color: #636E72;
-            line-height: 1.5;
-        }
-
-        .mkt-kit-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #f0fdf4;
-            color: #166534;
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-
-        .mkt-kit-tip {
-            margin-top: 12px;
-            padding: 8px 12px;
-            background: #fffbeb;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            color: #92400e;
-        }
-
         .mkt-video-card {
             display: flex;
             align-items: center;
@@ -1604,6 +1562,875 @@
                 width: 100%;
             }
         }
+
+        /* ============================================
+           B2B PORTAL DARK MODE
+           ============================================ */
+
+        /* Hero bar - nome do cliente sempre branco */
+        .b2b-hero h1,
+        .b2b-hero h1 span,
+        .b2b-hero .company-badge,
+        .b2b-hero #heroCustomerInfo,
+        .b2b-hero #heroCustomerInfo * {
+            color: #fff !important;
+        }
+
+        /* Dark mode: Tabs */
+        html[data-theme="dark"] .b2b-tabs {
+            background: #1e1e1e !important;
+            border: 1px solid #333;
+        }
+
+        html[data-theme="dark"] .b2b-tab {
+            color: #ccc !important;
+        }
+
+        html[data-theme="dark"] .b2b-tab:hover {
+            background: #2a2a2a !important;
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] .b2b-tab.active {
+            background: #2d6a4f !important;
+            color: #fff !important;
+        }
+
+        /* Dark mode: Product cards no B2B Shop */
+        html[data-theme="dark"] #portalShopGrid > div {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] #portalShopGrid > div * {
+            color: #e0e0e0;
+        }
+
+        html[data-theme="dark"] #portalShopGrid > div [style*="color:#1e293b"],
+        html[data-theme="dark"] #portalShopGrid > div [style*="color: #1e293b"] {
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] #portalShopGrid > div [style*="color:#94a3b8"],
+        html[data-theme="dark"] #portalShopGrid > div [style*="color: #94a3b8"] {
+            color: #888 !important;
+        }
+
+        html[data-theme="dark"] #portalShopGrid > div [style*="color:#1B4332"],
+        html[data-theme="dark"] #portalShopGrid > div [style*="color: #1B4332"] {
+            color: #4ade80 !important;
+        }
+
+        html[data-theme="dark"] #portalShopGrid > div img {
+            background: #2a2a2a !important;
+        }
+
+        /* Dark mode: Product modal */
+        html[data-theme="dark"] #b2bProductModalBody {
+            color: #e0e0e0;
+        }
+
+        html[data-theme="dark"] #b2bProductModalBody h2 {
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] #b2bProductModalBody [style*="background:#f8f9fa"] {
+            background: #2a2a2a !important;
+        }
+
+        html[data-theme="dark"] .pm-var-btn {
+            background: #2a2a2a !important;
+            color: #e0e0e0 !important;
+            border-color: #444 !important;
+        }
+
+        html[data-theme="dark"] .pm-var-btn.pm-var-backorder {
+            background: #3d2e0a !important;
+            border-color: #fbbf24 !important;
+            color: #fbbf24 !important;
+        }
+
+        /* Dark mode: Panels e conteúdo geral */
+        html[data-theme="dark"] .b2b-panel {
+            color: #e0e0e0;
+        }
+
+        html[data-theme="dark"] .b2b-table th {
+            background: #2a2a2a !important;
+            color: #e0e0e0 !important;
+        }
+
+        html[data-theme="dark"] .b2b-table td {
+            color: #ccc !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] .b2b-table tr:hover td {
+            background: #1e1e1e !important;
+        }
+
+        /* Dark mode: Modal de produto */
+        html[data-theme="dark"] #b2bProductModalContent {
+            background: #1a1a1a !important;
+        }
+
+        html[data-theme="dark"] #b2bProductModalContent button[onclick*="closeProductModal"] {
+            background: #333 !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Dark mode: Inline shop e recommended cards */
+        html[data-theme="dark"] #inlineShopGrid > div,
+        html[data-theme="dark"] #recommendedGrid > div {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] #inlineShopGrid > div *,
+        html[data-theme="dark"] #recommendedGrid > div * {
+            color: #e0e0e0;
+        }
+
+        html[data-theme="dark"] #inlineShopGrid > div img,
+        html[data-theme="dark"] #recommendedGrid > div img {
+            background: #2a2a2a !important;
+        }
+
+        /* ============================================
+           B2B DARK MODE - ALL SECTIONS COMPREHENSIVE
+           ============================================ */
+
+        /* General: All panels background & text */
+        html[data-theme="dark"] .b2b-panel,
+        html[data-theme="dark"] .b2b-panel.active {
+            background: transparent !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Dashboard: Stat cards */
+        html[data-theme="dark"] .stat-card,
+        html[data-theme="dark"] .stat-card.highlight {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+            color: #e0e0e0 !important;
+        }
+
+        html[data-theme="dark"] .stat-value {
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] .stat-label {
+            color: #999 !important;
+        }
+
+        html[data-theme="dark"] .stat-icon {
+            background: #2a2a2a !important;
+        }
+
+        /* Dashboard: Stats grid section headings */
+        html[data-theme="dark"] .stats-grid ~ h3,
+        html[data-theme="dark"] .b2b-panel h3,
+        html[data-theme="dark"] .b2b-panel h2 {
+            color: #f0f0f0 !important;
+        }
+
+        /* Dashboard: Quick action buttons / links below cards */
+        html[data-theme="dark"] .b2b-panel a[style*="background:#f8f9fa"],
+        html[data-theme="dark"] .b2b-panel a[style*="background: #f8f9fa"],
+        html[data-theme="dark"] .b2b-panel div[style*="background:#f8f9fa"],
+        html[data-theme="dark"] .b2b-panel div[style*="background: #f8f9fa"],
+        html[data-theme="dark"] .b2b-panel div[style*="background:#f1f5f9"],
+        html[data-theme="dark"] .b2b-panel div[style*="background: #f1f5f9"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* General: All white/light bg divs inside panels */
+        html[data-theme="dark"] .b2b-panel div[style*="background:#fff"],
+        html[data-theme="dark"] .b2b-panel div[style*="background: #fff"],
+        html[data-theme="dark"] .b2b-panel div[style*="background:#ffffff"],
+        html[data-theme="dark"] .b2b-panel div[style*="background: #ffffff"],
+        html[data-theme="dark"] .b2b-panel div[style*="background:white"],
+        html[data-theme="dark"] .b2b-panel div[style*="background: white"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* General: text color fixes in panels */
+        html[data-theme="dark"] .b2b-panel [style*="color:#1e293b"],
+        html[data-theme="dark"] .b2b-panel [style*="color: #1e293b"] {
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] .b2b-panel [style*="color:#333"],
+        html[data-theme="dark"] .b2b-panel [style*="color: #333"],
+        html[data-theme="dark"] .b2b-panel [style*="color:#495057"],
+        html[data-theme="dark"] .b2b-panel [style*="color: #495057"] {
+            color: #ccc !important;
+        }
+
+        html[data-theme="dark"] .b2b-panel [style*="color:#636E72"],
+        html[data-theme="dark"] .b2b-panel [style*="color: #636E72"] {
+            color: #999 !important;
+        }
+
+        html[data-theme="dark"] .b2b-panel p,
+        html[data-theme="dark"] .b2b-panel span,
+        html[data-theme="dark"] .b2b-panel label,
+        html[data-theme="dark"] .b2b-panel strong {
+            color: #ddd;
+        }
+
+        /* Orders: Order detail modal */
+        html[data-theme="dark"] .od-stat {
+            background: #1e1e1e !important;
+            color: #e0e0e0 !important;
+        }
+
+        html[data-theme="dark"] .od-stat-label {
+            color: #999 !important;
+        }
+
+        html[data-theme="dark"] .od-stat-val {
+            color: #f0f0f0 !important;
+        }
+
+        /* Financial: Sub-tabs & panels */
+        html[data-theme="dark"] .fin-subtab,
+        html[data-theme="dark"] .sup-subtab,
+        html[data-theme="dark"] .mkt-subtab {
+            background: transparent !important;
+            color: #ccc !important;
+            border-color: #444 !important;
+        }
+
+        html[data-theme="dark"] .fin-subtab:hover,
+        html[data-theme="dark"] .sup-subtab:hover,
+        html[data-theme="dark"] .mkt-subtab:hover {
+            background: #2a2a2a !important;
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] .fin-subtab.active,
+        html[data-theme="dark"] .sup-subtab.active,
+        html[data-theme="dark"] .mkt-subtab.active {
+            background: #2d6a4f !important;
+            color: #fff !important;
+        }
+
+        html[data-theme="dark"] .fin-panel,
+        html[data-theme="dark"] .sup-panel,
+        html[data-theme="dark"] .mkt-panel {
+            color: #e0e0e0 !important;
+        }
+
+        /* Filters row */
+        html[data-theme="dark"] .filters-row {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] .filters-row input,
+        html[data-theme="dark"] .filters-row select {
+            background: #2a2a2a !important;
+            color: #e0e0e0 !important;
+            border-color: #444 !important;
+        }
+
+        /* Marketing: Cards */
+        html[data-theme="dark"] .mkt-doc-card,
+        html[data-theme="dark"] .mkt-file-card,
+        html[data-theme="dark"] .mkt-video-card {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+            color: #e0e0e0 !important;
+        }
+
+        html[data-theme="dark"] .mkt-link {
+            color: #60a5fa !important;
+        }
+
+        /* Support: FAQ items */
+        html[data-theme="dark"] .sup-faq-item {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] .sup-faq-q {
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] .sup-faq-a {
+            color: #ccc !important;
+        }
+
+        /* Support: Ticket form */
+        html[data-theme="dark"] .b2b-panel textarea,
+        html[data-theme="dark"] .b2b-panel input[type="text"],
+        html[data-theme="dark"] .b2b-panel input[type="email"],
+        html[data-theme="dark"] .b2b-panel select {
+            background: #2a2a2a !important;
+            color: #e0e0e0 !important;
+            border-color: #444 !important;
+        }
+
+        /* Sub-Accounts section */
+        html[data-theme="dark"] .b2b-panel div[style*="border:1px solid #e2e8f0"],
+        html[data-theme="dark"] .b2b-panel div[style*="border: 1px solid #e2e8f0"] {
+            border-color: #333 !important;
+            background: #1e1e1e !important;
+        }
+
+        /* My Account: Info cards */
+        html[data-theme="dark"] .info-card {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] .info-card h3,
+        html[data-theme="dark"] .info-card h4 {
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] .info-row .label {
+            color: #999 !important;
+        }
+
+        html[data-theme="dark"] .info-row .value {
+            color: #e0e0e0 !important;
+        }
+
+        /* Reorder modal */
+        html[data-theme="dark"] .reorder-modal {
+            background: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Invoice modal */
+        html[data-theme="dark"] .inv-modal-content {
+            background: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* General: Buttons with light bg */
+        html[data-theme="dark"] .b2b-panel button[style*="background:#f0f0f0"],
+        html[data-theme="dark"] .b2b-panel button[style*="background: #f0f0f0"],
+        html[data-theme="dark"] .b2b-panel button[style*="background:#e9ecef"],
+        html[data-theme="dark"] .b2b-panel button[style*="background: #e9ecef"],
+        html[data-theme="dark"] .b2b-panel button[style*="background:#f1f5f9"],
+        html[data-theme="dark"] .b2b-panel button[style*="background: #f1f5f9"] {
+            background: #2a2a2a !important;
+            color: #e0e0e0 !important;
+            border-color: #444 !important;
+        }
+
+        /* General: Badge/tag elements */
+        html[data-theme="dark"] .b2b-panel [style*="background:#f0fdf4"] {
+            background: #0a2e1a !important;
+        }
+
+        html[data-theme="dark"] .b2b-panel [style*="background:#fef3c7"],
+        html[data-theme="dark"] .b2b-panel [style*="background: #fef3c7"] {
+            background: #3d2e0a !important;
+        }
+
+        /* Cart modal in dark */
+        html[data-theme="dark"] .cart-modal-content {
+            background: #1a1a1a !important;
+        }
+
+        html[data-theme="dark"] .cart-modal-item {
+            border-color: #333 !important;
+        }
+
+        /* Dark mode: main content area */
+        html[data-theme="dark"] main#main-content,
+        html[data-theme="dark"] main#main-content > .container {
+            background: #0F0F0F !important;
+        }
+
+        /* Sub-tab container divs (inline bg:#f1f5f9) */
+        html[data-theme="dark"] div[style*="background:#f1f5f9"],
+        html[data-theme="dark"] div[style*="background: #f1f5f9"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* All modals with white bg */
+        html[data-theme="dark"] div[style*="background:#fff"][style*="border-radius:16px"],
+        html[data-theme="dark"] div[style*="background:#fff"][style*="border-radius:12px"],
+        html[data-theme="dark"] .reorder-modal,
+        html[data-theme="dark"] div[style*="background:#fff"][style*="box-shadow"] {
+            background: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Modal sticky headers */
+        html[data-theme="dark"] div[style*="background:#fff"][style*="sticky"] {
+            background: #1a1a1a !important;
+            border-color: #333 !important;
+        }
+
+        /* Sub-accounts: cards with border e2e8f0 and white bg */
+        html[data-theme="dark"] div[style*="background:#fff"][style*="border:1px solid"],
+        html[data-theme="dark"] div[style*="background: #fff"][style*="border:1px solid"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* All text inside dark panels */
+        html[data-theme="dark"] #main-content h2,
+        html[data-theme="dark"] #main-content h3,
+        html[data-theme="dark"] #main-content h4 {
+            color: #f0f0f0 !important;
+        }
+
+        /* Dashboard: section with bg #f8f9fa */
+        html[data-theme="dark"] div[style*="background:#f8f9fa"],
+        html[data-theme="dark"] div[style*="background: #f8f9fa"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* Filter buttons with light bg */
+        html[data-theme="dark"] button[style*="background:#f1f5f9"],
+        html[data-theme="dark"] button[style*="background: #f1f5f9"] {
+            background: #2a2a2a !important;
+            color: #e0e0e0 !important;
+            border-color: #444 !important;
+        }
+
+        /* Invoice panel light rows */
+        html[data-theme="dark"] div[style*="padding:12px 0;background:#f8f9fa"] {
+            background: #1e1e1e !important;
+        }
+
+        /* Sub-account add modal */
+        html[data-theme="dark"] div[style*="max-width:520px"][style*="background:#fff"] {
+            background: #1a1a1a !important;
+        }
+
+        html[data-theme="dark"] div[style*="max-width:520px"] input,
+        html[data-theme="dark"] div[style*="max-width:520px"] select {
+            background: #2a2a2a !important;
+            color: #e0e0e0 !important;
+            border-color: #444 !important;
+        }
+
+        /* ============================================
+           DARK MODE FIXES - CONSISTENCY & DETAILS
+           ============================================ */
+
+        /* 1. Dashboard: stat-card icon strip - same tone as card */
+        html[data-theme="dark"] .stat-card .stat-icon,
+        html[data-theme="dark"] .stat-card > div:first-child {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* 2. Dashboard: quick action buttons below cards */
+        html[data-theme="dark"] #tab-dashboard a[style*="border-radius"],
+        html[data-theme="dark"] #tab-dashboard div[style*="display:flex"] > a,
+        html[data-theme="dark"] #tab-dashboard div[style*="display: flex"] > a {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+            color: #ccc !important;
+        }
+
+        /* 3. Financial: overview stat cards (Open Balance, Overdue, etc) */
+        html[data-theme="dark"] #tab-financial div[style*="border-radius:12px"],
+        html[data-theme="dark"] #tab-financial div[style*="border-radius: 12px"],
+        html[data-theme="dark"] .fin-panel div[style*="border-radius:12px"],
+        html[data-theme="dark"] .fin-panel div[style*="border-radius: 12px"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] .fin-panel div[style*="border-radius:12px"] *,
+        html[data-theme="dark"] #tab-financial div[style*="border-radius:12px"] * {
+            color: #e0e0e0;
+        }
+
+        /* Financial: account summary section */
+        html[data-theme="dark"] #tab-financial div[style*="border-left"],
+        html[data-theme="dark"] .fin-panel div[style*="border-left"] {
+            border-color: #444 !important;
+        }
+
+        /* 4. Sub-Accounts: main account card (green) - text must be white */
+        html[data-theme="dark"] #tab-subaccounts > div:first-of-type div[style*="background:#2d6a4f"],
+        html[data-theme="dark"] #tab-subaccounts > div:first-of-type div[style*="background: #2d6a4f"],
+        html[data-theme="dark"] #tab-subaccounts div[style*="border:2px solid #2d6a4f"],
+        html[data-theme="dark"] #tab-subaccounts div[style*="border: 2px solid #2d6a4f"],
+        html[data-theme="dark"] div[style*="border:2px solid #2D6A4F"],
+        html[data-theme="dark"] div[style*="border: 2px solid #2D6A4F"] {
+            background: #1a3a2a !important;
+            border-color: #2d6a4f !important;
+        }
+
+        html[data-theme="dark"] div[style*="border:2px solid #2D6A4F"] *,
+        html[data-theme="dark"] div[style*="border:2px solid #2d6a4f"] *,
+        html[data-theme="dark"] div[style*="border: 2px solid #2D6A4F"] *,
+        html[data-theme="dark"] div[style*="border: 2px solid #2d6a4f"] * {
+            color: #e0e0e0 !important;
+        }
+
+        /* Sub-Accounts: linked sub-account cards */
+        html[data-theme="dark"] #tab-subaccounts div[style*="border:1px solid"],
+        html[data-theme="dark"] #tab-subaccounts div[style*="border: 1px solid"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] #tab-subaccounts div[style*="border:1px solid"] *,
+        html[data-theme="dark"] #tab-subaccounts div[style*="border: 1px solid"] * {
+            color: #e0e0e0;
+        }
+
+        /* 5. My Account: unify card backgrounds - no different gray tones */
+        html[data-theme="dark"] .info-card,
+        html[data-theme="dark"] #tab-company .info-card,
+        html[data-theme="dark"] #tab-company div[style*="border-radius"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] .info-card > div,
+        html[data-theme="dark"] .info-card .info-row {
+            background: transparent !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] .info-card > div:first-child,
+        html[data-theme="dark"] .info-card h4,
+        html[data-theme="dark"] .info-card [style*="text-transform:uppercase"] {
+            background: transparent !important;
+            color: #f0f0f0 !important;
+        }
+
+        /* My Account: header strips in cards (same bg as card) */
+        html[data-theme="dark"] #tab-company div[style*="background:#e8f5ee"],
+        html[data-theme="dark"] #tab-company div[style*="background: #e8f5ee"],
+        html[data-theme="dark"] #tab-company div[style*="background:#f0f9f4"],
+        html[data-theme="dark"] #tab-company div[style*="background: #f0f9f4"],
+        html[data-theme="dark"] #tab-company div[style*="background:#eef6f1"],
+        html[data-theme="dark"] div[style*="background:#eef6f1"],
+        html[data-theme="dark"] div[style*="background:#e8f5ee"],
+        html[data-theme="dark"] div[style*="background: #e8f5ee"],
+        html[data-theme="dark"] div[style*="background:#f0f9f4"] {
+            background: #1e1e1e !important;
+        }
+
+        /* 6. B2B Shop: product card image area - same tone as card */
+        html[data-theme="dark"] #portalShopGrid > div img[style*="background:#f8f9fa"],
+        html[data-theme="dark"] #portalShopGrid > div img[style*="background: #f8f9fa"],
+        html[data-theme="dark"] #portalShopGrid img,
+        html[data-theme="dark"] #inlineShopGrid img,
+        html[data-theme="dark"] #recommendedGrid img {
+            background: #1e1e1e !important;
+        }
+
+        /* 7. Orders: table and order rows */
+        html[data-theme="dark"] #tab-orders div[style*="background:#fff"],
+        html[data-theme="dark"] #tab-orders div[style*="background: #fff"],
+        html[data-theme="dark"] #tab-orders div[style*="background:#f8f9fa"],
+        html[data-theme="dark"] #tab-orders div[style*="background: #f8f9fa"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* 8. All remaining inline border-bottom items */
+        html[data-theme="dark"] div[style*="border-bottom:1px solid #e2e8f0"],
+        html[data-theme="dark"] div[style*="border-bottom: 1px solid #e2e8f0"],
+        html[data-theme="dark"] div[style*="border-bottom:1px solid #e9ecef"],
+        html[data-theme="dark"] div[style*="border-bottom: 1px solid #e9ecef"] {
+            border-color: #333 !important;
+        }
+
+        /* 9. All remaining inline border elements */
+        html[data-theme="dark"] div[style*="border:1px solid #e2e8f0"],
+        html[data-theme="dark"] div[style*="border: 1px solid #e2e8f0"],
+        html[data-theme="dark"] div[style*="border:1px solid #e9ecef"],
+        html[data-theme="dark"] div[style*="border: 1px solid #e9ecef"] {
+            border-color: #333 !important;
+        }
+
+        /* 10. Product modal: info box and image bg unified */
+        html[data-theme="dark"] #b2bProductModalBody img[style*="background:#f8f9fa"],
+        html[data-theme="dark"] #b2bProductModalBody img[style*="background: #f8f9fa"] {
+            background: #1e1e1e !important;
+        }
+
+        html[data-theme="dark"] #b2bProductModalBody div[style*="background:#f8f9fa"],
+        html[data-theme="dark"] #b2bProductModalBody div[style*="background: #f8f9fa"] {
+            background: #2a2a2a !important;
+        }
+
+        /* 11. Force all remaining light backgrounds in panels */
+        html[data-theme="dark"] .b2b-panel div[style*="padding"][style*="background:#f"],
+        html[data-theme="dark"] .b2b-panel section[style*="background:#f"] {
+            background: #1e1e1e !important;
+        }
+
+        /* 12. Favourites panel */
+        html[data-theme="dark"] #favouritesPanel div[style*="background:#fff"],
+        html[data-theme="dark"] #favouritesPanel div[style*="border:1px solid"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] #favouritesPanel * {
+            color: #e0e0e0;
+        }
+
+        /* 13. Top Products section in dashboard */
+        html[data-theme="dark"] #topProductsGrid > div,
+        html[data-theme="dark"] #topProductsGrid img {
+            background: #1e1e1e !important;
+        }
+
+        /* 14. Stat-card highlight (green gradient) → dark in dark mode */
+        html[data-theme="dark"] .stat-card.highlight {
+            background: #1e1e1e !important;
+            border: 1px solid #2d6a4f !important;
+        }
+
+        html[data-theme="dark"] .stat-card.highlight .stat-value,
+        html[data-theme="dark"] .stat-card.highlight .stat-label {
+            color: #e0e0e0 !important;
+        }
+
+        /* 15. Sub-Accounts: main account card (#subMainAccount) */
+        html[data-theme="dark"] #subMainAccount {
+            background: #1a3a2a !important;
+            border-color: #2d6a4f !important;
+        }
+
+        html[data-theme="dark"] #subMainAccount * {
+            color: #e0e0e0 !important;
+        }
+
+        html[data-theme="dark"] #subMainAccount div[style*="color:#166534"],
+        html[data-theme="dark"] #subMainAccount div[style*="color: #166534"] {
+            color: #4ade80 !important;
+        }
+
+        html[data-theme="dark"] #subMainAccount div[style*="color:#1B4332"],
+        html[data-theme="dark"] #subMainAccount div[style*="color: #1B4332"] {
+            color: #f0f0f0 !important;
+        }
+
+        /* 16. Sub-account cards */
+        html[data-theme="dark"] .sub-account-card {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] .sub-account-card * {
+            color: #e0e0e0;
+        }
+
+        html[data-theme="dark"] .sub-account-card:hover {
+            border-color: #2d6a4f !important;
+        }
+
+        /* 17. Financial: JS-rendered overview cards */
+        html[data-theme="dark"] #tab-financial .fin-panel div[style*="text-align:center"][style*="border-radius"],
+        html[data-theme="dark"] #tab-financial .fin-panel div[style*="text-align: center"][style*="border-radius"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* 18. Quick action button strip in dashboard */
+        html[data-theme="dark"] #tab-dashboard > div[style*="display:flex"][style*="gap"],
+        html[data-theme="dark"] #tab-dashboard > div[style*="display: flex"][style*="gap"] {
+            background: transparent !important;
+        }
+
+        html[data-theme="dark"] #tab-dashboard > div[style*="gap"] > div[style*="cursor:pointer"],
+        html[data-theme="dark"] #tab-dashboard > div[style*="gap"] > div[style*="cursor: pointer"],
+        html[data-theme="dark"] #tab-dashboard > div[style*="gap"] > a {
+            background: #1e1e1e !important;
+            border: 1px solid #333 !important;
+            color: #ccc !important;
+        }
+
+        html[data-theme="dark"] #tab-dashboard > div[style*="gap"] > div[style*="cursor"] *,
+        html[data-theme="dark"] #tab-dashboard > div[style*="gap"] > a * {
+            color: #ccc !important;
+        }
+
+        /* 19. Quick action buttons (.b2b-qa) */
+        html[data-theme="dark"] .b2b-qa {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+            color: #ccc !important;
+        }
+
+        html[data-theme="dark"] .b2b-qa:hover {
+            background: #2a2a2a !important;
+            border-color: #2d6a4f !important;
+            color: #e0e0e0 !important;
+        }
+
+        html[data-theme="dark"] .b2b-qa-label {
+            color: #ccc !important;
+        }
+
+        /* 20. Financial overview cards - green/red/gray inline backgrounds */
+        html[data-theme="dark"] div[style*="background:#f0fdf4"],
+        html[data-theme="dark"] div[style*="background: #f0fdf4"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] div[style*="background:#fef2f2"],
+        html[data-theme="dark"] div[style*="background: #fef2f2"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] #finOpenBalance {
+            color: #4ade80 !important;
+        }
+
+        html[data-theme="dark"] #finOverdue {
+            color: #f87171 !important;
+        }
+
+        html[data-theme="dark"] #finCreditLimit,
+        html[data-theme="dark"] #finNextDue {
+            color: #e0e0e0 !important;
+        }
+
+        /* 21. Financial: Account Summary box */
+        html[data-theme="dark"] #fin-overview div[style*="background:#fff"][style*="border-radius:10px"],
+        html[data-theme="dark"] #fin-overview div[style*="background: #fff"][style*="border-radius: 10px"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] #fin-overview h4 {
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] #fin-overview strong {
+            color: #e0e0e0 !important;
+        }
+
+        /* 22. B2B Shop: product images - SAME tone as card */
+        html[data-theme="dark"] #portalShopGrid > div > img,
+        html[data-theme="dark"] #portalShopGrid > div img[alt] {
+            background: #1e1e1e !important;
+        }
+
+        /* 23. My Account info-card inner sections */
+        html[data-theme="dark"] #tab-company .info-card > div,
+        html[data-theme="dark"] #tab-company .info-grid > div,
+        html[data-theme="dark"] #tab-company div[style*="padding:20px"],
+        html[data-theme="dark"] #tab-company div[style*="padding: 20px"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* 24. Orders table rows */
+        html[data-theme="dark"] #tab-orders div[style*="border-radius:10px"],
+        html[data-theme="dark"] #tab-orders div[style*="border-radius: 10px"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* 25. General: Ensure all green-tinted light backgrounds go dark */
+        html[data-theme="dark"] div[style*="background:#eef6f1"],
+        html[data-theme="dark"] div[style*="background: #eef6f1"],
+        html[data-theme="dark"] div[style*="background:#e8f5ee"],
+        html[data-theme="dark"] div[style*="background: #e8f5ee"] {
+            background: #1e1e1e !important;
+        }
+
+        /* 26. General: border-bottom separators inside panels */
+        html[data-theme="dark"] .b2b-panel div[style*="border-bottom:1px solid #f1f5f9"],
+        html[data-theme="dark"] .b2b-panel div[style*="border-bottom: 1px solid #f1f5f9"],
+        html[data-theme="dark"] .fin-panel div[style*="border-bottom:1px solid #f1f5f9"],
+        html[data-theme="dark"] #fin-overview div[style*="border-bottom:1px solid #f1f5f9"] {
+            border-color: #333 !important;
+        }
+
+        /* 27. Sub-Accounts: Linked Sub-Accounts heading & add button area */
+        html[data-theme="dark"] #tab-subaccounts h4,
+        html[data-theme="dark"] #tab-subaccounts h3 {
+            color: #f0f0f0 !important;
+        }
+
+        /* 28. Financial: All fin-panel inner cards (invoices/payments/statement) */
+        html[data-theme="dark"] .fin-panel div[style*="border:1px solid"],
+        html[data-theme="dark"] .fin-panel div[style*="border: 1px solid"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* 29. Marketing & Support: All inner sections */
+        html[data-theme="dark"] .mkt-panel div[style*="background:#fff"],
+        html[data-theme="dark"] .mkt-panel div[style*="background: #fff"],
+        html[data-theme="dark"] .sup-panel div[style*="background:#fff"],
+        html[data-theme="dark"] .sup-panel div[style*="background: #fff"] {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        /* ============================================
+           DARK MODE - REORDER MODAL & QTY CONTROLS
+           ============================================ */
+
+        /* Reorder modal background */
+        html[data-theme="dark"] .reorder-modal {
+            background: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Reorder items */
+        html[data-theme="dark"] .reorder-item {
+            border-color: #333 !important;
+        }
+
+        html[data-theme="dark"] .reorder-item .ri-name {
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] .reorder-item .ri-price {
+            color: #999 !important;
+        }
+
+        html[data-theme="dark"] .reorder-item img {
+            background: #1e1e1e !important;
+        }
+
+        /* Qty control buttons - dark bg */
+        html[data-theme="dark"] .qty-controls button {
+            background: #2a2a2a !important;
+            border-color: #444 !important;
+            color: #e0e0e0 !important;
+        }
+
+        html[data-theme="dark"] .qty-controls button:hover {
+            background: #333 !important;
+            border-color: #2d6a4f !important;
+        }
+
+        html[data-theme="dark"] .qty-controls span {
+            color: #f0f0f0 !important;
+        }
+
+        /* Reorder total and footer */
+        html[data-theme="dark"] .reorder-modal h3,
+        html[data-theme="dark"] .reorder-modal h4 {
+            color: #f0f0f0 !important;
+        }
+
+        html[data-theme="dark"] .reorder-modal div[style*="border-top"] {
+            border-color: #333 !important;
+        }
     </style>
 </head>
 
@@ -1805,7 +2632,7 @@
                             <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:#94a3b8;">
                                 <div style="font-size:2rem;margin-bottom:8px;">⭐</div>
                                 <p style="font-size:14px;">No favourite products yet.</p>
-                                <p style="font-size:13px;margin-top:6px;">Browse the <a href="shop.html"
+                                <p style="font-size:13px;margin-top:6px;">Browse the <a href="javascript:void(0)" onclick="B2B.toggleInlineShop()"
                                         style="color:#2D6A4F;font-weight:600;">B2B Shop</a> and click the ⭐ on any
                                     product to save it here.</p>
                             </div>
@@ -2168,7 +2995,6 @@
                         style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:#f1f5f9;padding:4px;border-radius:8px;">
                         <button class="mkt-subtab active" data-mkt="files" onclick="B2B.showMktTab('files')">📁
                             Files</button>
-                        <button class="mkt-subtab" data-mkt="kits" onclick="B2B.showMktTab('kits')">🎁 Kits</button>
                         <button class="mkt-subtab" data-mkt="training" onclick="B2B.showMktTab('training')">🎓
                             Training</button>
                     </div>
@@ -2232,43 +3058,6 @@
                                     Facebook and TikTok.</p><a
                                     href="mailto:marketing@sportsfoodsireland.ie?subject=B2B%20Social%20Media%20Content"
                                     class="mkt-link">Request Content →</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MKT: Kits -->
-                    <div class="mkt-panel" id="mkt-kits" style="display:none;">
-                        <h4 style="color:#1e293b;margin-bottom:6px;">🎁 Suggested Combo Kits</h4>
-                        <p style="color:#636E72;font-size:0.85rem;margin-bottom:20px;">Cross-sell suggestions and bundle
-                            ideas to increase your average order value.</p>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
-                            <div class="mkt-kit-card">
-                                <div class="mkt-kit-badge">Best Seller</div>
-                                <h4>🏃 Runner's Essentials Kit</h4>
-                                <p>Tailwind Endurance Fuel + SaltStick Fastchews + Clif Bars. Perfect combo for marathon
-                                    runners and clubs.</p>
-                                <div class="mkt-kit-tip">💡 Average margin: 35% — great for checkout upsell</div>
-                            </div>
-                            <div class="mkt-kit-card">
-                                <div class="mkt-kit-badge">Popular</div>
-                                <h4>🏊 Swimmer's Recovery Pack</h4>
-                                <p>Tailwind Recovery Mix + PowerBar Protein Soft Layer + High5 Electrolyte Drink. Ideal
-                                    for swim clubs.</p>
-                                <div class="mkt-kit-tip">💡 Bundle discount suggestion: 10% off when bought together
-                                </div>
-                            </div>
-                            <div class="mkt-kit-card">
-                                <div class="mkt-kit-badge">New</div>
-                                <h4>🚴 Cyclist's Energy Bundle</h4>
-                                <p>PowerBar PowerGel + PowerBar Energize Bar + PowerBar 5 Electrolytes. All-in-one
-                                    cycling fuel.</p>
-                                <div class="mkt-kit-tip">💡 Perfect for bike shop counter display</div>
-                            </div>
-                            <div class="mkt-kit-card">
-                                <h4>🏆 Triathlon Starter Pack</h4>
-                                <p>Tailwind Endurance + Clif Shot Bloks + SaltStick Capsules + Nuun Sport Electrolyte.
-                                    Complete race-day nutrition.</p>
-                                <div class="mkt-kit-tip">💡 Suggest to triathlon clubs as a team deal</div>
                             </div>
                         </div>
                     </div>
@@ -3016,7 +3805,7 @@
     <script src="../js/cart.min.js?v=4" defer></script>
     <script src="../js/main.min.js?v=7" defer></script>
     <script src="../js/sfi-fixes.min.js?v=2" defer></script>
-    <script src="b2b-portal.js?v=44" defer></script>
+    <script src="b2b-portal.js?v=45" defer></script>
 </body>
 
 </html>

@@ -61,7 +61,7 @@ function buildCardVariantHTML(product) {
             const priceStr = opt.price ? ` data-price="${opt.price}"` : '';
             const oldPriceStr = opt.compare_at_price ? ` data-old-price="${opt.compare_at_price}"` : '';
             const stockStr = (opt.stock !== null && opt.stock <= 0) ? ' disabled' : '';
-            return `<option value="${opt.id}"${sel}${priceStr}${oldPriceStr}${stockStr}>${opt.label}${opt.stock !== null && opt.stock <= 0 ? ' (Out of Stock)' : ''}</option>`;
+            return `<option value="${opt.id}"${sel}${priceStr}${oldPriceStr}${stockStr}>${opt.label}${opt.stock !== null && opt.stock <= 0 ? ' ((Backorder))' : ''}</option>`;
         }).join('');
         return `<div class="card-variant-selector">
             <select class="card-variant-select" data-type="${group.slug}" title="${group.type}">
@@ -99,6 +99,12 @@ const categoryMap = {
     'Eletronicos': 'electronics'
 };
 
+// Some brands belong to additional categories (multi-categoria)
+// Ex.: Chamois Butt'r é Cycling mas também faz sentido em Running
+const extraCategoriesByBrand = {
+    "Chamois Butt'r": ['running']
+};
+
 // Subcategory mapping for better matching
 const subcategoryMap = {
     'Jerseys & Gilets': 'Jerseys & Gilets',
@@ -113,14 +119,19 @@ async function loadProducts() {
         
         // Quando a página é aberta via file:// (sem servidor), usar dados embutidos
         if (window.location.protocol === 'file:' && Array.isArray(window.EMBEDDED_PRODUCTS)) {
-            allProducts = window.EMBEDDED_PRODUCTS.map(product => ({
-                ...product,
-                categoryEn: categoryMap[product.categoria] || product.categoria.toLowerCase(),
-                price: parseFloat(product.preco) || 0,
-                oldPrice: parseFloat(product.preco_antigo) || null,
-                discount: product.desconto || 0,
-                inStock: product.em_stock !== false
-            }));
+            allProducts = window.EMBEDDED_PRODUCTS.map(product => {
+                const baseCategory = categoryMap[product.categoria] || product.categoria.toLowerCase();
+                const extras = extraCategoriesByBrand[product.marca] || [];
+                return {
+                    ...product,
+                    categoryEn: baseCategory,
+                    extraCategories: extras,
+                    price: parseFloat(product.preco) || 0,
+                    oldPrice: parseFloat(product.preco_antigo) || null,
+                    discount: product.desconto || 0,
+                    inStock: product.em_stock !== false
+                };
+            });
             
             // Aplicar filtro de marca via URL (ex.: shop.html?brand=Clif)
             let brandParamLocal = null;
@@ -182,14 +193,19 @@ async function loadProducts() {
         // Suporta tanto array direto quanto objeto com .produtos
         const productsArray = Array.isArray(data) ? data : data.produtos;
         
-        allProducts = productsArray.map(product => ({
-            ...product,
-            categoryEn: categoryMap[product.categoria] || product.categoria.toLowerCase(),
-            price: parseFloat(product.preco) || 0,
-            oldPrice: parseFloat(product.preco_antigo) || null,
-            discount: product.desconto || 0,
-            inStock: product.em_stock !== false
-        }));
+        allProducts = productsArray.map(product => {
+            const baseCategory = categoryMap[product.categoria] || product.categoria.toLowerCase();
+            const extras = extraCategoriesByBrand[product.marca] || [];
+            return {
+                ...product,
+                categoryEn: baseCategory,
+                extraCategories: extras,
+                price: parseFloat(product.preco) || 0,
+                oldPrice: parseFloat(product.preco_antigo) || null,
+                discount: product.desconto || 0,
+                inStock: product.em_stock !== false
+            };
+        });
         
         // Check URL hash for category filter and expand it
         const hash = window.location.hash.replace('#', '');
@@ -362,34 +378,45 @@ function applyFilters() {
                 if (generalBrandFilters.length > 0 && !generalBrandFilters.includes(p.marca)) {
                     return false;
                 }
-                
-                const categoryFilter = categoryFilters[p.categoryEn];
-                if (!categoryFilter) return false;
-                
-                let matchesSubcategory = categoryFilter.subcategories.length === 0;
-                let matchesBrand = categoryFilter.brands.length === 0;
-                
-                if (categoryFilter.subcategories.length > 0) {
-                    matchesSubcategory = categoryFilter.subcategories.includes(p.subcategoria);
+
+                const catsForProduct = [p.categoryEn, ...((p.extraCategories || []))];
+                let passes = false;
+
+                for (const cat of catsForProduct) {
+                    const categoryFilter = categoryFilters[cat];
+                    if (!categoryFilter) continue;
+
+                    let matchesSubcategory = categoryFilter.subcategories.length === 0;
+                    let matchesBrand = categoryFilter.brands.length === 0;
+
+                    if (categoryFilter.subcategories.length > 0) {
+                        matchesSubcategory = categoryFilter.subcategories.includes(p.subcategoria) || categoryFilter.subcategories.includes(p.sub_subcategoria);
+                    }
+
+                    if (categoryFilter.brands.length > 0) {
+                        matchesBrand = categoryFilter.brands.includes(p.marca);
+                    }
+
+                    // Dietary tag filter
+                    let matchesDietary = true;
+                    if (categoryFilter.dietary && categoryFilter.dietary.length > 0) {
+                        const tags = p.dietary_tags || [];
+                        matchesDietary = categoryFilter.dietary.every(d => tags.includes(d));
+                    }
+
+                    if (matchesSubcategory && matchesBrand && matchesDietary) {
+                        passes = true;
+                        break;
+                    }
                 }
-                
-                if (categoryFilter.brands.length > 0) {
-                    matchesBrand = categoryFilter.brands.includes(p.marca);
-                }
-                
-                // Dietary tag filter
-                let matchesDietary = true;
-                if (categoryFilter.dietary && categoryFilter.dietary.length > 0) {
-                    const tags = p.dietary_tags || [];
-                    matchesDietary = categoryFilter.dietary.every(d => tags.includes(d));
-                }
-                
-                return matchesSubcategory && matchesBrand && matchesDietary;
+
+                return passes;
             });
         } else {
             // If categories are expanded but no specific filters, show all products in those categories
             filteredProducts = filteredProducts.filter(p => {
-                if (!activeCategories.includes(p.categoryEn)) return false;
+                const catsForProduct = [p.categoryEn, ...((p.extraCategories || []))];
+                if (!catsForProduct.some(c => activeCategories.includes(c))) return false;
                 // Apply general brand filter if set
                 if (generalBrandFilters.length > 0) {
                     return generalBrandFilters.includes(p.marca);
@@ -579,15 +606,37 @@ function renderProducts() {
                 // Buscar produto nos dados carregados do shop
                 const product = allProducts.find(p => p.id === productId || p.id == productId || p._supabase_id === rawId);
                 if (product && typeof window.addToCart === 'function') {
-                    // Passar dados do produto com imagem processada
                     const imagemProcessada = getShopProductImage(product.imagem, productId);
-                    window.addToCart(productId, 1, {
-                        nome: product.nome,
-                        preco: product.preco || product.price,
-                        imagem: imagemProcessada
-                    });
+                    const shopProductData = { nome: product.nome, preco: product.preco || product.price, imagem: imagemProcessada };
+
+                    // Verificar se tem variantes (Supabase first, then description fallback)
+                    const hasSupaV = product.variantes && product.variantes.length > 0 &&
+                        product.variantes.some(g => g.options && g.options.length > 0);
+                    if (hasSupaV && typeof window.showSupabaseVariantModal === 'function') {
+                        window.showSupabaseVariantModal(product, function(selected) {
+                            const cartData = Object.assign({}, shopProductData);
+                            cartData.nome = cartData.nome + ' — ' + selected.label;
+                            cartData.variant = selected.label;
+                            cartData.variantId = selected.id;
+                            cartData.preco = selected.price || cartData.preco;
+                            window.addToCart(productId, 1, cartData);
+                        });
+                        return;
+                    }
+                    const descV = (typeof window.extractProductVariants === 'function') ? window.extractProductVariants(product) : null;
+                    if (descV && typeof window.showVariantModal === 'function') {
+                        window.showVariantModal(product, descV, function(selectedVariant) {
+                            const cartData = Object.assign({}, shopProductData);
+                            cartData.nome = cartData.nome + ' — ' + selectedVariant;
+                            cartData.variant = selectedVariant;
+                            cartData.variantType = descV.type;
+                            window.addToCart(productId, 1, cartData);
+                        });
+                        return;
+                    }
+
+                    window.addToCart(productId, 1, shopProductData);
                 } else if (typeof window.addToCart === 'function') {
-                    // Fallback se produto não encontrado
                     window.addToCart(productId, 1);
                 }
             }

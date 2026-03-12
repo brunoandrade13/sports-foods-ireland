@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Product — B2B | Sports Foods Ireland</title>
+<link rel="icon" type="image/png" href="../img/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/cart-modal.css?v=2">
+<style>
+:root{--g:#2D6A4F;--gd:#1B4332;--ga:#40916C;--bg:#f8faf9;--sf:#fff;--bd:#e2e8f0;--tx:#1e293b;--mt:#636E72;--rd:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--tx)}
+a{color:var(--g);text-decoration:none}
+</style>
+</head>
+<body>
+<style>
+/* Top bar */
+.b2b-topbar{background:var(--gd);padding:10px 24px;display:flex;align-items:center;justify-content:space-between}
+.b2b-topbar a{color:#a7f3d0;font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:6px}
+.b2b-topbar a:hover{color:#fff}
+.b2b-topbar .logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.1rem;color:#fff;letter-spacing:-0.5px}
+
+/* Breadcrumb */
+.bc{padding:14px 24px;font-size:.82rem;color:var(--mt);max-width:1200px;margin:0 auto}
+.bc a{color:var(--g);font-weight:500}.bc a:hover{text-decoration:underline}
+.bc span{margin:0 6px;color:#cbd5e1}
+
+/* Main grid */
+.product-wrap{max-width:1200px;margin:0 auto;padding:0 24px 60px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+@media(max-width:768px){.product-wrap{grid-template-columns:1fr;gap:24px;padding:0 16px 40px}}
+</style>
+<style>
+/* Product image */
+.prod-img-box{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rd);overflow:hidden;position:relative}
+.prod-img-box img{width:100%;aspect-ratio:1;object-fit:contain;padding:24px;display:block}
+.badge-b2b{position:absolute;top:12px;left:12px;background:var(--g);color:#fff;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:4px;letter-spacing:.5px}
+
+/* Product info */
+.prod-info .brand{font-size:.75rem;text-transform:uppercase;color:var(--mt);letter-spacing:.5px;margin-bottom:4px}
+.prod-info h1{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;line-height:1.3;margin-bottom:16px;color:var(--tx)}
+.prod-info .sku{font-size:.8rem;color:var(--mt);margin-bottom:16px}
+
+/* Pricing */
+.price-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--rd);padding:20px;margin-bottom:20px}
+.price-b2b{font-size:1.8rem;font-weight:700;color:var(--gd)}
+.price-rrp{font-size:.95rem;color:var(--mt);text-decoration:line-through;margin-left:12px}
+.price-save{display:inline-block;background:var(--gd);color:#fff;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:4px;margin-left:8px}
+.price-label{font-size:.75rem;color:var(--g);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+</style>
+<style>
+/* Variants */
+.var-group{margin-bottom:16px}
+.var-label{font-size:.8rem;font-weight:600;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.var-opts{display:flex;flex-wrap:wrap;gap:8px}
+.var-opt{padding:8px 16px;border:2px solid var(--bd);border-radius:8px;background:var(--sf);cursor:pointer;font-size:.88rem;color:var(--tx);transition:all .15s;user-select:none}
+.var-opt:hover{border-color:var(--g);background:#f0faf4}
+.var-opt.sel{border-color:var(--g);background:#e8f5ee;color:var(--gd);font-weight:600}
+.var-opt.dis{opacity:.4;cursor:not-allowed;pointer-events:none}
+
+/* Buttons */
+.btn-cart{width:100%;padding:16px;background:var(--g);color:#fff;border:none;border-radius:var(--rd);font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;margin-bottom:12px}
+.btn-cart:hover{background:var(--gd)}
+.btn-cart:disabled{opacity:.5;cursor:not-allowed}
+.btn-back{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;color:var(--g);font-weight:500;margin-top:8px}
+
+/* Details section */
+.details{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rd);padding:24px;margin-top:20px}
+.details h3{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;margin-bottom:12px;color:var(--tx)}
+.details-content{font-size:.9rem;color:#495057;line-height:1.7}
+.details-content p{margin-bottom:10px}
+
+/* Stock */
+.stock-ok{color:#166534;font-size:.85rem;font-weight:600}.stock-ok::before{content:'✓ '}
+.stock-out{color:#991b1b;font-size:.85rem;font-weight:600}.stock-out::before{content:'✗ '}
+.stock-row{display:flex;gap:16px;align-items:center;margin-bottom:16px;font-size:.85rem}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.85rem;color:var(--mt);padding:12px;background:#f8f9fa;border-radius:8px;margin-bottom:16px}
+.meta-grid strong{color:var(--tx)}
+
+/* Loading */
+.loading{text-align:center;padding:80px 24px;color:var(--mt)}
+.loading .spinner{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--g);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<!-- Top Bar -->
+<div class="b2b-topbar">
+  <a href="portal.html">← Back to Portal</a>
+  <span class="logo">SFI <span style="color:#a7f3d0;font-weight:500">B2B</span></span>
+  <a href="portal.html" style="font-size:.8rem">🛒 <span id="cartCount">0</span></a>
+</div>
+
+<!-- Breadcrumb -->
+<div class="bc">
+  <a href="portal.html">B2B Portal</a><span>/</span>
+  <a href="portal.html" id="bcBrand">Brand</a><span>/</span>
+  <span id="bcProduct">Product</span>
+</div>
+
+<!-- Loading -->
+<div class="loading" id="loadingState">
+  <div class="spinner"></div>
+  <p>Loading product details...</p>
+</div>
+
+<!-- Product -->
+<div class="product-wrap" id="productWrap" style="display:none">
+  <div class="prod-img-box">
+    <span class="badge-b2b">B2B PRICE</span>
+    <img id="prodImg" src="../img/placeholder.webp" alt="" onerror="this.src='../img/placeholder.webp'">
+  </div>
+  <div class="prod-info">
+    <div class="brand" id="prodBrand"></div>
+    <h1 id="prodName">Loading...</h1>
+    <div class="sku" id="prodSku"></div>
+    <div class="stock-row">
+      <span id="prodStock"></span>
+      <span id="prodStockQty" style="color:var(--mt)"></span>
+    </div>
+    <!-- Price -->
+    <div class="price-box">
+      <div class="price-label">Your B2B Price</div>
+      <span class="price-b2b" id="prodPrice">€0.00</span>
+      <span class="price-rrp" id="prodRrp"></span>
+    </div>
+
+    <!-- Variants -->
+    <div id="prodVariants"></div>
+
+    <!-- Meta -->
+    <div class="meta-grid" id="prodMeta" style="display:none">
+      <div><strong>Category:</strong> <span id="metaCat"></span></div>
+      <div><strong>Subcategory:</strong> <span id="metaSub"></span></div>
+    </div>
+
+    <!-- Add to Cart -->
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+      <input type="number" id="prodQty" value="1" min="1" max="99" style="width:64px;padding:12px;border:1px solid var(--bd);border-radius:var(--rd);font-size:1rem;text-align:center;font-family:inherit">
+      <button class="btn-cart" id="btnCart" onclick="addProductToCart()">🛒 Add to Cart</button>
+    </div>
+    <a class="btn-back" href="portal.html">← Continue shopping</a>
+
+    <!-- Description -->
+    <div class="details" id="prodDetails" style="display:none">
+      <h3>Product Description</h3>
+      <div class="details-content" id="prodDesc"></div>
+    </div>
+  </div>
+</div>
+<!-- Scripts -->
+<script src="../js/sfi-api.min.js?v=12" defer></script>
+<script src="../js/cart.min.js?v=4" defer></script>
+<script>
+var _product = null;
+var _selectedVariant = null;
+
+window.addEventListener('DOMContentLoaded', async function() {
+  var params = new URLSearchParams(window.location.search);
+  var legacyId = params.get('id');
+  if (!legacyId) { document.getElementById('loadingState').innerHTML = '<p>No product specified.</p>'; return; }
+
+  try {
+    // Ensure B2B auth
+    if (typeof sfi !== 'undefined' && sfi.auth) await sfi.auth.ensureAuth();
+  } catch(e) {}
+
+  try {
+    var U = 'https://styynhgzrkyoioqjssuw.supabase.co';
+    var K = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
+    var h = { 'apikey': K, 'Authorization': 'Bearer ' + K };
+
+    // Fetch product with relations (including variant SKU when existir)
+    var res = await fetch(U + '/rest/v1/products?legacy_id=eq.' + legacyId + '&select=*,brands(name,slug),categories(name,slug),subcategories(name,slug),product_variants(id,label,price,compare_at_price,stock,is_default,sort_order,sku,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: h });
+    var arr = await res.json();
+    if (!arr || !arr[0]) throw new Error('Product not found');
+    var p = arr[0];
+    _product = p;
+    var EXVAT = function(v) { return Number(v||0) / 1.23; };
+    var cur = (typeof sfi !== 'undefined' && sfi.currency === 'GBP') ? '\u00a3' : '\u20ac';
+    var wsPrice = Number(p.wholesale_price_eur) || 0;
+    var retailPrice = Number(p.price_eur) || 0;
+    var b2bPrice = (wsPrice > 0 && wsPrice < retailPrice) ? wsPrice : retailPrice;
+    var hasDiscount = wsPrice > 0 && wsPrice < retailPrice;
+    
+    var img = p.image_url || '';
+    if (img && !img.startsWith('http')) img = '../' + img;
+    if (!img) img = '../img/placeholder.webp';
+
+    // Populate UI
+    document.getElementById('prodImg').src = img;
+    document.getElementById('prodBrand').textContent = (p.brands && p.brands.name) || '';
+    document.getElementById('prodName').textContent = p.name || 'Product';
+    document.getElementById('prodSku').textContent = p.sku ? 'SKU: ' + p.sku : '';
+    document.getElementById('bcBrand').textContent = (p.brands && p.brands.name) || 'Products';
+    document.getElementById('bcProduct').textContent = p.name || '';
+    document.title = (p.name || 'Product') + ' — B2B | Sports Foods Ireland';
+
+    // Price
+    document.getElementById('prodPrice').textContent = cur + EXVAT(b2bPrice).toFixed(2);
+    if (hasDiscount) {
+      document.getElementById('prodRrp').textContent = 'RRP ' + cur + EXVAT(retailPrice).toFixed(2);
+    }
+    // Stock
+    var stockEl = document.getElementById('prodStock');
+    if (p.in_stock !== false) { stockEl.className = 'stock-ok'; stockEl.textContent = 'In Stock'; }
+    else { stockEl.className = 'stock-out'; stockEl.textContent = '📋 Backorder Available'; }
+    if (p.stock_quantity != null) document.getElementById('prodStockQty').textContent = '(' + p.stock_quantity + ' units)';
+
+    // Meta
+    var cat = (p.categories && p.categories.name) || '';
+    var sub = (p.subcategories && p.subcategories.name) || '';
+    if (cat || sub) {
+      document.getElementById('metaCat').textContent = cat;
+      document.getElementById('metaSub').textContent = sub;
+      document.getElementById('prodMeta').style.display = '';
+    }
+
+    // Description
+    if (p.description) {
+      document.getElementById('prodDesc').innerHTML = p.description;
+      document.getElementById('prodDetails').style.display = '';
+    }
+
+    // Variants
+    renderVariants(p);
+
+    // Show product
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('productWrap').style.display = 'grid';
+
+  } catch(e) {
+    document.getElementById('loadingState').innerHTML = '<p style="color:#ef4444">Error loading product: ' + e.message + '</p><a href="portal.html" style="color:var(--g)">← Back to Portal</a>';
+  }
+});
+function renderVariants(p) {
+  var container = document.getElementById('prodVariants');
+  var pvs = (p.product_variants || []).filter(function(v) { return v.label; });
+  if (!pvs.length) return;
+  var baseSku = p.sku || '';
+  // Group by type
+  var groups = {};
+  pvs.forEach(function(v) {
+    var t = v.variant_types || { name: 'Option', slug: 'option' };
+    var k = t.slug || 'option';
+    if (!groups[k]) groups[k] = { type: t.name, slug: k, options: [] };
+    groups[k].options.push(v);
+  });
+  var gArr = Object.values(groups);
+  container.innerHTML = gArr.map(function(g, gi) {
+    var hidden = gi > 0 ? ' style="display:none"' : '';
+    return '<div class="var-group" data-gi="' + gi + '"' + hidden + '><div class="var-label">' + g.type + '</div><div class="var-opts">' +
+      g.options.map(function(o) {
+        var oos = o.stock != null && o.stock <= 0;
+        return '<button class="var-opt' + (oos ? ' dis' : '') + '" data-vid="' + o.id + '" data-lbl="' + (o.label || '') + '" data-pr="' + (o.price || '') + '" data-sku="' + (o.sku || '') + '"' + (oos ? ' disabled' : '') + '>' + (o.label || '') + (oos ? ' (Backorder)' : '') + '</button>';
+      }).join('') + '</div></div>';
+  }).join('');
+
+  container.addEventListener('click', function(e) {
+    var o = e.target.closest('.var-opt'); if (!o || o.disabled) return;
+    var gr = o.closest('.var-group'); if (!gr) return;
+    gr.querySelectorAll('.var-opt').forEach(function(b) { b.classList.remove('sel'); });
+    o.classList.add('sel');
+    var gi = parseInt(gr.dataset.gi), ag = container.querySelectorAll('.var-group');
+    if (gi + 1 < ag.length) { ag[gi + 1].style.display = ''; for (var i = gi + 1; i < ag.length; i++) { ag[i].querySelectorAll('.var-opt').forEach(function(b) { b.classList.remove('sel'); }); if (i > gi + 1) ag[i].style.display = 'none'; } }
+    var lg = ag[ag.length - 1], ls = lg.querySelector('.var-opt.sel');
+    if (ls) {
+      _selectedVariant = { id: ls.dataset.vid, label: ls.dataset.lbl, price: parseFloat(ls.dataset.pr) || null, sku: (ls.dataset.sku || '') || null };
+      var cur = (typeof sfi !== 'undefined' && sfi.currency === 'GBP') ? '\u00a3' : '\u20ac';
+      if (_selectedVariant.price) document.getElementById('prodPrice').textContent = cur + EXVAT(_selectedVariant.price).toFixed(2);
+      var skuToShow = _selectedVariant.sku || baseSku;
+      document.getElementById('prodSku').textContent = skuToShow ? 'SKU: ' + skuToShow : '';
+    } else { _selectedVariant = null; }
+  });
+}
+
+function addProductToCart() {
+  if (!_product) return;
+  var qty = parseInt(document.getElementById('prodQty').value) || 1;
+  var name = _product.name || 'Product';
+  var price = EXVAT(Number(_product.wholesale_price_eur) || Number(_product.price_eur) || 0);
+  var img = _product.image_url || '';
+  if (img && !img.startsWith('http')) img = '../' + img;
+  var id = _product.legacy_id || _product.id;
+
+  if (_selectedVariant) {
+    name = name + ' \u2014 ' + _selectedVariant.label;
+    if (_selectedVariant.price) price = _selectedVariant.price;
+  }
+
+  if (typeof addToCart === 'function') {
+    addToCart(id, qty, {
+      nome: name,
+      preco: price,
+      imagem: img,
+      variant: _selectedVariant ? _selectedVariant.label : undefined,
+      variantId: _selectedVariant ? _selectedVariant.id : undefined,
+      sku: _selectedVariant && _selectedVariant.sku ? _selectedVariant.sku : (_product.sku || undefined)
+    });
+    var btn = document.getElementById('btnCart');
+    btn.textContent = '✓ Added!'; btn.style.background = '#166534';
+    setTimeout(function() { btn.textContent = '\uD83D\uDED2 Add to Cart'; btn.style.background = ''; }, 2000);
+  }
+}
+</script>
+</body>
+</html>

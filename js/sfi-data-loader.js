@@ -38,7 +38,7 @@
   // FETCH ALL PRODUCTS FROM SUPABASE
   // ============================================================
   async function fetchFromSupabase() {
-    const select = encodeURIComponent('*,brands(name,slug),categories(name,slug),subcategories(name,slug),product_images(id,url,alt_text,position,is_primary),product_variants(id,variant_type_id,label,price,compare_at_price,sku,stock,is_default,is_active,sort_order,parent_variant_id,variant_types(name,slug))');
+    const select = encodeURIComponent('*,brands(name,slug),categories(name,slug),subcategories(name,slug),sub_subcategories(name,slug),product_images(id,url,alt_text,position,is_primary),product_variants(id,variant_type_id,label,price,compare_at_price,sku,stock,is_default,is_active,sort_order,parent_variant_id,variant_types(name,slug))');
     const url = `${SUPABASE_URL}/rest/v1/products?select=${select}&is_active=eq.true&order=legacy_id.asc&limit=500`;
 
     const res = await fetch(url, {
@@ -166,6 +166,7 @@
       categoria: p.categories?.name || '',
       marca: p.brands?.name || '',
       subcategoria: p.subcategories?.name || '',
+      sub_subcategoria: p.sub_subcategories?.name || '',
       imagem: (p.image_url || '').includes('produtos-279/') 
         ? (p.image_url || '').replace(/\.(jpg|jpeg|png)$/i, '.webp')
         : (p.image_url || ''),

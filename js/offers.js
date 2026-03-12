@@ -245,15 +245,24 @@ function offersAddToCart(productId) {
     if (product) {
         // Processar imagem para garantir caminho correto
         const imagemProcessada = getOfferProductImage(product.imagem, productId);
-        
+        const offersProductData = { nome: product.nome, preco: product.preco, preco_antigo: product.preco_antigo, imagem: imagemProcessada };
+
+        // Verificar se tem variantes
+        const variants = (typeof window.extractProductVariants === 'function') ? window.extractProductVariants(product) : null;
+        if (variants && typeof window.showVariantModal === 'function') {
+            window.showVariantModal(product, variants, function(selectedVariant) {
+                const cartData = Object.assign({}, offersProductData);
+                cartData.nome = cartData.nome + ' — ' + selectedVariant;
+                cartData.variant = selectedVariant;
+                cartData.variantType = variants.type;
+                if (typeof window.addToCart === 'function') window.addToCart(productId, 1, cartData);
+            });
+            return;
+        }
+
         // Use the cart.js function if available, otherwise fallback
         if (typeof window.addToCart === 'function') {
-            window.addToCart(productId, 1, {
-                nome: product.nome,
-                preco: product.preco,
-                preco_antigo: product.preco_antigo,
-                imagem: imagemProcessada
-            });
+            window.addToCart(productId, 1, offersProductData);
         } else {
             // Fallback: use localStorage directly
             let cart = JSON.parse(localStorage.getItem('cart') || '[]');

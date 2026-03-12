@@ -844,7 +844,7 @@ window.subscribeNewsletter = async function(form) {
         btn.textContent = '✓ Subscribed!';
         btn.style.background = 'var(--gradient-primary)';
         if (typeof showNotification === 'function') {
-            showNotification('Thanks for subscribing! Check your email for a 10% discount code.', 'success');
+            showNotification('Thanks for subscribing! You will be the first to know about new launches and deals.', 'success');
         }
     } catch (e) {
         btn.textContent = '✓ Subscribed!';
@@ -1048,12 +1048,12 @@ class SportsFoodsChatbot {
         
         // Discount/coupon
         if (lower.includes('discount') || lower.includes('coupon') || lower.includes('code') || lower.includes('offer')) {
-            return "🎁 Sign up for our newsletter to get 10% off your first order! Also check our Offers page for current deals. First-time subscribers get FREE shipping too!";
+            return "🎁 Sign up for our newsletter to be the first to know about new product launches and exclusive deals! Also check our Offers page for current promotions.";
         }
         
         // Stock
         if (lower.includes('stock') || lower.includes('available') || lower.includes('when')) {
-            return "📋 Most items are in stock and ship within 24 hours. If a product is out of stock, you can sign up for restock alerts on the product page. Which product are you interested in?";
+            return "📋 Most items are in stock and ship within 24 hours. If a product is out of stock, you can place a backorder and receive it as soon as it is restocked. Which product are you interested in?";
         }
         
         // Greeting

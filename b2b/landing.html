@@ -19,7 +19,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="../css/sfi-styles.min.css?v=18">
+  <link rel="stylesheet" href="../css/sfi-styles.min.css?v=23">
   <style>
     .b2b-land {
       font-family: 'Inter', sans-serif;
@@ -557,7 +557,7 @@
           </div>
           <nav style="display:flex;flex-direction:column;gap:8px;">
             <a href="portal.html" class="b2b-menu-link">📊 Dashboard</a>
-            <a href="shop.html" class="b2b-menu-link">🛒 Shop</a>
+            <a href="portal.html?tab=shop" class="b2b-menu-link">🛒 Shop</a>
             <a href="portal.html?tab=orders" class="b2b-menu-link">📦 My Orders</a>
             <a href="portal.html?tab=financial" class="b2b-menu-link">💰 Financial</a>
             <a href="portal.html?tab=marketing" class="b2b-menu-link">📣 Marketing</a>
@@ -856,7 +856,7 @@
       document.addEventListener('DOMContentLoaded', function () {
         waitForSfi().then(function () {
           var ok = sfi.auth.handleOAuthCallback();
-          if (ok) setTimeout(function () { window.location.reload(); }, 500);
+          if (ok) setTimeout(function () { window.location.href = 'portal.html'; }, 500);
         });
       });
     }
@@ -884,12 +884,9 @@
           btn.textContent = 'Sign In to B2B Portal'; btn.disabled = false;
           return;
         }
-        // Success
-        const profile = await sfi.b2b.getProfile();
-        var cName = (profile && profile.b2b_company_name) || (profile && profile.first_name) || 'Partner';
-        document.getElementById('b2bWelcomeName').textContent = 'Welcome back, ' + cName + '!';
-        document.getElementById('b2bLoginForm').style.display = 'none';
-        document.getElementById('b2bLoggedIn').style.display = 'block';
+        // Success — redirect to portal
+        window.location.href = 'portal.html';
+        return;
       } catch (e) {
         showMsg(e.message || 'Login failed. Please check your credentials.', '#ef4444');
         btn.textContent = 'Sign In to B2B Portal'; btn.disabled = false;
@@ -913,11 +910,8 @@
         if (sfi.auth.isLoggedIn()) {
           const hasAccess = await sfi.b2b.checkAccess();
           if (hasAccess) {
-            const profile = await sfi.b2b.getProfile();
-            const name = profile?.b2b_company_name || profile?.first_name || 'Partner';
-            document.getElementById('b2bWelcomeName').textContent = 'Welcome back, ' + name + '!';
-            document.getElementById('b2bLoginForm').style.display = 'none';
-            document.getElementById('b2bLoggedIn').style.display = 'block';
+            window.location.href = 'portal.html';
+            return;
           }
         }
       } catch (e) { }

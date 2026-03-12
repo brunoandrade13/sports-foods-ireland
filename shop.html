@@ -24,9 +24,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <link rel="preload" href="css/sfi-styles.min.css?v=18" as="style">
+    <link rel="preload" href="css/sfi-styles.min.css?v=23" as="style">
     <style>:root{--primary:#2D6A4F;--secondary:#40916C;--accent:#95D5B2;--dark:#1B4332;--white:#FFFFFF;--bg:#F8FAF9;--text:#2D3436;--text-light:#636E72;--font-display:'Space Grotesk',sans-serif;--font-body:'Inter',sans-serif;--transition:0.3s ease}*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}img{max-width:100%;height:auto;display:block}a{text-decoration:none;color:inherit}.header{background:var(--dark);position:sticky;top:0;z-index:1000}.logo-img{height:82px;width:auto}.benefits-bar{background:var(--primary);color:var(--white);padding:8px 0;font-size:13px;overflow:hidden}.cart-count{background:var(--accent);color:var(--dark);border-radius:50%;font-size:11px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center}</style>
-    <link rel="stylesheet" href="css/sfi-styles.min.css?v=18" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="css/sfi-styles.min.css?v=18"></noscript>
+    <link rel="stylesheet" href="css/sfi-styles.min.css?v=23" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="css/sfi-styles.min.css?v=23"></noscript>
     <style>
         .shop-container {
             display: flex;
@@ -803,18 +803,18 @@
                     </button>
                     <div class="filter-subcategory-group" id="filter-subcategory-cycling">
                         <div class="filter-subsection">
-                            <h5>Type</h5>
+                            <h5>Clothing</h5>
                             <div class="filter-checkbox">
                                 <input type="checkbox" id="filter-cycling-jerseys" value="Jerseys & Gilets" class="subcategory-filter" data-category="cycling">
                                 <label for="filter-cycling-jerseys">Jerseys & Gilets</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-cycling-warmers" value="Warmers" class="subcategory-filter" data-category="cycling">
-                                <label for="filter-cycling-warmers">Warmers</label>
-                            </div>
-                            <div class="filter-checkbox">
                                 <input type="checkbox" id="filter-cycling-baselayers" value="Baselayers" class="subcategory-filter" data-category="cycling">
                                 <label for="filter-cycling-baselayers">Baselayers</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-cycling-shorts" value="Shorts" class="subcategory-filter" data-category="cycling">
+                                <label for="filter-cycling-shorts">Shorts</label>
                             </div>
                             <div class="filter-checkbox">
                                 <input type="checkbox" id="filter-cycling-gloves" value="Gloves" class="subcategory-filter" data-category="cycling">
@@ -825,28 +825,38 @@
                                 <label for="filter-cycling-overshoes">Overshoes</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-cycling-bibshorts" value="Bib Shorts" class="subcategory-filter" data-category="cycling">
-                                <label for="filter-cycling-bibshorts">Bib Shorts</label>
+                                <input type="checkbox" id="filter-cycling-warmers" value="Warmers" class="subcategory-filter" data-category="cycling">
+                                <label for="filter-cycling-warmers">Warmers</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-cycling-antichafing" value="Anti-Chafing" class="subcategory-filter" data-category="cycling">
-                                <label for="filter-cycling-antichafing">Anti-Chafing</label>
+                                <input type="checkbox" id="filter-cycling-socks" value="Socks" class="subcategory-filter" data-category="cycling">
+                                <label for="filter-cycling-socks">Socks</label>
                             </div>
-                            <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-cycling-accessories" value="Accessories" class="subcategory-filter" data-category="cycling">
-                                <label for="filter-cycling-accessories">Accessories</label>
-                            </div>
+                        </div>
+                        <div class="filter-subsection">
+                            <h5>Electronics</h5>
                             <div class="filter-checkbox">
                                 <input type="checkbox" id="filter-cycling-computers" value="Bike Computers" class="subcategory-filter" data-category="cycling">
                                 <label for="filter-cycling-computers">Bike Computers</label>
                             </div>
                             <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-cycling-lights" value="Lights" class="subcategory-filter" data-category="cycling">
+                                <label for="filter-cycling-lights">Lights</label>
+                            </div>
+                            <div class="filter-checkbox">
                                 <input type="checkbox" id="filter-cycling-sensors" value="Sensors & Monitors" class="subcategory-filter" data-category="cycling">
                                 <label for="filter-cycling-sensors">Sensors & Monitors</label>
                             </div>
+                        </div>
+                        <div class="filter-subsection">
+                            <h5>Accessories</h5>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-cycling-lights" value="Lights" class="subcategory-filter" data-category="cycling">
-                                <label for="filter-cycling-lights">Lights</label>
+                                <input type="checkbox" id="filter-cycling-antichafing" value="Anti-Chafing" class="subcategory-filter" data-category="cycling">
+                                <label for="filter-cycling-antichafing">Anti-Chafing</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-cycling-bottles" value="Bottles & Other" class="subcategory-filter" data-category="cycling">
+                                <label for="filter-cycling-bottles">Bottles & Other</label>
                             </div>
                         </div>
                         <div class="filter-subsection">
@@ -856,17 +866,16 @@
                                 <label for="filter-cycling-brand-spatzwear">Spatzwear</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-cycling-brand-chamois" value="Chamois Butt'r" class="brand-filter" data-category="cycling">
-                                <label for="filter-cycling-brand-chamois">Chamois Butt'r</label>
+                                <input type="checkbox" id="filter-cycling-brand-igpsport" value="iGPSPORT" class="brand-filter" data-category="cycling">
+                                <label for="filter-cycling-brand-igpsport">iGPSPORT</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-cycling-brand-igsport" value="iGPSPORT" class="brand-filter" data-category="cycling">
-                                <label for="filter-cycling-brand-igsport">iGPSPORT</label>
+                                <input type="checkbox" id="filter-cycling-brand-chamois" value="Chamois Butt'r" class="brand-filter" data-category="cycling">
+                                <label for="filter-cycling-brand-chamois">Chamois Butt'r</label>
                             </div>
                         </div>
                     </div>
                 </div>
-                
                 <!-- Swimming Category with Subfilters -->
                 <div class="filter-category-group">
                     <button class="filter-category-toggle" data-category="swimming">
@@ -875,50 +884,101 @@
                     </button>
                     <div class="filter-subcategory-group" id="filter-subcategory-swimming">
                         <div class="filter-subsection">
-                            <h5>Type</h5>
+                            <h5>Wetsuits</h5>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-swimming-wetsuits" value="Openwater Wetsuits" class="subcategory-filter" data-category="swimming">
-                                <label for="filter-swimming-wetsuits">Openwater Wetsuits</label>
+                                <input type="checkbox" id="filter-swimming-wetsuits-mens" value="Men's" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-wetsuits-mens">Men's</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-swimming-triathlon" value="Triathlon Wetsuits" class="subcategory-filter" data-category="swimming">
-                                <label for="filter-swimming-triathlon">Triathlon Wetsuits</label>
+                                <input type="checkbox" id="filter-swimming-wetsuits-womens" value="Women's" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-wetsuits-womens">Women's</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-swimming-swimwear" value="Swimwear & Trisuits" class="subcategory-filter" data-category="swimming">
-                                <label for="filter-swimming-swimwear">Swimwear & Trisuits</label>
+                                <input type="checkbox" id="filter-swimming-wetsuits-kids" value="Kids" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-wetsuits-kids">Kids</label>
                             </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-swimming-wetsuits-thermal" value="Thermal" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-wetsuits-thermal">Thermal</label>
+                            </div>
+                        </div>
+                        <div class="filter-subsection">
+                            <h5>Swimwear</h5>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-swimming-costumes" value="Costumes" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-costumes">Costumes</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-swimming-jammers" value="Jammers & Shorts" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-jammers">Jammers & Shorts</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-swimming-yulex" value="Yulex Collection" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-yulex">Yulex Collection</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-swimming-neoprene" value="Neoprene Layers" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-neoprene">Neoprene Layers</label>
+                            </div>
+                        </div>
+                        <div class="filter-subsection">
+                            <h5>Triathlon</h5>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-swimming-trisuits" value="Trisuits" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-trisuits">Trisuits</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-swimming-raceacc" value="Race Accessories" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-raceacc">Race Accessories</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-swimming-transbags" value="Transition Bags" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-transbags">Transition Bags</label>
+                            </div>
+                        </div>
+                        <div class="filter-subsection">
+                            <h5>Goggles & Caps</h5>
                             <div class="filter-checkbox">
                                 <input type="checkbox" id="filter-swimming-goggles" value="Goggles" class="subcategory-filter" data-category="swimming">
                                 <label for="filter-swimming-goggles">Goggles</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-swimming-caps" value="Swim Caps & Beanies" class="subcategory-filter" data-category="swimming">
-                                <label for="filter-swimming-caps">Swim Caps & Beanies</label>
+                                <input type="checkbox" id="filter-swimming-swimcaps" value="Swim Caps" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-swimcaps">Swim Caps</label>
                             </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-swimming-beanies" value="Beanies & Headwear" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-beanies">Beanies & Headwear</label>
+                            </div>
+                        </div>
+                        <div class="filter-subsection">
+                            <h5>Safety</h5>
                             <div class="filter-checkbox">
                                 <input type="checkbox" id="filter-swimming-safety" value="Safety Buoys" class="subcategory-filter" data-category="swimming">
                                 <label for="filter-swimming-safety">Safety Buoys</label>
                             </div>
+                        </div>
+                        <div class="filter-subsection">
+                            <h5>Accessories</h5>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-swimming-training" value="Training Aids" class="subcategory-filter" data-category="swimming">
-                                <label for="filter-swimming-training">Training Aids</label>
+                                <input type="checkbox" id="filter-swimming-glovessocks" value="Gloves & Socks" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-glovessocks">Gloves & Socks</label>
                             </div>
                             <div class="filter-checkbox">
                                 <input type="checkbox" id="filter-swimming-robes" value="Robes & Towels" class="subcategory-filter" data-category="swimming">
                                 <label for="filter-swimming-robes">Robes & Towels</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-swimming-bags" value="Bags & Accessories" class="subcategory-filter" data-category="swimming">
-                                <label for="filter-swimming-bags">Bags & Accessories</label>
+                                <input type="checkbox" id="filter-swimming-training" value="Training Aids" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-training">Training Aids</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-swimming-wetsuitcare" value="Wetsuit Care" class="subcategory-filter" data-category="swimming">
-                                <label for="filter-swimming-wetsuitcare">Wetsuit Care</label>
+                                <input type="checkbox" id="filter-swimming-bags" value="Bags & Storage" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-bags">Bags & Storage</label>
                             </div>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-swimming-socks" value="Swim Socks" class="subcategory-filter" data-category="swimming">
-                                <label for="filter-swimming-socks">Swim Socks</label>
+                                <input type="checkbox" id="filter-swimming-care" value="Care & Maintenance" class="subcategory-filter" data-category="swimming">
+                                <label for="filter-swimming-care">Care & Maintenance</label>
                             </div>
                         </div>
                         <div class="filter-subsection">
@@ -931,10 +991,13 @@
                                 <input type="checkbox" id="filter-swimming-brand-swimsecure" value="Swim Secure" class="brand-filter" data-category="swimming">
                                 <label for="filter-swimming-brand-swimsecure">Swim Secure</label>
                             </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-swimming-brand-blackwitch" value="Blackwitch" class="brand-filter" data-category="swimming">
+                                <label for="filter-swimming-brand-blackwitch">Blackwitch</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
                 <!-- Running Category with Subfilters -->
                 <div class="filter-category-group">
                     <button class="filter-category-toggle" data-category="running">
@@ -943,18 +1006,18 @@
                     </button>
                     <div class="filter-subcategory-group" id="filter-subcategory-running">
                         <div class="filter-subsection">
-                            <h5>Type</h5>
+                            <h5>Accessories</h5>
                             <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-running-accessories" value="Running Accessories" class="subcategory-filter" data-category="running">
-                                <label for="filter-running-accessories">Running Accessories</label>
+                                <input type="checkbox" id="filter-running-hydration" value="Hydration & Belts" class="subcategory-filter" data-category="running">
+                                <label for="filter-running-hydration">Hydration & Belts</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="filter-running-bodycare" value="Body Care" class="subcategory-filter" data-category="running">
+                                <label for="filter-running-bodycare">Body Care</label>
                             </div>
                             <div class="filter-checkbox">
                                 <input type="checkbox" id="filter-running-shoecare" value="Shoe Care" class="subcategory-filter" data-category="running">
                                 <label for="filter-running-shoecare">Shoe Care</label>
-                            </div>
-                            <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-running-recovery" value="Recovery" class="subcategory-filter" data-category="running">
-                                <label for="filter-running-recovery">Recovery</label>
                             </div>
                         </div>
                         <div class="filter-subsection">
@@ -970,10 +1033,6 @@
                             <div class="filter-checkbox">
                                 <input type="checkbox" id="filter-running-brand-trainerarmour" value="Trainer Armour" class="brand-filter" data-category="running">
                                 <label for="filter-running-brand-trainerarmour">Trainer Armour</label>
-                            </div>
-                            <div class="filter-checkbox">
-                                <input type="checkbox" id="filter-running-brand-icebein" value="Icebein" class="brand-filter" data-category="running">
-                                <label for="filter-running-brand-icebein">Icebein</label>
                             </div>
                         </div>
                     </div>
@@ -1306,12 +1365,12 @@
 <!-- dados-embed.js removido: 578KB blocking. sfi-data-loader handles all -->
     <!-- <script src="js/dados-embed.js"></script> -->
 <script src="js/sfi-api.min.js" defer></script>
-<script src="js/sfi-data-loader.min.js?v=5" defer></script>
+<script src="js/sfi-data-loader.min.js?v=6" defer></script>
 <script src="js/cart.min.js?v=6" defer></script>
-    <script src="js/product-card.min.js?v=6" defer></script>
-    <script src="js/main.min.js?v=10" defer></script>
-    <script src="js/shop.min.js?v=16" defer></script>
-    <script src="js/sfi-fixes.min.js" defer></script>
+    <script src="js/product-card.min.js?v=9" defer></script>
+    <script src="js/main.min.js?v=16" defer></script>
+    <script src="js/shop.min.js?v=9" defer></script>
+    <script src="js/sfi-fixes.min.js?v=6" defer></script>
     <script src="js/sfi-enhancements.min.js" defer></script>
     <script src="js/sfi-analytics.js" defer></script>
 </body>

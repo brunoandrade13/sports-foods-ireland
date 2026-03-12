@@ -358,3 +358,490 @@ function renderProductCards(products, containerId, opts = {}) {
         }, 1500);
     }, true);
 })();
+
+
+// ══════════════════════════════════════════════════════════
+// VARIANT SELECTOR MODAL — Para produtos com variantes
+// ══════════════════════════════════════════════════════════
+
+/**
+ * Extrai variantes (Flavour, Size, Model, Colour) do campo descricao_detalhada.
+ * Retorna { type: string, options: string[] } ou null se sem variantes.
+ */
+function extractProductVariants(product) {
+    const desc = product && (product.descricao_detalhada || '');
+    if (!desc || desc.length < 10) return null;
+
+    // Procurar no final da descrição (últimos 500 chars)
+    const tail = desc.slice(-500);
+
+    // Padrões a procurar: última ocorrência do keyword seguido de opções
+    const keywords = [
+        { regex: /Flavou?rs?\s+(.+)$/im, type: 'Flavour' },
+        { regex: /(?:^|\s)SIZE\s+(.+)$/im, type: 'Size' },
+        { regex: /(?:^|\s)Sizes?\s+(.+)$/im, type: 'Size' },
+        { regex: /Models?\s+(.+)$/im, type: 'Model' },
+        { regex: /Colou?rs?\s+(.+)$/im, type: 'Colour' }
+    ];
+
+    for (const kw of keywords) {
+        // Encontrar a ÚLTIMA ocorrência no tail
+        const matches = [...tail.matchAll(new RegExp(kw.regex.source, 'gim'))];
+        const m = matches.length > 0 ? matches[matches.length - 1] : null;
+        if (!m) continue;
+
+        let raw = m[1].trim();
+
+        // Limpar entidades HTML
+        raw = raw.replace(/&#8211;/g, '–').replace(/&#8217;/g, "'").replace(/&#8220;/g, '"').replace(/&#8221;/g, '"').replace(/&amp;/g, '&');
+
+        // Ignorar "SIZE FITS ALL" ou "ONE SIZE"
+        if (/fits?\s*all|one\s*size/i.test(raw)) continue;
+
+        // Tentar split por vírgula primeiro
+        let options = raw.split(',').map(s => s.trim()).filter(s => s.length > 0 && s.length < 80);
+
+        // Se só uma opção, tentar pattern "S M L XL" (sizes separados por espaço)
+        if (options.length <= 1 && kw.type === 'Size') {
+            const sizeMatch = raw.match(/^((?:(?:XX?S|XX?L|SM?|ML?|L(?:\/XL)?|M(?:\/L)?|S(?:\/M)?|Small(?:\/Medium)?|Medium(?:\/Large)?|Large(?:\/XLarge)?|XSmall|XXLarge|XLarge|XXL|Medium|Small|Large)\s*,?\s*)+)/i);
+            if (sizeMatch) {
+                options = sizeMatch[1].split(/[,\s]+/).map(s => s.trim()).filter(s => s.length > 0);
+            }
+        }
+
+        // Filtrar opções que parecem ser texto descritivo
+        options = options.filter(opt => opt.length <= 50);
+
+        // Remover opções que são claramente instruções/descrições
+        options = options.filter(opt => !/(?:CIRCUMFERENCE|CHEST|WAIST|GUIDE|CHART|Features|Available|PRODUCT|DESCRIPTION|Consume|Recommended)/i.test(opt));
+
+        // Remover opções que começam com parênteses ou contêm frases
+        options = options.filter(opt => !opt.startsWith('(') && !/\.\s/.test(opt) && opt.indexOf('.') < 0);
+
+        // Rejeitar se média de caracteres por opção é muito alta (provável texto descritivo)
+        if (options.length >= 2) {
+            const avgLen = options.reduce((a, o) => a + o.length, 0) / options.length;
+            if (avgLen > 35) continue; // provavelmente não são variantes reais
+            return { type: kw.type, options: options };
+        }
+    }
+    return null;
+}
+
+window.extractProductVariants = extractProductVariants;
+
+/**
+ * Injeta o CSS do modal de variantes (uma única vez).
+ */
+(function injectVariantModalCSS() {
+    if (document.getElementById('variant-modal-css')) return;
+    const style = document.createElement('style');
+    style.id = 'variant-modal-css';
+    style.textContent = `
+        .variant-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+            z-index: 10000; display: flex; align-items: center; justify-content: center;
+            padding: 16px; opacity: 0; transition: opacity 0.2s ease;
+        }
+        .variant-modal-overlay.show { opacity: 1; }
+        .variant-modal {
+            background: #fff; border-radius: 12px; padding: 0;
+            max-width: 420px; width: 100%; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); transform: translateY(20px);
+            transition: transform 0.25s ease;
+        }
+        .variant-modal-overlay.show .variant-modal { transform: translateY(0); }
+        .variant-modal-header {
+            display: flex; align-items: center; gap: 14px;
+            padding: 18px 20px; border-bottom: 1px solid #eee;
+        }
+        .variant-modal-header img {
+            width: 64px; height: 64px; object-fit: contain;
+            border-radius: 8px; background: #f5f5f5; flex-shrink: 0;
+        }
+        .variant-modal-header .vm-info { flex: 1; min-width: 0; }
+        .variant-modal-header .vm-name {
+            font-size: 0.95rem; font-weight: 600; color: #1a1a1a;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .variant-modal-header .vm-price { font-size: 1rem; font-weight: 700; color: #2D6A4F; margin-top: 2px; }
+        .variant-modal-close {
+            position: absolute; top: 12px; right: 14px;
+            width: 32px; height: 32px; border: none; background: #f0f0f0;
+            border-radius: 50%; font-size: 18px; color: #666; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s;
+        }
+        .variant-modal-close:hover { background: #e0e0e0; }
+        .variant-modal-body { padding: 18px 20px; }
+        .variant-modal-body .vm-label {
+            font-size: 0.8rem; font-weight: 600; color: #666;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;
+        }
+        .variant-options { display: flex; flex-wrap: wrap; gap: 8px; }
+        .variant-option {
+            padding: 8px 16px; border: 2px solid #e0e0e0; border-radius: 8px;
+            background: #fff; cursor: pointer; font-size: 0.88rem; color: #333;
+            transition: all 0.15s ease; user-select: none;
+        }
+        .variant-option:hover { border-color: #2D6A4F; background: #f0faf4; }
+        .variant-option.selected {
+            border-color: #2D6A4F; background: #e8f5ee; color: #1a5c3a; font-weight: 600;
+        }
+        .variant-modal-footer {
+            padding: 14px 20px; border-top: 1px solid #eee;
+            display: flex; gap: 10px;
+        }
+        .variant-modal-footer button {
+            flex: 1; padding: 12px; border: none; border-radius: 8px;
+            font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+        }
+        .vm-btn-cancel { background: #f0f0f0; color: #666; }
+        .vm-btn-cancel:hover { background: #e4e4e4; }
+        .vm-btn-add { background: #2D6A4F; color: #fff; opacity: 0.4; pointer-events: none; }
+        .vm-btn-add.active { opacity: 1; pointer-events: auto; }
+        .vm-btn-add.active:hover { background: #245a42; }
+        /* Dark mode */
+        html[data-theme="dark"] .variant-modal { background: #1e293b; }
+        html[data-theme="dark"] .variant-modal-header { border-color: #334155; }
+        html[data-theme="dark"] .variant-modal-header .vm-name { color: #e2e8f0; }
+        html[data-theme="dark"] .variant-modal-header .vm-price { color: #4ade80; }
+        html[data-theme="dark"] .variant-modal-close { background: #334155; color: #94a3b8; }
+        html[data-theme="dark"] .variant-modal-body .vm-label { color: #94a3b8; }
+        html[data-theme="dark"] .variant-option { border-color: #334155; background: #1e293b; color: #e2e8f0; }
+        html[data-theme="dark"] .variant-option:hover { border-color: #4ade80; background: #1a3a2a; }
+        html[data-theme="dark"] .variant-option.selected { border-color: #4ade80; background: #1a3a2a; color: #4ade80; }
+        html[data-theme="dark"] .variant-modal-footer { border-color: #334155; }
+        html[data-theme="dark"] .vm-btn-cancel { background: #334155; color: #94a3b8; }
+        html[data-theme="dark"] .vm-btn-add { background: #2D6A4F; }
+    `;
+    document.head.appendChild(style);
+})();
+
+/**
+ * Mostra o modal de seleção de variante.
+ * @param {Object} product - Dados do produto (do dados.json ou extraído do card)
+ * @param {Object} variantInfo - { type, options } do extractProductVariants
+ * @param {Function} onConfirm - Callback(selectedVariant) quando confirmado
+ */
+function showVariantModal(product, variantInfo, onConfirm) {
+    // Remover modal anterior se existir
+    const prev = document.getElementById('variantModalOverlay');
+    if (prev) prev.remove();
+
+    const name = product.nome || product.name || 'Product';
+    const price = parseFloat(product.preco || product.price) || 0;
+    const imgSrc = getCardProductImage(product.imagem || product.image || '', product.id || 0);
+
+    let selectedVariant = null;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'variantModalOverlay';
+    overlay.className = 'variant-modal-overlay';
+    overlay.innerHTML = `
+        <div class="variant-modal" role="dialog" aria-label="Select variant">
+            <button class="variant-modal-close" aria-label="Close">&times;</button>
+            <div class="variant-modal-header">
+                <img src="${imgSrc}" alt="${name.replace(/"/g, '&quot;')}" onerror="this.src='img/produto1.jpg'">
+                <div class="vm-info">
+                    <div class="vm-name">${name.replace(/</g, '&lt;')}</div>
+                    <div class="vm-price">€${price.toFixed(2)}</div>
+                </div>
+            </div>
+            <div class="variant-modal-body">
+                <div class="vm-label">Select ${variantInfo.type}</div>
+                <div class="variant-options">
+                    ${variantInfo.options.map(opt => 
+                        `<button class="variant-option" type="button" data-variant="${opt.replace(/"/g, '&quot;')}">${opt.replace(/</g, '&lt;')}</button>`
+                    ).join('\n                    ')}
+                </div>
+            </div>
+            <div class="variant-modal-footer">
+                <button class="vm-btn-cancel" type="button">Cancel</button>
+                <button class="vm-btn-add" type="button">Add to Basket</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Animar entrada
+    requestAnimationFrame(() => overlay.classList.add('show'));
+
+    // Referências
+    const modal = overlay.querySelector('.variant-modal');
+    const addBtn = overlay.querySelector('.vm-btn-add');
+    const cancelBtn = overlay.querySelector('.vm-btn-cancel');
+    const closeBtn = overlay.querySelector('.variant-modal-close');
+    const optionBtns = overlay.querySelectorAll('.variant-option');
+
+    // Selecionar variante
+    optionBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            optionBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedVariant = btn.getAttribute('data-variant');
+            addBtn.classList.add('active');
+        });
+    });
+
+    // Fechar modal
+    function closeModal() {
+        overlay.classList.remove('show');
+        setTimeout(() => overlay.remove(), 250);
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal();
+    });
+
+    // ESC para fechar
+    function onEsc(e) { if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', onEsc); } }
+    document.addEventListener('keydown', onEsc);
+
+    // Confirmar
+    addBtn.addEventListener('click', () => {
+        if (!selectedVariant) return;
+        closeModal();
+        if (typeof onConfirm === 'function') {
+            onConfirm(selectedVariant);
+        }
+    });
+}
+
+window.showVariantModal = showVariantModal;
+
+
+// ════════════════════════════════════════════════
+// SUPABASE VARIANT MODAL — uses real variant data from DB
+// ════════════════════════════════════════════════
+/**
+ * Shows a variant selection modal using Supabase variant data (product.variantes).
+ * Handles both simple variants (single group) and compound variants (Color / Size).
+ * @param {Object} product - Full product object with .variantes array
+ * @param {Function} onConfirm - Callback({ id, label, price, variantType }) when confirmed
+ */
+function showSupabaseVariantModal(product, onConfirm) {
+    const prev = document.getElementById('variantModalOverlay');
+    if (prev) prev.remove();
+
+    const name = product.nome || product.name || 'Product';
+    const basePrice = parseFloat(product.preco || product.price) || 0;
+    const imgSrc = getCardProductImage(product.imagem || product.image || '', product.id || 0);
+    const variants = product.variantes;
+    const currency = (window._sfiCurrency === 'GBP') ? '£' : '€';
+
+    // Detect compound variants (labels with " / " and multiple distinct level1+level2)
+    let isCompound = false;
+    let allCompoundOpts = [];
+    const allLabels = [];
+    variants.forEach(g => g.options.forEach(o => { if (o.label) allLabels.push(o); }));
+    const withSlash = allLabels.filter(o => o.label.includes(' / '));
+    if (withSlash.length >= 2) {
+        const parts = withSlash.map(o => {
+            const s = o.label.split(' / ');
+            return { ...o, l1: s[0].trim(), l2: (s[1] || '').trim() };
+        });
+        const uL1 = new Set(parts.map(p => p.l1));
+        const uL2 = new Set(parts.filter(p => p.l2).map(p => p.l2));
+        if (uL1.size >= 2 && uL2.size >= 2) {
+            isCompound = true;
+            allCompoundOpts = parts;
+        }
+    }
+
+    let selectedVariant = null;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'variantModalOverlay';
+    overlay.className = 'variant-modal-overlay';
+
+    if (isCompound) {
+        // ── Compound: show level1 first, then level2 on selection ──
+        const level1Values = [...new Set(allCompoundOpts.map(o => o.l1))];
+        const type1Name = variants[0]?.type || 'Option';
+        // Guess type2 name
+        let type2Name = 'Size';
+        const t1 = type1Name.toLowerCase();
+        if (t1.includes('size')) type2Name = 'Color';
+        else if (t1.includes('flavor') || t1.includes('flavour')) type2Name = 'Pack';
+
+        const level1Html = level1Values.map(val =>
+            `<button class="variant-option" type="button" data-level1="${val.replace(/"/g, '&quot;')}">${val}</button>`
+        ).join('\n');
+
+        overlay.innerHTML = `
+            <div class="variant-modal" role="dialog" aria-label="Select variant">
+                <button class="variant-modal-close" aria-label="Close">&times;</button>
+                <div class="variant-modal-header">
+                    <img src="${imgSrc}" alt="${name.replace(/"/g, '&quot;')}" onerror="this.src='img/produto1.jpg'">
+                    <div class="vm-info">
+                        <div class="vm-name">${name.replace(/</g, '&lt;')}</div>
+                        <div class="vm-price" id="vmPriceDisplay">${currency}${basePrice.toFixed(2)}</div>
+                    </div>
+                </div>
+                <div class="variant-modal-body">
+                    <div class="vm-label">${type1Name}</div>
+                    <div class="variant-options" id="vmLevel1Opts">${level1Html}</div>
+                    <div id="vmLevel2Wrap" style="display:none;margin-top:16px">
+                        <div class="vm-label" id="vmLevel2Label">${type2Name}</div>
+                        <div class="variant-options" id="vmLevel2Opts"></div>
+                    </div>
+                </div>
+                <div class="variant-modal-footer">
+                    <button class="vm-btn-cancel" type="button">Cancel</button>
+                    <button class="vm-btn-add" type="button">Add to Basket</button>
+                </div>
+            </div>`;
+
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+
+        const addBtn = overlay.querySelector('.vm-btn-add');
+        const level2Wrap = overlay.querySelector('#vmLevel2Wrap');
+        const level2Opts = overlay.querySelector('#vmLevel2Opts');
+        const priceDisplay = overlay.querySelector('#vmPriceDisplay');
+
+        // Level 1 click
+        overlay.querySelector('#vmLevel1Opts').addEventListener('click', function(e) {
+            const btn = e.target.closest('.variant-option');
+            if (!btn) return;
+            this.querySelectorAll('.variant-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedVariant = null;
+            addBtn.classList.remove('active');
+
+            const selL1 = btn.dataset.level1;
+            const matching = allCompoundOpts.filter(o => o.l1 === selL1);
+            level2Opts.innerHTML = matching.map(opt => {
+                const outOfStock = opt.stock != null && opt.stock <= 0;
+                return `<button class="variant-option${outOfStock ? ' backorder-variant' : ''}" type="button"
+                    data-variant-id="${opt.id}" data-label="${opt.label.replace(/"/g, '&quot;')}"
+                    data-price="${opt.price || ''}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.l2}${outOfStock ? ' (Backorder)' : ''}</button>`;
+            }).join('\n');
+            level2Wrap.style.display = '';
+            level2Wrap.style.animation = 'fadeSlideIn 0.3s ease';
+        });
+
+        // Level 2 click
+        level2Opts.addEventListener('click', function(e) {
+            const btn = e.target.closest('.variant-option');
+            if (!btn || btn.disabled) return;
+            this.querySelectorAll('.variant-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedVariant = { id: btn.dataset.variantId, label: btn.dataset.label, price: parseFloat(btn.dataset.price) || null };
+            addBtn.classList.add('active');
+            if (selectedVariant.price) priceDisplay.textContent = currency + selectedVariant.price.toFixed(2);
+        });
+
+    } else {
+        // ── Simple: single or multiple groups, show all options ──
+        const groupsHtml = variants.map((group, gi) => {
+            const hidden = gi > 0 ? 'style="display:none"' : '';
+            const optsHtml = group.options.map(opt => {
+                const outOfStock = opt.stock != null && opt.stock <= 0;
+                return `<button class="variant-option${outOfStock ? ' backorder-variant' : ''}" type="button"
+                    data-variant-id="${opt.id}" data-label="${(opt.label || '').replace(/"/g, '&quot;')}"
+                    data-price="${opt.price || ''}" data-group="${gi}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.label}${outOfStock ? ' (Backorder)' : ''}</button>`;
+            }).join('\n');
+            return `<div class="vm-group" data-group-index="${gi}" ${hidden}>
+                <div class="vm-label">${group.type}</div>
+                <div class="variant-options">${optsHtml}</div>
+            </div>`;
+        }).join('');
+
+        overlay.innerHTML = `
+            <div class="variant-modal" role="dialog" aria-label="Select variant">
+                <button class="variant-modal-close" aria-label="Close">&times;</button>
+                <div class="variant-modal-header">
+                    <img src="${imgSrc}" alt="${name.replace(/"/g, '&quot;')}" onerror="this.src='img/produto1.jpg'">
+                    <div class="vm-info">
+                        <div class="vm-name">${name.replace(/</g, '&lt;')}</div>
+                        <div class="vm-price" id="vmPriceDisplay">${currency}${basePrice.toFixed(2)}</div>
+                    </div>
+                </div>
+                <div class="variant-modal-body">${groupsHtml}</div>
+                <div class="variant-modal-footer">
+                    <button class="vm-btn-cancel" type="button">Cancel</button>
+                    <button class="vm-btn-add" type="button">Add to Basket</button>
+                </div>
+            </div>`;
+
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+
+        const addBtn = overlay.querySelector('.vm-btn-add');
+        const priceDisplay = overlay.querySelector('#vmPriceDisplay');
+        const allGroups = overlay.querySelectorAll('.vm-group');
+
+        // Simple variant click handler with cascading groups
+        overlay.querySelector('.variant-modal-body').addEventListener('click', function(e) {
+            const btn = e.target.closest('.variant-option');
+            if (!btn || btn.disabled) return;
+            const groupEl = btn.closest('.vm-group');
+            const gIdx = parseInt(groupEl.dataset.groupIndex);
+
+            // Deselect siblings
+            groupEl.querySelectorAll('.variant-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+
+            // Show next group if exists
+            if (gIdx + 1 < allGroups.length) {
+                const next = allGroups[gIdx + 1];
+                if (next.style.display === 'none') {
+                    next.style.display = '';
+                    next.style.animation = 'fadeSlideIn 0.3s ease';
+                }
+                // Reset subsequent groups
+                for (let i = gIdx + 1; i < allGroups.length; i++) {
+                    allGroups[i].querySelectorAll('.variant-option').forEach(b => b.classList.remove('selected'));
+                    if (i > gIdx + 1) allGroups[i].style.display = 'none';
+                }
+            }
+
+            // Build selected label from all selected options across groups
+            const allSelected = overlay.querySelectorAll('.variant-option.selected');
+            const labels = Array.from(allSelected).map(b => b.dataset.label);
+            const allGroupsSelected = Array.from(allGroups).every(g => g.querySelector('.variant-option.selected'));
+
+            if (allGroupsSelected) {
+                const lastSelected = allSelected[allSelected.length - 1];
+                selectedVariant = {
+                    id: lastSelected.dataset.variantId,
+                    label: labels.join(' / '),
+                    price: parseFloat(lastSelected.dataset.price) || null
+                };
+                addBtn.classList.add('active');
+                if (selectedVariant.price) priceDisplay.textContent = currency + selectedVariant.price.toFixed(2);
+            } else {
+                selectedVariant = null;
+                addBtn.classList.remove('active');
+                // Update price from current selection if available
+                const p = parseFloat(btn.dataset.price);
+                if (p) priceDisplay.textContent = currency + p.toFixed(2);
+            }
+        });
+    }
+
+    // ── Shared: close + confirm logic ──
+    function closeModal() {
+        overlay.classList.remove('show');
+        setTimeout(() => overlay.remove(), 250);
+    }
+
+    overlay.querySelector('.variant-modal-close').addEventListener('click', closeModal);
+    overlay.querySelector('.vm-btn-cancel').addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+    function onEsc(e) { if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', onEsc); } }
+    document.addEventListener('keydown', onEsc);
+
+    overlay.querySelector('.vm-btn-add').addEventListener('click', function() {
+        if (!selectedVariant) return;
+        closeModal();
+        if (typeof onConfirm === 'function') onConfirm(selectedVariant);
+    });
+}
+
+window.showSupabaseVariantModal = showSupabaseVariantModal;

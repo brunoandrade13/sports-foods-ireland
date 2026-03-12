@@ -269,6 +269,11 @@ Deno.serve(async (req: Request) => {
                         updateData.vendor_sku = item.PurchaseDesc;
                     }
 
+                    // SKU: se o produto ainda não tem SKU no Supabase, preencher com o Item.Sku do QuickBooks
+                    if ((!matchedProduct.sku || String(matchedProduct.sku).trim() === "") && item.Sku) {
+                        updateData.sku = item.Sku;
+                    }
+
                     // VAT: Resolve tax code from QB SalesTaxCodeRef → rate percentage
                     if (item.SalesTaxCodeRef?.value) {
                         const taxCodeId = String(item.SalesTaxCodeRef.value);

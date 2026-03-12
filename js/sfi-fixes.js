@@ -1020,6 +1020,47 @@
         if (idStr) {
             const id = parseInt(idStr, 10);
             if (!isNaN(id) && typeof window.addToCart === 'function') {
+                // Verificar se o produto tem variantes (Supabase data ou fallback descrição)
+                const fullProduct = (typeof resolveProduct === 'function') ? resolveProduct(id) : null;
+                const hasSupabaseVariants = fullProduct && fullProduct.variantes && fullProduct.variantes.length > 0 &&
+                    fullProduct.variantes.some(g => g.options && g.options.length > 0);
+
+                if (hasSupabaseVariants && typeof window.showSupabaseVariantModal === 'function') {
+                    // Produto com variantes do Supabase — abrir modal de seleção
+                    const prodForModal = fullProduct || { id: id, nome: productData?.nome, preco: productData?.preco, imagem: productData?.imagem };
+                    window.showSupabaseVariantModal(prodForModal, function(selected) {
+                        const cartData = productData ? Object.assign({}, productData) : {};
+                        cartData.nome = (cartData.nome || prodForModal.nome || 'Product') + ' — ' + selected.label;
+                        cartData.variant = selected.label;
+                        cartData.variantId = selected.id;
+                        cartData.preco = selected.price || cartData.preco;
+                        window.addToCart(id, 1, cartData);
+                        const origText = btn.textContent;
+                        btn.textContent = '✓ ADDED';
+                        btn.style.background = '#00A651';
+                        setTimeout(() => { btn.textContent = origText; btn.style.background = ''; }, 2000);
+                    });
+                    return;
+                }
+
+                // Fallback: extrair variantes da descrição do produto
+                const descVariants = (fullProduct && typeof window.extractProductVariants === 'function') ? window.extractProductVariants(fullProduct) : null;
+                if (descVariants && typeof window.showVariantModal === 'function') {
+                    const prodForModal2 = fullProduct || { id: id, nome: productData?.nome, preco: productData?.preco, imagem: productData?.imagem };
+                    window.showVariantModal(prodForModal2, descVariants, function(selectedVariant) {
+                        const cartData = productData ? Object.assign({}, productData) : {};
+                        cartData.nome = (cartData.nome || prodForModal2.nome || 'Product') + ' — ' + selectedVariant;
+                        cartData.variant = selectedVariant;
+                        cartData.variantType = descVariants.type;
+                        window.addToCart(id, 1, cartData);
+                        const origText = btn.textContent;
+                        btn.textContent = '✓ ADDED';
+                        btn.style.background = '#00A651';
+                        setTimeout(() => { btn.textContent = origText; btn.style.background = ''; }, 2000);
+                    });
+                    return;
+                }
+
                 window.addToCart(id, 1, productData);
                 // Visual feedback no botão
                 const originalText = btn.textContent;

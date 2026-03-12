@@ -303,7 +303,29 @@ function populateHomeCarousels() {
             if (this.closest('form')) e.preventDefault();
             const productId = this.getAttribute('data-product-id');
             if (productId && typeof window.addToCart === 'function') {
-                window.addToCart(parseInt(productId, 10), 1);
+                const id = parseInt(productId, 10);
+                const fullProd = (typeof resolveProduct === 'function') ? resolveProduct(id) : null;
+                const _hasSV = fullProd && fullProd.variantes && fullProd.variantes.length > 0 && fullProd.variantes.some(g => g.options && g.options.length > 0);
+                if (_hasSV && typeof window.showSupabaseVariantModal === 'function') {
+                    const btn = this;
+                    window.showSupabaseVariantModal(fullProd, function(selected) {
+                        window.addToCart(id, 1, { nome: (fullProd.nome || 'Product') + ' \u2014 ' + selected.label, preco: selected.price || fullProd.preco, imagem: fullProd.imagem, variant: selected.label, variantId: selected.id });
+                        btn.textContent = '\u2713 ADDED'; btn.style.background = '#00A651';
+                        setTimeout(() => { btn.textContent = 'ADD TO BASKET'; btn.style.background = ''; }, 2000);
+                    });
+                    return;
+                }
+                const variants = (fullProd && typeof window.extractProductVariants === 'function') ? window.extractProductVariants(fullProd) : null;
+                if (variants && typeof window.showVariantModal === 'function') {
+                    const btn = this;
+                    window.showVariantModal(fullProd, variants, function(sel) {
+                        window.addToCart(id, 1, { nome: (fullProd.nome || 'Product') + ' — ' + sel, preco: fullProd.preco, imagem: fullProd.imagem, variant: sel, variantType: variants.type });
+                        btn.textContent = '✓ ADDED'; btn.style.background = '#00A651';
+                        setTimeout(() => { btn.textContent = 'ADD TO BASKET'; btn.style.background = ''; }, 2000);
+                    });
+                    return;
+                }
+                window.addToCart(id, 1);
             }
         });
     });
@@ -362,6 +384,21 @@ function renderProductGrid(produtos, container) {
             e.preventDefault();
             const id = Number(btn.getAttribute('data-product-id'));
             if (typeof window.addToCart === 'function') {
+                const _fp = (window._sfiProducts || []).find(p => (p.id === id || p.id == id));
+                const _hsv = _fp && _fp.variantes && _fp.variantes.length > 0 && _fp.variantes.some(g => g.options && g.options.length > 0);
+                if (_hsv && typeof window.showSupabaseVariantModal === 'function') {
+                    window.showSupabaseVariantModal(_fp, function(sel) {
+                        window.addToCart(id, 1, { nome: (_fp.nome || 'Product') + ' \u2014 ' + sel.label, preco: sel.price || _fp.preco, imagem: _fp.imagem, variant: sel.label, variantId: sel.id });
+                    });
+                    return;
+                }
+                const _dv = (_fp && typeof window.extractProductVariants === 'function') ? window.extractProductVariants(_fp) : null;
+                if (_dv && typeof window.showVariantModal === 'function') {
+                    window.showVariantModal(_fp, _dv, function(s) {
+                        window.addToCart(id, 1, { nome: (_fp.nome || 'Product') + ' — ' + s, preco: _fp.preco, imagem: _fp.imagem, variant: s, variantType: _dv.type });
+                    });
+                    return;
+                }
                 window.addToCart(id, 1);
             }
         }
@@ -1422,7 +1459,26 @@ function initAddToBasketAndUI() {
 
             const productId = this.getAttribute('data-product-id');
             if (productId && typeof window.addToCart === 'function') {
-                window.addToCart(parseInt(productId, 10));
+                const _id = parseInt(productId, 10);
+                const _prod = (typeof resolveProduct === 'function') ? resolveProduct(_id) : null;
+                const _hasSV2 = _prod && _prod.variantes && _prod.variantes.length > 0 && _prod.variantes.some(g => g.options && g.options.length > 0);
+                if (_hasSV2 && typeof window.showSupabaseVariantModal === 'function') {
+                    window.showSupabaseVariantModal(_prod, function(selected) {
+                        window.addToCart(_id, 1, { nome: (_prod.nome || 'Product') + ' \u2014 ' + selected.label, preco: selected.price || _prod.preco, imagem: _prod.imagem, variant: selected.label, variantId: selected.id });
+                    });
+                    return;
+                }
+                const _vr = (_prod && typeof window.extractProductVariants === 'function') ? window.extractProductVariants(_prod) : null;
+                if (_vr && typeof window.showVariantModal === 'function') {
+                    const _btn = this;
+                    window.showVariantModal(_prod, _vr, function(sel) {
+                        window.addToCart(_id, 1, { nome: (_prod.nome || 'Product') + ' — ' + sel, preco: _prod.preco, imagem: _prod.imagem, variant: sel, variantType: _vr.type });
+                        _btn.textContent = '✓ ADDED'; _btn.style.background = '#00A651';
+                        setTimeout(() => { _btn.textContent = 'ADD TO BASKET'; _btn.style.background = ''; }, 2000);
+                    });
+                    return;
+                }
+                window.addToCart(_id);
             } else if (productId) {
                 // Fallback if cart.js not loaded yet
                 const id = parseInt(productId, 10);
@@ -1459,8 +1515,25 @@ function initAddToBasketAndUI() {
             button.setAttribute('data-listener-attached', 'true');
             const productId = button.getAttribute('data-product-id');
             if (productId && typeof window.addToCart === 'function') {
-                window.addToCart(parseInt(productId, 10));
-                // Visual feedback
+                const _id2 = parseInt(productId, 10);
+                const _prod2 = (typeof resolveProduct === 'function') ? resolveProduct(_id2) : null;
+                const _hasSV3 = _prod2 && _prod2.variantes && _prod2.variantes.length > 0 && _prod2.variantes.some(g => g.options && g.options.length > 0);
+                if (_hasSV3 && typeof window.showSupabaseVariantModal === 'function') {
+                    window.showSupabaseVariantModal(_prod2, function(selected) {
+                        window.addToCart(_id2, 1, { nome: (_prod2.nome || 'Product') + ' \u2014 ' + selected.label, preco: selected.price || _prod2.preco, imagem: _prod2.imagem, variant: selected.label, variantId: selected.id });
+                    });
+                    return;
+                }
+                const _vr2 = (_prod2 && typeof window.extractProductVariants === 'function') ? window.extractProductVariants(_prod2) : null;
+                if (_vr2 && typeof window.showVariantModal === 'function') {
+                    window.showVariantModal(_prod2, _vr2, function(sel) {
+                        window.addToCart(_id2, 1, { nome: (_prod2.nome || 'Product') + ' — ' + sel, preco: _prod2.preco, imagem: _prod2.imagem, variant: sel, variantType: _vr2.type });
+                        button.textContent = '✓ ADDED'; button.style.background = '#00A651';
+                        setTimeout(() => { button.textContent = 'ADD TO BASKET'; button.style.background = ''; }, 2000);
+                    });
+                    return;
+                }
+                window.addToCart(_id2);
                 const originalText = button.textContent;
                 button.textContent = '✓ ADDED';
                 button.style.background = '#00A651';
@@ -2273,8 +2346,8 @@ function openQuickView(productId) {
     // Handle stock status
     const stockEl = document.getElementById('qvStock');
     if (product.stock === 0) {
-        stockEl.className = 'qv-stock out-of-stock';
-        stockEl.querySelector('.stock-text').textContent = 'Out of Stock';
+        stockEl.className = 'qv-stock backorder';
+        stockEl.querySelector('.stock-text').textContent = 'Backorder Available';
     } else if (product.stock && product.stock < 5) {
         stockEl.className = 'qv-stock low-stock';
         stockEl.querySelector('.stock-text').textContent = `Only ${product.stock} left!`;
@@ -2537,11 +2610,11 @@ function showNewsletterPopup() {
         <div class="newsletter-popup-content">
             <button class="newsletter-popup-close" onclick="closeNewsletterPopup()" aria-label="Close">&times;</button>
             <div class="newsletter-popup-icon">📧</div>
-            <h2>Get 10% Off Your First Order!</h2>
-            <p>Subscribe to our newsletter and receive exclusive offers, new product alerts, and training tips.</p>
+            <h2>Stay Ahead of the Game!</h2>
+            <p>Be the first to know about new arrivals, product launches and exclusive deals. Subscribe to our newsletter!</p>
             <form class="newsletter-popup-form" onsubmit="submitNewsletter(event)">
                 <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
-                <button type="submit" class="btn-newsletter-submit">Subscribe & Save</button>
+                <button type="submit" class="btn-newsletter-submit">Subscribe</button>
             </form>
             <p class="newsletter-privacy">We respect your privacy. Unsubscribe anytime.</p>
         </div>
@@ -2582,7 +2655,7 @@ function submitNewsletter(e) {
             <div class="newsletter-success">
                 <div class="success-icon">✓</div>
                 <h2>Thank You!</h2>
-                <p>Check your email for your 10% discount code.</p>
+                <p>You're now subscribed! You'll be the first to hear about new launches and exclusive deals.</p>
                 <button class="btn-newsletter-submit" onclick="closeNewsletterPopup()">Start Shopping</button>
             </div>
         `;
@@ -2606,9 +2679,9 @@ function initNewsletterPopup() {
 function getStockStatus(stock) {
     if (stock === 0 || stock === null || stock === undefined) {
         return {
-            class: 'out-of-stock',
-            text: 'Out of Stock',
-            showNotify: true
+            class: 'backorder',
+            text: 'Backorder Available',
+            showNotify: false
         };
     } else if (stock <= 5) {
         return {
@@ -2634,8 +2707,8 @@ function createStockIndicator(stock) {
             <span class="stock-text">${status.text}</span>
     `;
 
-    if (status.showNotify) {
-        html += `<button class="notify-btn" onclick="showNotifyModal()">Notify Me</button>`;
+    if (status.class === 'backorder') {
+        html += `<span class="backorder-label">📋 Order now, ships when restocked</span>`;
     }
 
     html += `</div>`;
@@ -2648,8 +2721,8 @@ function createStockBadge(stock) {
 
     if (status.class === 'low-stock') {
         return `<span class="product-stock-badge low-stock">Only ${stock} left!</span>`;
-    } else if (status.class === 'out-of-stock') {
-        return `<span class="product-stock-badge out-of-stock">Out of Stock</span>`;
+    } else if (status.class === 'backorder') {
+        return `<span class="product-stock-badge backorder">📋 Backorder</span>`;
     }
 
     return '';

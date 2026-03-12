@@ -121,6 +121,14 @@ function renderProduct() {
         brandEl.style.display = 'inline-block';
     }
 
+    // SKU display
+    const skuDisplay = document.getElementById('productSkuDisplay');
+    const skuValue = document.getElementById('productSkuValue');
+    if (skuDisplay && skuValue && currentProduct.sku) {
+        skuValue.textContent = currentProduct.sku;
+        skuDisplay.style.display = 'block';
+    }
+
     // Breadcrumb (both desktop and mobile)
     const breadcrumbCategory = document.getElementById('breadcrumbCategory');
     const breadcrumbProduct = document.getElementById('breadcrumbProduct');
@@ -325,7 +333,7 @@ function renderProduct() {
                 </tr>
                 <tr>
                     <td>Stock</td>
-                    <td>${currentProduct.stockQty != null ? (currentProduct.stockQty > 0 ? '<span style="color:#2D6A4F;font-weight:600">In Stock</span>' : '<span style="color:#e74c3c;font-weight:600">Out of Stock</span>') : (currentProduct.inStock ? 'In Stock' : 'Out of Stock')}</td>
+                    <td>${currentProduct.stockQty != null ? (currentProduct.stockQty > 0 ? '<span style="color:#2D6A4F;font-weight:600">In Stock</span>' : '<span style="color:#d97706;font-weight:600">📋 Backorder Available</span>') : (currentProduct.inStock ? 'In Stock' : '<span style="color:#d97706;font-weight:600">📋 Backorder Available</span>')}</td>
                 </tr>
             </table>
         `;
@@ -749,8 +757,20 @@ function renderProductVariants(product) {
     container.style.display = '';
     container.innerHTML = '';
 
-    // Detect compound variants (labels with " / " separator)
-    const hasCompound = variants.some(g => g.options.some(o => o.label && o.label.includes(' / ')));
+    // Detect compound variants — require real cascading structure
+    // Labels must contain " / " AND produce at least 2 distinct first-parts
+    // with at least 2 distinct second-parts to avoid false positives
+    let hasCompound = false;
+    const compoundLabels = [];
+    variants.forEach(g => g.options.forEach(o => {
+        if (o.label && o.label.includes(' / ')) compoundLabels.push(o.label);
+    }));
+    if (compoundLabels.length >= 2) {
+        const parts = compoundLabels.map(l => { const s = l.split(' / '); return { l1: s[0].trim(), l2: (s[1] || '').trim() }; });
+        const uniqueL1 = new Set(parts.map(p => p.l1));
+        const uniqueL2 = new Set(parts.filter(p => p.l2).map(p => p.l2));
+        hasCompound = uniqueL1.size >= 2 && uniqueL2.size >= 2;
+    }
 
     if (hasCompound) {
         renderCompoundVariants(container, variants, product);
@@ -766,9 +786,10 @@ function renderSimpleVariants(container, variants, product) {
             const outOfStock = opt.stock != null && opt.stock <= 0;
             const priceAttr = opt.price ? `data-price="${opt.price}"` : '';
             const oldPriceAttr = opt.compare_at_price ? `data-old-price="${opt.compare_at_price}"` : '';
-            return `<button type="button" class="variant-option${outOfStock ? ' disabled' : ''}"
-                data-variant-id="${opt.id}" data-label="${opt.label}" ${priceAttr} ${oldPriceAttr}
-                ${outOfStock ? 'disabled' : ''}>${opt.label}${outOfStock ? ' (Out of Stock)' : ''}</button>`;
+            const skuAttr = opt.sku ? `data-sku="${opt.sku}"` : '';
+            return `<button type="button" class="variant-option${outOfStock ? ' backorder-variant' : ''}"
+                data-variant-id="${opt.id}" data-label="${opt.label}" ${priceAttr} ${oldPriceAttr} ${skuAttr}
+                ${outOfStock ? 'data-backorder="true"' : ''}>${opt.label}${outOfStock ? ' (Backorder)' : ''}</button>`;
         }).join('');
         const hidden = gi > 0 ? 'style="display:none"' : '';
         return `<div class="variant-group" data-group-index="${gi}" ${hidden}>
@@ -856,8 +877,8 @@ function renderCompoundVariants(container, variants, product) {
         const matchingOpts = allOptions.filter(o => o.level1 === val);
         const totalStock = matchingOpts.reduce((s, o) => s + (o.stock || 0), 0);
         const outOfStock = totalStock <= 0;
-        return `<button type="button" class="variant-option${outOfStock ? ' disabled' : ''}"
-            data-level1="${val}" ${outOfStock ? 'disabled' : ''}>${val}${outOfStock ? ' (Out of Stock)' : ''}</button>`;
+        return `<button type="button" class="variant-option${outOfStock ? ' backorder-variant' : ''}"
+            data-level1="${val}" ${outOfStock ? 'data-backorder="true"' : ''}>${val}${outOfStock ? ' (Backorder)' : ''}</button>`;
     }).join('');
 
     container.innerHTML = `
@@ -898,9 +919,10 @@ function renderCompoundVariants(container, variants, product) {
                 const outOfStock = opt.stock != null && opt.stock <= 0;
                 const priceAttr = opt.price ? `data-price="${opt.price}"` : '';
                 const oldPriceAttr = opt.compare_at_price ? `data-old-price="${opt.compare_at_price}"` : '';
-                return `<button type="button" class="variant-option${outOfStock ? ' disabled' : ''}"
-                    data-variant-id="${opt.id}" data-label="${opt.label}" ${priceAttr} ${oldPriceAttr}
-                    ${outOfStock ? 'disabled' : ''}>${opt.level2}${outOfStock ? ' (Out of Stock)' : ''}</button>`;
+                const skuAttr = opt.sku ? `data-sku="${opt.sku}"` : '';
+                return `<button type="button" class="variant-option${outOfStock ? ' backorder-variant' : ''}"
+                    data-variant-id="${opt.id}" data-label="${opt.label}" ${priceAttr} ${oldPriceAttr} ${skuAttr}
+                    ${outOfStock ? 'data-backorder="true"' : ''}>${opt.level2}${outOfStock ? ' (Backorder)' : ''}</button>`;
             }).join('');
 
             // Show level 2 with animation
@@ -930,6 +952,21 @@ function updateVariantPrice(btn, product) {
             oldPriceEl.style.display = 'inline';
         } else {
             oldPriceEl.style.display = 'none';
+        }
+    }
+    // Update SKU when variant selected
+    const variantSku = btn.dataset.sku;
+    const skuDisplay = document.getElementById('productSkuDisplay');
+    const skuValue = document.getElementById('productSkuValue');
+    if (skuDisplay && skuValue) {
+        if (variantSku) {
+            skuValue.textContent = variantSku;
+            skuDisplay.style.display = 'block';
+        } else if (product.sku) {
+            skuValue.textContent = product.sku;
+            skuDisplay.style.display = 'block';
+        } else {
+            skuDisplay.style.display = 'none';
         }
     }
 }
