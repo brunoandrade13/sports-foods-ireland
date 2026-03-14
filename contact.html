@@ -62,10 +62,10 @@
         }
         
         .contact-form {
-            background: var(--color-bg-alt);
+            background: #d4eddf;
             padding: var(--space-xl);
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 16px rgba(22,155,98,0.12);
         }
         
         .contact-form h2 {
@@ -136,8 +136,8 @@
         .contact-info {
             padding: var(--space-xl);
             border-radius: 12px;
-            background: var(--color-bg-alt);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            background: #fde8d8;
+            box-shadow: 0 4px 16px rgba(255,136,62,0.12);
         }
         
         .contact-info h2 {
@@ -202,17 +202,16 @@
             justify-content: center;
             width: 40px;
             height: 40px;
-            background: var(--color-primary);
-            color: #fff;
-            border-radius: 50%;
-            text-decoration: none;
             transition: all var(--transition);
-            font-size: 18px;
         }
         
         .social-links a:hover {
-            background: #e55a2b;
-            transform: scale(1.1);
+            transform: scale(1.15);
+        }
+
+        .social-links .social-icon {
+            width: 36px;
+            height: 36px;
         }
         
         @media (max-width: 1023px) {
@@ -229,6 +228,21 @@
                 font-size: 16px;
             }
         }
+    </style>
+
+    <style>
+        .sfi-highlights { padding: 60px 0 20px; }
+        .sfi-highlights h2 { font-family: var(--font-title); font-size: 32px; font-weight: 700; color: #169B62; text-align: center; margin-bottom: 10px; }
+        .sfi-highlights h2::after { content: ''; display: block; width: 48px; height: 3px; background: linear-gradient(90deg, #169B62, #FF883E); border-radius: 2px; margin: 10px auto 0; }
+        .sfi-highlights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; max-width: 1200px; margin: 32px auto 0; padding: 0 24px; }
+        .sfi-highlight-card { background: #d4eddf; padding: 28px 24px; border-radius: 12px; text-align: center; }
+        .sfi-highlight-card:nth-child(2), .sfi-highlight-card:nth-child(4) { background: #fde8d8; }
+        .sfi-highlight-card .card-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+        .sfi-highlight-card h3 { font-family: var(--font-title, 'Space Grotesk', sans-serif); font-size: 20px; font-weight: 700; color: #169B62 !important; margin-bottom: 10px; }
+        .sfi-highlight-card:nth-child(2) h3, .sfi-highlight-card:nth-child(4) h3 { color: #FF883E !important; }
+        .sfi-highlight-card p { font-size: 14px; line-height: 1.6; color: var(--color-text-secondary, #636E72); }
+        @media (max-width: 767px) { .sfi-highlights-grid { grid-template-columns: 1fr 1fr; } .sfi-highlights h2 { font-size: 24px; } }
+        @media (max-width: 480px) { .sfi-highlights-grid { grid-template-columns: 1fr; } }
     </style>
 
     <!-- Twitter Card -->
@@ -546,12 +560,12 @@
                         
                         <div class="contact-info-item">
                             <strong>Opening Hours</strong>
-                            <p>Monday - Friday: 09:00 - 17:00<br>Saturday: 10:00 - 14:00<br>Sunday: Closed</p>
+                            <p>Monday - Thursday: 09:00 - 17:00<br>Friday: Closed<br>Saturday: Closed<br>Sunday: Closed</p>
                         </div>
                         
                         <div class="map-container">
                             <iframe
-                                src="https://www.google.com/maps?q=Unit+12+Northwest+Centre,+Northwest+Business+Park,+Blanchardstown,+Dublin+D15+YC53&output=embed"
+                                src="https://maps.google.com/maps?q=Northwest+Business+Park,+Blanchardstown,+Dublin+D15+YC53,+Ireland&output=embed&z=16"
                                 width="100%"
                                 height="250"
                                 style="border:0;"
@@ -564,16 +578,46 @@
                         <div class="contact-info-item">
                             <strong>Follow Us</strong>
                             <div class="social-links">
-                                <a href="https://facebook.com/" target="_blank" aria-label="Facebook">f</a>
-                                <a href="https://instagram.com/" target="_blank" aria-label="Instagram">📷</a>
-                                <a href="https://twitter.com/" target="_blank" aria-label="Twitter">🐦</a>
-                                <a href="https://wa.me/35318400403" target="_blank" aria-label="WhatsApp">💬</a>
+                                <a href="https://www.facebook.com/sportsfoodsireland" target="_blank" aria-label="Facebook"><img src="img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook" class="social-icon"></a>
+                                <a href="https://www.instagram.com/sportsfoodsireland/" target="_blank" aria-label="Instagram"><img src="img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram" class="social-icon"></a>
+                                <a href="https://x.com/sportsfoodsirl" target="_blank" aria-label="Twitter/X"><img src="img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
+                                <a href="https://tiktok.com/" target="_blank" aria-label="TikTok"><img src="img/socialmedia-icons/icons8-tiktok-50.svg" alt="TikTok" class="social-icon"></a>
+                                <a href="https://pinterest.com/" target="_blank" aria-label="Pinterest"><img src="img/socialmedia-icons/icons8-pinterest-50.svg" alt="Pinterest" class="social-icon"></a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Highlights -->
+        <section class="sfi-highlights">
+            <div class="container">
+                <h2>Why Contact Us?</h2>
+                <div class="sfi-highlights-grid">
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">⚡</span>
+                        <h3>Fast Response</h3>
+                        <p>We reply to all enquiries within 1 business day. Our team is here to help you.</p>
+                    </div>
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">🎯</span>
+                        <h3>Expert Advice</h3>
+                        <p>Get tailored product recommendations from our sports nutrition specialists.</p>
+                    </div>
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">🔄</span>
+                        <h3>Easy Returns</h3>
+                        <p>30-day hassle-free returns policy. We make the process simple and stress-free.</p>
+                    </div>
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">🔒</span>
+                        <h3>Secure & Trusted</h3>
+                        <p>Proudly serving Irish athletes since 2020. Your satisfaction is our priority.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
     
     <!-- FOOTER -->
@@ -587,7 +631,7 @@
                             <p><strong>📍</strong> Unit 12 Northwest Centre, Northwest Business Park, Blanchardstown, Dublin D15 YC53</p>
                             <p><strong>📞</strong> <a href="tel:+35318400403" style="color:inherit;text-decoration:none;">+353 1 840 0403</a></p>
                             <p><strong>📧</strong> info@sportsfoodsireland.ie</p>
-                            <p><strong>🕐</strong> Mon-Fri: 9am-6pm</p>
+                            <p><strong>🕐</strong> Mon-Thu: 9am-5pm | Fri-Sun: Closed</p>
                         </div>
                     </div>
                 <div class="footer-col">
@@ -607,7 +651,7 @@
                             <li><a href="faq.html">FAQs</a></li>
                             <li><a href="shipping.html">Shipping Info</a></li>
                             <li><a href="returns.html">Returns & Refunds</a></li>
-                            <li><a href="#">Track Order</a></li>
+                            <li><a href="tracking.html">Track Order</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -622,9 +666,9 @@
                 <div class="footer-col footer-social">
                         <h4>Connect With Us</h4>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook"><img loading="lazy" src="img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook" class="social-icon"></a>
-                        <a href="#" aria-label="Instagram"><img loading="lazy" src="img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram" class="social-icon"></a>
-                        <a href="#" aria-label="Twitter/X"><img loading="lazy" src="img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
+                        <a href="https://www.facebook.com/sportsfoodsireland" aria-label="Facebook"><img loading="lazy" src="img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook" class="social-icon"></a>
+                        <a href="https://www.instagram.com/sportsfoodsireland/" aria-label="Instagram"><img loading="lazy" src="img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram" class="social-icon"></a>
+                        <a href="https://x.com/sportsfoodsirl" aria-label="Twitter/X"><img loading="lazy" src="img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
                         <a href="#" aria-label="TikTok"><img loading="lazy" src="img/socialmedia-icons/icons8-tiktok-50.svg" alt="TikTok" class="social-icon"></a>
                         <a href="#" aria-label="Pinterest"><img loading="lazy" src="img/socialmedia-icons/icons8-pinterest-50.svg" alt="Pinterest" class="social-icon"></a>
                     </div>

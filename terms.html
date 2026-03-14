@@ -36,6 +36,27 @@
     <link rel="manifest" href="site.webmanifest">
     <link rel="apple-touch-icon" href="img/logo.png">
     <meta name="theme-color" content="#2D6A4F">
+    <style>
+        /* Sidebar cards */
+        .sidebar-card:nth-child(1) { background: #d4eddf !important; border-color: #169B62 !important; }
+        .sidebar-card:nth-child(1) h3 { color: #169B62 !important; }
+        .sidebar-card:nth-child(2) { background: #fde8d8 !important; border-color: #FF883E !important; }
+        .sidebar-card:nth-child(2) h3 { color: #CC5500 !important; }
+
+        /* Highlights strip */
+        .sfi-highlights { padding: 60px 0 20px; }
+        .sfi-highlights h2 { font-family: var(--font-title, 'Space Grotesk', sans-serif); font-size: 32px; font-weight: 700; color: #169B62; text-align: center; margin-bottom: 10px; }
+        .sfi-highlights h2::after { content: ''; display: block; width: 48px; height: 3px; background: linear-gradient(90deg, #169B62, #FF883E); border-radius: 2px; margin: 10px auto 0; }
+        .sfi-highlights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; max-width: 1200px; margin: 32px auto 0; padding: 0 24px; }
+        .sfi-highlight-card { background: #d4eddf; padding: 28px 24px; border-radius: 12px; text-align: center; }
+        .sfi-highlight-card:nth-child(2), .sfi-highlight-card:nth-child(4) { background: #fde8d8; }
+        .sfi-highlight-card .card-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+        .sfi-highlight-card h3 { font-family: var(--font-title, 'Space Grotesk', sans-serif); font-size: 20px; font-weight: 700; color: #169B62 !important; margin-bottom: 10px; }
+        .sfi-highlight-card:nth-child(2) h3, .sfi-highlight-card:nth-child(4) h3 { color: #CC5500 !important; }
+        .sfi-highlight-card p { font-size: 14px; line-height: 1.6; color: #2D3436; }
+        @media (max-width: 767px) { .sfi-highlights-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 480px) { .sfi-highlights-grid { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
@@ -371,6 +392,35 @@
                 </aside>
             </div>
         </div>
+
+        <!-- Colored Info Cards -->
+        <section class="sfi-highlights">
+            <div class="container">
+                <h2>Shopping With Confidence</h2>
+                <div class="sfi-highlights-grid">
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">🛡️</span>
+                        <h3>Buyer Protection</h3>
+                        <p>All purchases are protected by our 30-day returns policy and secure payment processing.</p>
+                    </div>
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">✅</span>
+                        <h3>100% Authentic</h3>
+                        <p>Every product is genuine and sourced directly from official brand distributors.</p>
+                    </div>
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">⚖️</span>
+                        <h3>Irish Law</h3>
+                        <p>Our terms comply fully with Irish and EU consumer protection legislation.</p>
+                    </div>
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">📞</span>
+                        <h3>We're Here to Help</h3>
+                        <p>Any questions about our terms? Contact us at info@sportsfoodsireland.ie.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
         <!-- FOOTER -->
         <footer class="main-footer">
@@ -403,7 +453,7 @@
                             <li><a href="faq.html">FAQs</a></li>
                             <li><a href="shipping.html">Shipping Info</a></li>
                             <li><a href="returns.html">Returns & Refunds</a></li>
-                            <li><a href="#">Track Order</a></li>
+                            <li><a href="tracking.html">Track Order</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -418,9 +468,9 @@
                 <div class="footer-col footer-social">
                         <h4>Connect With Us</h4>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook"><img loading="lazy" src="img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook" class="social-icon"></a>
-                        <a href="#" aria-label="Instagram"><img loading="lazy" src="img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram" class="social-icon"></a>
-                        <a href="#" aria-label="Twitter/X"><img loading="lazy" src="img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
+                        <a href="https://www.facebook.com/sportsfoodsireland" aria-label="Facebook"><img loading="lazy" src="img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook" class="social-icon"></a>
+                        <a href="https://www.instagram.com/sportsfoodsireland/" aria-label="Instagram"><img loading="lazy" src="img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram" class="social-icon"></a>
+                        <a href="https://x.com/sportsfoodsirl" aria-label="Twitter/X"><img loading="lazy" src="img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
                         <a href="#" aria-label="TikTok"><img loading="lazy" src="img/socialmedia-icons/icons8-tiktok-50.svg" alt="TikTok" class="social-icon"></a>
                         <a href="#" aria-label="Pinterest"><img loading="lazy" src="img/socialmedia-icons/icons8-pinterest-50.svg" alt="Pinterest" class="social-icon"></a>
                     </div>

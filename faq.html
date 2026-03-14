@@ -66,18 +66,25 @@
             font-family: var(--font-title);
             font-size: 28px;
             font-weight: var(--weight-bold);
-            color: var(--color-text);
+            color: #169B62;
             margin-bottom: var(--space-lg);
             padding-bottom: var(--space-sm);
-            border-bottom: 2px solid var(--color-border);
+            border-bottom: 3px solid #169B62;
         }
         
         .faq-item {
-            background: var(--color-bg-alt);
             border-radius: 8px;
             margin-bottom: var(--space-md);
             overflow: hidden;
-            border: 1px solid var(--color-border);
+            border: none;
+        }
+
+        .faq-category .faq-item:nth-child(odd) {
+            background: #d4eddf;
+        }
+
+        .faq-category .faq-item:nth-child(even) {
+            background: #fde8d8;
         }
         
         .faq-question {
@@ -98,11 +105,11 @@
         }
         
         .faq-question:hover {
-            background: rgba(0,0,0,0.02);
+            filter: brightness(0.95);
         }
         
         .faq-question.active {
-            color: var(--color-primary);
+            color: #169B62;
         }
         
         .faq-icon {
@@ -165,6 +172,20 @@
                 padding: var(--space-md);
             }
         }
+
+        /* Colored info cards */
+        .sfi-highlights { padding: 60px 0 20px; }
+        .sfi-highlights h2 { font-family: var(--font-title, 'Space Grotesk', sans-serif); font-size: 32px; font-weight: 700; color: #169B62; text-align: center; margin-bottom: 10px; }
+        .sfi-highlights h2::after { content: ''; display: block; width: 48px; height: 3px; background: linear-gradient(90deg, #169B62, #FF883E); border-radius: 2px; margin: 10px auto 0; }
+        .sfi-highlights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; max-width: 1200px; margin: 32px auto 0; padding: 0 24px; }
+        .sfi-highlight-card { background: #d4eddf; padding: 28px 24px; border-radius: 12px; text-align: center; }
+        .sfi-highlight-card:nth-child(2), .sfi-highlight-card:nth-child(4) { background: #fde8d8; }
+        .sfi-highlight-card .card-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+        .sfi-highlight-card h3 { font-family: var(--font-title, 'Space Grotesk', sans-serif); font-size: 20px; font-weight: 700; color: #169B62 !important; margin-bottom: 10px; }
+        .sfi-highlight-card:nth-child(2) h3, .sfi-highlight-card:nth-child(4) h3 { color: #CC5500 !important; }
+        .sfi-highlight-card p { font-size: 14px; line-height: 1.6; color: #2D3436; }
+        @media (max-width: 767px) { .sfi-highlights-grid { grid-template-columns: 1fr 1fr; } .sfi-highlights h2 { font-size: 24px; } }
+        @media (max-width: 480px) { .sfi-highlights-grid { grid-template-columns: 1fr; } }
     </style>
 
     <!-- Twitter Card -->
@@ -532,7 +553,47 @@
                                 <span class="faq-icon">▼</span>
                             </button>
                             <div class="faq-answer">
-                                <p>We accept all major credit and debit cards (Visa, Mastercard, American Express), PayPal, and bank transfers. All payments are processed securely through encrypted connections.</p>
+                                <p>We accept all major credit and debit cards (Visa, Mastercard, American Express), PayPal, Apple Pay, Google Pay, and Klarna. All payments are processed securely through encrypted connections.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>What is Klarna and how does it work?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>Klarna is a flexible payment service that lets you shop now and pay later. At checkout, simply select Klarna as your payment method and choose from three options: <strong>Pay in 3</strong> (split your purchase into 3 interest-free instalments), <strong>Pay Later</strong> (pay up to 30 days after delivery), or <strong>Pay Now</strong> (pay immediately via bank transfer). Klarna is available to eligible customers and subject to approval.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>Is Klarna available for all orders?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>Klarna is available for most orders on our website. Eligibility is determined by Klarna based on your account history and order details. Klarna is not available for B2B wholesale orders — business customers should use bank transfer or card payment instead.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>Are there any fees for using Klarna?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>Klarna's <strong>Pay in 3</strong> and <strong>Pay Later</strong> options are completely interest-free when you pay on time. However, late payments may incur fees charged directly by Klarna. We recommend reviewing Klarna's terms and conditions before completing your purchase. Sports Foods Ireland does not charge any additional fee for using Klarna.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>I have an issue with my Klarna payment. Who do I contact?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>For any queries about your Klarna payment plan, instalments, or account, please contact Klarna directly through their app or at <a href="https://www.klarna.com/ie/" target="_blank" style="color:#169B62;font-weight:600;">klarna.com/ie</a>. If your issue relates to the order itself (wrong item, missing delivery, return), please contact us at <a href="mailto:info@sportsfoodsireland.ie" style="color:#169B62;">info@sportsfoodsireland.ie</a> and we'll resolve it promptly.</p>
                             </div>
                         </div>
                         
@@ -557,6 +618,81 @@
                         </div>
                     </div>
                     
+                    <!-- B2B / Wholesale -->
+                    <div class="faq-category">
+                        <h2>B2B / Wholesale</h2>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>Does Sports Foods Ireland offer a wholesale programme?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>Yes! We have a dedicated B2B wholesale programme for gyms, sports clubs, retailers, physiotherapy clinics, coaches, and other businesses. Our wholesale customers get access to exclusive ex-VAT pricing, a dedicated B2B portal, and priority support. To apply, please visit our <a href="b2b/landing.html" style="color:#169B62;font-weight:600;">B2B Portal</a> or contact us directly.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>How do I apply for a wholesale account?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>Applying is easy. Visit our <a href="b2b/landing.html" style="color:#169B62;font-weight:600;">B2B Portal</a> and register your business. Once your account is reviewed and approved, you'll gain immediate access to wholesale pricing and the full B2B order portal. Approval typically takes 1 business day. You can also email us at <a href="mailto:info@sportsfoodsireland.ie" style="color:#169B62;">info@sportsfoodsireland.ie</a> with your business details.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>What discounts are available for wholesale customers?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>Wholesale pricing is available ex-VAT (23% VAT excluded) across our full product range. Discount levels depend on the product and order volume. B2B customers also benefit from free delivery on orders over €150 and access to exclusive bulk pricing tiers. Log in to the <a href="b2b/portal.html" style="color:#169B62;font-weight:600;">B2B Portal</a> to view your personalised pricing.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>Is there a minimum order quantity for wholesale?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>There is no strict minimum order quantity for wholesale orders. However, free B2B delivery applies to orders over €150 (ex-VAT). For very large or pallet orders, please contact us for a custom quote and delivery arrangement.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>What payment methods are available for B2B orders?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>B2B wholesale customers can pay by bank transfer (EFT), credit or debit card, or invoice (for approved accounts with agreed credit terms). Klarna is not available for wholesale orders. If you require invoice payment terms, please contact us to discuss your account setup.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>Can I get a VAT invoice for my B2B order?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>Yes, all B2B orders come with a full VAT invoice. You can view and download your invoices at any time from the <a href="b2b/portal.html" style="color:#169B62;font-weight:600;">B2B Portal</a> under your order history. If you need a copy of a past invoice, contact us at <a href="mailto:info@sportsfoodsireland.ie" style="color:#169B62;">info@sportsfoodsireland.ie</a>.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>Do you offer drop shipping or white-label products?</span>
+                                <span class="faq-icon">▼</span>
+                            </button>
+                            <div class="faq-answer">
+                                <p>We do not currently offer drop shipping or white-label products. All products are sold under their original brand names. If you have a specific partnership proposal, please get in touch at <a href="mailto:info@sportsfoodsireland.ie" style="color:#169B62;">info@sportsfoodsireland.ie</a> and we'll be happy to discuss.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Account & Support -->
                     <div class="faq-category">
                         <h2>Account & Support</h2>
@@ -594,6 +730,35 @@
                 </div>
             </div>
         </div>
+
+        <!-- Colored Info Cards -->
+        <section class="sfi-highlights">
+            <div class="container">
+                <h2>Still Need Help?</h2>
+                <div class="sfi-highlights-grid">
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">📞</span>
+                        <h3>Call Us</h3>
+                        <p>Speak directly with our team. Mon–Fri 09:00–17:00 at +353 1 840 0403.</p>
+                    </div>
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">📧</span>
+                        <h3>Email Us</h3>
+                        <p>Send us a message at info@sportsfoodsireland.ie — we reply within 24 hours.</p>
+                    </div>
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">🚚</span>
+                        <h3>Shipping Info</h3>
+                        <p>Free delivery over €60 across Ireland. Orders dispatched within 1–2 business days.</p>
+                    </div>
+                    <div class="sfi-highlight-card">
+                        <span class="card-icon">🔄</span>
+                        <h3>Easy Returns</h3>
+                        <p>Not happy? Our 30-day hassle-free returns policy has you covered.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
     
     <!-- FOOTER -->
@@ -627,7 +792,7 @@
                             <li><a href="faq.html">FAQs</a></li>
                             <li><a href="shipping.html">Shipping Info</a></li>
                             <li><a href="returns.html">Returns & Refunds</a></li>
-                            <li><a href="#">Track Order</a></li>
+                            <li><a href="tracking.html">Track Order</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -642,9 +807,9 @@
                 <div class="footer-col footer-social">
                         <h4>Connect With Us</h4>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook"><img loading="lazy" src="img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook" class="social-icon"></a>
-                        <a href="#" aria-label="Instagram"><img loading="lazy" src="img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram" class="social-icon"></a>
-                        <a href="#" aria-label="Twitter/X"><img loading="lazy" src="img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
+                        <a href="https://www.facebook.com/sportsfoodsireland" aria-label="Facebook"><img loading="lazy" src="img/socialmedia-icons/icons8-facebook-50.svg" alt="Facebook" class="social-icon"></a>
+                        <a href="https://www.instagram.com/sportsfoodsireland/" aria-label="Instagram"><img loading="lazy" src="img/socialmedia-icons/icons8-instagram-50.svg" alt="Instagram" class="social-icon"></a>
+                        <a href="https://x.com/sportsfoodsirl" aria-label="Twitter/X"><img loading="lazy" src="img/socialmedia-icons/icons8-x-50.svg" alt="Twitter/X" class="social-icon"></a>
                         <a href="#" aria-label="TikTok"><img loading="lazy" src="img/socialmedia-icons/icons8-tiktok-50.svg" alt="TikTok" class="social-icon"></a>
                         <a href="#" aria-label="Pinterest"><img loading="lazy" src="img/socialmedia-icons/icons8-pinterest-50.svg" alt="Pinterest" class="social-icon"></a>
                     </div>
