@@ -24,9 +24,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <link rel="preload" href="css/sfi-styles.min.css?v=23" as="style">
+    <link rel="preload" href="css/sfi-styles.min.css?v=24" as="style">
     <style>:root{--primary:#2D6A4F;--secondary:#40916C;--accent:#95D5B2;--dark:#1B4332;--white:#FFFFFF;--bg:#F8FAF9;--text:#2D3436;--text-light:#636E72;--font-display:'Space Grotesk',sans-serif;--font-body:'Inter',sans-serif;--transition:0.3s ease}*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}img{max-width:100%;height:auto;display:block}a{text-decoration:none;color:inherit}.header{background:var(--dark);position:sticky;top:0;z-index:1000}.logo-img{height:82px;width:auto}.benefits-bar{background:var(--primary);color:var(--white);padding:8px 0;font-size:13px;overflow:hidden}.cart-count{background:var(--accent);color:var(--dark);border-radius:50%;font-size:11px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center}</style>
-    <link rel="stylesheet" href="css/sfi-styles.min.css?v=23" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="css/sfi-styles.min.css?v=23"></noscript>
+    <link rel="stylesheet" href="css/sfi-styles.min.css?v=24" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="css/sfi-styles.min.css?v=24"></noscript>
     <style>
         .shop-container {
             display: flex;
@@ -372,17 +372,7 @@
             border-color: var(--color-primary);
         }
         
-        .mobile-filters-toggle {
-            display: none;
-            padding: var(--space-sm) var(--space-md);
-            background: var(--color-primary);
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            font-weight: var(--weight-semibold);
-            cursor: pointer;
-            margin-bottom: var(--space-md);
-        }
+
         
         @media (max-width: 1023px) {
             .shop-container {
@@ -403,9 +393,7 @@
                 display: block;
             }
             
-            .mobile-filters-toggle {
-                display: block;
-            }
+
             
             .shop-content {
                 padding: 0 var(--space-md);
@@ -1127,7 +1115,7 @@
             
             <!-- Products Content -->
             <div class="shop-content">
-                <button class="mobile-filters-toggle" id="mobileFiltersToggle">☰ Filters</button>
+
                 
                 <div class="shop-header">
                     <h1 class="shop-title" id="shopTitle">All Products</h1>
@@ -1362,8 +1350,6 @@
             <div class="quiz-footer" id="quizFooter"><button class="quiz-btn quiz-btn-secondary" id="prevBtn" onclick="prevQuestion()" style="visibility:hidden">← Back</button><button class="quiz-btn quiz-btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Next →</button></div>
         </div>
     </div>
-<!-- dados-embed.js removido: 578KB blocking. sfi-data-loader handles all -->
-    <!-- <script src="js/dados-embed.js"></script> -->
 <script src="js/sfi-api.min.js" defer></script>
 <script src="js/sfi-data-loader.min.js?v=6" defer></script>
 <script src="js/cart.min.js?v=6" defer></script>
@@ -1372,6 +1358,6 @@
     <script src="js/shop.min.js?v=9" defer></script>
     <script src="js/sfi-fixes.min.js?v=6" defer></script>
     <script src="js/sfi-enhancements.min.js" defer></script>
-    <script src="js/sfi-analytics.js" defer></script>
+    <script src="js/sfi-analytics.min.js" defer></script>
 </body>
 </html>

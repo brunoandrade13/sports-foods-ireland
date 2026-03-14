@@ -6,7 +6,7 @@
   'use strict';
 
   const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc3NjIwMDAsImV4cCI6MjA1MzMzODAwMH0.xM1m1HRt6RBlGOJFBFBk_5P_oHgbkBIjBTl8GUemREA';
+  const SUPA_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
 
   // ---- Session Management ----
   function getSessionId() {

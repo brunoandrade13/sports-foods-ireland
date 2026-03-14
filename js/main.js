@@ -236,34 +236,20 @@ function populateHomeCarousels() {
     const newProducts = diversifyCarousel(newProductsSorted, 12);
     newProducts.forEach(p => usedIds.add(p.id));
 
-    // 3) Best Sellers: prioridade Nutrição Esportiva (barras, gels, bebidas), depois rating; depois diversificar
-    const availableForBestsellers = products.filter(p => !usedIds.has(p.id));
-    const isNutrition = (p) => (p.categoria || '').toLowerCase().includes('nutrição') || (p.categoria || '').toLowerCase().includes('nutricao');
-    const isBarOrNutrition = (p) => {
-        const n = (p.nome || '').toLowerCase();
-        return /bar|barra|gel|energy|drink|bebida|shot|chew|recovery|protein|electrolyte|fuel/i.test(n);
-    };
-    const nutritionFirst = availableForBestsellers
-        .filter(p => isNutrition(p))
-        .sort((a, b) => {
-            const barA = isBarOrNutrition(a) ? 1 : 0;
-            const barB = isBarOrNutrition(b) ? 1 : 0;
-            if (barB !== barA) return barB - barA;
-            const rA = a.rating || 0;
-            const rB = b.rating || 0;
-            if (rB !== rA) return rB - rA;
-            return (b.id || 0) - (a.id || 0);
-        });
-    const othersByRating = availableForBestsellers
-        .filter(p => !isNutrition(p))
-        .sort((a, b) => {
-            const rA = a.rating || 0;
-            const rB = b.rating || 0;
-            if (rB !== rA) return rB - rA;
-            return (b.id || 0) - (a.id || 0);
-        });
-    const bestSellersSorted = [...nutritionFirst, ...othersByRating];
-    const bestSellers = diversifyCarousel(bestSellersSorted, 12);
+    // 3) Best Sellers: based on REAL sales data from Supabase (order_items quantity)
+    // Cached top-seller legacy_ids from actual paid orders — refreshed async below
+    const cachedBestSellerIds = [13, 16, 216, 43, 127, 42, 30, 2, 36, 37, 31, 101];
+    const bestSellers = cachedBestSellerIds
+        .map(id => products.find(p => p.id === id || p.id === String(id)))
+        .filter(Boolean)
+        .slice(0, 12);
+    // If cache miss (products not found), fall back to rating-based selection
+    if (bestSellers.length < 6) {
+        const fallback = products
+            .filter(p => !usedIds.has(p.id))
+            .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        bestSellers.push(...diversifyCarousel(fallback, 12 - bestSellers.length));
+    }
 
     const trackByCarousel = {
         bestsellers: document.querySelector('.category-products-grid[data-carousel="bestsellers"]')

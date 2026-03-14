@@ -225,12 +225,12 @@ img, video, iframe {
 html {
   scroll-behavior: smooth;
   font-display: swap;
-  overflow-x: hidden !important;
+  overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
   box-sizing: border-box;
   position: relative;
-  background: var(--color-bg) !important;
+  background: var(--color-bg);
   background-color: var(--color-bg);
 }
 
@@ -310,7 +310,7 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--color-bg) !important;
+  background: var(--color-bg);
   background-color: var(--color-bg);
 }
 
@@ -322,7 +322,7 @@ section {
   margin: 0 auto;
 }
 section:not(.brands-section):not(.social-proof-section):not(.newsletter):not(.newsletter-section):not(.benefits-bar) {
-  background: var(--color-bg) !important;
+  background: var(--color-bg);
   background-color: var(--color-bg);
 }
 
@@ -381,18 +381,18 @@ img {
 .payment-icon-img,
 .benefit-svg-icon,
 .header-svg-icon {
-  opacity: 1 !important;
+  opacity: 1;
 }
 
 /* Forçar visibilidade das imagens principais para debug de produtos */
 main#main-content img {
-  opacity: 1 !important;
+  opacity: 1;
 }
 
 /* Shop: imagens de produto sempre visíveis (lazy usa opacity 0 até .loaded; aqui forçamos visibilidade) */
 .shop-products-grid .product-img,
 #productsGrid .product-img {
-  opacity: 1 !important;
+  opacity: 1;
 }
 
 /* 2. CONTAINER */
@@ -430,15 +430,15 @@ header {
 /* Header fixo no mobile */
 @media (max-width: 767px) {
   header {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 70px;
-    z-index: 9999 !important;
-    overflow: hidden !important;
-    overflow-x: hidden !important;
-    overflow-y: hidden !important;
+    z-index: 9999;
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
   }
   
   /* Espaço para compensar o header fixo */
@@ -502,7 +502,7 @@ header .container {
 }
 .menu a.nav-b2b {
   background: #2D6A4F;
-  color: #fff !important;
+  color: #fff;
   padding: 6px 14px;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -700,14 +700,14 @@ header .container {
   display: block;
   transition: opacity 0.3s ease, visibility 0.3s ease;
   box-sizing: border-box;
-  overflow: hidden !important;
+  overflow: hidden;
   pointer-events: none;
 }
 
 .cart-modal-overlay.active {
   opacity: 1 !important;
   visibility: visible !important;
-  overflow: hidden !important;
+  overflow: hidden;
   display: block !important;
   pointer-events: auto !important;
 }
@@ -722,13 +722,13 @@ header .container {
 }
 
 body.cart-modal-open {
-  overflow: hidden !important;
-  position: fixed !important;
-  width: 100% !important;
-  height: 100% !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
   /* Prevent scroll on iOS Safari */
   touch-action: none;
   -webkit-overflow-scrolling: none;
@@ -736,16 +736,16 @@ body.cart-modal-open {
 
 /* Prevent scroll on html element as well */
 html.cart-modal-open {
-  overflow: hidden !important;
-  height: 100% !important;
+  overflow: hidden;
+  height: 100%;
 }
 
 .cart-modal {
-  position: fixed !important;
+  position: fixed;
   top: 120px !important;
-  right: 20px !important;
+  right: 20px;
   bottom: auto;
-  background: #ffffff !important;
+  background: #ffffff;
   border-radius: 12px;
   width: 360px;
   max-width: calc(100vw - 40px);
@@ -779,10 +779,10 @@ html.cart-modal-open {
 /* Ensure modal doesn't get cut off at top */
 @media (max-height: 600px) {
   .cart-modal {
-    top: 100px !important;
+    top: 100px;
     bottom: auto;
-    max-height: calc(100vh - 120px) !important;
-    height: auto !important;
+    max-height: calc(100vh - 120px);
+    height: auto;
   }
   
   .cart-modal-overlay.active .cart-modal {
@@ -837,9 +837,9 @@ html.cart-modal-open {
 /* Force modal to always use top positioning */
 .cart-modal-overlay.active .cart-modal,
 .cart-modal-overlay .cart-modal {
-  max-height: calc(100vh - 150px) !important;
-  height: auto !important;
-  top: 120px !important;
+  max-height: calc(100vh - 150px);
+  height: auto;
+  top: 120px;
   bottom: auto;
 }
 
@@ -982,7 +982,7 @@ html.cart-modal-open {
 }
 
 .cart-modal-item-quantity {
-  color: #001f3f !important;
+  color: #001f3f;
 }
 
 .cart-modal-item-price {
@@ -1049,7 +1049,7 @@ html.cart-modal-open {
 }
 
 .cart-modal-total-final span:last-child {
-  color: #001f3f !important;
+  color: #001f3f;
   font-size: 18px;
 }
 
@@ -1415,7 +1415,7 @@ html.cart-modal-open {
 #cartModal .cart-modal-total-final,
 #cartModal .cart-modal-total-final span,
 #cartModal .cart-modal-empty {
-  color: #001f3f !important;
+  color: #001f3f;
 }
 
 /* Classes usadas por cart.js no modal – forçar azul-marinho */
@@ -1431,7 +1431,7 @@ html.cart-modal-open {
 #cartModalOverlay.active #cartModal .cart-item-quantity,
 #cartModalOverlay.active #cartModal .cart-item-quantity span,
 #cartModalOverlay.active #cartModal .cart-item-remove {
-  color: #001f3f !important;
+  color: #001f3f;
 }
 
 .cart-dropdown-header {
@@ -1562,10 +1562,10 @@ html.cart-modal-open {
 /* Debug: Make sure cart-wrapper is visible */
 .cart-wrapper {
   position: relative;
-  display: inline-flex !important;
+  display: inline-flex;
   align-items: center;
-  visibility: visible !important;
-  opacity: 1 !important;
+  visibility: visible;
+  opacity: 1;
   z-index: 10;
 }
 
@@ -1576,18 +1576,18 @@ html.cart-modal-open {
   }
   
   .cart-modal {
-    position: fixed !important;
+    position: fixed;
     /* top definido por JS (openCartModal) - logo abaixo do cabeçalho */
-    right: 10px !important;
-    left: 10px !important;
+    right: 10px;
+    left: 10px;
     bottom: 10px;
     width: auto;
     max-width: calc(100vw - 20px);
-    max-height: none !important;
+    max-height: none;
     min-height: 200px;
-    overflow: hidden !important;
-    z-index: 10001 !important;
-    height: auto !important;
+    overflow: hidden;
+    z-index: 10001;
+    height: auto;
   }
   
   .cart-modal-overlay.active .cart-modal {
@@ -1778,8 +1778,8 @@ html.cart-modal-open {
 
 /* Slide 1: usa <img> tag - altura natural */
 .carousel-slide[data-slide="athlete"] .slide-image {
-  background-image: none !important;
-  transform: none !important;
+  background-image: none;
+  transform: none;
 }
 .hero-banner-img-wrap {
   display: block;
@@ -1832,8 +1832,8 @@ html.cart-modal-open {
   
   .slide-image-sale-mobile,
   .slide-image-sports-mobile {
-    background-size: contain !important;
-    background-position: center 0% !important;
+    background-size: contain;
+    background-position: center 0%;
     background-repeat: no-repeat;
   }
 }
@@ -1860,8 +1860,8 @@ html.cart-modal-open {
   
   .slide-image-sale-mobile,
   .slide-image-sports-mobile {
-    background-size: cover !important;
-    background-position: center center !important;
+    background-size: cover;
+    background-position: center center;
     background-repeat: no-repeat;
   }
 }
@@ -1881,8 +1881,8 @@ html.cart-modal-open {
 
 .slide-image-athlete::before,
 .slide-image-athlete-mobile::before {
-  background-size: cover !important;
-  background-position: center center !important;
+  background-size: cover;
+  background-position: center center;
 }
 
 .carousel-slide.active .slide-image {
@@ -1896,7 +1896,7 @@ html.cart-modal-open {
 /* Primeiro slide: nunca aplicar transform (evita layer em baixa resolução) */
 .carousel-slide[data-slide="athlete"].active .slide-image,
 .carousel-slide[data-slide="athlete"]:not(.active) .slide-image {
-  transform: none !important;
+  transform: none;
 }
 
 .slide-overlay {
@@ -2095,10 +2095,10 @@ html.cart-modal-open {
 
 /* 5. SEÇÃO CATEGORIAS */
 .categorias {
-  margin: 0 auto !important;
-  margin-top: 36px !important;
-  margin-bottom: var(--space-lg) !important;
-  padding-top: 0 !important;
+  margin: 0 auto;
+  margin-top: 36px;
+  margin-bottom: var(--space-lg);
+  padding-top: 0;
   width: 100%;
   max-width: 100vw;
   overflow: hidden;
@@ -2123,7 +2123,7 @@ html.cart-modal-open {
   max-width: 100%;
   padding: 0;
   box-sizing: border-box;
-  margin: 0 auto !important;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -2157,9 +2157,9 @@ html.cart-modal-open {
   
   /* Tamanho dos ícones de categorias no desktop */
   .categoria-card {
-    width: 200px !important;
-    max-width: 200px !important;
-    height: 200px !important;
+    width: 200px;
+    max-width: 200px;
+    height: 200px;
   }
   
   /* Desktop: ~5 cards visíveis no carrossel */
@@ -2213,9 +2213,9 @@ html.cart-modal-open {
 .categorias-grid .cat-swimming,
 .categoria-card.cat-natacao,
 .categoria-card.cat-swimming {
-  background-image: url('../img/cat-swimming.webp') !important;
-  background-size: cover !important;
-  background-position: center center !important;
+  background-image: url('../img/cat-swimming.webp');
+  background-size: cover;
+  background-position: center center;
   background-repeat: no-repeat;
 }
 
@@ -2225,9 +2225,9 @@ html.cart-modal-open {
   .categorias-grid .cat-swimming,
   a.categoria-card.cat-natacao,
   a.categoria-card.cat-swimming {
-    background-image: url('../img/cat-swimming.webp') !important;
-    background-size: cover !important;
-    background-position: center center !important;
+    background-image: url('../img/cat-swimming.webp');
+    background-size: cover;
+    background-position: center center;
     background-repeat: no-repeat;
   }
 }
@@ -2261,7 +2261,7 @@ html.cart-modal-open {
   height: 100%;
   width: 100%;
   top: 0;
-  color: #fff !important;
+  color: #fff;
   left: 0;
   right: 0;
   bottom: 0;
@@ -2337,7 +2337,7 @@ html.cart-modal-open {
   max-width: 100vw;
   overflow: visible;
   position: relative; /* For button positioning */
-  background: var(--color-bg) !important;
+  background: var(--color-bg);
   background-color: var(--color-bg);
 }
 
@@ -2377,12 +2377,12 @@ html.cart-modal-open {
   }
   
   .product-carousel-header h2 {
-    font-size: 22px !important;
-    margin: 0 !important;
+    font-size: 22px;
+    margin: 0;
   }
   
   .product-carousel-wrapper {
-    padding: 4px 40px 8px 40px !important;
+    padding: 4px 40px 8px 40px;
   }
   
   /* Cards de produtos no mobile - manter estilo limpo */
@@ -2411,9 +2411,9 @@ html[data-theme="dark"] .category-product-card {
   html[data-theme="dark"] .product-card,
   html[data-theme="dark"] .product-carousel-track .product-card,
   html[data-theme="dark"] .product-carousel-section .product-carousel-wrapper .product-carousel-track .product-card {
-    background: #1e1e1e !important;
+    background: #1e1e1e;
     background-color: #1e1e1e;
-    border: 1px solid #333 !important;
+    border: 1px solid #333;
   }
 }
 
@@ -2429,9 +2429,9 @@ html[data-theme="dark"] .category-product-card {
 [data-carousel="newproducts"] .product-carousel-track .product-card,
 [data-carousel="promotions"] .product-carousel-track .product-card {
   flex: 0 0 220px;
-  min-width: 220px !important;
-  max-width: 220px !important;
-  width: 220px !important;
+  min-width: 220px;
+  max-width: 220px;
+  width: 220px;
 }
 
 @media (min-width: 1024px) {
@@ -2451,7 +2451,7 @@ html[data-theme="dark"] .category-product-card {
   padding: 0 var(--space-sm);
   box-sizing: border-box;
   overflow: visible;
-  background: var(--color-bg) !important;
+  background: var(--color-bg);
   background-color: var(--color-bg);
 }
 
@@ -2464,7 +2464,7 @@ html[data-theme="dark"] .category-product-card {
   max-width: 100%;
   box-sizing: border-box;
   position: relative;
-  background: transparent !important;
+  background: transparent;
   background-color: transparent;
 }
 
@@ -2473,8 +2473,8 @@ html[data-theme="dark"] .category-product-card {
   font-size: 32px;
   font-weight: var(--weight-bold);
   /* Garantir legibilidade forte em azul-marinho padrão */
-  color: #001f3f !important;
-  opacity: 1 !important;
+  color: #001f3f;
+  opacity: 1;
   margin: 0;
   text-align: center;
   width: 100%;
@@ -2543,22 +2543,22 @@ html[data-theme="dark"] .category-product-card {
 
 .product-carousel-track .product-card {
   flex: 0 0 220px;
-  min-width: 220px !important;
-  max-width: 220px !important;
-  width: 220px !important;
+  min-width: 220px;
+  max-width: 220px;
+  width: 220px;
   scroll-snap-align: start;
-  opacity: 1 !important;
-  visibility: visible !important;
+  opacity: 1;
+  visibility: visible;
   display: flex !important;
   flex-direction: column;
-  flex-shrink: 0 !important;
+  flex-shrink: 0;
   will-change: auto;
   backface-visibility: visible;
   -webkit-backface-visibility: visible;
-  transform: translateZ(0) !important;
-  -webkit-transform: translateZ(0) !important;
-  overflow: visible !important;
-  position: relative !important;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  overflow: visible;
+  position: relative;
   z-index: 1;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
@@ -2572,25 +2572,25 @@ html[data-theme="dark"] .category-product-card {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 1001 !important; /* Much higher z-index to be above everything */
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 2px solid var(--color-border) !important;
-  width: 48px !important;
-  height: 48px !important;
+  z-index: 1001; /* Much higher z-index to be above everything */
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--color-border);
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  font-size: 28px !important;
-  font-weight: bold !important;
+  font-size: 28px;
+  font-weight: bold;
   /* Ícones de seta no mesmo azul-marinho usado nos títulos */
-  color: #001f3f !important;
-  cursor: pointer !important;
-  display: flex !important; /* Force display */
+  color: #001f3f;
+  cursor: pointer;
+  display: flex; /* Force display */
   align-items: center;
   justify-content: center;
   transition: all var(--transition);
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  opacity: 1 !important; /* Force visibility */
-  visibility: visible !important; /* Force visibility */
-  pointer-events: auto !important; /* Ensure clicks work */
+  opacity: 1; /* Force visibility */
+  visibility: visible; /* Force visibility */
+  pointer-events: auto; /* Ensure clicks work */
 }
 
 .product-carousel-btn:hover {
@@ -2612,9 +2612,9 @@ html[data-theme="dark"] .category-product-card {
 }
 
 .product-carousel-prev {
-  left: 0 !important; /* Position at the left edge, inside padding area */
-  z-index: 1001 !important; /* Ensure it's above everything */
-  position: absolute !important; /* Force absolute positioning */
+  left: 0; /* Position at the left edge, inside padding area */
+  z-index: 1001; /* Ensure it's above everything */
+  position: absolute; /* Force absolute positioning */
 }
 
 .product-carousel-next {
@@ -2682,35 +2682,35 @@ html[data-theme="dark"] .category-product-card {
 .product-carousel-track .badge-new,
 .product-carousel-track .badge-bestseller,
 .product-carousel-track [class*="badge"] {
-  position: absolute !important;
-  font-size: 9px !important;
-  padding: 3px 6px !important;
-  left: 6px !important;
-  top: 6px !important;
-  letter-spacing: 0.3px !important;
+  position: absolute;
+  font-size: 9px;
+  padding: 3px 6px;
+  left: 6px;
+  top: 6px;
+  letter-spacing: 0.3px;
   border-radius: 3px;
-  z-index: 5 !important;
-  display: inline-block !important;
-  width: auto !important;
-  max-width: none !important;
+  z-index: 5;
+  display: inline-block;
+  width: auto;
+  max-width: none;
   text-align: center;
 }
 
 /* Todos os badges com mesmo estilo - posição absoluta no canto superior esquerdo */
 .badge-new,
 .badge-bestseller {
-  position: absolute !important;
-  left: var(--space-sm) !important;
-  top: var(--space-sm) !important;
+  position: absolute;
+  left: var(--space-sm);
+  top: var(--space-sm);
   color: #fff !important;
-  font-size: 10px !important;
+  font-size: 10px;
   font-family: var(--font-title);
-  font-weight: var(--weight-bold) !important;
+  font-weight: var(--weight-bold);
   border-radius: 4px;
-  padding: 4px 8px !important;
-  z-index: 5 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
+  padding: 4px 8px;
+  z-index: 5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .badge-new {
@@ -2748,15 +2748,15 @@ html[data-theme="dark"] .category-product-card {
 
 /* Smaller prices in carousel */
 .product-carousel-track .new-price {
-  font-size: 16px !important;
+  font-size: 16px;
 }
 
 .product-carousel-track .old-price {
-  font-size: 12px !important;
+  font-size: 12px;
 }
 
 .product-carousel-track .product-prices {
-  margin: 0 var(--space-xs) var(--space-xs) var(--space-xs) !important;
+  margin: 0 var(--space-xs) var(--space-xs) var(--space-xs);
   gap: 4px;
 }
 
@@ -2772,13 +2772,13 @@ html[data-theme="dark"] .category-product-card {
 
 /* Smaller rating in carousel */
 .product-carousel-track .product-rating {
-  font-size: 12px !important;
-  margin-left: var(--space-sm) !important;
+  font-size: 12px;
+  margin-left: var(--space-sm);
   margin-bottom: var(--space-xs);
 }
 
 .product-carousel-track .product-rating .stars {
-  font-size: 14px !important;
+  font-size: 14px;
 }
 
 .product-rating .stars {
@@ -2811,10 +2811,10 @@ html[data-theme="dark"] .category-product-card {
 
 /* Smaller button in carousel */
 .product-carousel-track .btn-basket {
-  height: 38px !important;
-  font-size: 11px !important;
-  padding: 0 var(--space-xs) !important;
-  margin-top: auto !important;
+  height: 38px;
+  font-size: 11px;
+  padding: 0 var(--space-xs);
+  margin-top: auto;
 }
 
 .btn-basket:hover,
@@ -2995,13 +2995,13 @@ html[data-theme="dark"] .category-product-card {
   color: #4A5F53;
   transition: color var(--transition);
   display: inline-block;
-  background: none !important;
-  background-image: none !important;
-  border: none !important;
+  background: none;
+  background-image: none;
+  border: none;
   border-radius: 0;
   padding: 0;
-  width: auto !important;
-  height: auto !important;
+  width: auto;
+  height: auto;
 }
 
 .footer-col a:hover,
@@ -3303,18 +3303,7 @@ footer > p {
   background: #008a42;
 }
 
-/* Esconder botão de filtros na página shop (mobile) */
-@media (max-width: 767px) {
-  .mobile-filters-toggle,
-  #mobileFiltersToggle,
-  .shop-filters-toggle {
-    display: none !important;
-  }
-  
-  .shop-filters {
-    display: none !important;
-  }
-}
+
 
 /* 10. RESPONSIVIDADE MEDIA QUERIES */
 
@@ -3447,7 +3436,7 @@ footer > p {
   
   .carousel-slide {
     width: 100% !important;
-    min-width: 100% !important;
+    min-width: 100%;
     max-width: 100% !important;
   }
   
@@ -3534,25 +3523,25 @@ footer > p {
   
   /* Reduzir imagens de produtos em 40% no desktop */
   .product-img {
-    max-width: 60% !important;
+    max-width: 60%;
     margin: 0 auto;
   }
   
   .product-card .product-img {
-    max-width: 60% !important;
+    max-width: 60%;
     margin: 0 auto;
   }
   
   .product-carousel-track .product-img {
-    max-width: 60% !important;
+    max-width: 60%;
     margin: 0 auto;
   }
   
   /* Tamanho dos botões de categorias no desktop */
   .categoria-card {
-    width: 200px !important;
-    max-width: 200px !important;
-    height: 200px !important;
+    width: 200px;
+    max-width: 200px;
+    height: 200px;
   }
   
   .mini-products-section {
@@ -3600,7 +3589,7 @@ footer > p {
   /* Reduzir imagens de produtos no grid em 40% no desktop */
   .products-grid .product-img,
   .products-grid .product-card .product-img {
-    max-width: 60% !important;
+    max-width: 60%;
     margin: 0 auto;
   }
   
@@ -3629,15 +3618,15 @@ footer > p {
   /* Reduzir imagens de produtos no grid em 40% no desktop grande */
   .products-grid .product-img,
   .products-grid .product-card .product-img {
-    max-width: 60% !important;
+    max-width: 60%;
     margin: 0 auto;
   }
   
   /* Tamanho dos ícones de categorias no desktop grande */
   .categoria-card {
-    width: 215px !important;
-    max-width: 215px !important;
-    height: 215px !important;
+    width: 215px;
+    max-width: 215px;
+    height: 215px;
   }
 }
 
@@ -3678,23 +3667,23 @@ footer > p {
   .hero-carousel {
     height: auto;
     max-height: unset;
-    width: 100% !important;
-    max-width: 100vw !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    width: 100%;
+    max-width: 100vw;
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
   }
   
   .carousel-container {
-    height: 100% !important;
+    height: 100%;
   }
   
   .carousel-slides {
-    height: 100% !important;
+    height: 100%;
   }
   
   .carousel-slide {
-    height: 100% !important;
+    height: 100%;
   }
   
   .slide-image {
@@ -3719,17 +3708,17 @@ footer > p {
   }
   
   .slide-image {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 100%;
+    max-width: 100%;
     height: auto !important;
-    background-size: contain !important;
-    background-position: center 0% !important;
+    background-size: contain;
+    background-position: center 0%;
   }
   
   .slide-image-athlete,
   .slide-image-athlete-mobile {
-    background-size: cover !important;
-    background-position: center center !important;
+    background-size: cover;
+    background-position: center center;
   }
   
   .carousel-btn {
@@ -3805,9 +3794,9 @@ footer > p {
   
   .categoria-card {
     height: 180px;
-    width: 180px !important;
-    max-width: 180px !important;
-    margin: 0 auto !important;
+    width: 180px;
+    max-width: 180px;
+    margin: 0 auto;
     padding: 0;
     box-sizing: border-box;
     border-radius: 8px;
@@ -3817,7 +3806,7 @@ footer > p {
   }
   
   .categoria-overlay {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.45) 100%) !important;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.45) 100%);
   }
   
   .categoria-info {
@@ -3894,8 +3883,8 @@ footer > p {
   
   /* FIX: container clips carousel scroll - override for carousel sections */
   .product-carousel-section .container {
-    overflow-x: visible !important;
-    overflow-y: visible !important;
+    overflow-x: visible;
+    overflow-y: visible;
   }
   
   .category-products-grid {
@@ -3929,9 +3918,9 @@ footer > p {
     flex-direction: column;
     transition: transform var(--transition), box-shadow var(--transition);
     padding: var(--space-sm);
-    width: 42% !important;
-    min-width: 42% !important;
-    max-width: 42% !important;
+    width: 42%;
+    min-width: 42%;
+    max-width: 42%;
     min-height: auto;
     height: auto;
     flex-shrink: 0;
@@ -4048,15 +4037,15 @@ footer > p {
   .product-carousel-wrapper {
     padding: 0;
     overflow: visible !important;
-    overflow-x: visible !important;
-    transform: none !important;
-    -webkit-transform: none !important;
+    overflow-x: visible;
+    transform: none;
+    -webkit-transform: none;
     isolation: auto;
   }
   
   .product-carousel-section {
-    overflow-x: visible !important; /* Allow horizontal scroll on mobile */
-    overflow-y: visible !important;
+    overflow-x: visible; /* Allow horizontal scroll on mobile */
+    overflow-y: visible;
   }
   
   .product-carousel-section .container {
@@ -4065,7 +4054,7 @@ footer > p {
     max-width: 100%;
     overflow: visible !important;
     display: block !important;
-    visibility: visible !important;
+    visibility: visible;
   }
   
   .product-carousel-header {
@@ -4095,14 +4084,14 @@ footer > p {
   
   .product-carousel-wrapper {
     padding: 0 !important; /* Remove padding for native scroll */
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 100%;
+    max-width: 100%;
     overflow: visible !important; /* Allow products to be visible on mobile */
     display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    position: relative !important;
-    height: auto !important;
+    visibility: visible;
+    opacity: 1;
+    position: relative;
+    height: auto;
     min-height: 400px;
     box-sizing: border-box;
   }
@@ -4121,12 +4110,12 @@ footer > p {
     display: flex !important;
     flex-direction: row;
     gap: var(--space-sm);
-    padding: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
+    overflow-x: auto;
+    overflow-y: hidden;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
@@ -4134,9 +4123,9 @@ footer > p {
     -ms-overflow-style: none; /* IE and Edge */
     /* Remove desktop styles that interfere */
     transition: none;
-    transform: none !important;
-    -webkit-transform: none !important;
-    will-change: auto !important;
+    transform: none;
+    -webkit-transform: none;
+    will-change: auto;
   }
   
   .product-carousel-track::-webkit-scrollbar {
@@ -4273,15 +4262,15 @@ footer > p {
   /* On mobile, use native scroll instead of transform */
   @media (max-width: 767px) {
     .product-carousel-track {
-      transform: none !important;
-      -webkit-transform: none !important;
+      transform: none;
+      -webkit-transform: none;
     }
   }
   
   /* On desktop, ensure transform works correctly */
   @media (min-width: 768px) {
     .product-carousel-track {
-      transform: translate3d(0, 0, 0) !important; /* Reset on load */
+      transform: translate3d(0, 0, 0); /* Reset on load */
     }
   }
   
@@ -4310,66 +4299,66 @@ footer > p {
   }
   
   .main-footer .container {
-    padding: 0 var(--space-sm) !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    padding: 0 var(--space-sm);
+    width: 100%;
+    max-width: 100%;
   }
   
   .footer-grid {
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
     gap: var(--space-md);
   }
   
   .footer-col {
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
   }
   
   .footer-col h4 {
-    padding: 0 !important;
-    margin: 0 0 var(--space-sm) 0 !important;
+    padding: 0;
+    margin: 0 0 var(--space-sm) 0;
     text-align: left;
   }
   
   .footer-col ul {
-    padding: 0 !important;
-    margin: 0 !important;
+    padding: 0;
+    margin: 0;
     list-style: none;
   }
   
   .footer-col ul li {
-    padding: 0 !important;
-    margin: 0 0 var(--space-xs) 0 !important;
+    padding: 0;
+    margin: 0 0 var(--space-xs) 0;
   }
   
   .footer-col a {
-    padding: 0 !important;
-    margin: 0 !important;
+    padding: 0;
+    margin: 0;
   }
   
   .footer-social .social-links {
-    padding: 0 !important;
-    margin: 0 0 var(--space-md) 0 !important;
+    padding: 0;
+    margin: 0 0 var(--space-md) 0;
     justify-content: flex-start;
   }
   
   .footer-newsletter {
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
     align-items: flex-start;
   }
   
   .footer-newsletter input[type="email"] {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
   }
 }
 
@@ -4563,10 +4552,10 @@ html {
     /* Fundo no mesmo gradiente laranja dos botões, com alta prioridade */
     background: var(--gradient-secondary) !important;
     background-color: #E07A5F !important;
-    overflow: hidden !important;
+    overflow: hidden;
 }
 .brands-section .container {
-    overflow: hidden !important;
+    overflow: hidden;
 }
 
 .brands-section h2 {
@@ -7711,9 +7700,9 @@ html {
 @media (min-width: 1280px) {
     .product-carousel-section .product-carousel-wrapper .product-carousel-track .product-card {
         flex: 0 0 220px;
-        min-width: 220px !important;
-        max-width: 220px !important;
-        width: 220px !important;
+        min-width: 220px;
+        max-width: 220px;
+        width: 220px;
     }
 }
 
@@ -8180,7 +8169,7 @@ html {
     justify-content: center;
     align-items: center;
     gap: var(--space-lg);
-    max-width: 100% !important;
+    max-width: 100%;
 }
 
 .brand-card {
@@ -8263,13 +8252,13 @@ html {
     }
     
     .brands-section .brand-item {
-        width: 70px !important;
-        height: 40px !important;
-        padding: var(--space-xs) !important;
+        width: 70px;
+        height: 40px;
+        padding: var(--space-xs);
     }
     
     .brands-section .brand-logo-placeholder {
-        font-size: 8px !important;
+        font-size: 8px;
     }
     
     .alphabet-btn {
@@ -8856,7 +8845,7 @@ html {
 }
 
 .product-carousel-track .product-card:hover {
-    transform: translateY(-8px) !important;
+    transform: translateY(-8px);
     box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
     z-index: 10;
 }
@@ -8917,13 +8906,13 @@ html {
 .product-carousel-section .product-card:hover .product-quick-actions-inline,
 .product-carousel-section .product-card.card-hovered .product-quick-actions-inline {
     display: flex;
-    opacity: 1 !important;
+    opacity: 1;
     max-height: 56px;
     min-height: 48px;
     padding: 6px 0;
     margin: 6px 0;
-    visibility: visible !important;
-    pointer-events: auto !important;
+    visibility: visible;
+    pointer-events: auto;
     overflow: visible;
 }
 
@@ -8993,7 +8982,7 @@ html {
     height: 150px;
     min-height: 150px;
     max-height: 150px;
-    width: 100% !important;
+    width: 100%;
     object-fit: contain;
     display: block;
 }
@@ -9005,12 +8994,12 @@ html {
     height: 36px;
     min-height: 36px;
     max-height: 36px;
-    overflow: hidden !important;
+    overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     font-size: 13px;
-    line-height: 1.4 !important;
+    line-height: 1.4;
     margin: 6px 0 4px 0;
     padding: 0;
 }
@@ -9031,22 +9020,22 @@ html {
 
 /* Review/Rating com altura fixa */
 .product-carousel-track .product-card .product-rating {
-    height: 18px !important;
+    height: 18px;
     min-height: 18px;
-    max-height: 18px !important;
+    max-height: 18px;
     display: flex !important;
     align-items: center;
     gap: 4px;
-    margin: 0 0 4px 0 !important;
+    margin: 0 0 4px 0;
     padding: 0;
     font-size: 12px;
 }
 
 /* Botão Add to Basket sempre no final */
 .product-carousel-track .product-card .btn-basket {
-    margin-top: auto !important;
-    font-size: 11px !important;
-    padding: 8px 12px !important;
+    margin-top: auto;
+    font-size: 11px;
+    padding: 8px 12px;
 }
 
 /* Mobile - Efeito de toque nos cards de produto */
@@ -9057,7 +9046,7 @@ html {
     }
     
     .product-card:active {
-        transform: translateY(-5px) scale(0.98) !important;
+        transform: translateY(-5px) scale(0.98);
         box-shadow: 0 12px 24px rgba(0,0,0,0.15);
     }
     
@@ -9085,7 +9074,7 @@ html {
     }
     
     .product-carousel-track .product-card:active {
-        transform: translateY(-5px) !important;
+        transform: translateY(-5px);
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
         z-index: 10;
     }
@@ -9137,7 +9126,7 @@ html[data-theme="dark"] .category-product-card {
     background: #1e1e1e !important;
     background-color: #1e1e1e;
     border: 1px solid #333 !important;
-    border-color: #333 !important;
+    border-color: #333;
 }
 
 @media (max-width: 767px) {
@@ -9147,9 +9136,9 @@ html[data-theme="dark"] .category-product-card {
     html[data-theme="dark"] .product-carousel-section .product-carousel-wrapper .product-carousel-track .product-card,
     html[data-theme="dark"] .products-grid .product-card,
     html[data-theme="dark"] .shop-products-grid .product-card {
-        background: #1e1e1e !important;
+        background: #1e1e1e;
         background-color: #1e1e1e;
-        border: 1px solid #333 !important;
+        border: 1px solid #333;
     }
 }
 
@@ -9227,7 +9216,7 @@ html:not([data-theme="dark"]) .product-card *:not(.badge):not(.btn):not(.wishlis
 html:not([data-theme="dark"]) .product-card .product-name,
 html:not([data-theme="dark"]) .product-card h3 {
     color: var(--color-text) !important;
-    font-weight: 600 !important;
+    font-weight: 600;
 }
 
 /* ===========================================
@@ -9268,12 +9257,12 @@ html:not([data-theme="dark"]) .product-card h3 {
     pointer-events: auto;
     z-index: 10000;
     position: fixed;
-    top: 0 !important;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    width: 100vw !important;
-    height: 100vh !important;
+    width: 100vw;
+    height: 100vh;
 }
 
 #cartModalOverlay.active #cartModal,
@@ -9281,16 +9270,16 @@ html:not([data-theme="dark"]) .product-card h3 {
 .cart-modal-overlay.active .cart-modal,
 .cart-modal-overlay.active #cartModal {
     display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    z-index: 10001 !important;
-    position: fixed !important;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 10001;
+    position: fixed;
     /* top definido por JS em openCartModal */
     bottom: 20px;
-    right: 20px !important;
-    left: auto !important;
-    transform: translateY(0) !important;
+    right: 20px;
+    left: auto;
+    transform: translateY(0);
 }
 
 /* Mobile */
@@ -9300,7 +9289,7 @@ html:not([data-theme="dark"]) .product-card h3 {
         /* top definido por JS */
         bottom: 10px;
         right: 10px;
-        left: 10px !important;
+        left: 10px;
         width: auto;
     }
 }
@@ -9364,23 +9353,23 @@ html[data-theme="dark"] .product-short-desc-detail {
 .inline-flex-center { position: relative; display: inline-flex; align-items: center; }
 .close-btn-abs { position: absolute; right: 8px; background: none; border: none; cursor: pointer; padding: 5px; }
 .darkmode-toggle-fixed {
-  position: fixed !important;
+  position: fixed;
   bottom: 100px;
-  right: 24px !important;
-  width: 52px !important;
-  height: 52px !important;
+  right: 24px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: #ffffff !important;
-  border: 3px solid #2D6A4F !important;
+  background: #ffffff;
+  border: 3px solid #2D6A4F;
   box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-  cursor: pointer !important;
+  cursor: pointer;
   display: flex !important;
   align-items: center;
   justify-content: center;
-  font-size: 24px !important;
-  z-index: 99999 !important;
-  visibility: visible !important;
-  opacity: 1 !important;
+  font-size: 24px;
+  z-index: 99999;
+  visibility: visible;
+  opacity: 1;
 }
 
 /* ====== 2/9: nova-paleta-2026.css ====== */
@@ -9695,8 +9684,8 @@ header {
 
 /* Seções alternadas */
 section:nth-child(even):not(.brands-section):not(.social-proof-section):not(.newsletter):not(.newsletter-section):not(.benefits-bar) {
-    background: var(--color-bg) !important;
-    background-color: var(--color-bg) !important;
+    background: var(--color-bg);
+    background-color: var(--color-bg);
 }
 
 /* Seção de benefícios - tom claro/gelo */
@@ -9777,8 +9766,8 @@ html[data-theme="dark"] textarea {
 html:not([data-theme="dark"]),
 html:not([data-theme="dark"]) body,
 html:not([data-theme="dark"]) main {
-    background: #FDFCF7 !important;
-    background-color: #FDFCF7 !important;
+    background: #FDFCF7;
+    background-color: #FDFCF7;
 }
 
 /* ====== 3/9: modern-enhancements.css ====== */
@@ -10155,7 +10144,7 @@ html[data-theme="dark"] .footer-col h4 {
 }
 
 html[data-theme="dark"] .footer-col a {
-    color: #4A5F53 !important;
+    color: #4A5F53;
 }
 
 html[data-theme="dark"] .mobile-bottom-nav {
@@ -10356,9 +10345,9 @@ html[data-theme="dark"] .brands-section p {
 }
 
 html[data-theme="dark"] .brand-item {
-    background: transparent !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
 }
 
 html[data-theme="dark"] .brand-logo-placeholder {
@@ -10366,7 +10355,7 @@ html[data-theme="dark"] .brand-logo-placeholder {
 }
 
 html[data-theme="dark"] .brand-logo-large {
-    background: transparent !important;
+    background: transparent;
 }
 
 html[data-theme="dark"] .brand-logo-large span {
@@ -16181,8 +16170,8 @@ html[data-theme="dark"] .cart-count {
 html[data-theme="dark"] .main-footer,
 html[data-theme="dark"] footer.main-footer,
 html[data-theme="dark"] footer {
-    background: #E5E8E6 !important;
-    background-color: #E5E8E6 !important;
+    background: #E5E8E6;
+    background-color: #E5E8E6;
 }
 
 html[data-theme="dark"] .main-footer *,
@@ -16192,26 +16181,26 @@ html[data-theme="dark"] .footer-col h4,
 html[data-theme="dark"] .footer-col a,
 html[data-theme="dark"] .footer-col p,
 html[data-theme="dark"] .footer-bottom {
-    color: #2B3D33 !important;
+    color: #2B3D33;
 }
 
 html[data-theme="dark"] .footer-col a:hover {
-    color: #FF883E !important;
+    color: #FF883E;
 }
 
 html[data-theme="dark"] .footer-bottom {
-    background: #D8E0DA !important;
-    border-top: 1px solid rgba(0,0,0,0.08) !important;
+    background: #D8E0DA;
+    border-top: 1px solid rgba(0,0,0,0.08);
 }
 
 html[data-theme="dark"] .footer-bottom p,
 html[data-theme="dark"] .footer-bottom a,
 html[data-theme="dark"] .footer-bottom-links a {
-    color: #4A5D53 !important;
+    color: #4A5D53;
 }
 
 html[data-theme="dark"] .footer-social .social-links a {
-    background: rgba(0,0,0,0.08) !important;
+    background: rgba(0,0,0,0.08);
 }
 
 /* NEWSLETTER - Manter cores originais no dark mode */
@@ -16277,27 +16266,27 @@ html[data-theme="dark"] .trusted-brands-section h2 {
 /* TRUST BADGES - Texto claro no dark mode */
 html[data-theme="dark"] .trust-badges-section .trust-badge-title,
 html[data-theme="dark"] .trust-badge-title {
-    color: #F5F5F5 !important;
+    color: #F5F5F5;
 }
 
 html[data-theme="dark"] .trust-badges-section .trust-badge-text,
 html[data-theme="dark"] .trust-badge-text {
-    color: #CCCCCC !important;
+    color: #CCCCCC;
 }
 
 /* NEWSLETTER INPUT - Fundo branco no dark mode */
 html[data-theme="dark"] .newsletter-input,
 html[data-theme="dark"] .newsletter input[type="email"],
 html[data-theme="dark"] .newsletter-section input[type="email"] {
-    background: #FFFFFF !important;
-    color: #1A1A1A !important;
-    border-color: rgba(0,0,0,0.15) !important;
+    background: #FFFFFF;
+    color: #1A1A1A;
+    border-color: rgba(0,0,0,0.15);
 }
 
 html[data-theme="dark"] .newsletter-input::placeholder,
 html[data-theme="dark"] .newsletter input[type="email"]::placeholder,
 html[data-theme="dark"] .newsletter-section input[type="email"]::placeholder {
-    color: #999999 !important;
+    color: #999999;
 }
 
 /* ============================================
@@ -16387,7 +16376,7 @@ html[data-theme="dark"] .product-carousel-header h2 {
 .hero-carousel .slide-content p,
 .hero-carousel .slide-content .hero-text p {
     color: #ffffff !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6);
 }
 /* Chamada (subtítulo) do banner – branco e legível; override explícito das regras "section p" */
 .hero-carousel .hero-chamada,
@@ -16397,19 +16386,19 @@ html:not([data-theme="dark"]) .hero-carousel .slide-content p,
 html:not([data-theme="dark"]) .hero-carousel .slide-content .hero-text p,
 html:not([data-theme="dark"]) .hero-carousel p.hero-chamada {
     color: #ffffff !important;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 2px 10px rgba(0,0,0,0.7) !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 2px 10px rgba(0,0,0,0.7);
 }
 /* Segundo slide (sale): garantir chamada branca mesmo com .hero-tag-sale no mesmo bloco */
 .hero-carousel .carousel-slide[data-slide="sale"] .slide-content p,
 .hero-carousel .carousel-slide[data-slide="sale"] .slide-content .hero-text p,
 .hero-carousel .carousel-slide[data-slide="sale"] p.hero-chamada {
     color: #ffffff !important;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 2px 10px rgba(0,0,0,0.7) !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 2px 10px rgba(0,0,0,0.7);
 }
 .hero-carousel .hero-tag,
 .hero-carousel .hero-tag-sale {
     color: #ffffff !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 /* HERO CAROUSEL - Manter original (dark mode) */
@@ -16647,7 +16636,7 @@ footer .social-links img.social-icon,
 .social-links img.social-icon,
 .social-links .social-icon,
 img.social-icon {
-    filter: none !important;
+    filter: none;
     width: 28px;
     height: 28px;
     display: inline-block;
@@ -16738,7 +16727,7 @@ img.social-icon {
 
 .social-links a:hover .social-icon {
     transform: scale(1.15);
-    filter: brightness(0) invert(1) !important;
+    filter: brightness(0) invert(1);
 }
 
 .payment-icons {
@@ -16846,7 +16835,7 @@ img.social-icon {
 .product-card .product-brand,
 .product-carousel-track .product-card .product-brand,
 span.product-brand {
-  color: #E07A5F !important;
+  color: #E07A5F;
 }
 
 /* ----- 5. PRICES ----- */
@@ -16881,7 +16870,7 @@ span.product-brand {
 
 /* ----- 7. ADD TO BASKET BUTTON ----- */
 .product-card .btn-basket {
-  background: #E07A5F !important;
+  background: #E07A5F;
   color: #fff !important;
   border: none;
   border-radius: 12px;
@@ -16896,7 +16885,7 @@ span.product-brand {
 
 .product-card .btn-basket:hover,
 .product-card .btn-basket:focus {
-  background: #e55a2b !important;
+  background: #e55a2b;
   transform: translateY(-2px);
 }
 
@@ -17221,7 +17210,7 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
   /* Make hamburger button bigger */
   .mobile-menu-toggle {
     display: flex !important;
-    flex-direction: row !important;
+    flex-direction: row;
     align-items: center;
     gap: 7px;
     padding: 8px 12px;
@@ -17260,7 +17249,7 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
 
   .header-right .busca,
   .header-right #busca {
-    width: 100% !important;
+    width: 100%;
     max-width: 100%;
     min-width: 0;
     font-size: 14px;
@@ -17270,7 +17259,7 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
 
   .header-right .busca:focus,
   .header-right #busca:focus {
-    width: 100% !important;
+    width: 100%;
   }
 
   /* Adjust header layout for more breathing room */
@@ -17300,12 +17289,12 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
 
 /* Fix: prevent old .mobile-menu-toggle span styles from affecting label */
 .mobile-menu-toggle .hamburger-label {
-  width: auto !important;
-  height: auto !important;
-  background: none !important;
-  transform: none !important;
-  opacity: 1 !important;
-  border-radius: 0 !important;
+  width: auto;
+  height: auto;
+  background: none;
+  transform: none;
+  opacity: 1;
+  border-radius: 0;
 }
 
 
@@ -17318,18 +17307,18 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
 
   /* 1. WISHLIST HEART — Always visible, top-right corner (no layout shift) */
   .product-card .product-quick-actions-inline {
-    position: absolute !important;
-    top: 8px !important;
-    right: 8px !important;
-    left: auto !important;
-    bottom: auto !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    max-height: none !important;
-    overflow: visible !important;
-    pointer-events: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    left: auto;
+    bottom: auto;
+    opacity: 1;
+    visibility: visible;
+    max-height: none;
+    overflow: visible;
+    pointer-events: auto;
+    margin: 0;
+    padding: 0;
     z-index: 5;
     display: flex !important;
     justify-content: center;
@@ -17341,24 +17330,24 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
   .product-card .product-quick-actions-inline .wishlist-icon,
   .product-card .product-quick-actions-inline .quick-action-btn-inline.wishlist-icon {
     display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    width: 36px !important;
-    height: 36px !important;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    width: 36px;
+    height: 36px;
     min-width: 36px;
     min-height: 36px;
-    background: rgba(255,255,255,0.92) !important;
-    border: 1px solid #e0e0e0 !important;
-    border-radius: 50% !important;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid #e0e0e0;
+    border-radius: 50%;
     box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     cursor: pointer;
     z-index: 6;
   }
 
   .product-card .product-quick-actions-inline .wishlist-icon .wishlist-heart-img {
-    width: 20px !important;
-    height: 20px !important;
+    width: 20px;
+    height: 20px;
   }
 
   /* 2. BRAND — Ensure visible on mobile */
@@ -17366,10 +17355,10 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
   .product-carousel-track .product-card .product-brand,
   .category-product-card .product-brand {
     display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    visibility: visible;
+    opacity: 1;
     font-size: 10px;
-    color: #E07A5F !important;
+    color: #E07A5F;
     text-transform: uppercase;
     letter-spacing: 0.3px;
     margin: 0 8px 2px;
@@ -17384,8 +17373,8 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
   .product-carousel-track .product-card .product-rating,
   .category-product-card .product-rating {
     display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    visibility: visible;
+    opacity: 1;
     align-items: center;
     font-size: 11px;
     margin: 0 8px 4px;
@@ -17408,11 +17397,11 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
   .product-card .btn-basket {
     position: relative;
     z-index: 4;
-    pointer-events: auto !important;
-    width: calc(100% - 16px) !important;
-    margin: auto 8px 8px !important;
-    padding: 10px 12px !important;
-    font-size: 12px !important;
+    pointer-events: auto;
+    width: calc(100% - 16px);
+    margin: auto 8px 8px;
+    padding: 10px 12px;
+    font-size: 12px;
     font-weight: 700;
     min-height: 40px;
     touch-action: manipulation;
@@ -17423,24 +17412,24 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
   .product-card:hover .product-quick-actions-inline,
   .product-card:active .product-quick-actions-inline,
   .product-card.card-hovered .product-quick-actions-inline {
-    position: absolute !important;
-    top: 8px !important;
-    right: 8px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-height: none !important;
-    min-height: auto !important;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    margin: 0;
+    padding: 0;
+    max-height: none;
+    min-height: auto;
   }
 
   /* 6. Prevent card transform on mobile tap (avoid misclicks) */
   .product-card:active,
   .product-card:hover {
-    transform: none !important;
+    transform: none;
   }
 
   .product-carousel-track .product-card:active {
-    transform: none !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 }
 
@@ -17455,7 +17444,7 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
   .category-product-card,
   .product-carousel-track .product-card,
   .product-carousel-section .product-card {
-    overflow: visible !important;
+    overflow: visible;
   }
 
   /* Image wrapper keeps rounded corners via its own overflow */
@@ -17476,7 +17465,7 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
 /* DESKTOP: ensure heart visible on hover for ALL cards (left and right) */
 .product-card,
 .category-product-card {
-  overflow: visible !important;
+  overflow: visible;
 }
 
 /* Image wrapper clips for border-radius on desktop too */

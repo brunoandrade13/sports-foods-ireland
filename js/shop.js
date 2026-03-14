@@ -151,8 +151,8 @@ async function loadProducts() {
             applyFilters();
             const hashLocal = window.location.hash.replace('#', '');
             if (hashLocal) {
-                const categoryFromHash = hashLocal.split('#')[0];
-                activateCategoryFilter(categoryFromHash);
+                const hashParts = hashLocal.split('#');
+                activateCategoryFilter(hashParts[0], hashParts[1] || null);
             }
             return;
         }
@@ -210,8 +210,8 @@ async function loadProducts() {
         // Check URL hash for category filter and expand it
         const hash = window.location.hash.replace('#', '');
         if (hash) {
-            const category = hash.split('#')[0];
-            activateCategoryFilter(category);
+            const hashParts = hash.split('#');
+            activateCategoryFilter(hashParts[0], hashParts[1] || null);
         }
         
         // Check URL search parameter
@@ -853,14 +853,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('hashchange', () => {
         const hash = window.location.hash.replace('#', '');
         if (hash) {
-            const category = hash.split('#')[0];
-            activateCategoryFilter(category);
+            const hashParts = hash.split('#');
+            activateCategoryFilter(hashParts[0], hashParts[1] || null);
         }
     });
 });
 
 // Function to activate a category filter from URL hash
-function activateCategoryFilter(category) {
+function activateCategoryFilter(category, subcategory) {
     // First, deactivate all category toggles
     document.querySelectorAll('.filter-category-toggle.active').forEach(toggle => {
         toggle.classList.remove('active');
@@ -890,6 +890,19 @@ function activateCategoryFilter(category) {
             categoryToggle.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
+        // If subcategory hash provided, check the matching checkbox
+        if (subcategory) {
+            const subCheckboxes = subcategoryGroup ? subcategoryGroup.querySelectorAll('.subcategory-filter') : [];
+            subCheckboxes.forEach(cb => {
+                const val = (cb.value || '').toLowerCase();
+                const id = (cb.id || '').toLowerCase();
+                if (val.toLowerCase() === subcategory.toLowerCase() || 
+                    id.includes(subcategory.toLowerCase())) {
+                    cb.checked = true;
+                }
+            });
+        }
+
         // Apply filters
         currentPage = 1;
         applyFilters();
