@@ -1,0 +1,56 @@
+# === SECURITY: Block access to sensitive files ===
+# Block all dotfiles (.env, .git, .gitignore, etc.)
+<FilesMatch "^\.">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Block specific sensitive files
+<FilesMatch "(\.env|\.env\..+|\.gitignore|\.git|package\.json|package-lock\.json)$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Block dev-archive directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^dev-archive/ - [F,L]
+    RewriteRule ^admin/ - [F,L]
+    RewriteRule ^\.env - [F,L]
+    RewriteRule ^\.git - [F,L]
+</IfModule>
+
+# Block access to JS source files (only .min.js should be served)
+<FilesMatch "^(?!.*\.min\.js$).*\.(json)$">
+    <IfModule mod_headers.c>
+        Header set X-Robots-Tag "noindex"
+    </IfModule>
+</FilesMatch>
+
+# === SECURITY HEADERS ===
+<IfModule mod_headers.c>
+    # Prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    # XSS Protection (legacy browsers)
+    Header always set X-XSS-Protection "1; mode=block"
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # Permissions Policy - disable dangerous features
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(self)"
+    # Content Security Policy
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://*.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://fonts.googleapis.com; frame-ancestors 'self'; form-action 'self'; base-uri 'self'"
+</IfModule>
+
+# === HTTPS ENFORCEMENT ===
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# === HSTS (after confirming HTTPS works) ===
+<IfModule mod_headers.c>
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+</IfModule>

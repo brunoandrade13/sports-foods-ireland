@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SFI Admin</title>
   <meta name="robots" content="noindex, nofollow">
+<link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --bg: #0a0f1a;
@@ -34,11 +37,7 @@
       --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --mono: 'JetBrains Mono', 'Fira Code', monospace;
     }
-  </style>
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
-  <style>
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -2104,7 +2103,7 @@
               <div class="form-group full">
                 <label>Customer *</label>
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                  <select id="moCustomer">
+                  <select id="moCustomer" onchange="renderManualOrderProductPicker()">
                     <option value="">Select customer…</option>
                   </select>
                   <label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;color:var(--text-muted);cursor:pointer">
@@ -2167,13 +2166,13 @@
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:flex-end">
                 <div class="form-group">
                   <label>Filter by brand</label>
-                  <select id="moBrandFilter">
+                  <select id="moBrandFilter" onchange="renderManualOrderProductPicker()">
                     <option value="">All brands</option>
                   </select>
                 </div>
                 <div class="form-group">
                   <label>Filter by category</label>
-                  <select id="moCategoryFilter">
+                  <select id="moCategoryFilter" onchange="renderManualOrderProductPicker()">
                     <option value="">All categories</option>
                   </select>
                 </div>
@@ -4002,9 +4001,9 @@
     // SUPABASE CONFIG
     // ============================================================
     const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDQyODg3NywiZXhwIjoyMDg2MDA0ODc3fQ.YMd5_2axb5QFrMu5x-nOvRNiIQMjAbGwvkYdBVoAdug';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE'; // anon key (safe for client-side)
 
-    const DEV_MODE = true; // Usar sempre service_role no admin
+    const DEV_MODE = false; // SECURITY: Must be false in production
 
     // State
     let allProducts = [], filteredProducts = [];
@@ -4036,7 +4035,7 @@
     // ============================================================
     // AUTH
     // ============================================================
-    function doLogin() {
+    async function doLogin() {
       if (DEV_MODE) {
         localStorage.setItem('sfi_admin_dev', '1');
         showApp();
@@ -4048,43 +4047,100 @@
       errEl.style.display = 'none';
       if (!email || !pass) { errEl.textContent = 'Enter email and password'; errEl.style.display = 'block'; return; }
 
-      fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: pass })
-      })
-        .then(r => r.json())
-        .then(d => {
-          if (d.access_token) {
-            localStorage.setItem('sfi_admin_token', d.access_token);
-            localStorage.setItem('sfi_admin_email', d.user?.email || email);
-            showApp();
-          } else {
-            errEl.textContent = d.error_description || 'Invalid credentials';
-            errEl.style.display = 'block';
+      const btn = document.querySelector('.btn-login');
+      if (btn) { btn.disabled = true; btn.textContent = 'Signing in...'; }
+
+      try {
+        // Step 1: Authenticate with Supabase Auth
+        const authRes = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`, {
+          method: 'POST',
+          headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: pass })
+        });
+        const d = await authRes.json();
+        if (!d.access_token) {
+          errEl.textContent = d.error_description || 'Invalid credentials';
+          errEl.style.display = 'block';
+          return;
+        }
+
+        // Step 2: Verify user is in admin_users table
+        const adminCheck = await fetch(`${SUPA_URL}/rest/v1/rpc/is_admin`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPA_KEY,
+            'Authorization': `Bearer ${d.access_token}`,
+            'Content-Type': 'application/json'
           }
-        })
-        .catch(() => { errEl.textContent = 'Connection error'; errEl.style.display = 'block'; });
+        });
+        const isAdmin = await adminCheck.json();
+        if (isAdmin !== true) {
+          errEl.textContent = 'Access denied. You are not an authorized admin.';
+          errEl.style.display = 'block';
+          // Revoke the session
+          fetch(`${SUPA_URL}/auth/v1/logout`, {
+            method: 'POST',
+            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${d.access_token}` }
+          }).catch(() => {});
+          return;
+        }
+
+        // Step 3: Admin confirmed — store token and proceed
+        localStorage.setItem('sfi_admin_token', d.access_token);
+        localStorage.setItem('sfi_admin_refresh', d.refresh_token || '');
+        localStorage.setItem('sfi_admin_email', d.user?.email || email);
+        _startTokenRefresh();
+        showApp();
+      } catch (e) {
+        errEl.textContent = 'Connection error: ' + (e.message || 'Try again');
+        errEl.style.display = 'block';
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
+      }
     }
 
     function doLogout() {
       localStorage.removeItem('sfi_admin_token');
+      localStorage.removeItem('sfi_admin_refresh');
       localStorage.removeItem('sfi_admin_dev');
       localStorage.removeItem('sfi_admin_email');
+      if (_refreshInterval) { clearInterval(_refreshInterval); _refreshInterval = null; }
       document.getElementById('appMain').style.display = 'none';
       document.getElementById('loginScreen').style.display = 'flex';
     }
 
-    function doDevLogin() {
-      try {
-        localStorage.setItem('sfi_admin_dev', '1');
-        showApp();
-      } catch (e) {
-        console.error('doDevLogin', e);
-        alert('Erro ao entrar: ' + (e.message || e));
-      }
+    // SECURITY: doDevLogin function removed
+
+    // ============================================================
+    // TOKEN REFRESH (Supabase JWT expires in ~1 hour)
+    // ============================================================
+    let _refreshInterval = null;
+    function _startTokenRefresh() {
+      if (_refreshInterval) clearInterval(_refreshInterval);
+      // Refresh every 50 minutes (JWT default expiry is 60 min)
+      _refreshInterval = setInterval(async () => {
+        const refreshToken = localStorage.getItem('sfi_admin_refresh');
+        if (!refreshToken) return;
+        try {
+          const res = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=refresh_token`, {
+            method: 'POST',
+            headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: refreshToken })
+          });
+          const d = await res.json();
+          if (d.access_token) {
+            localStorage.setItem('sfi_admin_token', d.access_token);
+            if (d.refresh_token) localStorage.setItem('sfi_admin_refresh', d.refresh_token);
+          } else {
+            // Refresh failed — force re-login
+            toast('Session expired. Please log in again.', 'error');
+            doLogout();
+          }
+        } catch (e) {
+          // Silent fail — will retry in 50 min
+        }
+      }, 50 * 60 * 1000); // 50 minutes
     }
-    window.doDevLogin = doDevLogin;
 
     function showApp() {
       const loginEl = document.getElementById('loginScreen');
@@ -4092,14 +4148,19 @@
       const userEl = document.getElementById('userEmail');
       if (loginEl) loginEl.style.display = 'none';
       if (appEl) appEl.style.display = 'grid';
-      if (userEl) userEl.textContent = (DEV_MODE || localStorage.getItem('sfi_admin_dev')) ? '🔧 Dev Mode' : (localStorage.getItem('sfi_admin_email') || '');
+      if (userEl) userEl.textContent = localStorage.getItem('sfi_admin_email') || 'Admin';
       loadAllData();
     }
 
     function getAuthHeaders() {
       const h = { 'apikey': SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
-      const useDevKey = DEV_MODE || localStorage.getItem('sfi_admin_dev');
-      const token = useDevKey ? SUPA_KEY : localStorage.getItem('sfi_admin_token');
+      // Use authenticated user's JWT token (RLS policies handle admin access)
+      const token = localStorage.getItem('sfi_admin_token');
+      if (!token) {
+        // Not logged in — redirect to login
+        doLogout();
+        throw new Error('Session expired. Please log in again.');
+      }
       if (token) h['Authorization'] = `Bearer ${token}`;
       return h;
     }
@@ -4423,13 +4484,22 @@
     let finRawData = null;
     let finProfitData = null;
     let finChart = null;
+    let finChart2 = null;
     let finMonthChart2 = null;
     let finMCtx = { mk:'', yr:0, mo:0, yoyActive:false };
     const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const MONTH_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const FIN_COLORS = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa','#22d3ee','#fb923c','#e879f9','#34d399','#f87171','#818cf8','#facc15','#2dd4bf','#c084fc','#38bdf8'];
 
+    let _finSummaryTimer = null;
     async function updateFinanceSummary() {
+      // Debounce: if called multiple times rapidly, only execute the last call
+      if (_finSummaryTimer) clearTimeout(_finSummaryTimer);
+      return new Promise(resolve => {
+        _finSummaryTimer = setTimeout(() => { _updateFinanceSummaryImpl().then(resolve).catch(resolve); }, 150);
+      });
+    }
+    async function _updateFinanceSummaryImpl() {
       const wrap = document.getElementById('financeSummary');
       if (!wrap) return;
       if (!allOrders || allOrders.length === 0) {
@@ -4934,7 +5004,7 @@
           }).join('')}</tbody></table>
         </div>`;
 
-      if(finChart){finChart.destroy();finChart=null;}
+      if(finChart){finChart.destroy();finChart=null;}if(finChart2){finChart2.destroy();finChart2=null;}
       const ctx = document.getElementById('finMainChart').getContext('2d');
       finChart = new Chart(ctx, {
         type:'bar',
@@ -5029,7 +5099,7 @@
         </div>`;
 
       // Stacked bar chart
-      if(finChart){finChart.destroy();finChart=null;}
+      if(finChart){finChart.destroy();finChart=null;}if(finChart2){finChart2.destroy();finChart2=null;}
       const ctx = document.getElementById('finMainChart').getContext('2d');
       const datasets = top10.map(([name], i) => ({
         label: name,
@@ -5080,7 +5150,7 @@
           }).join('')}</tbody></table>
         </div>`;
 
-      if(finChart){finChart.destroy();finChart=null;}
+      if(finChart){finChart.destroy();finChart=null;}if(finChart2){finChart2.destroy();finChart2=null;}
       const ctx = document.getElementById('finMainChart').getContext('2d');
       finChart = new Chart(ctx, {
         type:'bar',
@@ -5146,6 +5216,7 @@
           </div>`;
 
         if(finChart){finChart.destroy();finChart=null;}
+        if(finChart2){finChart2.destroy();finChart2=null;}
         // Doughnut
         const ctx1 = document.getElementById('finMainChart').getContext('2d');
         finChart = new Chart(ctx1, {
@@ -5160,7 +5231,7 @@
           label:s, data:months.map(m=>(mBySource[m]||{})[s]||0),
           backgroundColor:FIN_COLORS[i%FIN_COLORS.length]+'AA', borderColor:FIN_COLORS[i%FIN_COLORS.length], borderWidth:1, borderRadius:2
         }));
-        new Chart(ctx2, {
+        finChart2 = new Chart(ctx2, {
           type:'bar', data:{labels:months.map(m=>{const[y,mo]=m.split('-').map(Number);return MONTH_NAMES[mo-1]+' '+y;}),datasets:dsM},
           options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
             plugins:{legend:{labels:{color:'#94a3b8',font:{size:9}},position:'bottom'},tooltip:{callbacks:{label:c=>`${c.dataset.label}: €${c.parsed.y.toFixed(2)}`}}},
@@ -5202,7 +5273,7 @@
             ).join('')}</tbody></table>
           </div>`;
 
-        if(finChart){finChart.destroy();finChart=null;}
+        if(finChart){finChart.destroy();finChart=null;}if(finChart2){finChart2.destroy();finChart2=null;}
         const ctx = document.getElementById('finMainChart').getContext('2d');
         finChart = new Chart(ctx, {
           type:'line',
@@ -6251,6 +6322,34 @@
     // ============================================================
     // NAVIGATION
     // ============================================================
+    // Track which pages have been rendered (lazy-load optimization)
+    const _renderedPages = new Set(['dashboard']); // dashboard renders at startup
+
+    // Page-to-render mapping for lazy loading
+    const _pageRenderers = {
+      products: () => renderProducts(),
+      brands: () => renderBrands(),
+      categories: () => renderCategories(),
+      stock: () => renderStock(),
+      discounts: () => renderDiscounts(),
+      orders: () => renderOrders(),
+      customers: () => renderCustomers(),
+      reviews: () => renderReviews(),
+      coupons: () => renderCoupons(),
+      giftcards: () => renderGiftCards(),
+      abandoned: () => renderAbandoned(),
+      shipping: () => renderShipping(),
+      settings: () => renderSettings(),
+      analytics: () => renderAnalytics(),
+      suppliers: () => renderSuppliers(),
+      'purchase-orders': () => renderPurchaseOrders(),
+      invoices: () => renderInvoices(),
+      finance: () => updateFinanceSummary().catch(()=>{}),
+      b2b: () => loadB2BData(),
+      'site-analytics': () => loadSAReport(saCurrentReport),
+      reports: () => {} // reports load on-demand via their own controls
+    };
+
     function showPage(page) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -6263,10 +6362,16 @@
         reviews: 'Reviews', orders: 'Orders', customers: 'Customers', abandoned: 'Abandoned Carts', discounts: 'Discount Codes',
         coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', 'site-analytics': 'Site Analytics', settings: 'Settings'
       };
-      // Load B2B data when navigating to B2B page
+      document.getElementById('pageTitle').textContent = titles[page] || page;
+
+      // Lazy render: only render a page the first time it is visited
+      if (!_renderedPages.has(page) && _pageRenderers[page]) {
+        _renderedPages.add(page);
+        try { _pageRenderers[page](); } catch(e) { console.error('Render error for ' + page + ':', e); }
+      }
+      // B2B and site-analytics always reload on visit (they fetch fresh data)
       if (page === 'b2b') loadB2BData();
       if (page === 'site-analytics') loadSAReport(saCurrentReport);
-      document.getElementById('pageTitle').textContent = titles[page] || page;
     }
 
     // ============================================================
@@ -6286,15 +6391,17 @@
     // ============================================================
     async function loadAllData() {
       try {
-        // Core catalog data
-        const [prods, br, cats, subcats, dc, vt, pv] = await Promise.all([
+        // ── PHASE 1: Essential data (products + catalog + orders + customers) ──
+        const [prods, br, cats, subcats, dc, vt, pv, custs, ords] = await Promise.all([
           supaGet('products', '?select=*,brands(name),categories(name)&is_active=eq.true&order=name'),
           supaGet('brands', '?order=name'),
           supaGet('categories', '?order=name'),
           supaGet('subcategories', '?select=*,categories(name)&order=name').catch(() => []),
           supaGet('discount_codes', '?order=created_at.desc'),
           supaGet('variant_types', '?order=sort_order').catch(() => []),
-          supaGet('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => [])
+          supaGet('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => []),
+          supaGetAll('customers', '?parent_customer_id=is.null&order=created_at.desc').catch(() => []),
+          supaGetAll('orders', '?order=created_at.desc').catch(() => [])
         ]);
 
         allProducts = (prods || []).filter(p => p.is_active !== false);
@@ -6318,40 +6425,18 @@
           if (vars && vars.length > 0) {
             const activeVars = vars.filter(v => v.is_active);
             const parentIds = new Set(activeVars.filter(v => v.parent_variant_id).map(v => v.parent_variant_id));
-            // Only sum leaf variants (those that are NOT parents of other variants)
             const leafVars = activeVars.filter(v => !parentIds.has(v.id));
             const variantSum = leafVars.reduce((sum, v) => sum + (v.stock || 0), 0);
             p.stock_quantity = variantSum;
           }
         });
 
-        // New tables - load in parallel, catch individually
-        const [custs, ords, revs, coups, gcs, aban, shipZones, vends, pos, supps, invs, custPrices] = await Promise.all([
-          supaGetAll('customers', '?parent_customer_id=is.null&order=created_at.desc').catch(() => []),
-          supaGetAll('orders', '?order=created_at.desc').catch(() => []),
-          supaGet('reviews', '?select=*,products(name)&order=created_at.desc').catch(() => []),
-          supaGet('coupons', '?order=created_at.desc').catch(() => []),
-          supaGet('gift_cards', '?order=created_at.desc').catch(() => []),
-          supaGet('abandoned_carts', '?order=created_at.desc&limit=200').catch(() => []),
-          supaGet('shipping_zones', '?order=sort_order').catch(() => []),
-          supaGetAll('vendors', '?order=name').catch(() => []),
-          supaGetAll('purchase_orders', '?order=order_date.desc').catch(() => []),
-          supaGetAll('suppliers', '?order=name').catch(() => []),
-          supaGet('v_all_sales', '?order=txn_date.desc&limit=1000').catch(() => []),
-          supaGetAll('customer_product_prices', '?order=created_at.desc').catch(() => [])
-        ]);
+        allCustomers = (custs || []).sort((a,b) => (b.total_spent_eur||0) - (a.total_spent_eur||0));
+        filteredCustomers = [...allCustomers];
+        allOrders = ords || [];
+        filteredOrders = [...allOrders];
 
-        allCustomers = (custs || []).sort((a,b) => (b.total_spent_eur||0) - (a.total_spent_eur||0)); filteredCustomers = [...allCustomers];
-
-        // Build customer-specific price cache by product
-        window.customerProductPricesCache = {};
-        (custPrices || []).forEach(function(row) {
-          if (!row || !row.product_id) return;
-          if (!window.customerProductPricesCache[row.product_id]) window.customerProductPricesCache[row.product_id] = [];
-          window.customerProductPricesCache[row.product_id].push(row);
-        });
-
-        // Mark group parents and aggregate group totals (parent + all subsidiaries) for list/KPIs
+        // Customer group aggregation (essential for dashboard revenue)
         try {
           const childRows = await supaGetAll('customers', '?parent_customer_id=not.is.null&select=id,parent_customer_id,email').catch(() => []);
           const childList = Array.isArray(childRows) ? childRows : [];
@@ -6364,7 +6449,6 @@
             parentToChildren[pid].push(ch.id);
           });
           allCustomers.forEach(c => { c._isGroupParent = parentIds.has(c.id); });
-          // Map customer_id and email -> group (parent) id for relatórios por grupo
           window.customerIdToGroupId = {};
           window.emailToGroupId = {};
           allCustomers.forEach(c => {
@@ -6398,7 +6482,7 @@
           filteredCustomers = [...allCustomers];
         } catch (e) { console.warn('Group aggregation skipped:', e); }
 
-        // Helpers para agregação por grupo (sempre mostrar cliente = grupo/empresa)
+        // Helpers para agregação por grupo
         window.getCustomerGroupKey = function(customerId, email) {
           const e = (email || '').trim().toLowerCase();
           if (customerId && window.customerIdToGroupId && window.customerIdToGroupId[customerId] !== undefined) return window.customerIdToGroupId[customerId];
@@ -6406,12 +6490,128 @@
           return customerId || e || 'unknown';
         };
         window.getCustomerGroupDisplayName = function(groupKey) {
-          if (!groupKey || groupKey === 'unknown') return '—';
+          if (!groupKey || groupKey === 'unknown') return '\u2014';
           const c = (typeof allCustomers !== 'undefined' && allCustomers || []).find(function(x) { return String(x.id) === String(groupKey); });
-          return c ? (c.display_name || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.company || c.name || c.email || '—') : (typeof groupKey === 'string' && groupKey.indexOf('@') !== -1 ? groupKey : '—');
+          return c ? (c.display_name || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.company || c.name || c.email || '\u2014') : (typeof groupKey === 'string' && groupKey.indexOf('@') !== -1 ? groupKey : '\u2014');
         };
 
-        allOrders = ords || []; filteredOrders = [...allOrders];
+        // Update sidebar counts (Phase 1 data)
+        document.getElementById('productCount').textContent = allProducts.length;
+        const lowStk = allProducts.filter(p => p.stock_quantity > 0 && p.stock_quantity < 10).length;
+        if (lowStk > 0) { const el = document.getElementById('lowStockCount'); el.textContent = lowStk; el.style.display = 'inline'; }
+        const pendOrd = allOrders.filter(o => o.fulfillment_status === 'unfulfilled').length;
+        if (pendOrd > 0) { const el = document.getElementById('pendingOrderCount'); el.textContent = pendOrd; el.style.display = 'inline'; }
+
+        // Populate filters & render dashboard IMMEDIATELY (don't wait for Phase 2)
+        populateFilters();
+        renderDashboard();
+
+        // ── PHASE 2: Secondary data (loads in background, doesn't block UI) ──
+        _loadSecondaryData();
+
+      } catch (e) {
+        toast('Error loading data: ' + e.message, 'error');
+        console.error(e);
+      }
+    }
+
+    // ============================================================
+    // TARGETED REFRESH (avoid full loadAllData after saves)
+    // ============================================================
+    async function _refreshProducts() {
+      const [prods, pv] = await Promise.all([
+        supaGet('products', '?select=*,brands(name),categories(name)&is_active=eq.true&order=name'),
+        supaGet('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => [])
+      ]);
+      allProducts = (prods || []).filter(p => p.is_active !== false);
+      filteredProducts = [...allProducts];
+      productVariantsCache = {};
+      (pv || []).forEach(v => {
+        if (!productVariantsCache[v.product_id]) productVariantsCache[v.product_id] = [];
+        productVariantsCache[v.product_id].push(v);
+      });
+      allProducts.forEach(p => {
+        const vars = productVariantsCache[p.id];
+        if (vars && vars.length > 0) {
+          const activeVars = vars.filter(v => v.is_active);
+          const parentIds = new Set(activeVars.filter(v => v.parent_variant_id).map(v => v.parent_variant_id));
+          const leafVars = activeVars.filter(v => !parentIds.has(v.id));
+          p.stock_quantity = leafVars.reduce((sum, v) => sum + (v.stock || 0), 0);
+        }
+      });
+      document.getElementById('productCount').textContent = allProducts.length;
+      const lowStk = allProducts.filter(p => p.stock_quantity > 0 && p.stock_quantity < 10).length;
+      const el = document.getElementById('lowStockCount');
+      if (el) { el.textContent = lowStk; el.style.display = lowStk > 0 ? 'inline' : 'none'; }
+      populateFilters();
+      if (_renderedPages.has('products')) renderProducts();
+      if (_renderedPages.has('stock')) { _renderedPages.delete('stock'); renderStock(); _renderedPages.add('stock'); }
+      if (_renderedPages.has('dashboard')) renderDashboard();
+    }
+
+    async function _refreshBrands() {
+      brands = await supaGet('brands', '?order=name').catch(() => brands);
+      populateFilters();
+      if (_renderedPages.has('brands')) renderBrands();
+    }
+
+    async function _refreshCategories() {
+      categories = await supaGet('categories', '?order=name').catch(() => categories);
+      populateFilters();
+      if (_renderedPages.has('categories')) renderCategories();
+    }
+
+    async function _refreshDiscounts() {
+      discountCodes = await supaGet('discount_codes', '?order=created_at.desc').catch(() => discountCodes);
+      if (_renderedPages.has('discounts')) renderDiscounts();
+    }
+
+    async function _refreshOrders() {
+      allOrders = await supaGetAll('orders', '?order=created_at.desc').catch(() => allOrders);
+      filteredOrders = [...allOrders];
+      const pendOrd = allOrders.filter(o => o.fulfillment_status === 'unfulfilled').length;
+      const el = document.getElementById('pendingOrderCount');
+      if (el) { el.textContent = pendOrd; el.style.display = pendOrd > 0 ? 'inline' : 'none'; }
+      if (_renderedPages.has('orders')) renderOrders();
+      if (_renderedPages.has('dashboard')) renderDashboard();
+    }
+
+    async function _refreshReviews() {
+      allReviews = await supaGet('reviews', '?select=*,products(name)&order=created_at.desc').catch(() => allReviews);
+      filteredReviews = [...allReviews];
+      if (_renderedPages.has('reviews')) renderReviews();
+    }
+
+    async function _refreshCoupons() {
+      allCoupons = await supaGet('coupons', '?order=created_at.desc').catch(() => allCoupons);
+      if (_renderedPages.has('coupons')) renderCoupons();
+    }
+
+    async function _refreshGiftCards() {
+      allGiftCards = await supaGet('gift_cards', '?order=created_at.desc').catch(() => allGiftCards);
+      if (_renderedPages.has('giftcards')) renderGiftCards();
+    }
+
+    async function _refreshShippingZones() {
+      allShippingZones = await supaGet('shipping_zones', '?order=sort_order').catch(() => allShippingZones);
+      if (_renderedPages.has('shipping')) renderShipping();
+    }
+
+        async function _loadSecondaryData() {
+      try {
+        const [revs, coups, gcs, aban, shipZones, vends, pos, supps, invs, custPrices] = await Promise.all([
+          supaGet('reviews', '?select=*,products(name)&order=created_at.desc').catch(() => []),
+          supaGet('coupons', '?order=created_at.desc').catch(() => []),
+          supaGet('gift_cards', '?order=created_at.desc').catch(() => []),
+          supaGet('abandoned_carts', '?order=created_at.desc&limit=200').catch(() => []),
+          supaGet('shipping_zones', '?order=sort_order').catch(() => []),
+          supaGetAll('vendors', '?order=name').catch(() => []),
+          supaGetAll('purchase_orders', '?order=order_date.desc').catch(() => []),
+          supaGetAll('suppliers', '?order=name').catch(() => []),
+          supaGet('v_all_sales', '?order=txn_date.desc&limit=1000').catch(() => []),
+          supaGetAll('customer_product_prices', '?order=created_at.desc').catch(() => [])
+        ]);
+
         allReviews = revs || []; filteredReviews = [...allReviews];
         allCoupons = coups || [];
         allGiftCards = gcs || [];
@@ -6422,42 +6622,38 @@
         allSuppliers = supps || [];
         allInvoices = invs || []; filteredInvoices = [...allInvoices];
 
-        // Update counts in sidebar
-        document.getElementById('productCount').textContent = allProducts.length;
-        const lowStk = allProducts.filter(p => p.stock_quantity > 0 && p.stock_quantity < 10).length;
-        if (lowStk > 0) { const el = document.getElementById('lowStockCount'); el.textContent = lowStk; el.style.display = 'inline'; }
+        // Build customer-specific price cache
+        window.customerProductPricesCache = {};
+        (custPrices || []).forEach(function(row) {
+          if (!row || !row.product_id) return;
+          if (!window.customerProductPricesCache[row.product_id]) window.customerProductPricesCache[row.product_id] = [];
+          window.customerProductPricesCache[row.product_id].push(row);
+        });
+
+        // Update sidebar and dashboard counts that depend on Phase 2 data
         const pendRev = allReviews.filter(r => r.review_status === 'pending').length;
-        if (pendRev > 0) { const el = document.getElementById('pendingReviewCount'); el.textContent = pendRev; el.style.display = 'inline'; }
-        const pendOrd = allOrders.filter(o => o.fulfillment_status === 'unfulfilled').length;
-        if (pendOrd > 0) { const el = document.getElementById('pendingOrderCount'); el.textContent = pendOrd; el.style.display = 'inline'; }
+        if (pendRev > 0) { const el = document.getElementById('pendingReviewCount'); if (el) { el.textContent = pendRev; el.style.display = 'inline'; } }
 
-        // Populate filters
-        populateFilters();
+        // Refresh dashboard stats that use secondary data (vendors, invoices, abandoned, reviews)
+        const statVendors = document.getElementById('statSuppliers');
+        if (statVendors) statVendors.textContent = allVendors.length;
+        const statInvoices = document.getElementById('statInvoices');
+        if (statInvoices) statInvoices.textContent = allInvoices.length;
+        const statAbandoned = document.getElementById('statAbandoned');
+        if (statAbandoned) statAbandoned.textContent = allAbandoned.length;
+        const statPendRev = document.getElementById('statPendingReviews');
+        if (statPendRev) statPendRev.textContent = pendRev;
 
-        // Render all pages
-        renderDashboard();
-        renderProducts();
-        renderBrands();
-        renderCategories();
-        renderStock();
-        renderDiscounts();
-        renderOrders();
-        renderCustomers();
-        renderReviews();
-        renderCoupons();
-        renderGiftCards();
-        renderAbandoned();
-        renderShipping();
-        renderSettings();
-        renderAnalytics();
-        renderSuppliers();
-        renderPurchaseOrders();
-        renderInvoices();
-        updateFinanceSummary().catch(()=>{});
+        // If user already navigated to a secondary page before data loaded, re-render it
+        _renderedPages.forEach(page => {
+          if (['reviews','coupons','giftcards','abandoned','shipping','suppliers','purchase-orders','invoices'].includes(page)) {
+            _renderedPages.delete(page); // Force re-render with fresh data
+            if (_pageRenderers[page]) { try { _pageRenderers[page](); _renderedPages.add(page); } catch(e) {} }
+          }
+        });
 
       } catch (e) {
-        toast('Error loading data: ' + e.message, 'error');
-        console.error(e);
+        console.warn('Secondary data load error:', e);
       }
     }
 
@@ -7074,7 +7270,7 @@
       if (img.id) {
         try {
           await fetch(`${SUPA_URL}/rest/v1/product_images?id=eq.${img.id}`, {
-            method: 'DELETE', headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY} ` }
+            method: 'DELETE', headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${await getValidBearerToken()}` }
           });
         } catch (e) { console.error('Delete image error:', e); }
       }
@@ -7101,7 +7297,7 @@
 
           const resp = await fetch(`${STORAGE_URL}/${STORAGE_BUCKET}/${fileName}`, {
             method: 'POST',
-            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': file.type, 'x-upsert': 'true' },
+            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${await getValidBearerToken()}`, 'Content-Type': file.type, 'x-upsert': 'true' },
             body: file
           });
           if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
@@ -7114,7 +7310,7 @@
           if (productId) {
             const saveResp = await fetch(`${SUPA_URL}/rest/v1/product_images`, {
               method: 'POST',
-              headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+              headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${await getValidBearerToken()}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
               body: JSON.stringify({ product_id: productId, url: publicUrl, alt_text: productName, position: pos, is_primary: newImg.is_primary })
             });
             const saved = await saveResp.json();
@@ -7136,7 +7332,7 @@
       if (!productId) { renderImageGallery(); return; }
       try {
         const resp = await fetch(`${SUPA_URL}/rest/v1/product_images?product_id=eq.${productId}&order=position.asc,is_primary.desc`, {
-          headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+          headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${await getValidBearerToken()}` }
         });
         const imgs = await resp.json();
         if (Array.isArray(imgs)) currentProductImages = imgs;
@@ -7153,14 +7349,14 @@
           // Update existing
           await fetch(`${SUPA_URL}/rest/v1/product_images?id=eq.${img.id}`, {
             method: 'PATCH',
-            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json' },
+            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${await getValidBearerToken()}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ position: i, is_primary: i === 0 })
           });
         } else {
           // Insert new (for images uploaded on new product before first save)
           const resp = await fetch(`${SUPA_URL}/rest/v1/product_images`, {
             method: 'POST',
-            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${await getValidBearerToken()}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
             body: JSON.stringify(imgData)
           });
           const saved = await resp.json();
@@ -7282,7 +7478,7 @@
         toast(id ? 'Product updated' : 'Product created');
         const state = saveProductListState();
         closeProductModal();
-        await loadAllData();
+        await _refreshProducts();
         restoreProductListState(state);
       } catch (e) { toast('Error: ' + e.message, 'error'); }
     }
@@ -7323,7 +7519,7 @@
     async function deleteProduct(id, name) {
       if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
       const state = saveProductListState();
-      try { await supaUpdate('products', id, { is_active: false }); toast(`"${name}" deactivated`); await loadAllData(); restoreProductListState(state); }
+      try { await supaUpdate('products', id, { is_active: false }); toast(`"${name}" deactivated`); await _refreshProducts(); restoreProductListState(state); }
       catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
@@ -7339,7 +7535,7 @@
         weight_grams: p.weight_grams, is_active: false, is_new: false, discount_percent: p.discount_percent || 0
       };
       const state = saveProductListState();
-      try { await supaInsert('products', copy); toast('Product duplicated (inactive, 0 stock)'); await loadAllData(); restoreProductListState(state); }
+      try { await supaInsert('products', copy); toast('Product duplicated (inactive, 0 stock)'); await _refreshProducts(); restoreProductListState(state); }
       catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
@@ -7588,47 +7784,10 @@
       };
       try {
         if (id) await supaUpdate('brands', id, data); else await supaInsert('brands', data);
-        toast(id ? 'Brand updated' : 'Brand created'); closeBrandModal(); await loadAllData();
+        toast(id ? 'Brand updated' : 'Brand created'); closeBrandModal(); await _refreshBrands();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
-    function renderCategories() {
-      const catCounts = {};
-      allProducts.forEach(p => { if (p.categories?.name) catCounts[p.categories.name] = (catCounts[p.categories.name] || 0) + 1; });
-      document.getElementById('categoriesTable').innerHTML = categories.map(c => `
-    <tr><td><strong>${esc(c.name)}</strong></td><td><span class="product-sku">${esc(c.slug)}</span></td>
-    <td>${catCounts[c.name] || 0}</td><td><span class="stock-badge ${c.is_active ? 'in' : 'out'}">${c.is_active ? 'Active' : 'Inactive'}</span></td>
-    <td><button class="btn-sm btn-outline" onclick="openCategoryModal('${c.id}')">Edit</button></td></tr>
-  `).join('');
-    }
-    function openCategoryModal(id = null) {
-      const c = id ? categories.find(x => x.id === id) : null;
-      document.getElementById('catModalTitle').textContent = c ? 'Edit Category' : 'New Category';
-      document.getElementById('catId').value = c?.id || '';
-      document.getElementById('catName').value = c?.name || '';
-      document.getElementById('catSlug').value = c?.slug || '';
-      document.getElementById('catDesc').value = c?.description || '';
-      document.getElementById('catActive').checked = c ? c.is_active : true;
-      document.getElementById('categoryModal').style.display = 'flex';
-    }
-    function closeCategoryModal() { document.getElementById('categoryModal').style.display = 'none'; }
-    async function saveCategory() {
-      const name = document.getElementById('catName').value.trim();
-      if (!name) { toast('Category name required', 'error'); return; }
-      const id = document.getElementById('catId').value;
-      const data = {
-        name, slug: document.getElementById('catSlug').value.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        description: document.getElementById('catDesc').value.trim() || null, is_active: document.getElementById('catActive').checked
-      };
-      try {
-        if (id) await supaUpdate('categories', id, data); else await supaInsert('categories', data);
-        toast(id ? 'Category updated' : 'Category created'); closeCategoryModal(); await loadAllData();
-      } catch (e) { toast('Error: ' + e.message, 'error'); }
-    }
-
-    // ============================================================
-    // STOCK
-    // ============================================================
     function renderStock() {
       const active = allProducts.filter(p => p.is_active !== false);
       const totalUnits = active.reduce((s, p) => s + (p.stock_quantity || 0), 0);
@@ -7788,7 +7947,7 @@
         if (btn) { btn.disabled = true; btn.textContent = 'A carregar…'; }
         try {
           const url = (typeof SUPA_URL !== 'undefined' ? SUPA_URL : '') + '/functions/v1/b2b-price-report';
-          const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (typeof SUPA_KEY !== 'undefined' ? SUPA_KEY : '') } });
+          const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (await getValidBearerToken()) } });
           let data;
           try { data = await resp.json(); } catch (_) { data = { success: false, error: resp.status + ' ' + resp.statusText + ' (resposta não JSON)' }; }
           if (!resp.ok) throw new Error(data.error || 'Erro ' + resp.status);
@@ -7808,7 +7967,7 @@
           if (qb.error) {
             html += '<p style="color:var(--danger)">Erro QB: ' + (qb.error || '') + '</p>';
           } else {
-            var qbPrices = qb.prices_found || [];
+            let qbPrices = qb.prices_found || [];
             html += '<p>Total de itens lidos do QB: <strong>' + qbPrices.length + '</strong>. Itens com preço de venda &gt; 0: <strong>' + (qb.items_with_unit_price != null ? qb.items_with_unit_price : 0) + '</strong>.</p>';
             if (qbPrices.length > 0) {
               html += '<div style="max-height:320px;overflow:auto;margin-top:8px;border:1px solid var(--border);border-radius:8px;padding:8px"><table style="width:100%;font-size:0.85rem"><thead><tr><th>ID</th><th>Nome</th><th>SKU</th><th>Preço (€)</th><th>Custo (€)</th></tr></thead><tbody>';
@@ -7835,7 +7994,7 @@
           } else if (wc.error) {
             html += '<p style="color:var(--danger)">Erro WC: ' + (wc.error || '') + '</p>';
           } else {
-            var wcPrices = wc.prices_found || [];
+            let wcPrices = wc.prices_found || [];
             html += '<p>Total de produtos com preço wholesale na meta: <strong>' + wcPrices.length + '</strong>.</p>';
             if (wcPrices.length > 0) {
               html += '<div style="max-height:320px;overflow:auto;margin-top:8px;border:1px solid var(--border);border-radius:8px;padding:8px"><table style="width:100%;font-size:0.85rem"><thead><tr><th>ID</th><th>Nome</th><th>SKU</th><th>Preço B2B (€)</th></tr></thead><tbody>';
@@ -8197,7 +8356,7 @@
       const state = saveProductListState();
       try {
         await supaUpdate('products', id, { stock_quantity: qty, in_stock: qty > 0 });
-        toast(`Stock updated: ${name} → ${qty}`); await loadAllData();
+        toast(`Stock updated: ${name} \u2192 ${qty}`); await _refreshProducts();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
@@ -8263,7 +8422,7 @@
       };
       try {
         if (id) await supaUpdate('discount_codes', id, data); else await supaInsert('discount_codes', data);
-        toast(id ? 'Discount updated' : 'Discount created'); closeDiscountModal(); await loadAllData();
+        toast(id ? 'Discount updated' : 'Discount created'); closeDiscountModal(); await _refreshDiscounts();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
@@ -8328,7 +8487,7 @@
       };
       try {
         if (id) await supaUpdate('categories', id, data); else await supaInsert('categories', data);
-        toast(id ? 'Category updated' : 'Category created'); closeCategoryModal(); await loadAllData();
+        toast(id ? 'Category updated' : 'Category created'); closeCategoryModal(); await _refreshCategories();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
@@ -8338,6 +8497,39 @@
     // ============================================================
     // WOOCOMMERCE SYNC (calls Edge Function)
     // ============================================================
+    // Helper: get a valid Bearer token for Edge Function calls
+    // Refreshes expired admin token, falls back to anon key
+    async function getValidBearerToken() {
+      const token = localStorage.getItem('sfi_admin_token');
+      if (!token) return SUPA_KEY;
+      // Check if JWT is expired (decode payload, check exp)
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const nowSec = Math.floor(Date.now() / 1000);
+        if (payload.exp && payload.exp > nowSec + 60) return token; // valid, 60s buffer
+      } catch (e) { /* invalid token format */ }
+      // Token expired or invalid — try refresh
+      const refreshToken = localStorage.getItem('sfi_admin_refresh');
+      if (refreshToken) {
+        try {
+          const res = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=refresh_token`, {
+            method: 'POST',
+            headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: refreshToken })
+          });
+          const d = await res.json();
+          if (d.access_token) {
+            localStorage.setItem('sfi_admin_token', d.access_token);
+            if (d.refresh_token) localStorage.setItem('sfi_admin_refresh', d.refresh_token);
+            return d.access_token;
+          }
+        } catch (e) { /* refresh failed */ }
+      }
+      // All failed — return anon key as last resort
+      return SUPA_KEY;
+    }
+
+    // ============================================================
     async function syncWooOrders() {
       const btn = document.getElementById('btnSyncWoo');
       const status = document.getElementById('syncStatus');
@@ -8346,9 +8538,10 @@
       status.textContent = 'Calling WooCommerce sync...';
 
       try {
+        const bearerToken = await getValidBearerToken();
         const resp = await fetch(`${SUPA_URL}/functions/v1/woo-sync-orders?mode=sync`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPA_KEY}` }
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${bearerToken}` }
         });
         const result = await resp.json();
         if (!resp.ok || !result.success) throw new Error(result.error || 'WooCommerce sync failed');
@@ -8379,9 +8572,10 @@
       if (status) status.textContent = 'Calling WooCommerce SKU sync...';
 
       try {
+        const bearerToken = await getValidBearerToken();
         const resp = await fetch(`${SUPA_URL}/functions/v1/woo-sync-skus`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPA_KEY}` }
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${bearerToken}` }
         });
         const result = await resp.json();
         if (!resp.ok || !result.success) throw new Error(result.error || 'WooCommerce SKU sync failed');
@@ -8391,7 +8585,7 @@
         toast(`Woo SKUs synced: ${s.updated||0} products updated`, 'success');
 
         // Reload products to reflect new SKUs
-        await loadAllData();
+        await _refreshProducts();
       } catch (err) {
         if (status) status.textContent = `❌ Woo SKUs Error: ${err.message}`;
         toast('WooCommerce SKU sync failed: ' + err.message, 'error');
@@ -8412,11 +8606,12 @@
       status.textContent = 'Calling QuickBooks sync...';
 
       try {
+        const _bt = await getValidBearerToken();
         const resp = await fetch(`${SUPA_URL}/functions/v1/qb-sync-orders`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SUPA_KEY}`
+            'Authorization': `Bearer ${_bt}`
           }
         });
 
@@ -9437,8 +9632,8 @@
       document.getElementById('reportDetailModal').style.display = 'flex';
       document.getElementById('reportDetailKPIs').innerHTML = '<div style="color:var(--text-muted);padding:12px">Loading...</div>';
       document.getElementById('reportDetailTable').querySelector('tbody').innerHTML = '';
-      var topClientsWrap = document.getElementById('reportDetailTopClientsWrap');
-      var topClientsBody = document.getElementById('reportDetailTopClientsBody');
+      let topClientsWrap = document.getElementById('reportDetailTopClientsWrap');
+      let topClientsBody = document.getElementById('reportDetailTopClientsBody');
       if (topClientsWrap) topClientsWrap.style.display = 'none';
       if (topClientsBody) topClientsBody.innerHTML = '';
       document.getElementById('btnReportYoY').textContent = '📊 Compare vs Previous Year';
@@ -9581,30 +9776,30 @@
 
       if (type === 'product') {
         try {
-          var pFilter = productId ? 'product_id=eq.' + productId : 'product_name=eq.' + encodeURIComponent(key);
-          var dateFilt = (dateFrom && dateTo) ? '&orders.created_at=gte.' + encodeURIComponent(dateFrom) + '&orders.created_at=lte.' + encodeURIComponent(dateTo) : '';
-          var itemsClients = await supaGetAll('order_items', '?' + pFilter + '&select=quantity,total_price,order_id,orders!inner(customer_id,customer_email,created_at,financial_status)&orders.financial_status=eq.paid' + dateFilt);
-          var byGroup = {};
-          var getGroupKey = window.getCustomerGroupKey || function(cid, email) { return cid || (email || '').trim().toLowerCase() || 'unknown'; };
-          var getGroupName = window.getCustomerGroupDisplayName || function() { return '—'; };
+          let pFilter = productId ? 'product_id=eq.' + productId : 'product_name=eq.' + encodeURIComponent(key);
+          let dateFilt = (dateFrom && dateTo) ? '&orders.created_at=gte.' + encodeURIComponent(dateFrom) + '&orders.created_at=lte.' + encodeURIComponent(dateTo) : '';
+          let itemsClients = await supaGetAll('order_items', '?' + pFilter + '&select=quantity,total_price,order_id,orders!inner(customer_id,customer_email,created_at,financial_status)&orders.financial_status=eq.paid' + dateFilt);
+          let byGroup = {};
+          let getGroupKey = window.getCustomerGroupKey || function(cid, email) { return cid || (email || '').trim().toLowerCase() || 'unknown'; };
+          let getGroupName = window.getCustomerGroupDisplayName || function() { return '—'; };
           (itemsClients || []).forEach(function(i) {
-            var ord = i.orders;
-            var o = Array.isArray(ord) ? ord[0] : ord;
-            var cid = o && o.customer_id ? String(o.customer_id) : null;
-            var cemail = (o && o.customer_email) ? String(o.customer_email).trim().toLowerCase() : '';
-            var k = getGroupKey(cid, cemail);
+            let ord = i.orders;
+            let o = Array.isArray(ord) ? ord[0] : ord;
+            let cid = o && o.customer_id ? String(o.customer_id) : null;
+            let cemail = (o && o.customer_email) ? String(o.customer_email).trim().toLowerCase() : '';
+            let k = getGroupKey(cid, cemail);
             if (!byGroup[k]) byGroup[k] = { groupKey: k, qty: 0, revenue: 0 };
             byGroup[k].qty += parseInt(i.quantity, 10) || 1;
             byGroup[k].revenue += parseFloat(i.total_price) || 0;
           });
-          var sortedClients = Object.keys(byGroup).map(function(k) { return byGroup[k]; }).sort(function(a, b) { return b.revenue - a.revenue; }).slice(0, 20);
-          var tbodyClients = document.getElementById('reportDetailTopClientsBody');
-          var wrapClients = document.getElementById('reportDetailTopClientsWrap');
+          let sortedClients = Object.keys(byGroup).map(function(k) { return byGroup[k]; }).sort(function(a, b) { return b.revenue - a.revenue; }).slice(0, 20);
+          let tbodyClients = document.getElementById('reportDetailTopClientsBody');
+          let wrapClients = document.getElementById('reportDetailTopClientsWrap');
           if (tbodyClients) {
             tbodyClients.innerHTML = sortedClients.length === 0 ? '<tr><td colspan="6" style="color:var(--text-muted);padding:12px">Nenhum cliente encontrado neste período.</td></tr>' : sortedClients.map(function(row, idx) {
-              var name = getGroupName(row.groupKey);
-              var groupId = (typeof row.groupKey === 'string' && row.groupKey.indexOf('@') === -1 && row.groupKey !== 'unknown') ? row.groupKey : '';
-              var btn = groupId ? '<button type="button" class="btn-sm btn-outline" onclick="closeReportDetail(); viewCustomerProfile(\'' + groupId + '\')">Ver</button>' : '';
+              let name = getGroupName(row.groupKey);
+              let groupId = (typeof row.groupKey === 'string' && row.groupKey.indexOf('@') === -1 && row.groupKey !== 'unknown') ? row.groupKey : '';
+              let btn = groupId ? '<button type="button" class="btn-sm btn-outline" onclick="closeReportDetail(); viewCustomerProfile(\'' + groupId + '\')">Ver</button>' : '';
               return '<tr><td>' + (idx + 1) + '</td><td>' + esc(name) + '</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</td><td style="text-align:right">' + row.qty + '</td><td class="price" style="text-align:right">€' + row.revenue.toFixed(2) + '</td><td>' + btn + '</td></tr>';
             }).join('');
           }
@@ -10495,7 +10690,7 @@
               </tr>`;
             }).join('');
           }
-        } catch(subErr) { console.log('Subsidiary load error:', subErr); }
+        } catch(subErr) { /* subsidiary load error - silent */ }
 
       } catch (e) {
         document.getElementById('cpOrdersTable').innerHTML = `<tr><td colspan="6" class="empty-state">Error loading orders</td></tr>`;
@@ -10759,95 +10954,6 @@
       if (totalEl && !isNaN(total)) totalEl.value = total.toFixed(2);
     }
 
-    function renderManualOrderProductPicker() {
-      const body = document.getElementById('moProductPickerBody');
-      if (!body) return;
-      const customerId = document.getElementById('moCustomer')?.value || null;
-      if (!customerId) {
-        body.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">Select a B2B customer first.</td></tr>';
-        return;
-      }
-      const brand = document.getElementById('moBrandFilter')?.value || '';
-      const cat = document.getElementById('moCategoryFilter')?.value || '';
-      const search = (document.getElementById('moProductSearch')?.value || '').toLowerCase();
-      const list = (allProducts || []).filter(function (p) {
-        if (p.is_active === false) return false;
-        if (brand && (!p.brands || p.brands.name !== brand)) return false;
-        if (cat && (!p.categories || p.categories.name !== cat)) return false;
-        if (search) {
-          const s = (p.name || '').toLowerCase();
-          const sku = (p.sku || '').toLowerCase();
-          if (!s.includes(search) && !sku.includes(search)) return false;
-        }
-        return true;
-      }).slice(0, 100);
-      if (!list.length) {
-        body.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">No products match your filters.</td></tr>';
-        return;
-      }
-      body.innerHTML = list.map(function (p) {
-        const unit = getB2BPriceForCustomer(p, customerId);
-        return `<tr data-product-id="${p.id}">
-          <td>${esc(p.name)}</td>
-          <td>${p.brands && p.brands.name ? esc(p.brands.name) : '—'}</td>
-          <td style="text-align:right">€${unit.toFixed(2)}</td>
-          <td style="text-align:right"><input type="number" min="1" step="1" value="1" style="width:80px;text-align:right" onkeydown="if(event.key==='Enter'){event.preventDefault(); addManualOrderItemFromRow(this);}"></td>
-          <td style="text-align:right"><button class="btn-sm btn-outline" type="button" onclick="addManualOrderItemFromRow(this)">Add</button></td>
-        </tr>`;
-      }).join('');
-    }
-
-    function addManualOrderItemFromRow(el) {
-      const row = el.closest('tr');
-      if (!row) return;
-      const productId = row.getAttribute('data-product-id');
-      const qtyInput = row.querySelector('input[type="number"]');
-      let qty = parseInt(qtyInput && qtyInput.value || '1', 10);
-      if (!qty || qty <= 0) qty = 1;
-      const p = (allProducts || []).find(function (x) { return x.id === productId; });
-      const customerId = document.getElementById('moCustomer')?.value || null;
-      if (!p || !customerId) return;
-      const unit = getB2BPriceForCustomer(p, customerId);
-      const body = document.getElementById('moItemsBody');
-      if (!body) return;
-      let existing = body.querySelector(`tr[data-product-id="${productId}"]`);
-      if (existing) {
-        const qtyCell = existing.querySelector('td[data-role="qty"]');
-        const totalCell = existing.querySelector('td[data-role="total"]');
-        let curQty = parseInt(existing.getAttribute('data-qty') || '0', 10) || 0;
-        curQty += qty;
-        existing.setAttribute('data-qty', String(curQty));
-        if (qtyCell) qtyCell.textContent = curQty;
-        if (totalCell) totalCell.textContent = '€' + (curQty * unit).toFixed(2);
-      } else {
-        const html = `<tr data-product-id="${productId}" data-qty="${qty}" data-unit="${unit.toFixed(2)}">
-          <td>${esc(p.name)}</td>
-          <td style="text-align:right">€${unit.toFixed(2)}</td>
-          <td style="text-align:right" data-role="qty">${qty}</td>
-          <td style="text-align:right" data-role="total">€${(qty * unit).toFixed(2)}</td>
-          <td style="text-align:right"><button class="btn-sm btn-ghost" type="button" onclick="removeManualOrderItem(this)">✕</button></td>
-        </tr>`;
-        if (body.querySelector('tr') && !body.querySelector('tr').hasAttribute('data-product-id')) {
-          body.innerHTML = html;
-        } else {
-          body.insertAdjacentHTML('beforeend', html);
-        }
-      }
-      recalcManualOrderSubtotalFromItems();
-    }
-
-    function removeManualOrderItem(btn) {
-      const row = btn.closest('tr');
-      const body = document.getElementById('moItemsBody');
-      if (row && body) {
-        row.remove();
-        if (!body.querySelector('tr')) {
-          body.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);font-size:0.85rem;">No items added yet.</td></tr>';
-        }
-      }
-      recalcManualOrderSubtotalFromItems();
-    }
-
     function recalcManualOrderSubtotalFromItems() {
       const body = document.getElementById('moItemsBody');
       if (!body) return;
@@ -10890,8 +10996,8 @@
       }
       let list = (allProducts || []).filter(function (p) {
         if (p.is_active === false) return false;
-        if (brandId && p.brand_id !== brandId) return false;
-        if (catId && p.category_id !== catId) return false;
+        if (brandId && (!p.brands || p.brands.name !== brandId)) return false;
+        if (catId && (!p.categories || p.categories.name !== catId)) return false;
         if (search) {
           const txt = (p.name || '').toLowerCase() + ' ' + (p.sku || '').toLowerCase();
           if (!txt.includes(search)) return false;
@@ -11059,7 +11165,7 @@
         toast('Manual order created');
         closeManualOrderModal();
         manualOrderItems = [];
-        await loadAllData();
+        await _refreshOrders();
       } catch (e) {
         console.error('Manual order error', e);
         toast('Error creating manual order: ' + e.message, 'error');
@@ -11485,7 +11591,7 @@
     async function moderateReview(id, status) {
       try {
         await supaUpdate('reviews', id, { review_status: status, moderated_at: new Date().toISOString() });
-        toast(`Review ${status} `); await loadAllData();
+        toast(`Review ${status} `); await _refreshReviews();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
@@ -11563,7 +11669,7 @@
       };
       try {
         if (id) await supaUpdate('coupons', id, data); else await supaInsert('coupons', data);
-        toast(id ? 'Coupon updated' : 'Coupon created'); closeCouponModal(); await loadAllData();
+        toast(id ? 'Coupon updated' : 'Coupon created'); closeCouponModal(); await _refreshCoupons();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
@@ -11627,7 +11733,7 @@
       if (id) delete data.current_balance;
       try {
         if (id) await supaUpdate('gift_cards', id, data); else await supaInsert('gift_cards', data);
-        toast(id ? 'Gift card updated' : 'Gift card created'); closeGiftCardModal(); await loadAllData();
+        toast(id ? 'Gift card updated' : 'Gift card created'); closeGiftCardModal(); await _refreshGiftCards();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
@@ -11711,7 +11817,7 @@
       };
       try {
         if (id) await supaUpdate('shipping_zones', id, data); else await supaInsert('shipping_zones', data);
-        toast(id ? 'Zone updated' : 'Zone created'); closeShippingModal(); await loadAllData();
+        toast(id ? 'Zone updated' : 'Zone created'); closeShippingModal(); await _refreshShippingZones();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
@@ -11951,7 +12057,7 @@
         const url = (typeof SUPA_URL !== 'undefined' ? SUPA_URL : '') + '/functions/v1/qb-sync-purchase-orders';
         const resp = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (typeof SUPA_KEY !== 'undefined' ? SUPA_KEY : '') }
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (await getValidBearerToken()) }
         });
         let result;
         try { result = await resp.json(); } catch (_) { throw new Error('Resposta inválida (' + resp.status + '). Verifique se a Edge Function qb-sync-purchase-orders está publicada no Supabase.'); }
@@ -12451,7 +12557,7 @@
     // ============================================================
     // INIT
     // ============================================================
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       // Nav items
       document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
@@ -12461,8 +12567,22 @@
       });
 
       // Check auth
-      if (DEV_MODE || localStorage.getItem('sfi_admin_token') || localStorage.getItem('sfi_admin_dev')) {
-        showApp();
+      if (localStorage.getItem('sfi_admin_token')) {
+        // Re-verify admin status with existing token (auto-refresh if expired)
+        try {
+          const validToken = await getValidBearerToken();
+          const checkRes = await fetch(`${SUPA_URL}/rest/v1/rpc/is_admin`, {
+            method: 'POST',
+            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${validToken}`, 'Content-Type': 'application/json' }
+          });
+          const stillAdmin = await checkRes.json();
+          if (stillAdmin === true) { _startTokenRefresh(); showApp(); }
+          else { localStorage.removeItem('sfi_admin_token'); localStorage.removeItem('sfi_admin_email'); }
+        } catch(e) {
+          // Token expired or network error — show login
+          localStorage.removeItem('sfi_admin_token');
+          localStorage.removeItem('sfi_admin_email');
+        }
       }
 
       // Login form enter key

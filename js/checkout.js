@@ -343,7 +343,17 @@
                 throw new Error(data.error || 'Could not create checkout session');
             }
 
-            window.location.href = data.url;
+            // Security: validate redirect URL before navigating
+            const allowedDomains = ['checkout.stripe.com', 'sportsfoodsireland.ie', 'www.sportsfoodsireland.ie'];
+            try {
+                const redirectUrl = new URL(data.url);
+                if (!allowedDomains.some(d => redirectUrl.hostname === d || redirectUrl.hostname.endsWith('.' + d))) {
+                    throw new Error('Untrusted redirect domain: ' + redirectUrl.hostname);
+                }
+                window.location.href = data.url;
+            } catch (urlErr) {
+                throw new Error('Invalid checkout URL');
+            }
 
         } catch (err) {
             console.error('[checkout] Payment error:', err);

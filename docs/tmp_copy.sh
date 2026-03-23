@@ -1,0 +1,1 @@
+cp /Users/test/Downloads/freepik_the-confetti-particles-in-the-image-fall-naturally_minimax_768p_9-16_24fps_81216.mp4 /Users/test/Desktop/sport/website-sfi-novo/docs/clip3_we_are_live.mp4

@@ -236,7 +236,7 @@ document.getElementById('profileForm')?.addEventListener('submit', async functio
         const res = await fetch(sfi.auth._url || `https://styynhgzrkyoioqjssuw.supabase.co/auth/v1/user`, {
             method: 'PUT',
             headers: {
-                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE',
+                'apikey': 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH',
                 'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
             },
@@ -352,7 +352,7 @@ window.removeAddress = async function(idx) {
 async function saveUserMeta(dataObj) {
     const token = localStorage.getItem('sfi_token');
     const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
+    const SUPA_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
     const res = await fetch(`${SUPA_URL}/auth/v1/user`, {
         method: 'PUT',
         headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
@@ -373,7 +373,7 @@ document.getElementById('changePasswordForm')?.addEventListener('submit', async 
 
     const token = localStorage.getItem('sfi_token');
     const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
+    const SUPA_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
     try {
         const res = await fetch(`${SUPA_URL}/auth/v1/user`, {
             method: 'PUT',

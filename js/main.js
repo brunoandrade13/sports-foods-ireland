@@ -1,5 +1,5 @@
 // Main JS - helper de debug (use ?debug=1 na URL para ativar logs)
-const _dbg = () => !!(typeof URLSearchParams !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1');
+const _dbg = () => false; // Debug disabled in production
 
 // ======== HELPER: Função para obter dados de produtos (com fallback para file://) =========
 async function getMainProductsData() {
@@ -464,10 +464,17 @@ function initBuscaLive() {
         dropdown.style.width = Math.max(rect.width, 350) + 'px';
     }
 
+    // Sanitize HTML to prevent XSS injection
+    function sanitizeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
     function showDropdown(results, term) {
         positionDropdown();
         if (results.length === 0) {
-            dropdown.innerHTML = `<div class="sfi-sr-empty">No products found for "<strong>${term}</strong>"</div>`;
+            dropdown.innerHTML = `<div class="sfi-sr-empty">No products found for "<strong>${sanitizeHTML(term)}</strong>"</div>`;
             dropdown.style.display = 'block';
             activeIndex = -1;
             return;
@@ -486,16 +493,18 @@ function initBuscaLive() {
                 <div class="sfi-sr-price">${currency}${price.toFixed(2)}${oldHtml}</div>
             </a>`;
         }).join('');
-        html += `<div class="sfi-sr-footer" onclick="window.location.href='shop.html?search=${encodeURIComponent(term)}'">View all results for "${term}" →</div>`;
+        html += `<div class="sfi-sr-footer" onclick="window.location.href='shop.html?search=${encodeURIComponent(term)}'">View all results for "${sanitizeHTML(term)}" →</div>`;
         dropdown.innerHTML = html;
         dropdown.style.display = 'block';
         activeIndex = -1;
     }
 
     function highlightMatch(text, term) {
-        if (!term) return text;
-        const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return text.replace(new RegExp(`(${escaped})`, 'gi'), '<strong style="color:#fff">$1</strong>');
+        if (!term) return sanitizeHTML(text);
+        const safeText = sanitizeHTML(text);
+        const safeTerm = sanitizeHTML(term);
+        const escaped = safeTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return safeText.replace(new RegExp(`(${escaped})`, 'gi'), '<strong style="color:#fff">$1</strong>');
     }
 
     function hideDropdown() {
