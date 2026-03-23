@@ -1027,14 +1027,14 @@
 
     .variant-row {
       display: grid;
-      grid-template-columns: 120px 180px 120px 80px 60px 36px 36px;
+      grid-template-columns: 36px 120px 180px 120px 80px 60px 36px 36px;
       gap: 6px;
       align-items: center;
       padding: 8px 0;
       border-bottom: 1px solid var(--border);
     }
     .variant-row.child-variant {
-      grid-template-columns: 20px 120px 180px 120px 80px 36px 1px 36px;
+      grid-template-columns: 36px 20px 120px 180px 120px 80px 36px 1px 36px;
       padding-left: 10px;
       background: var(--surface-2);
       border-radius: 4px;
@@ -1048,6 +1048,53 @@
       border-left: 3px solid var(--accent);
       padding-left: 8px;
     }
+
+
+    /* Variant Image Picker Modal */
+    #variantImgModal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 10000;
+      align-items: center; justify-content: center;
+    }
+    #variantImgModal .vimg-inner {
+      background: var(--surface-1); border-radius: 12px; width: 90%; max-width: 800px;
+      max-height: 80vh; display: flex; flex-direction: column; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    #variantImgModal .vimg-header {
+      padding: 16px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center;
+    }
+    #variantImgModal .vimg-header input {
+      flex: 1; padding: 8px 12px; background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 14px; outline: none;
+    }
+    #variantImgModal .vimg-header input:focus { border-color: var(--accent); }
+    .vimg-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 8px; padding: 16px; overflow-y: auto; flex: 1;
+    }
+    .vimg-item {
+      cursor: pointer; border-radius: 8px; overflow: hidden; border: 2px solid transparent;
+      background: var(--surface-2); transition: border-color .15s;
+    }
+    .vimg-item:hover { border-color: var(--accent); transform: scale(1.02); }
+    .vimg-item img { width: 100%; height: 90px; object-fit: cover; display: block; }
+    .vimg-item span { display: block; padding: 4px 6px; font-size: 0.65rem; color: var(--text-dim);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .variant-img-btn {
+      width: 32px; height: 32px; border-radius: 6px; border: 1px dashed var(--border);
+      background: var(--surface-2); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; overflow: hidden; padding: 0; position: relative;
+    }
+    .variant-img-btn:hover { border-color: var(--accent); }
+    .variant-img-btn img { width: 100%; height: 100%; object-fit: cover; }
+    .variant-img-btn .placeholder { font-size: 14px; color: var(--text-dim); }
+    .variant-img-btn .remove-img {
+      position: absolute; top: -4px; right: -4px; background: var(--danger); color: #fff;
+      border: none; border-radius: 50%; width: 14px; height: 14px; font-size: 8px;
+      cursor: pointer; display: none; line-height: 14px; padding: 0;
+    }
+    .variant-img-btn:hover .remove-img { display: block; }
 
     .variant-row.header {
       color: var(--text-muted);
@@ -3411,6 +3458,7 @@
         <h4>Variants <span class="count" id="variantCountLabel">No variants</span></h4>
         <div class="variant-type-tabs" id="variantTypeTabs"></div>
         <div class="variant-row header">
+          <span></span>
           <span>Type</span>
           <span>Value</span>
           <span>SKU</span>
@@ -7567,7 +7615,7 @@
       const typeOpts = variantTypes.map(vt => `<option value="${vt.id}" ${vt.id === vtId ? 'selected' : ''}>${vt.name}</option>`).join('');
 
       if (isChild) {
-        row.innerHTML = `<span class="child-indent">↳</span>
+        row.innerHTML = `<button type="button" class="variant-img-btn" id="vimg-${idx}" data-url="${existing?.image_url || ''}" onclick="openVariantImagePicker(${idx})" title="Set image">${existing?.image_url ? '<img src=\"'+existing.image_url+'\">' : '<span class=\"placeholder\">📷</span>'}</button><span class="child-indent">↳</span>
     <select id="vtype-${idx}">${typeOpts}</select>
     <input type="text" id="vval-${idx}" placeholder="e.g. 30 Serv Bag..." value="${esc(label)}">
     <input type="text" id="vsku-${idx}" placeholder="SKU" value="${esc(existingSku || '')}">
@@ -7578,7 +7626,7 @@
     <button class="remove-btn" onclick="removeVariantRow(${idx})">✕</button>`;
       } else {
         row.classList.add('parent-variant');
-        row.innerHTML = `<select id="vtype-${idx}">${typeOpts}</select>
+        row.innerHTML = `<button type="button" class="variant-img-btn" id="vimg-${idx}" data-url="${existing?.image_url || ''}" onclick="openVariantImagePicker(${idx})" title="Set image">${existing?.image_url ? '<img src=\"'+existing.image_url+'\">' : '<span class=\"placeholder\">📷</span>'}</button><select id="vtype-${idx}">${typeOpts}</select>
     <input type="text" id="vval-${idx}" placeholder="e.g. Berry, Blue..." value="${esc(label)}">
     <input type="text" id="vsku-${idx}" placeholder="SKU" value="${esc(existingSku || '')}">
     <input type="number" id="vprice-${idx}" step="0.01" min="0" placeholder="€" value="${existing?.price || ''}">
@@ -7627,7 +7675,81 @@
       updateVariantCountLabel();
     }
 
-    function updateVariantCountLabel() {
+    // ---- Variant Image Picker ----
+    let variantImgCache = null;
+    async function loadStorageImages() {
+      if (variantImgCache) return variantImgCache;
+      try {
+        const res = await fetch(SUPABASE_URL + '/storage/v1/object/list/product-images', {
+          method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prefix: '', limit: 1000, offset: 0, sortBy: { column: 'name', order: 'asc' } })
+        });
+        const d1 = await res.json();
+        let all = d1.map(f => f.name);
+        if (d1.length === 1000) {
+          const r2 = await fetch(SUPABASE_URL + '/storage/v1/object/list/product-images', {
+            method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prefix: '', limit: 1000, offset: 1000, sortBy: { column: 'name', order: 'asc' } })
+          });
+          const d2 = await r2.json();
+          all = all.concat(d2.map(f => f.name));
+        }
+        variantImgCache = all;
+        return all;
+      } catch(e) { console.error(e); return []; }
+    }
+
+    async function openVariantImagePicker(idx) {
+      const modal = document.getElementById('variantImgModal');
+      if (!modal) return;
+      modal.dataset.idx = idx;
+      modal.style.display = 'flex';
+      const grid = document.getElementById('vimgGrid');
+      const search = document.getElementById('vimgSearch');
+      grid.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:40px">Loading images...</p>';
+      const imgs = await loadStorageImages();
+      const productName = document.getElementById('prodName')?.value || '';
+      search.value = productName.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').slice(0,3).join(' ');
+      renderImgGrid(imgs, search.value, idx);
+      search.oninput = () => renderImgGrid(imgs, search.value, idx);
+    }
+
+    function renderImgGrid(imgs, query, idx) {
+      const grid = document.getElementById('vimgGrid');
+      const base = SUPABASE_URL + '/storage/v1/object/public/product-images/';
+      const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+      let filtered = imgs;
+      if (words.length > 0) {
+        filtered = imgs.filter(n => { const ln = n.toLowerCase(); return words.some(w => ln.includes(w)); });
+      }
+      if (filtered.length === 0 && words.length > 0) {
+        filtered = imgs.filter(n => { const ln = n.toLowerCase(); return words.some(w => ln.includes(w.slice(0,4))); });
+      }
+      grid.innerHTML = filtered.slice(0, 100).map(name => {
+        const short = name.replace(/-\d{13}-\d+\.(jpg|webp|png)$/, '').replace(/-/g, ' ');
+        return `<div class="vimg-item" onclick="setVariantImage(${idx}, '${base}${name}')" title="${short}">
+          <img src="${base}${name}" loading="lazy" onerror="this.parentNode.style.display='none'">
+          <span>${short.substring(0,30)}</span></div>`;
+      }).join('') || '<p style="color:var(--text-dim);padding:20px">No images found.</p>';
+      const count = document.getElementById('vimgCount');
+      if (count) count.textContent = filtered.length + ' images';
+    }
+
+    function setVariantImage(idx, url) {
+      const btn = document.getElementById('vimg-' + idx);
+      if (btn) { btn.dataset.url = url; btn.innerHTML = '<img src="' + url + '"><button class="remove-img" onclick="event.stopPropagation();removeVariantImage(' + idx + ')">\u2715</button>'; }
+      document.getElementById('variantImgModal').style.display = 'none';
+      toast('Image linked!', 'success');
+    }
+
+    function removeVariantImage(idx) {
+      const btn = document.getElementById('vimg-' + idx);
+      if (btn) { btn.dataset.url = ''; btn.innerHTML = '<span class="placeholder">\ud83d\udcf7</span>'; }
+    }
+
+    function closeVimgModal() { document.getElementById('variantImgModal').style.display = 'none'; }
+
+        function updateVariantCountLabel() {
       const count = document.querySelectorAll('#variantRows .variant-row').length;
       document.getElementById('variantCountLabel').textContent = count === 0 ? 'No variants' : `${count} variant${count > 1 ? 's' : ''}`;
     }
@@ -7656,6 +7778,7 @@
           is_default: document.getElementById(`vdef-${idx}`)?.checked || false,
           is_child: isChild,
           parent_row_idx: parentRowIdx,
+          image_url: document.getElementById(`vimg-${idx}`)?.dataset?.url || null,
           _rowIdx: idx
         };
         if (!isChild) parentMap[idx] = data;
@@ -7681,7 +7804,7 @@
       for (let i = 0; i < variants.length; i++) {
         const v = variants[i];
         if (v.is_child) continue;
-        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: null };
+        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: null, image_url: v.image_url || null };
         try {
           if (v.existingId) {
             await supaUpdate('product_variants', v.existingId, data);
@@ -7698,7 +7821,7 @@
         const v = variants[i];
         if (!v.is_child) continue;
         const parentUUID = parentIdMap[v.parent_row_idx] || v.existingId ? (existing.find(e => e.id === v.existingId)?.parent_variant_id || null) : null;
-        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: parentUUID };
+        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: parentUUID, image_url: v.image_url || null };
         try {
           if (v.existingId) await supaUpdate('product_variants', v.existingId, data);
           else await supaInsert('product_variants', data);
@@ -12274,7 +12397,20 @@
           .inv-totals-row.due { color: #b91c1c; font-weight: 700; }
           .inv-footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #E8ECEF; text-align: center; font-size: 0.78rem; color: #999; }
         </style>
-        </head><body>${printArea.innerHTML}</body></html>`);
+        </head><body>${printArea.innerHTML}
+<!-- Variant Image Picker Modal -->
+<div id="variantImgModal" onclick="if(event.target===this)closeVimgModal()">
+  <div class="vimg-inner">
+    <div class="vimg-header">
+      <span style="font-weight:700;color:var(--text)">Select Image</span>
+      <input type="text" id="vimgSearch" placeholder="Search images...">
+      <span id="vimgCount" style="font-size:12px;color:var(--text-dim);white-space:nowrap"></span>
+      <button onclick="closeVimgModal()" style="background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;padding:4px">&times;</button>
+    </div>
+    <div class="vimg-grid" id="vimgGrid"></div>
+  </div>
+</div>
+</body></html>`);
       win.document.close();
       win.focus();
       setTimeout(() => { win.print(); win.close(); }, 250);
