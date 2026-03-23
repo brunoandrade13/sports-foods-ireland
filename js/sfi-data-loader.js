@@ -38,7 +38,7 @@
   // FETCH ALL PRODUCTS FROM SUPABASE
   // ============================================================
   async function fetchFromSupabase() {
-    const select = encodeURIComponent('*,brands(name,slug),categories(name,slug),subcategories(name,slug),sub_subcategories(name,slug),product_images(id,url,alt_text,position,is_primary),product_variants(id,variant_type_id,label,price,compare_at_price,sku,stock,is_default,is_active,sort_order,parent_variant_id,variant_types(name,slug))');
+    const select = encodeURIComponent('*,brands(name,slug),categories(name,slug),subcategories(name,slug),sub_subcategories(name,slug),product_images(id,url,alt_text,position,is_primary),product_variants(id,variant_type_id,label,price,compare_at_price,sku,stock,is_default,is_active,sort_order,parent_variant_id,image_url,variant_types(name,slug))');
     const url = `${SUPABASE_URL}/rest/v1/products?select=${select}&is_active=eq.true&order=legacy_id.asc&limit=500`;
 
     const res = await fetch(url, {
@@ -109,7 +109,8 @@
           sku: child.sku || parent.sku,
           stock: child.stock,
           is_default: child.is_default || parent.is_default,
-          sort_order: (parent.sort_order || 0) * 100 + (child.sort_order || 0)
+          sort_order: (parent.sort_order || 0) * 100 + (child.sort_order || 0),
+          image_url: child.image_url || parent.image_url || null
         });
       });
 
@@ -145,7 +146,7 @@
       byType[typeSlug].options.push({
         id: v.id, label: v.label, price: v.price,
         compare_at_price: v.compare_at_price, sku: v.sku,
-        stock: v.stock, is_default: v.is_default, sort_order: v.sort_order || 0
+        stock: v.stock, is_default: v.is_default, sort_order: v.sort_order || 0, image_url: v.image_url || null
       });
     });
     return Object.values(byType).map(g => {

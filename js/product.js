@@ -787,8 +787,9 @@ function renderSimpleVariants(container, variants, product) {
             const priceAttr = opt.price ? `data-price="${opt.price}"` : '';
             const oldPriceAttr = opt.compare_at_price ? `data-old-price="${opt.compare_at_price}"` : '';
             const skuAttr = opt.sku ? `data-sku="${opt.sku}"` : '';
+            const imgAttr = opt.image_url ? `data-image-url="${opt.image_url}"` : '';
             return `<button type="button" class="variant-option${outOfStock ? ' backorder-variant' : ''}"
-                data-variant-id="${opt.id}" data-label="${opt.label}" ${priceAttr} ${oldPriceAttr} ${skuAttr}
+                data-variant-id="${opt.id}" data-label="${opt.label}" ${priceAttr} ${oldPriceAttr} ${skuAttr} ${imgAttr}
                 ${outOfStock ? 'data-backorder="true"' : ''}>${opt.label}${outOfStock ? ' (Backorder)' : ''}</button>`;
         }).join('');
         const hidden = gi > 0 ? 'style="display:none"' : '';
@@ -820,6 +821,16 @@ function renderSimpleVariants(container, variants, product) {
         const groupIdx = parseInt(groupEl.dataset.groupIndex);
         groupEl.querySelectorAll('.variant-option').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
+        // Swap image on variant click
+        const vImgSimple = btn.dataset.imageUrl;
+        if (vImgSimple) {
+            const mainImg = document.querySelector('.product-main-image, #productMainImage, .product-gallery img, .product-image img');
+            if (mainImg) {
+                mainImg.style.transition = 'opacity 0.25s ease';
+                mainImg.style.opacity = '0';
+                setTimeout(() => { mainImg.src = vImgSimple; mainImg.style.opacity = '1'; }, 150);
+            }
+        }
         const allGroups = container.querySelectorAll('.variant-group');
         if (groupIdx + 1 < allGroups.length) {
             const next = allGroups[groupIdx + 1];
@@ -878,7 +889,7 @@ function renderCompoundVariants(container, variants, product) {
         const totalStock = matchingOpts.reduce((s, o) => s + (o.stock || 0), 0);
         const outOfStock = totalStock <= 0;
         return `<button type="button" class="variant-option${outOfStock ? ' backorder-variant' : ''}"
-            data-level1="${val}" ${outOfStock ? 'data-backorder="true"' : ''}>${val}${outOfStock ? ' (Backorder)' : ''}</button>`;
+            data-level1="${val}" data-image-url="${(matchingOpts.find(o => o.image_url) || {}).image_url || ''}" ${outOfStock ? 'data-backorder="true"' : ''}>${val}${outOfStock ? ' (Backorder)' : ''}</button>`;
     }).join('');
 
     container.innerHTML = `
@@ -907,6 +918,17 @@ function renderCompoundVariants(container, variants, product) {
         groupEl.querySelectorAll('.variant-option').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
 
+        // Swap image on level 1 click (e.g. color selection)
+        const vImg = btn.dataset.imageUrl;
+        if (vImg) {
+            const mainImg = document.querySelector('.product-main-image, #productMainImage, .product-gallery img, .product-image img');
+            if (mainImg) {
+                mainImg.style.transition = 'opacity 0.25s ease';
+                mainImg.style.opacity = '0';
+                setTimeout(() => { mainImg.src = vImg; mainImg.style.opacity = '1'; }, 150);
+            }
+        }
+
         if (level === '1' && hasLevel2) {
             const selectedL1 = btn.dataset.level1;
             const level2Group = container.querySelector('[data-level="2"]');
@@ -919,9 +941,10 @@ function renderCompoundVariants(container, variants, product) {
                 const outOfStock = opt.stock != null && opt.stock <= 0;
                 const priceAttr = opt.price ? `data-price="${opt.price}"` : '';
                 const oldPriceAttr = opt.compare_at_price ? `data-old-price="${opt.compare_at_price}"` : '';
+                const imgAttr = opt.image_url ? `data-image-url="${opt.image_url}"` : '';
                 const skuAttr = opt.sku ? `data-sku="${opt.sku}"` : '';
                 return `<button type="button" class="variant-option${outOfStock ? ' backorder-variant' : ''}"
-                    data-variant-id="${opt.id}" data-label="${opt.label}" ${priceAttr} ${oldPriceAttr} ${skuAttr}
+                    data-variant-id="${opt.id}" data-label="${opt.label}" ${priceAttr} ${oldPriceAttr} ${skuAttr} ${imgAttr}
                     ${outOfStock ? 'data-backorder="true"' : ''}>${opt.level2}${outOfStock ? ' (Backorder)' : ''}</button>`;
             }).join('');
 
@@ -938,6 +961,16 @@ function renderCompoundVariants(container, variants, product) {
 
 // ── Update price from selected variant ──
 function updateVariantPrice(btn, product) {
+    // Swap main product image if variant has its own image
+    const vImgUrl = btn.dataset.imageUrl;
+    if (vImgUrl) {
+        const mainImg = document.querySelector('.product-main-image, #productMainImage, .product-gallery img, .product-image img');
+        if (mainImg) {
+            mainImg.style.transition = 'opacity 0.25s ease';
+            mainImg.style.opacity = '0';
+            setTimeout(() => { mainImg.src = vImgUrl; mainImg.style.opacity = '1'; }, 150);
+        }
+    }
     const variantPrice = parseFloat(btn.dataset.price);
     const variantOldPrice = parseFloat(btn.dataset.oldPrice);
     if (variantPrice && !isNaN(variantPrice)) {
