@@ -824,7 +824,7 @@ function renderSimpleVariants(container, variants, product) {
         // Swap image on variant click
         const vImgSimple = btn.dataset.imageUrl;
         if (vImgSimple) {
-            const mainImg = document.querySelector('.product-main-image, #productMainImage, .product-gallery img, .product-image img');
+            const mainImg = document.querySelector('#productMainImage, .product-main-image img, .product-gallery img');
             if (mainImg) {
                 mainImg.style.transition = 'opacity 0.25s ease';
                 mainImg.style.opacity = '0';
@@ -921,7 +921,7 @@ function renderCompoundVariants(container, variants, product) {
         // Swap image on level 1 click (e.g. color selection)
         const vImg = btn.dataset.imageUrl;
         if (vImg) {
-            const mainImg = document.querySelector('.product-main-image, #productMainImage, .product-gallery img, .product-image img');
+            const mainImg = document.querySelector('#productMainImage, .product-main-image img, .product-gallery img');
             if (mainImg) {
                 mainImg.style.transition = 'opacity 0.25s ease';
                 mainImg.style.opacity = '0';
@@ -964,7 +964,7 @@ function updateVariantPrice(btn, product) {
     // Swap main product image if variant has its own image
     const vImgUrl = btn.dataset.imageUrl;
     if (vImgUrl) {
-        const mainImg = document.querySelector('.product-main-image, #productMainImage, .product-gallery img, .product-image img');
+        const mainImg = document.querySelector('#productMainImage, .product-main-image img, .product-gallery img');
         if (mainImg) {
             mainImg.style.transition = 'opacity 0.25s ease';
             mainImg.style.opacity = '0';
