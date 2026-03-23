@@ -1063,11 +1063,8 @@
     #variantImgModal .vimg-header {
       padding: 16px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center;
     }
-    #variantImgModal .vimg-header input {
-      flex: 1; padding: 8px 12px; background: var(--surface-2); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); font-size: 14px; outline: none;
-    }
-    #variantImgModal .vimg-header input:focus { border-color: var(--accent); }
+
+
     .vimg-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
       gap: 8px; padding: 16px; overflow-y: auto; flex: 1;
@@ -1077,9 +1074,8 @@
       background: var(--surface-2); transition: border-color .15s;
     }
     .vimg-item:hover { border-color: var(--accent); transform: scale(1.02); }
-    .vimg-item img { width: 100%; height: 90px; object-fit: cover; display: block; }
-    .vimg-item span { display: block; padding: 4px 6px; font-size: 0.65rem; color: var(--text-dim);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .vimg-item img { width: 100%; height: 120px; object-fit: cover; display: block; }
+    .vimg-item span { display: none; }
 
         .variant-img-btn {
       width: 32px; height: 32px; border-radius: 6px; border: 1px dashed var(--border);
@@ -7705,12 +7701,11 @@
       modal.dataset.idx = idx;
       modal.style.display = 'flex';
       const grid = document.getElementById('vimgGrid');
-      const search = document.getElementById('vimgSearch');
-      grid.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:40px">Loading product images...</p>';
+      const title = document.getElementById('vimgTitle');
+      grid.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:40px">Loading...</p>';
       const allImgs = await loadStorageImages();
-      const productName = document.getElementById('prodName')?.value || '';
+      const productName = document.getElementById('editName')?.value || '';
       const slug = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-      // Progressive slug matching: try full slug, then remove last segment until we find matches
       let productImgs = [];
       const parts = slug.split('-');
       for (let len = parts.length; len >= 2; len--) {
@@ -7718,33 +7713,18 @@
         productImgs = allImgs.filter(n => n.toLowerCase().startsWith(trySlug));
         if (productImgs.length > 0) break;
       }
-      search.value = '';
-      search.placeholder = productImgs.length + ' photos for ' + productName;
-      renderImgGrid(productImgs, '', idx, allImgs);
-      search.oninput = () => renderImgGrid(productImgs, search.value, idx, allImgs);
+      if (title) title.textContent = productImgs.length + ' photos — ' + productName;
+      const base = SUPA_URL + '/storage/v1/object/public/product-images/';
+      if (productImgs.length === 0) {
+        grid.innerHTML = '<p style="color:var(--text-dim);padding:30px;text-align:center">No photos found for this product.</p>';
+      } else {
+        grid.innerHTML = productImgs.map(name => {
+          return '<div class="vimg-item" onclick="setVariantImage(' + idx + ',\'' + base + name + '\')" title="' + name + '"><img src="' + base + name + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></div>';
+        }).join('');
+      }
     }
 
-    function renderImgGrid(productImgs, query, idx, allImgs) {
-      const grid = document.getElementById('vimgGrid');
-      const base = SUPA_URL + '/storage/v1/object/public/product-images/';
-      let filtered = productImgs;
-      if (query.trim().length > 0) {
-        const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 1);
-        filtered = (allImgs || productImgs).filter(n => { const ln = n.toLowerCase(); return words.every(w => ln.includes(w)); });
-      }
-      if (filtered.length === 0 && query.trim().length === 0) {
-        grid.innerHTML = '<p style="color:var(--text-dim);padding:20px;text-align:center">No images found for this product in Storage.</p>';
-      } else {
-        grid.innerHTML = filtered.map(name => {
-          const short = name.replace(/-\d{13}-\d+\.(jpg|webp|png)$/, '').replace(/-/g, ' ');
-          return `<div class="vimg-item" onclick="setVariantImage(${idx}, '${base}${name}')" title="${name}">
-            <img src="${base}${name}" loading="lazy" onerror="this.parentNode.style.display='none'">
-            <span>${short.substring(0,35)}</span></div>`;
-        }).join('') || '<p style="color:var(--text-dim);padding:20px">No results. Type to search all images.</p>';
-      }
-      const count = document.getElementById('vimgCount');
-      if (count) count.textContent = filtered.length + ' images' + (query ? ' (searching all)' : '');
-    }
+
 
     function setVariantImage(idx, url) {
       const btn = document.getElementById('vimg-' + idx);
@@ -13392,10 +13372,8 @@
 <div id="variantImgModal" onclick="if(event.target===this)closeVimgModal()">
   <div class="vimg-inner">
     <div class="vimg-header">
-      <span style="font-weight:700;color:var(--text)">Select Image</span>
-      <input type="text" id="vimgSearch" placeholder="Search images...">
-      <span id="vimgCount" style="font-size:12px;color:var(--text-dim);white-space:nowrap"></span>
-      <button onclick="closeVimgModal()" style="background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;padding:4px">&times;</button>
+      <span id="vimgTitle" style="font-weight:700;color:var(--text);flex:1">Select Image</span>
+      <button onclick="closeVimgModal()" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;padding:4px 8px">&times;</button>
     </div>
     <div class="vimg-grid" id="vimgGrid"></div>
   </div>
