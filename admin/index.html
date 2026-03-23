@@ -7710,7 +7710,14 @@
       const allImgs = await loadStorageImages();
       const productName = document.getElementById('prodName')?.value || '';
       const slug = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-      const productImgs = allImgs.filter(n => n.toLowerCase().startsWith(slug));
+      // Progressive slug matching: try full slug, then remove last segment until we find matches
+      let productImgs = [];
+      const parts = slug.split('-');
+      for (let len = parts.length; len >= 2; len--) {
+        const trySlug = parts.slice(0, len).join('-');
+        productImgs = allImgs.filter(n => n.toLowerCase().startsWith(trySlug));
+        if (productImgs.length > 0) break;
+      }
       search.value = '';
       search.placeholder = productImgs.length + ' photos for ' + productName;
       renderImgGrid(productImgs, '', idx, allImgs);
