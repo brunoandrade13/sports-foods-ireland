@@ -3338,13 +3338,17 @@
           <input type="hidden" id="editCompareEur" value="0">
           <input type="hidden" id="editPriceGbp" value="0">
           <input type="hidden" id="editCompareGbp" value="0">
+          <div class="form-group"><label>💵 Cost Price (USD)</label><input type="number" step="0.01" id="editCostPriceUsd"
+              placeholder="0.00" oninput="autoCalcCostFromUsd()">
+            <div class="hint">Enter cost in USD — EUR auto-calculated below</div>
+          </div>
           <div class="form-group"><label>💷 Cost Price (GBP)</label><input type="number" step="0.01" id="editCostPriceGbp"
-              placeholder="0.00" oninput="autoCalcCostEur()">
+              placeholder="0.00" oninput="autoCalcCostFromGbp()">
             <div class="hint">Enter cost in GBP — EUR auto-calculated below</div>
           </div>
           <div class="form-group"><label>💰 Cost Price (EUR)</label><input type="number" step="0.01" id="editCostPrice"
               placeholder="0.00">
-            <div class="hint">Auto-filled from GBP × 1.17 (editable)</div>
+            <div class="hint">Auto-filled from USD × 0.92 or GBP × 1.17 (editable)</div>
           </div>
           <div class="form-group"><label>🧾 VAT Rate (%)</label><input type="number" step="0.01" id="editVatRate"
               placeholder="23.00">
@@ -4323,12 +4327,18 @@
     let currentFinanceBrand = null; // selected brand for Revenue by Brand
     let currentFinanceCategory = null; // selected category for Revenue by Category
     let currentFinanceProduct = null; // selected product for Top Products
-    // Auto-calculate EUR cost from GBP cost
-    function autoCalcCostEur() {
+    // Auto-calculate EUR cost from USD
+    function autoCalcCostFromUsd() {
+      const usdVal = parseFloat(document.getElementById('editCostPriceUsd')?.value) || 0;
+      if (usdVal > 0) {
+        document.getElementById('editCostPrice').value = (usdVal * 0.92).toFixed(2);
+      }
+    }
+    // Auto-calculate EUR cost from GBP
+    function autoCalcCostFromGbp() {
       const gbpVal = parseFloat(document.getElementById('editCostPriceGbp')?.value) || 0;
       if (gbpVal > 0) {
-        const eurVal = (gbpVal * 1.17).toFixed(2);
-        document.getElementById('editCostPrice').value = eurVal;
+        document.getElementById('editCostPrice').value = (gbpVal * 1.17).toFixed(2);
       }
     }
 
@@ -7175,6 +7185,7 @@
         document.getElementById('editDiscount').value = product.discount_percent || 0;
         document.getElementById('editCostPrice').value = product.cost_price_eur || '';
         document.getElementById('editCostPriceGbp').value = product.cost_price_gbp || '';
+        document.getElementById('editCostPriceUsd').value = product.cost_price_usd || '';
         document.getElementById('editVatRate').value = product.vat_rate != null ? product.vat_rate : '';
         document.getElementById('editQbTaxCode').value = product.qb_sales_tax_code || '';
         document.getElementById('editWholesalePrice').value = product.wholesale_price_eur || '';
@@ -7588,6 +7599,7 @@
         discount_percent: parseInt(document.getElementById('editDiscount').value) || 0,
         cost_price_eur: parseFloat(document.getElementById('editCostPrice').value) || null,
         cost_price_gbp: parseFloat(document.getElementById('editCostPriceGbp').value) || null,
+        cost_price_usd: parseFloat(document.getElementById('editCostPriceUsd').value) || null,
         vat_rate: parseFloat(document.getElementById('editVatRate').value) || null,
         wholesale_price_eur: parseFloat(document.getElementById('editWholesalePrice').value) || null,
         bulk_price_eur: parseFloat(document.getElementById('editBulkPrice').value) || null,
