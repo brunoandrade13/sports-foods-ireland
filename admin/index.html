@@ -9094,7 +9094,7 @@
           // Build variant map: product_name -> [{variant_name, sku, qty, revenue}]
           const variantMap = {};
           variantData.forEach(v => {
-            const key = v.base_name;
+            const key = v.product_id || v.base_name;
             if (!variantMap[key]) variantMap[key] = [];
             variantMap[key].push({ name: v.variant_name, sku: v.product_sku, qty: Number(v.total_qty), revenue: Number(v.total_revenue) });
           });
@@ -9146,7 +9146,7 @@
               '<td><div style="display:flex;align-items:center;gap:4px"><div style="background:var(--accent);height:8px;width:' + pct + '%;border-radius:4px;min-width:2px"></div>' + pct + '%</div></td></tr>';
 
             // Variant rows from variant_sales RPC
-            const variants = variantMap[pName] || [];
+            const variants = variantMap[d.product_id] || variantMap[pName] || [];
             if (variants.length > 0) {
               const prodRev = parseFloat(d.total_revenue);
               variants.forEach(v => {
