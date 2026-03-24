@@ -2128,7 +2128,7 @@
               </thead>
               <tbody id="ordersTable">
                 <tr>
-                  <td colspan="8" class="loading-overlay"><span class="spinner"></span></td>
+                  <td colspan="9" class="loading-overlay"><span class="spinner"></span></td>
                 </tr>
               </tbody>
             </table>
@@ -4046,6 +4046,10 @@
             <p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Status</p>
             <div id="omPaymentStatus" style="margin-bottom: 3px;"></div>
             <div id="omFulfillmentStatus" style="margin-bottom: 5px;"></div>
+          </div>
+          <div style="flex: 1; min-width: 150px;">
+            <p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Source</p>
+            <div id="omSource">—</div>
           </div>
         </div>
 
@@ -8967,7 +8971,7 @@
       const start = (orderPage - 1) * PER_PAGE;
       const pageItems = filteredOrders.slice(start, start + PER_PAGE);
       document.getElementById('ordersTable').innerHTML = pageItems.length === 0
-        ? '<tr><td colspan="8" class="empty-state">No orders yet</td></tr>'
+        ? '<tr><td colspan="9" class="empty-state">No orders yet</td></tr>'
         : pageItems.map(o => {
           const fin = o.financial_status || 'pending';
           const ful = o.fulfillment_status || 'unfulfilled';
@@ -9017,6 +9021,16 @@
           <td><span class="stock-badge ${finCls}">${fin}</span></td>
           <td><span class="stock-badge ${fulCls}">${ful}</span></td>
           <td>${new Date(o.created_at).toLocaleDateString()}</td>
+          <td>${(() => {
+            const st = o.attribution_source_type || '';
+            const us = o.attribution_utm_source || '';
+            const dv = o.attribution_device_type || '';
+            if (!st && !us) return '<span style="color:var(--text-dim)">—</span>';
+            const icon = st === 'organic' ? '🔍' : st === 'typein' ? '🔗' : st === 'referral' ? '↩️' : st === 'utm' ? '📢' : '🌐';
+            const label = us === '(direct)' ? 'Direct' : us ? us.charAt(0).toUpperCase() + us.slice(1) : st;
+            const dvIcon = dv === 'Mobile' ? '📱' : dv === 'Desktop' ? '💻' : '';
+            return '<span title="' + esc(st + ' | ' + us + (dv ? ' | ' + dv : '')) + '" style="font-size:0.8rem;white-space:nowrap;cursor:default;">' + icon + ' ' + esc(label) + (dvIcon ? ' ' + dvIcon : '') + '</span>';
+          })()}</td>
           <td style="text-align:center;">
              <button class="btn-sm btn-outline" onclick="openOrderModal(this.closest('tr').dataset.orderId)">View</button>
           </td>
@@ -11098,6 +11112,21 @@
       const ful = order.fulfillment_status || 'unfulfilled';
       document.getElementById('omPaymentStatus').innerHTML = `<span class="stock-badge ${fin === 'paid' ? 'in' : 'low'}">${fin}</span>`;
       document.getElementById('omFulfillmentStatus').innerHTML = `<span class="stock-badge ${ful === 'fulfilled' ? 'in' : 'low'}">${ful}</span>`;
+
+      // Source attribution
+      const srcType = order.attribution_source_type || '';
+      const utmSrc = order.attribution_utm_source || '';
+      const devType = order.attribution_device_type || '';
+      const srcIcon = srcType === 'organic' ? '🔍' : srcType === 'typein' ? '🔗' : srcType === 'referral' ? '↩️' : srcType === 'utm' ? '📢' : '';
+      const srcLabel = utmSrc === '(direct)' ? 'Direct' : utmSrc || srcType || '—';
+      const devIcon = devType === 'Mobile' ? '📱' : devType === 'Desktop' ? '💻' : '';
+      const srcEntry = order.attribution_session_entry || '';
+      const srcPages = order.attribution_session_pages || '';
+      let srcHtml = srcIcon ? srcIcon + ' ' + esc(srcLabel) : esc(srcLabel);
+      if (devIcon) srcHtml += ' ' + devIcon;
+      if (srcPages) srcHtml += '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">' + srcPages + ' pages viewed</div>';
+      if (srcEntry) srcHtml += '<div style="font-size:0.7rem;color:var(--text-dim);margin-top:1px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + esc(srcEntry) + '">' + esc(srcEntry.replace('https://sportsfoodsireland.ie', '')) + '</div>';
+      document.getElementById('omSource').innerHTML = srcHtml;
 
       const wrapper = document.getElementById('omItemsWrapper');
       wrapper.innerHTML = '<span class="spinner" style="display:inline-block;width:16px;height:16px;border-width:2px;border-top-color:var(--primary-color);"></span> Loading items...';
