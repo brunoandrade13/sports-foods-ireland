@@ -9066,26 +9066,42 @@
               </table></div>`;
 
         } else if (type === 'productAnalytics') {
-          // Product Analytics Report with date filter + brand filter
           document.getElementById('reportDateFilter').style.display = 'block';
           const { from, to } = getReportDateRange();
           window.reportDetailDateRange = { from, to };
           const dateLabel = currentReportPeriod || 'all';
 
-          const rpcRes = await fetch(`${SUPA_URL}/rest/v1/rpc/get_product_analytics`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ date_from: from, date_to: to })
-          });
+          // Fetch main product analytics + variant sales in parallel
+          const [rpcRes, varRes] = await Promise.all([
+            fetch(`${SUPA_URL}/rest/v1/rpc/get_product_analytics`, {
+              method: 'POST', headers: getAuthHeaders(),
+              body: JSON.stringify({ date_from: from, date_to: to })
+            }),
+            fetch(`${SUPA_URL}/rest/v1/rpc/get_variant_sales`, {
+              method: 'POST', headers: getAuthHeaders(),
+              body: JSON.stringify({ date_from: from, date_to: to })
+            })
+          ]);
           if (!rpcRes.ok) throw new Error(`RPC failed: ${rpcRes.status}`);
           const data = await rpcRes.json();
+          const variantData = varRes.ok ? await varRes.json() : [];
 
           if (!data || data.length === 0) {
             out.innerHTML = '<div style="color:var(--text-muted);padding:40px;text-align:center;">No product data found for this period.</div>';
             return;
           }
 
-          // Build brand list sorted by revenue
+          // Build variant map: product_name -> [{variant_name, sku, qty, revenue}]
+          const variantMap = {};
+          variantData.forEach(v => {
+            const key = v.base_name;
+            if (!variantMap[key]) variantMap[key] = [];
+            variantMap[key].push({ name: v.variant_name, sku: v.product_sku, qty: Number(v.total_qty), revenue: Number(v.total_revenue) });
+          });
+          // Sort variants by revenue desc
+          Object.values(variantMap).forEach(arr => arr.sort((a, b) => b.revenue - a.revenue));
+
+          // Brand list for filter
           const brandRevMap = {};
           data.forEach(d => {
             const b = d.brand_name || 'Unknown';
@@ -9093,8 +9109,6 @@
             brandRevMap[b] = (brandRevMap[b] || 0) + parseFloat(d.total_revenue || 0);
           });
           const brandList = Object.entries(brandRevMap).sort((a, b) => b[1] - a[1]).map(e => e[0]);
-
-          // Brand filter HTML
           const brandAllStyle = !currentReportBrand ? 'background:var(--accent-bg);color:var(--accent);' : '';
           const brandFilterHtml = '<div style="margin-bottom:15px;background:var(--surface-2);padding:12px 15px;border-radius:8px;"><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">' +
             '<span style="color:var(--text-muted);font-size:0.9rem;">\ud83c\udff7\ufe0f Brand:</span>' +
@@ -9104,50 +9118,46 @@
               const isActive = b === currentReportBrand;
               const st = isActive ? 'background:var(--accent-bg);color:var(--accent);' : '';
               return '<button class="btn-sm btn-outline" style="padding:6px 14px;' + st + '" onclick="currentReportBrand=\'' + safe + '\';loadReport(\'productAnalytics\')">' + b + '</button>';
-            }).join('') +
-            '</div></div>';
+            }).join('') + '</div></div>';
 
-          // Filter by brand if selected
+          // Filter by brand
           let filtered = data;
           if (currentReportBrand) {
             filtered = data.filter(d => d.brand_name === currentReportBrand);
           }
 
-          // Group products by base name (before " - ") and collect variants
-          const productGroups = {};
-          filtered.forEach(d => {
-            const fullName = d.product_name || 'Unknown';
-            const dashIdx = fullName.indexOf(' - ');
-            const baseName = dashIdx > 0 ? fullName.substring(0, dashIdx).trim() : fullName;
-            const variantName = dashIdx > 0 ? fullName.substring(dashIdx + 3).trim() : null;
-            if (!productGroups[baseName]) {
-              productGroups[baseName] = { brand: d.brand_name, category: d.category_name, sku: d.product_sku, qty: 0, revenue: 0, variants: [], product_id: d.product_id };
-            }
-            productGroups[baseName].qty += parseInt(d.total_qty || 0);
-            productGroups[baseName].revenue += parseFloat(d.total_revenue || 0);
-            if (variantName) {
-              productGroups[baseName].variants.push({ name: variantName, sku: d.product_sku, qty: parseInt(d.total_qty || 0), revenue: parseFloat(d.total_revenue || 0) });
-            }
-          });
-
-          // Sort by revenue
-          const groupsSorted = Object.entries(productGroups).sort((a, b) => b[1].revenue - a[1].revenue);
-          const filtTotal = groupsSorted.reduce((s, [, g]) => s + g.revenue, 0);
-          const filtQty = groupsSorted.reduce((s, [, g]) => s + g.qty, 0);
-
+          const prodSorted = [...filtered].sort((a, b) => parseFloat(b.total_revenue) - parseFloat(a.total_revenue));
+          const filtTotal = filtered.reduce((s, d) => s + parseFloat(d.total_revenue || 0), 0);
+          const filtQty = filtered.reduce((s, d) => s + parseInt(d.total_qty || 0), 0);
           const periodLabel = { thisMonth: 'This Month', lastMonth: 'Last Month', quarter: 'Last 3 Months', semester: 'Last 6 Months', year: 'Last 12 Months', all: 'All Time' }[dateLabel] || 'All Time';
           const brandLabel = currentReportBrand ? ' \u2014 ' + currentReportBrand : '';
 
           let rowsHtml = '';
-          groupsSorted.forEach(([baseName, g], i) => {
-            const pct = filtTotal > 0 ? ((g.revenue / filtTotal) * 100).toFixed(1) : 0;
-            rowsHtml += '<tr><td>' + (i + 1) + '</td><td><strong>' + esc(baseName) + '</strong></td><td style="font-family:monospace;font-size:0.85rem">' + esc(g.sku || '\u2014') + '</td><td>' + esc(g.brand || '\u2014') + '</td><td>' + esc(g.category || '\u2014') + '</td><td>' + g.qty + '</td><td class="price">\u20ac' + g.revenue.toFixed(2) + '</td><td><div style="display:flex;align-items:center;gap:4px"><div style="background:var(--accent);height:8px;width:' + pct + '%;border-radius:4px;min-width:2px"></div>' + pct + '%</div></td></tr>';
-            // Variant rows
-            if (g.variants.length > 0) {
-              g.variants.sort((a, b) => b.revenue - a.revenue);
-              g.variants.forEach(v => {
-                const vpct = g.revenue > 0 ? ((v.revenue / g.revenue) * 100).toFixed(0) : 0;
-                rowsHtml += '<tr style="background:var(--surface-2);font-size:0.85rem"><td></td><td style="padding-left:28px;color:var(--text-muted)">\u2514 ' + esc(v.name) + '</td><td style="font-family:monospace;font-size:0.8rem;color:var(--text-muted)">' + esc(v.sku || '') + '</td><td colspan="2"></td><td style="color:var(--text-muted)">' + v.qty + '</td><td style="color:var(--text-muted)">\u20ac' + v.revenue.toFixed(2) + '</td><td style="color:var(--text-muted)">' + vpct + '%</td></tr>';
+          prodSorted.forEach((d, i) => {
+            const pct = filtTotal > 0 ? ((parseFloat(d.total_revenue) / filtTotal) * 100).toFixed(1) : 0;
+            const pName = d.product_name || 'Unknown';
+            rowsHtml += '<tr style="cursor:pointer" onclick="openReportDetail(\'product\',\'' + esc(pName).replace(/'/g, "\\\\'") + '\',\'' + esc(pName).replace(/'/g, "\\\\'") + '\',\'' + (d.product_id || '') + '\')">' +
+              '<td>' + (i+1) + '</td><td><strong>' + esc(pName) + '</strong></td>' +
+              '<td style="font-family:monospace;font-size:0.85rem">' + esc(d.product_sku || '\u2014') + '</td>' +
+              '<td>' + esc(d.brand_name || '\u2014') + '</td>' +
+              '<td>' + esc(d.category_name || '\u2014') + '</td>' +
+              '<td>' + d.total_qty + '</td>' +
+              '<td class="price">\u20ac' + parseFloat(d.total_revenue).toFixed(2) + '</td>' +
+              '<td><div style="display:flex;align-items:center;gap:4px"><div style="background:var(--accent);height:8px;width:' + pct + '%;border-radius:4px;min-width:2px"></div>' + pct + '%</div></td></tr>';
+
+            // Variant rows from variant_sales RPC
+            const variants = variantMap[pName] || [];
+            if (variants.length > 0) {
+              const prodRev = parseFloat(d.total_revenue);
+              variants.forEach(v => {
+                const vpct = prodRev > 0 ? ((v.revenue / prodRev) * 100).toFixed(0) : 0;
+                rowsHtml += '<tr style="background:var(--surface-2);font-size:0.85rem">' +
+                  '<td></td><td style="padding-left:28px;color:var(--text-muted)">\u2514 ' + esc(v.name) + '</td>' +
+                  '<td style="font-family:monospace;font-size:0.8rem;color:var(--text-muted)">' + esc(v.sku || '') + '</td>' +
+                  '<td colspan="2"></td>' +
+                  '<td style="color:var(--text-muted)">' + v.qty + '</td>' +
+                  '<td style="color:var(--text-muted)">\u20ac' + v.revenue.toFixed(2) + '</td>' +
+                  '<td style="color:var(--text-muted)">' + vpct + '%</td></tr>';
               });
             }
           });
@@ -9157,7 +9167,7 @@
             '<div style="overflow-x:auto;max-height:70vh;overflow-y:auto;margin-bottom:25px;"><table>' +
             '<thead><tr><th>#</th><th>Product</th><th>SKU</th><th>Brand</th><th>Category</th><th>Qty</th><th>Revenue</th><th>Share</th></tr></thead>' +
             '<tbody>' + rowsHtml + '</tbody>' +
-            '<tfoot><tr style="font-weight:bold;border-top:2px solid var(--border)"><td colspan="5">TOTAL (' + groupsSorted.length + ' products' + brandLabel + ')</td><td>' + filtQty + '</td><td class="price">\u20ac' + filtTotal.toFixed(2) + '</td><td>100%</td></tr></tfoot>' +
+            '<tfoot><tr style="font-weight:bold;border-top:2px solid var(--border)"><td colspan="5">TOTAL (' + prodSorted.length + ' products' + brandLabel + ')</td><td>' + filtQty + '</td><td class="price">\u20ac' + filtTotal.toFixed(2) + '</td><td>100%</td></tr></tfoot>' +
             '</table></div>';
 
         } else if (type === 'brandAnalysis' || type === 'categoryAnalysis') {
