@@ -4308,6 +4308,7 @@
     let currentFinanceCategory = null; // selected category for Revenue by Category
     let currentFinanceProduct = null; // selected product for Top Products
     let currentFinanceTopBrand = null; // selected brand filter for Top Products
+    let currentReportBrand = null; // brand filter for Product Analytics report
 
     function getFinanceDateRange() {
       const now = new Date();
@@ -9051,7 +9052,7 @@
               </table></div>`;
 
         } else if (type === 'productAnalytics') {
-          // Product Analytics Report with date filter
+          // Product Analytics Report with date filter + brand filter
           document.getElementById('reportDateFilter').style.display = 'block';
           const { from, to } = getReportDateRange();
           window.reportDetailDateRange = { from, to };
@@ -9066,56 +9067,84 @@
           const data = await rpcRes.json();
 
           if (!data || data.length === 0) {
-            out.innerHTML = '<div style="color:var(--text-muted);padding:40px;text-align:center;">No product data found for this period. Items may not be synced yet.</div>';
+            out.innerHTML = '<div style="color:var(--text-muted);padding:40px;text-align:center;">No product data found for this period.</div>';
             return;
           }
 
-          // Top Products — lista completa (todos os produtos), ordenados por receita
-          const prodSorted = [...data].sort((a, b) => parseFloat(b.total_revenue) - parseFloat(a.total_revenue));
-          const prodTotal = data.reduce((s, d) => s + parseFloat(d.total_revenue || 0), 0);
-
-          // Top Categories
-          const cats = {};
-          data.forEach(d => {
-            const c = d.category_name || 'Uncategorized';
-            if (!cats[c]) cats[c] = { qty: 0, revenue: 0, products: 0 };
-            cats[c].qty += parseInt(d.total_qty || 0);
-            cats[c].revenue += parseFloat(d.total_revenue || 0);
-            cats[c].products++;
-          });
-          const catSorted = Object.entries(cats).sort((a, b) => b[1].revenue - a[1].revenue);
-
-          // Top Brands
-          const brands = {};
+          // Build brand list sorted by revenue
+          const brandRevMap = {};
           data.forEach(d => {
             const b = d.brand_name || 'Unknown';
-            if (!brands[b]) brands[b] = { qty: 0, revenue: 0, products: 0 };
-            brands[b].qty += parseInt(d.total_qty || 0);
-            brands[b].revenue += parseFloat(d.total_revenue || 0);
-            brands[b].products++;
+            if (b === 'Unknown' || b === 'Uncategorized') return;
+            brandRevMap[b] = (brandRevMap[b] || 0) + parseFloat(d.total_revenue || 0);
           });
-          const brandSorted = Object.entries(brands).sort((a, b) => b[1].revenue - a[1].revenue);
+          const brandList = Object.entries(brandRevMap).sort((a, b) => b[1] - a[1]).map(e => e[0]);
+
+          // Brand filter HTML
+          const brandAllStyle = !currentReportBrand ? 'background:var(--accent-bg);color:var(--accent);' : '';
+          const brandFilterHtml = '<div style="margin-bottom:15px;background:var(--surface-2);padding:12px 15px;border-radius:8px;"><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">' +
+            '<span style="color:var(--text-muted);font-size:0.9rem;">\ud83c\udff7\ufe0f Brand:</span>' +
+            '<button class="btn-sm btn-outline" style="padding:6px 14px;' + brandAllStyle + '" onclick="currentReportBrand=null;loadReport(\'productAnalytics\')">All Brands</button>' +
+            brandList.map(b => {
+              const safe = b.replace(/'/g, "\\'");
+              const isActive = b === currentReportBrand;
+              const st = isActive ? 'background:var(--accent-bg);color:var(--accent);' : '';
+              return '<button class="btn-sm btn-outline" style="padding:6px 14px;' + st + '" onclick="currentReportBrand=\'' + safe + '\';loadReport(\'productAnalytics\')">' + b + '</button>';
+            }).join('') +
+            '</div></div>';
+
+          // Filter by brand if selected
+          let filtered = data;
+          if (currentReportBrand) {
+            filtered = data.filter(d => d.brand_name === currentReportBrand);
+          }
+
+          // Group products by base name (before " - ") and collect variants
+          const productGroups = {};
+          filtered.forEach(d => {
+            const fullName = d.product_name || 'Unknown';
+            const dashIdx = fullName.indexOf(' - ');
+            const baseName = dashIdx > 0 ? fullName.substring(0, dashIdx).trim() : fullName;
+            const variantName = dashIdx > 0 ? fullName.substring(dashIdx + 3).trim() : null;
+            if (!productGroups[baseName]) {
+              productGroups[baseName] = { brand: d.brand_name, category: d.category_name, sku: d.product_sku, qty: 0, revenue: 0, variants: [], product_id: d.product_id };
+            }
+            productGroups[baseName].qty += parseInt(d.total_qty || 0);
+            productGroups[baseName].revenue += parseFloat(d.total_revenue || 0);
+            if (variantName) {
+              productGroups[baseName].variants.push({ name: variantName, sku: d.product_sku, qty: parseInt(d.total_qty || 0), revenue: parseFloat(d.total_revenue || 0) });
+            }
+          });
+
+          // Sort by revenue
+          const groupsSorted = Object.entries(productGroups).sort((a, b) => b[1].revenue - a[1].revenue);
+          const filtTotal = groupsSorted.reduce((s, [, g]) => s + g.revenue, 0);
+          const filtQty = groupsSorted.reduce((s, [, g]) => s + g.qty, 0);
 
           const periodLabel = { thisMonth: 'This Month', lastMonth: 'Last Month', quarter: 'Last 3 Months', semester: 'Last 6 Months', year: 'Last 12 Months', all: 'All Time' }[dateLabel] || 'All Time';
+          const brandLabel = currentReportBrand ? ' \u2014 ' + currentReportBrand : '';
 
-          out.innerHTML = `
-            <h3 style="margin:0 0 20px 0;">📦 Product Analytics — ${periodLabel}</h3>
-            <h4 style="margin:20px 0 10px 0;">🏆 Top Products by Revenue (todos os produtos)</h4>
-            <div style="overflow-x:auto;max-height:70vh;overflow-y:auto;margin-bottom:25px;"><table>
-              <thead><tr><th>#</th><th>Product</th><th>SKU</th><th>Brand</th><th>Category</th><th>Qty</th><th>Revenue</th><th>Share</th></tr></thead>
-              <tbody>${prodSorted.map((d, i) => {
-            const pct = prodTotal > 0 ? ((parseFloat(d.total_revenue) / prodTotal) * 100).toFixed(1) : 0;
-            return `<tr style="cursor:pointer" onclick="openReportDetail('product','${esc(d.product_name).replace(/'/g,"\\'")}','${esc(d.product_name).replace(/'/g,"\\'")}','${d.product_id||''}')"><td>${i + 1}</td>
-                  <td><strong>${esc(d.product_name)}</strong></td>
-                  <td style="font-family:monospace;font-size:0.85rem;">${esc(d.product_sku || '—')}</td>
-                  <td>${esc(d.brand_name || '—')}</td>
-                  <td>${esc(d.category_name || '—')}</td>
-                  <td>${d.total_qty}</td>
-                  <td class="price">€${parseFloat(d.total_revenue).toFixed(2)}</td>
-                  <td><div style="display:flex;align-items:center;gap:4px;"><div style="background:var(--accent);height:8px;width:${pct}%;border-radius:4px;min-width:2px"></div>${pct}%</div></td></tr>`;
-          }).join('')}</tbody>
-              <tfoot><tr style="font-weight:bold;border-top:2px solid var(--border)"><td colspan="5">TOTAL (all ${data.length} products)</td><td>${data.reduce((s, d) => s + parseInt(d.total_qty || 0), 0)}</td><td class="price">€${prodTotal.toFixed(2)}</td><td>100%</td></tr></tfoot>
-            </table></div>`;
+          let rowsHtml = '';
+          groupsSorted.forEach(([baseName, g], i) => {
+            const pct = filtTotal > 0 ? ((g.revenue / filtTotal) * 100).toFixed(1) : 0;
+            rowsHtml += '<tr><td>' + (i + 1) + '</td><td><strong>' + esc(baseName) + '</strong></td><td style="font-family:monospace;font-size:0.85rem">' + esc(g.sku || '\u2014') + '</td><td>' + esc(g.brand || '\u2014') + '</td><td>' + esc(g.category || '\u2014') + '</td><td>' + g.qty + '</td><td class="price">\u20ac' + g.revenue.toFixed(2) + '</td><td><div style="display:flex;align-items:center;gap:4px"><div style="background:var(--accent);height:8px;width:' + pct + '%;border-radius:4px;min-width:2px"></div>' + pct + '%</div></td></tr>';
+            // Variant rows
+            if (g.variants.length > 0) {
+              g.variants.sort((a, b) => b.revenue - a.revenue);
+              g.variants.forEach(v => {
+                const vpct = g.revenue > 0 ? ((v.revenue / g.revenue) * 100).toFixed(0) : 0;
+                rowsHtml += '<tr style="background:var(--surface-2);font-size:0.85rem"><td></td><td style="padding-left:28px;color:var(--text-muted)">\u2514 ' + esc(v.name) + '</td><td style="font-family:monospace;font-size:0.8rem;color:var(--text-muted)">' + esc(v.sku || '') + '</td><td colspan="2"></td><td style="color:var(--text-muted)">' + v.qty + '</td><td style="color:var(--text-muted)">\u20ac' + v.revenue.toFixed(2) + '</td><td style="color:var(--text-muted)">' + vpct + '%</td></tr>';
+              });
+            }
+          });
+
+          out.innerHTML = brandFilterHtml +
+            '<h3 style="margin:0 0 20px 0;">\ud83d\udce6 Product Analytics \u2014 ' + periodLabel + brandLabel + '</h3>' +
+            '<div style="overflow-x:auto;max-height:70vh;overflow-y:auto;margin-bottom:25px;"><table>' +
+            '<thead><tr><th>#</th><th>Product</th><th>SKU</th><th>Brand</th><th>Category</th><th>Qty</th><th>Revenue</th><th>Share</th></tr></thead>' +
+            '<tbody>' + rowsHtml + '</tbody>' +
+            '<tfoot><tr style="font-weight:bold;border-top:2px solid var(--border)"><td colspan="5">TOTAL (' + groupsSorted.length + ' products' + brandLabel + ')</td><td>' + filtQty + '</td><td class="price">\u20ac' + filtTotal.toFixed(2) + '</td><td>100%</td></tr></tfoot>' +
+            '</table></div>';
 
         } else if (type === 'brandAnalysis' || type === 'categoryAnalysis') {
           // Both share the same RPC data
