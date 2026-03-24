@@ -130,8 +130,8 @@ const B2B = (function() {
     const el1 = document.getElementById('ordStatSpend');
     const el2 = document.getElementById('ordStatOrders');
     const el3 = document.getElementById('ordStatPending');
-    const s1 = document.getElementById('statSpendTotal');
-    const s2 = document.getElementById('statOrdersTotal');
+    const s1 = document.getElementById('statSpendYear');
+    const s2 = document.getElementById('statOrdersYear');
     const s3 = document.getElementById('statPending');
     if (el1 && s1) el1.textContent = s1.textContent;
     if (el2 && s2) el2.textContent = s2.textContent;
@@ -441,7 +441,7 @@ const B2B = (function() {
       if (stats) {
         var totalSpent = Number(stats.total_spent||0);
         var totalOrders = Number(stats.total_orders||0);
-        var yearSpent = Number(stats.year_spent||0);
+        var yearSpent = Number(stats.month_spent||0);
         var outstanding = Number(stats.outstanding||0);
         var avg = totalOrders > 0 ? totalSpent / totalOrders : 0;
         document.getElementById('finOpenBalance').textContent = FMT(outstanding);
@@ -657,10 +657,8 @@ const B2B = (function() {
       // Load dashboard stats via dedicated RPC
       const stats = await sfi.b2b.getDashboardStats();
       if (stats) {
-        document.getElementById('statSpendTotal').textContent = FMT(Number(stats.total_spent||0));
-        document.getElementById('statOrdersTotal').textContent = stats.total_orders || 0;
-        document.getElementById('statSpendYear').textContent = FMT(Number(stats.year_spent||0));
-        document.getElementById('statOrdersYear').textContent = stats.year_orders || 0;
+        document.getElementById('statSpendYear').textContent = FMT(Number(stats.month_spent||0));
+        document.getElementById('statOrdersYear').textContent = stats.month_orders || 0;
         document.getElementById('statPending').textContent = FMT(Number(stats.outstanding||0));
         document.getElementById('statInProgress').textContent = stats.pending_orders || 0;
       }
