@@ -3179,17 +3179,48 @@
           <h1>🏢 B2B Management</h1>
         </div>
 
-        <!-- Pending Applications -->
-        <div class="detail-panel" style="margin-bottom:20px;">
-          <h3 style="margin-bottom:16px;">Pending Applications <span class="badge" id="b2bPendingInline"
-              style="display:none">0</span></h3>
-          <div id="b2bPendingList" style="color:var(--muted);">Loading...</div>
+        <!-- B2B Customer List -->
+        <div class="detail-panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <h3 style="margin:0">B2B Customers <span id="b2bCount" style="font-size:0.85rem;color:var(--text-muted);font-weight:400"></span></h3>
+            <input type="text" id="b2bSearch" placeholder="Search by name, company, email..." oninput="renderB2BList()"
+              style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem;width:300px;max-width:100%">
+          </div>
+          <div id="b2bActiveList" style="color:var(--muted);">Loading...</div>
         </div>
 
-        <!-- Active B2B Customers -->
-        <div class="detail-panel">
-          <h3 style="margin-bottom:16px;">Active B2B Customers</h3>
-          <div id="b2bActiveList" style="color:var(--muted);">Loading...</div>
+        <!-- B2B Edit Modal -->
+        <div class="modal-overlay" id="b2bEditModal" style="display:none" onclick="if(event.target===this)closeB2BEditModal()">
+          <div class="modal" style="max-width:500px">
+            <div class="modal-header">
+              <h3>Edit B2B Customer</h3>
+              <button class="modal-close" onclick="closeB2BEditModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" id="b2bEditId">
+              <div style="margin-bottom:16px;padding:12px;background:var(--surface-2);border-radius:8px">
+                <div style="font-weight:700;font-size:1.05rem" id="b2bEditName"></div>
+                <div style="font-size:0.85rem;color:var(--text-muted)" id="b2bEditEmail"></div>
+              </div>
+              <div class="form-group"><label>Company Name</label><input type="text" id="b2bEditCompany" placeholder="Company name"></div>
+              <div class="form-group"><label>VAT Number</label><input type="text" id="b2bEditVat" placeholder="IE1234567X"></div>
+              <div class="form-group">
+                <label>Customer Type</label>
+                <select id="b2bEditType" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.95rem;width:100%">
+                  <option value="b2b">B2B (Wholesale)</option>
+                  <option value="b2c">B2C (Retail)</option>
+                </select>
+                <div class="hint" style="color:var(--warning)">Changing to B2C will remove wholesale access</div>
+              </div>
+            </div>
+            <div class="modal-footer" style="justify-content:space-between">
+              <button class="btn" style="background:#ef4444;color:#fff" onclick="deleteB2BCustomer()">Delete</button>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost" onclick="closeB2BEditModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveB2BEdit()">Save Changes</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -12698,112 +12729,113 @@
     // ============================================================
     // B2B MANAGEMENT
     // ============================================================
-    let b2bPending = [];
-    let b2bActive = [];
+    let b2bCustomers = [];
 
     async function loadB2BData() {
       try {
-        // Load pending applications
-        b2bPending = await supaGet('profiles', '?b2b_status=eq.pending&select=*&order=b2b_applied_at.desc');
-        // Load approved B2B customers
-        b2bActive = await supaGet('profiles', '?b2b_status=eq.approved&is_b2b=eq.true&select=*&order=b2b_approved_at.desc');
-
-        renderB2BPending();
-        renderB2BActive();
-
-        // Update badge count
-        const badge = document.getElementById('b2bPendingInline');
-        if (badge) {
-          badge.textContent = b2bPending.length;
-          badge.style.display = b2bPending.length > 0 ? 'inline' : 'none';
-        }
+        const h = getAuthHeaders();
+        // Load ALL B2B customers from customers table
+        const res = await fetch(SUPA_URL + '/rest/v1/customers?customer_type=eq.b2b&select=id,first_name,last_name,email,company,customer_type,b2b_company_name,b2b_vat_number,b2b_status,b2b_business_type,b2b_expected_volume,b2b_applied_at,b2b_approved_at,is_b2b&order=first_name.asc&limit=600', { headers: h });
+        if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+        b2bCustomers = await res.json();
+        renderB2BList();
       } catch (e) {
         console.error('B2B load error:', e);
-        document.getElementById('b2bPendingList').innerHTML = '<div style="color:var(--danger)">Failed to load B2B data</div>';
+        document.getElementById('b2bActiveList').innerHTML = '<div style="color:var(--danger)">Failed to load: ' + e.message + '</div>';
       }
     }
 
-    function renderB2BPending() {
-      const el = document.getElementById('b2bPendingList');
-      if (!b2bPending.length) {
-        el.innerHTML = '<p style="color:var(--muted);padding:12px 0;">No pending applications</p>';
-        return;
-      }
-      el.innerHTML = `<table class="data-table"><thead><tr>
-        <th>Company</th><th>Contact</th><th>Email</th><th>VAT</th><th>Type</th><th>Volume</th><th>Applied</th><th style="width:140px">Actions</th>
-      </tr></thead><tbody>${b2bPending.map(p => `<tr>
-        <td><strong>${esc(p.b2b_company_name || '—')}</strong></td>
-        <td>${esc((p.first_name || '') + ' ' + (p.last_name || ''))}</td>
-        <td style="font-size:0.8rem">${esc(p.email || '—')}</td>
-        <td style="font-family:monospace;font-size:0.8rem">${esc(p.b2b_vat_number || '—')}</td>
-        <td>${esc(p.b2b_business_type || '—')}</td>
-        <td>${esc(p.b2b_expected_volume || '—')}</td>
-        <td style="font-size:0.8rem">${p.b2b_applied_at ? new Date(p.b2b_applied_at).toLocaleDateString() : '—'}</td>
-        <td>
-          <button class="btn-sm" style="background:#22c55e;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.75rem;margin-right:4px" onclick="approveB2B('${p.user_id}')">✅ Approve</button>
-          <button class="btn-sm" style="background:#ef4444;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.75rem" onclick="rejectB2B('${p.user_id}')">❌ Reject</button>
-        </td>
-      </tr>`).join('')}</tbody></table>`;
-    }
-
-    function renderB2BActive() {
+    function renderB2BList() {
       const el = document.getElementById('b2bActiveList');
-      if (!b2bActive.length) {
-        el.innerHTML = '<p style="color:var(--muted);padding:12px 0;">No active B2B customers yet</p>';
+      const search = (document.getElementById('b2bSearch')?.value || '').toLowerCase();
+      let filtered = b2bCustomers;
+      if (search.length >= 2) {
+        filtered = b2bCustomers.filter(c => {
+          const name = ((c.first_name || '') + ' ' + (c.last_name || '') + ' ' + (c.b2b_company_name || '') + ' ' + (c.email || '')).toLowerCase();
+          return name.includes(search);
+        });
+      }
+      document.getElementById('b2bCount').textContent = filtered.length + ' / ' + b2bCustomers.length;
+      if (!filtered.length) {
+        el.innerHTML = '<p style="color:var(--muted);padding:12px 0;">No B2B customers found</p>';
         return;
       }
-      el.innerHTML = `<table class="data-table"><thead><tr>
-        <th>Company</th><th>Contact</th><th>Email</th><th>VAT</th><th>Status</th><th>Approved</th><th style="width:120px">Actions</th>
-      </tr></thead><tbody>${b2bActive.map(p => `<tr>
-        <td><strong>${esc(p.b2b_company_name || '—')}</strong></td>
-        <td>${esc((p.first_name || '') + ' ' + (p.last_name || ''))}</td>
-        <td style="font-size:0.8rem">${esc(p.email || '—')}</td>
-        <td style="font-family:monospace;font-size:0.8rem">${esc(p.b2b_vat_number || '—')}</td>
-        <td><span class="stock-badge in" style="font-size:0.7rem;padding:2px 8px">Active</span></td>
-        <td style="font-size:0.8rem">${p.b2b_approved_at ? new Date(p.b2b_approved_at).toLocaleDateString() : '—'}</td>
-        <td>
-          <button class="btn-sm btn-danger-outline" style="font-size:0.75rem;padding:4px 10px" onclick="revokeB2B('${p.user_id}')">Revoke</button>
-        </td>
-      </tr>`).join('')}</tbody></table>`;
+      el.innerHTML = '<div style="overflow-x:auto"><table class="data-table"><thead><tr>' +
+        '<th>Name</th><th>Company</th><th>Email</th><th>VAT</th><th>Status</th><th style="width:100px">Actions</th>' +
+        '</tr></thead><tbody>' +
+        filtered.map(function(c) {
+          var name = esc((c.first_name || '') + ' ' + (c.last_name || ''));
+          var company = esc(c.b2b_company_name || c.company || '\u2014');
+          var email = esc(c.email || '\u2014');
+          var vat = esc(c.b2b_vat_number || '\u2014');
+          var status = c.b2b_status === 'approved' ? '<span style="color:#22c55e;font-weight:600">Active</span>' : (c.b2b_status || '<span style="color:var(--text-muted)">\u2014</span>');
+          return '<tr>' +
+            '<td><strong>' + name + '</strong></td>' +
+            '<td>' + company + '</td>' +
+            '<td style="font-size:0.8rem">' + email + '</td>' +
+            '<td style="font-family:monospace;font-size:0.8rem">' + vat + '</td>' +
+            '<td>' + status + '</td>' +
+            '<td><button class="btn-sm btn-outline" style="font-size:0.75rem;padding:4px 10px" onclick="openB2BEditModal(\'' + c.id + '\')">\u270f\ufe0f Edit</button></td>' +
+            '</tr>';
+        }).join('') +
+        '</tbody></table></div>';
     }
 
-    async function patchProfile(userId, data) {
-      const h = getAuthHeaders();
-      h['Prefer'] = 'return=representation';
-      const r = await fetch(`${SUPA_URL}/rest/v1/profiles?user_id=eq.${userId}`, {
-        method: 'PATCH', headers: h, body: JSON.stringify(data)
-      });
-      if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.message || 'PATCH failed: ' + r.status); }
-      return r.json();
+    function openB2BEditModal(customerId) {
+      var c = b2bCustomers.find(function(x) { return x.id === customerId; });
+      if (!c) { toast('Customer not found', 'error'); return; }
+      document.getElementById('b2bEditId').value = c.id;
+      document.getElementById('b2bEditName').textContent = (c.first_name || '') + ' ' + (c.last_name || '');
+      document.getElementById('b2bEditEmail').textContent = c.email || '\u2014';
+      document.getElementById('b2bEditCompany').value = c.b2b_company_name || c.company || '';
+      document.getElementById('b2bEditVat').value = c.b2b_vat_number || '';
+      document.getElementById('b2bEditType').value = c.customer_type || 'b2b';
+      document.getElementById('b2bEditModal').style.display = 'flex';
     }
 
-    async function approveB2B(userId) {
-      if (!confirm('Approve this B2B application?')) return;
+    function closeB2BEditModal() { document.getElementById('b2bEditModal').style.display = 'none'; }
+
+    async function saveB2BEdit() {
+      var id = document.getElementById('b2bEditId').value;
+      var newType = document.getElementById('b2bEditType').value;
+      var company = document.getElementById('b2bEditCompany').value.trim();
+      var vat = document.getElementById('b2bEditVat').value.trim();
+      var data = {
+        customer_type: newType,
+        b2b_company_name: company || null,
+        b2b_vat_number: vat || null
+      };
+      if (newType === 'b2c') {
+        data.is_b2b = false;
+        data.b2b_status = null;
+      }
       try {
-        await patchProfile(userId, { is_b2b: true, b2b_status: 'approved', b2b_approved_at: new Date().toISOString() });
-        toast('B2B application approved');
+        var h = getAuthHeaders();
+        h['Prefer'] = 'return=representation';
+        var res = await fetch(SUPA_URL + '/rest/v1/customers?id=eq.' + id, {
+          method: 'PATCH', headers: h, body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Update failed: ' + res.status);
+        toast(newType === 'b2c' ? 'Customer changed to B2C' : 'Customer updated');
+        closeB2BEditModal();
         await loadB2BData();
-      } catch (e) { toast('Error approving: ' + e.message, 'error'); }
+      } catch(e) { toast('Error: ' + e.message, 'error'); }
     }
 
-    async function rejectB2B(userId) {
-      const reason = prompt('Rejection reason (optional):');
-      if (reason === null) return;
+    async function deleteB2BCustomer() {
+      var id = document.getElementById('b2bEditId').value;
+      var name = document.getElementById('b2bEditName').textContent;
+      if (!confirm('Delete customer "' + name + '"? This cannot be undone.')) return;
       try {
-        await patchProfile(userId, { b2b_status: 'rejected', b2b_notes: reason || 'Application rejected' });
-        toast('B2B application rejected');
+        var h = getAuthHeaders();
+        var res = await fetch(SUPA_URL + '/rest/v1/customers?id=eq.' + id, { method: 'DELETE', headers: h });
+        if (!res.ok) throw new Error('Delete failed: ' + res.status);
+        toast('Customer deleted');
+        closeB2BEditModal();
         await loadB2BData();
-      } catch (e) { toast('Error rejecting: ' + e.message, 'error'); }
+      } catch(e) { toast('Error: ' + e.message, 'error'); }
     }
 
-    async function revokeB2B(userId) {
-      if (!confirm('Revoke B2B access? Customer will lose wholesale pricing.')) return;
-      try {
-        await patchProfile(userId, { is_b2b: false, b2b_status: 'rejected', b2b_notes: 'Revoked by admin ' + new Date().toLocaleDateString() });
-        toast('B2B access revoked');
-        await loadB2BData();
-      } catch (e) { toast('Error revoking: ' + e.message, 'error'); }
-    }
 
     // ============================================================
     // INIT
