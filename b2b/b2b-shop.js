@@ -104,10 +104,8 @@
     const currency = sfi.currency === 'GBP' ? '£' : '€';
     grid.innerHTML = products.map(p => {
       const imgSrc = p.imagem ? (p.imagem.startsWith('http') ? p.imagem : '../' + p.imagem) : '../img/placeholder.webp';
-      const b2bPrice = p.b2b_price != null ? currency + EXVAT(p.b2b_price).toFixed(2) : 'N/A';
-      const retailPrice = p.retail_price != null ? currency + EXVAT(p.retail_price).toFixed(2) : '';
+      const b2bPrice = p.b2b_price != null ? currency + Number(p.b2b_price).toFixed(2) : 'N/A';
       const brandName = p.brands?.name || p.marca || '';
-      const hasDiscount = p.has_wholesale && p.retail_price && p.b2b_price < p.retail_price;
       const inStock = p.em_stock !== false;
       const stockQty = p._stock_qty;
 
@@ -137,7 +135,6 @@
           
           <div class="b2b-price-row">
             <span class="b2b-price">${b2bPrice}</span>
-            ${hasDiscount ? '<span class="retail-price">RRP ' + retailPrice + '</span>' : ''}
           </div>
           ${actionBtn}
         </div>

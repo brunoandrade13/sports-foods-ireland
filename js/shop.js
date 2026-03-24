@@ -527,7 +527,7 @@ function renderProducts() {
             ? `<span class="badge-desconto">-${product.discount}%</span>` 
             : '';
         const oldPrice = product.oldPrice && product.oldPrice > product.price
-            ? `<span class="old-price">€${product.oldPrice.toFixed(2)}</span>`
+            ? ''
             : '';
         
         // Variant selector for cards
@@ -578,7 +578,7 @@ function renderProducts() {
             const oldPriceEl = card.querySelector('.old-price');
             if (oldPriceVal && !isNaN(oldPriceVal) && oldPriceVal > price) {
                 if (oldPriceEl) { oldPriceEl.textContent = `${currency}${oldPriceVal.toFixed(2)}`; oldPriceEl.style.display = ''; }
-                else { const sp = document.createElement('span'); sp.className = 'old-price'; sp.textContent = `${currency}${oldPriceVal.toFixed(2)}`; card.querySelector('.product-prices')?.prepend(sp); }
+                else { /* RRP removed */ }
             } else if (oldPriceEl) { oldPriceEl.style.display = 'none'; }
         });
         

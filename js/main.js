@@ -139,9 +139,7 @@ function buildHomeCarouselCard(prod) {
     }
     // Fallback — same structure as shop card
     const discountBadge = prod.desconto > 0 ? `<span class="badge-desconto">-${prod.desconto}%</span>` : '';
-    const oldPrice = prod.preco_antigo && prod.preco_antigo > prod.preco
-        ? `<span class="old-price">€${Number(prod.preco_antigo).toFixed(2)}</span>`
-        : '';
+    const oldPrice = '';
     const imgSrc = getProductImage(prod.imagem, prod.id);
     const prodId = prod.id;
     return `
@@ -345,7 +343,7 @@ function renderProductGrid(produtos, container) {
             ${prod.marca ? `<span class="product-brand">${prod.marca}</span>` : ''}
             ${prod.descricao ? `<p class="product-short-desc">${prod.descricao}</p>` : ''}
             <div class="product-prices">
-                ${prod.preco_antigo && prod.preco_antigo > prod.preco ? `<span class="old-price">€${prod.preco_antigo.toFixed(2)}</span>` : ''}
+                
                 <span class="new-price">€${prod.preco.toFixed(2)}</span>
             </div>
             <button class="btn-basket" data-product-id="${prod.id}" type="button">ADD TO BASKET</button>
@@ -2111,7 +2109,7 @@ function renderWishlistProducts(wishlistIds, produtos) {
             </h3>
             ${safeBrand ? `<span class="product-brand">${safeBrand}</span>` : ''}
             <div class="product-prices">
-                ${prod.preco_antigo && prod.preco_antigo > prod.preco ? `<span class="old-price">€${prod.preco_antigo.toFixed(2)}</span>` : ''}
+                
                 <span class="new-price">€${prod.preco.toFixed(2)}</span>
             </div>
             <button class="btn-basket" data-product-id="${prod.id}">ADD TO BASKET</button>
@@ -2241,7 +2239,7 @@ function renderRecentlyViewed() {
                     <a href="produto.html?id=${prod.id}">${prod.nome}</a>
                 </h3>
                 <div class="product-prices">
-                    ${prod.preco_antigo ? `<span class="old-price">€${prod.preco_antigo.toFixed(2)}</span>` : ''}
+                    
                     <span class="new-price">€${prod.preco.toFixed(2)}</span>
                 </div>
                 <button class="btn-basket" data-product-id="${prod.id}">ADD TO BASKET</button>
@@ -2327,7 +2325,7 @@ function openQuickView(productId) {
     const oldPriceEl = document.getElementById('qvOldPrice');
     const discountEl = document.getElementById('qvDiscount');
 
-    if (product.preco_antigo && product.preco_antigo > product.preco) {
+    if (false) { // RRP removed
         oldPriceEl.textContent = `€${product.preco_antigo.toFixed(2)}`;
         oldPriceEl.style.display = 'inline';
         const discountPercent = Math.round((1 - product.preco / product.preco_antigo) * 100);

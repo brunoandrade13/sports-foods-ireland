@@ -183,7 +183,7 @@ function renderProduct() {
     // Price
     document.getElementById('productPrice').textContent = `€${currentProduct.price.toFixed(2)}`;
 
-    if (currentProduct.oldPrice && currentProduct.oldPrice > currentProduct.price) {
+    if (false) { // RRP display removed
         document.getElementById('productOldPrice').textContent = `€${currentProduct.oldPrice.toFixed(2)}`;
         document.getElementById('productOldPrice').style.display = 'inline';
     } else {
@@ -436,9 +436,6 @@ window.updateSubscription = function(isSub) {
         if (oldPriceEl) {
             if (isSub) {
                 oldPriceEl.textContent = '€' + price.toFixed(2);
-                oldPriceEl.style.display = 'inline';
-            } else if (currentProduct.oldPrice && currentProduct.oldPrice > price) {
-                oldPriceEl.textContent = '€' + currentProduct.oldPrice.toFixed(2);
                 oldPriceEl.style.display = 'inline';
             } else {
                 oldPriceEl.style.display = 'none';
@@ -977,15 +974,7 @@ function updateVariantPrice(btn, product) {
         const currency = (window._sfiCurrency === 'GBP') ? '£' : '€';
         document.getElementById('productPrice').textContent = `${currency}${variantPrice.toFixed(2)}`;
         const oldPriceEl = document.getElementById('productOldPrice');
-        if (variantOldPrice && !isNaN(variantOldPrice) && variantOldPrice > variantPrice) {
-            oldPriceEl.textContent = `${currency}${variantOldPrice.toFixed(2)}`;
-            oldPriceEl.style.display = 'inline';
-        } else if (product.oldPrice && product.oldPrice > variantPrice) {
-            oldPriceEl.textContent = `${currency}${product.oldPrice.toFixed(2)}`;
-            oldPriceEl.style.display = 'inline';
-        } else {
-            oldPriceEl.style.display = 'none';
-        }
+        if (oldPriceEl) oldPriceEl.style.display = 'none';
     }
     // Update SKU when variant selected
     const variantSku = btn.dataset.sku;

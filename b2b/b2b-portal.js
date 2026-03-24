@@ -814,7 +814,7 @@ const B2B = (function() {
           <img src="${img}" alt="${p.product_name||''}" onerror="this.src='../img/placeholder.webp'">
           <div class="prod-brand">${p.brand_name||''}</div>
           <div class="prod-name">${p.product_name||'Product'}</div>
-          <div class="prod-price">${FMTX(p.b2b_price)}</div>
+          <div class="prod-price">${p.b2b_price != null ? FMT(Number(p.b2b_price)) : 'N/A'}</div>
           <div class="prod-orders">${p.order_count} order${p.order_count!==1?'s':''}</div>
         </div>`;
       }).join('');
@@ -982,7 +982,7 @@ const B2B = (function() {
         <img src="${img}" alt="" onerror="this.src='../img/placeholder.webp'">
         <div class="ri-info">
           <div class="ri-name">${item.name}</div>
-          <div class="ri-price">${FMTX(item.price)} each</div>
+          <div class="ri-price">${FMT(Number(item.price))} each</div>
         </div>
         <div class="qty-controls">
           <button onclick="B2B.updateQty(${idx},-1)">−</button>
@@ -1005,7 +1005,7 @@ const B2B = (function() {
 
   function updateReorderTotal() {
     const total = reorderItems.reduce((s, i) => s + (i.price * i.quantity), 0);
-    document.getElementById('reorderTotal').textContent = FMT(total / 1.23);
+    document.getElementById('reorderTotal').textContent = FMT(total);
   }
 
   function closeReorder() {
@@ -1019,7 +1019,7 @@ const B2B = (function() {
     let added = 0;
     active.forEach(i => {
       if (i.legacy_id) {
-        addToCart(i.legacy_id, i.quantity, { nome: i.name, preco: EXVAT(i.price), imagem: i.image });
+        addToCart(i.legacy_id, i.quantity, { nome: i.name, preco: Number(i.price), imagem: i.image });
         added++;
       }
     });
@@ -1152,7 +1152,7 @@ const B2B = (function() {
       price: Number(i.unit_price)||0, total: Number(i.total)||0
     }));
     const total = Number(order.total)||0;
-    const subtotal = +(total / 1.23).toFixed(2);
+    const subtotal = +total.toFixed(2);
     const tax = +(total - subtotal).toFixed(2);
     renderInvoiceDoc({
       number: 'SFI-' + (order.order_number||order.id),
@@ -1244,7 +1244,7 @@ const B2B = (function() {
     let added = 0;
     items.forEach(i => {
       if (i.legacy_id) {
-        addToCart(i.legacy_id, i.quantity||1, { nome: i.product_name, preco: EXVAT(i.unit_price), imagem: i.image_url||'' });
+        addToCart(i.legacy_id, i.quantity||1, { nome: i.product_name, preco: Number(i.unit_price), imagem: i.image_url||'' });
         added++;
       }
     });
@@ -1365,9 +1365,7 @@ const B2B = (function() {
     grid.innerHTML = products.map(function(p) {
       var rawImg = p.imagem || p.image_url || '';
       var img = rawImg ? (rawImg.startsWith('http') ? rawImg : '../' + rawImg) : '../img/placeholder.webp';
-      var price = p.b2b_price != null ? currency + EXVAT(p.b2b_price).toFixed(2) : 'N/A';
-      var retail = p.retail_price != null ? currency + EXVAT(p.retail_price).toFixed(2) : '';
-      var hasDiscount = p.b2b_price != null && p.retail_price != null && p.b2b_price < p.retail_price;
+      var price = p.b2b_price != null ? currency + Number(p.b2b_price).toFixed(2) : 'N/A';
       var brand = p.brands?.name || p.marca || '';
       var inStock = p.em_stock !== false;
       var freq = frequentMap[p.id];
@@ -1384,7 +1382,6 @@ const B2B = (function() {
         '<div style="margin-top:auto;">' +
         '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;">' +
           '<span style="font-weight:700;color:#1B4332;font-size:0.95rem;">' + price + '</span>' +
-          (hasDiscount ? '<span style="font-size:0.7rem;color:#94a3b8;text-decoration:line-through;">RRP ' + retail + '</span>' : '') +
         '</div>' +
         (inStock
           ? '<button onclick="event.stopPropagation();B2B.addShopToCart(' + (p.id||0) + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\')" style="width:100%;padding:8px;background:#2D6A4F;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer;">Add to Cart</button>'
@@ -1441,9 +1438,7 @@ const B2B = (function() {
       var cat = (fullData && fullData.categories && fullData.categories.name) || (p && p.categoria) || '';
       var subcat = (fullData && fullData.subcategories && fullData.subcategories.name) || '';
       var stockQty = fullData && fullData.stock_quantity;
-      var hasWholesale = b2bPrice && retailPrice && b2bPrice < retailPrice;
-      var b2bStr = b2bPrice != null ? currency + EXVAT(b2bPrice).toFixed(2) : 'N/A';
-      var retailStr = retailPrice != null ? currency + EXVAT(retailPrice).toFixed(2) : '';
+            var b2bStr = b2bPrice != null ? currency + Number(b2bPrice).toFixed(2) : 'N/A';
       var dietaryTags = fullData && fullData.dietary_tags ? fullData.dietary_tags : [];
 
       // Build variant buttons HTML
@@ -1480,7 +1475,6 @@ const B2B = (function() {
           (freq ? '<div style="display:inline-block;background:#f0fdf4;color:#166534;font-size:0.8rem;font-weight:600;padding:4px 12px;border-radius:6px;margin-bottom:12px;">\ud83d\udd01 You ordered this ' + freq.orders + ' times (' + freq.qty + ' units)</div><br>' : '') +
           '<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">' +
             '<span id="pmPrice" style="font-size:1.6rem;font-weight:700;color:#1B4332;">' + b2bStr + '</span>' +
-            (hasWholesale ? '<span id="pmRrp" style="font-size:0.9rem;color:#94a3b8;text-decoration:line-through;">RRP ' + retailStr + '</span>' : '') +
           '</div>' +
 
           '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.85rem;color:#636E72;margin-bottom:16px;padding:12px;background:#f8f9fa;border-radius:8px;">' +
@@ -1544,7 +1538,7 @@ const B2B = (function() {
             _pmSelVar = { id: this.dataset.vid, label: this.dataset.lbl, price: vp || b2bPrice, sku: this.dataset.sku || '' };
             // Update price
             var pe = document.getElementById('pmPrice');
-            if (pe && vp) pe.textContent = currency + EXVAT(vp).toFixed(2);
+            if (pe && vp) pe.textContent = currency + Number(vp).toFixed(2);
             // Update SKU
             var skuRow = document.getElementById('pmSkuRow');
             var skuVal = document.getElementById('pmSkuVal');
@@ -1583,13 +1577,13 @@ const B2B = (function() {
         addBtn.addEventListener('click', function() {
           var qty = parseInt(qtyInput.value) || 1;
           if (_pmSelVar) {
-            var finalPrice = EXVAT(_pmSelVar.price) || EXVAT(b2bPrice);
+            var finalPrice = Number(_pmSelVar.price) || Number(b2bPrice);
             if (typeof addToCart === 'function') {
               addToCart(legacyId, qty, { nome: name + ' \u2014 ' + _pmSelVar.label, preco: finalPrice, imagem: rawImg, variant: _pmSelVar.label, variantId: _pmSelVar.id });
               toast('Added ' + qty + 'x to cart');
             }
           } else {
-            var finalP = EXVAT(b2bPrice);
+            var finalP = Number(b2bPrice);
             if (typeof addToCart === 'function') {
               addToCart(legacyId, qty, { nome: name, preco: finalP, imagem: rawImg });
               toast('Added ' + qty + 'x to cart');
@@ -1681,12 +1675,11 @@ const B2B = (function() {
           '<div style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;background:' + badgeColor + ';color:' + badgeText + ';">' + (p.reason||'') + '</div>' +
           '<div style="font-size:0.65rem;text-transform:uppercase;color:#94a3b8;">' + (p.brand_name||'') + '</div>' +
           '<div style="font-weight:600;font-size:0.8rem;color:#1e293b;margin-bottom:6px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + (p.product_name||'') + '</div>';
-        var wsP = p.wholesale_price != null ? p.wholesale_price : p.price;
+        var wsP = p.wholesale_price != null ? Number(p.wholesale_price) : Number(p.price);
         var rtP = p.price;
         var hasWsDisc = wsP != null && rtP != null && wsP < rtP;
         html += '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;">' +
-          '<span style="font-weight:700;color:#1B4332;font-size:0.95rem;">' + (wsP != null ? currency + EXVAT(wsP).toFixed(2) : '') + '</span>' +
-          (hasWsDisc ? '<span style="font-size:0.7rem;color:#94a3b8;text-decoration:line-through;">RRP ' + currency + EXVAT(rtP).toFixed(2) + '</span>' : '') +
+          '<span style="font-weight:700;color:#1B4332;font-size:0.95rem;">' + (wsP != null ? currency + Number(wsP).toFixed(2) : '') + '</span>' +
         '</div>' +
           '<button onclick="event.stopPropagation();B2B.addRecToCart(' + (p.legacy_id||0) + ',\'' + (p.product_name||'').replace(/'/g,"\\'") + '\',' + (wsP||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\')" style="width:100%;padding:8px;background:#2D6A4F;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer;">Add to Cart</button>' +
           '</div></div>';
@@ -1771,12 +1764,10 @@ const B2B = (function() {
     grid.innerHTML = products.map(function(p) {
       var rawImg = p.imagem || p.image_url || '';
       var img = rawImg ? (rawImg.startsWith('http') ? rawImg : '../' + rawImg) : '../img/placeholder.webp';
-      var price = p.b2b_price != null ? currency + EXVAT(p.b2b_price).toFixed(2) : 'N/A';
+      var price = p.b2b_price != null ? currency + Number(p.b2b_price).toFixed(2) : 'N/A';
       var brand = p.brands?.name || p.marca || '';
       var inStock = p.em_stock !== false;
       var freq = frequentMap[p.id];
-      var retail2 = p.retail_price != null ? currency + EXVAT(p.retail_price).toFixed(2) : '';
-      var hasDisc2 = p.b2b_price != null && p.retail_price != null && p.b2b_price < p.retail_price;
       var freqBadge = freq ? '<div style="font-size:0.65rem;color:#2D6A4F;font-weight:700;background:#f0fdf4;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;">🔁 Ordered ' + freq.orders + 'x</div>' : '';
       return '<div onclick="B2B.showProductModal(' + (p.id||0) + ')" style="background:#fff;border:1px solid ' + (freq ? '#86efac' : '#e2e8f0') + ';border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
         '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#f8f9fa;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
@@ -1787,7 +1778,6 @@ const B2B = (function() {
         '<div style="margin-top:auto;">' +
         '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;">' +
           '<span style="font-weight:700;color:#1B4332;font-size:0.95rem;">' + price + '</span>' +
-          (hasDisc2 ? '<span style="font-size:0.7rem;color:#94a3b8;text-decoration:line-through;">RRP ' + retail2 + '</span>' : '') +
         '</div>' +
         (inStock
           ? '<button onclick="event.stopPropagation();B2B.addInlineToCart(' + (p.id||0) + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\')" style="width:100%;padding:8px;background:#2D6A4F;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer;">Add to Cart</button>'
@@ -1918,11 +1908,11 @@ const B2B = (function() {
     ab.addEventListener('click', function() { if (!sel) return; cls(); if (typeof onConfirm === 'function') onConfirm(sel); });
   }
   async function b2bAddWithVariants(id, name, price, image) {
-    price = EXVAT(price);  // B2B prices shown/stored ex-VAT
+    price = Number(price);  // B2B wholesale prices already ex-VAT
     var v = await b2bFetchVariants(id);
     if (v && v.length > 0 && v.some(function(g) { return g.options && g.options.length > 0; })) {
       b2bShowVariantModal({ name: name, price: price, image: image }, v, function(s) {
-        if (typeof addToCart === 'function') { addToCart(id, 1, { nome: name + ' \u2014 ' + s.label, preco: EXVAT(s.price) || price, imagem: image, variant: s.label, variantId: s.id }); toast('Added to cart'); }
+        if (typeof addToCart === 'function') { addToCart(id, 1, { nome: name + ' \u2014 ' + s.label, preco: Number(s.price) || price, imagem: image, variant: s.label, variantId: s.id }); toast('Added to cart'); }
       });
     } else {
       if (typeof addToCart === 'function') { addToCart(id, 1, { nome: name, preco: price, imagem: image }); toast('Added to cart'); }
