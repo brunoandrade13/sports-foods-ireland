@@ -38,7 +38,7 @@
   // FETCH ALL PRODUCTS FROM SUPABASE
   // ============================================================
   async function fetchFromSupabase() {
-    const select = encodeURIComponent('*,brands(name,slug),categories(name,slug),subcategories(name,slug),sub_subcategories(name,slug),product_images(id,url,alt_text,position,is_primary),product_variants(id,variant_type_id,label,price,compare_at_price,sku,stock,is_default,is_active,sort_order,parent_variant_id,image_url,variant_types(name,slug))');
+    const select = encodeURIComponent('*,brands(name,slug),categories(name,slug),subcategories(name,slug),sub_subcategories(name,slug),product_images(id,url,alt_text,position,is_primary),product_variants(id,variant_type_id,label,price,compare_at_price,wholesale_price,cost_price,sku,stock,is_default,is_active,sort_order,parent_variant_id,image_url,variant_types(name,slug))');
     const url = `${SUPABASE_URL}/rest/v1/products?select=${select}&is_active=eq.true&order=legacy_id.asc&limit=500`;
 
     const res = await fetch(url, {
@@ -105,6 +105,8 @@
           id: child.id,
           label: parentLabel + ' / ' + childLabel,
           price: child.price || parent.price,
+          wholesale_price: child.wholesale_price || parent.wholesale_price,
+          cost_price: child.cost_price || parent.cost_price,
           compare_at_price: child.compare_at_price || parent.compare_at_price,
           sku: child.sku || parent.sku,
           stock: child.stock,
@@ -120,6 +122,7 @@
         if (!parentIdsWithChildren.has(p.id)) {
           compoundOptions.push({
             id: p.id, label: p.label, price: p.price,
+            wholesale_price: p.wholesale_price, cost_price: p.cost_price,
             compare_at_price: p.compare_at_price, sku: p.sku,
             stock: p.stock, is_default: p.is_default,
             sort_order: (p.sort_order || 0) * 100
@@ -145,6 +148,7 @@
       if (!byType[typeSlug]) byType[typeSlug] = { type: typeName, slug: typeSlug, options: [] };
       byType[typeSlug].options.push({
         id: v.id, label: v.label, price: v.price,
+        wholesale_price: v.wholesale_price, cost_price: v.cost_price,
         compare_at_price: v.compare_at_price, sku: v.sku,
         stock: v.stock, is_default: v.is_default, sort_order: v.sort_order || 0, image_url: v.image_url || null
       });

@@ -1027,7 +1027,7 @@
 
     .variant-row {
       display: grid;
-      grid-template-columns: 36px 120px 180px 120px 80px 60px 36px 36px;
+      grid-template-columns: 36px 100px 160px 100px 75px 75px 70px 55px 30px 30px;
       gap: 6px;
       align-items: center;
       padding: 8px 0;
@@ -3483,9 +3483,10 @@
           <span>Value</span>
           <span>SKU</span>
           <span>Price €</span>
+          <span>B2B €</span>
+          <span>Cost €</span>
           <span>Stock</span>
           <span>Def</span>
-          <span></span>
           <span></span>
         </div>
         <div id="variantRows"></div>
@@ -7732,9 +7733,10 @@
     <input type="text" id="vval-${idx}" placeholder="e.g. 30 Serv Bag..." value="${esc(label)}">
     <input type="text" id="vsku-${idx}" placeholder="SKU" value="${esc(existingSku || '')}">
     <input type="number" id="vprice-${idx}" step="0.01" min="0" placeholder="€" value="${existing?.price || ''}">
+    <input type="number" id="vb2b-${idx}" step="0.01" min="0" placeholder="B2B" value="${existing?.wholesale_price || ''}">
+    <input type="number" id="vcost-${idx}" step="0.01" min="0" placeholder="Cost" value="${existing?.cost_price || ''}">
     <input type="number" id="vstock-${idx}" min="0" placeholder="0" value="${existing?.stock || 0}">
     <input type="radio" name="vdefault" class="variant-default-radio" id="vdef-${idx}" ${existing?.is_default ? 'checked' : ''}>
-    <span></span>
     <button class="remove-btn" onclick="removeVariantRow(${idx})">✕</button>`;
       } else {
         row.classList.add('parent-variant');
@@ -7742,6 +7744,8 @@
     <input type="text" id="vval-${idx}" placeholder="e.g. Berry, Blue..." value="${esc(label)}">
     <input type="text" id="vsku-${idx}" placeholder="SKU" value="${esc(existingSku || '')}">
     <input type="number" id="vprice-${idx}" step="0.01" min="0" placeholder="€" value="${existing?.price || ''}">
+    <input type="number" id="vb2b-${idx}" step="0.01" min="0" placeholder="B2B" value="${existing?.wholesale_price || ''}">
+    <input type="number" id="vcost-${idx}" step="0.01" min="0" placeholder="Cost" value="${existing?.cost_price || ''}">
     <input type="number" id="vstock-${idx}" min="0" placeholder="0" value="${existing?.stock || 0}">
     <input type="radio" name="vdefault" class="variant-default-radio" id="vdef-${idx}" ${existing?.is_default ? 'checked' : ''}>
     <button class="remove-btn" style="font-size:0.7rem;color:var(--info);width:auto;padding:2px 6px" onclick="addChildVariant(${idx})" title="Add sub-variant (size/pack)">+Sub</button>
@@ -7854,6 +7858,8 @@
           value: val,
           sku: skuVal || null,
           price_eur: parseFloat(document.getElementById(`vprice-${idx}`)?.value) || null,
+          wholesale_price: parseFloat(document.getElementById(`vb2b-${idx}`)?.value) || null,
+          cost_price: parseFloat(document.getElementById(`vcost-${idx}`)?.value) || null,
           stock_quantity: parseInt(document.getElementById(`vstock-${idx}`)?.value) || 0,
           is_default: document.getElementById(`vdef-${idx}`)?.checked || false,
           is_child: isChild,
@@ -7884,7 +7890,7 @@
       for (let i = 0; i < variants.length; i++) {
         const v = variants[i];
         if (v.is_child) continue;
-        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: null, image_url: v.image_url || null };
+        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, wholesale_price: v.wholesale_price, cost_price: v.cost_price, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: null, image_url: v.image_url || null };
         try {
           if (v.existingId) {
             await supaUpdate('product_variants', v.existingId, data);
@@ -7901,7 +7907,7 @@
         const v = variants[i];
         if (!v.is_child) continue;
         const parentUUID = parentIdMap[v.parent_row_idx] || v.existingId ? (existing.find(e => e.id === v.existingId)?.parent_variant_id || null) : null;
-        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: parentUUID, image_url: v.image_url || null };
+        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, wholesale_price: v.wholesale_price, cost_price: v.cost_price, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: parentUUID, image_url: v.image_url || null };
         try {
           if (v.existingId) await supaUpdate('product_variants', v.existingId, data);
           else await supaInsert('product_variants', data);
