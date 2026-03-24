@@ -7671,60 +7671,33 @@
       updateVariantCountLabel();
     }
 
-    // ---- Variant Image Picker ----
-    let variantImgCache = null;
-    async function loadStorageImages() {
-      if (variantImgCache) return variantImgCache;
-      try {
-        const res = await fetch(SUPA_URL + '/storage/v1/object/list/product-images', {
-          method: 'POST', headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prefix: '', limit: 1000, offset: 0, sortBy: { column: 'name', order: 'asc' } })
-        });
-        const d1 = await res.json();
-        let all = d1.map(f => f.name);
-        if (d1.length === 1000) {
-          const r2 = await fetch(SUPA_URL + '/storage/v1/object/list/product-images', {
-            method: 'POST', headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prefix: '', limit: 1000, offset: 1000, sortBy: { column: 'name', order: 'asc' } })
-          });
-          const d2 = await r2.json();
-          all = all.concat(d2.map(f => f.name));
-        }
-        variantImgCache = all;
-        return all;
-      } catch(e) { console.error(e); return []; }
-    }
-
-    async function openVariantImagePicker(idx) {
+    // ---- Variant Image Picker (uses product's own images) ----
+    function openVariantImagePicker(idx) {
       const modal = document.getElementById('variantImgModal');
       if (!modal) return;
       modal.dataset.idx = idx;
       modal.style.display = 'flex';
       const grid = document.getElementById('vimgGrid');
       const title = document.getElementById('vimgTitle');
-      grid.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:40px">Loading...</p>';
-      const allImgs = await loadStorageImages();
       const productName = document.getElementById('editName')?.value || '';
-      const slug = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-      let productImgs = [];
-      const parts = slug.split('-');
-      for (let len = parts.length; len >= 2; len--) {
-        const trySlug = parts.slice(0, len).join('-');
-        productImgs = allImgs.filter(n => n.toLowerCase().startsWith(trySlug));
-        if (productImgs.length > 0) break;
+      const mainImg = document.getElementById('editImage')?.value || '';
+      const allUrls = [];
+      if (mainImg) allUrls.push(mainImg);
+      if (typeof currentProductImages !== 'undefined' && currentProductImages.length > 0) {
+        currentProductImages.forEach(img => {
+          if (img.url && !allUrls.includes(img.url)) allUrls.push(img.url);
+        });
       }
-      if (title) title.textContent = productImgs.length + ' photos — ' + productName;
-      const base = SUPA_URL + '/storage/v1/object/public/product-images/';
-      if (productImgs.length === 0) {
-        grid.innerHTML = '<p style="color:var(--text-dim);padding:30px;text-align:center">No photos found for this product.</p>';
+      if (title) title.textContent = allUrls.length + ' photos \u2014 ' + productName;
+      if (allUrls.length === 0) {
+        grid.innerHTML = '<p style="color:var(--text-dim);padding:30px;text-align:center">No photos. Add images to this product first.</p>';
       } else {
-        grid.innerHTML = productImgs.map(name => {
-          return '<div class="vimg-item" onclick="setVariantImage(' + idx + ',\'' + base + name + '\')" title="' + name + '"><img src="' + base + name + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></div>';
+        grid.innerHTML = allUrls.map(function(url) {
+          var fullUrl = url.startsWith('http') ? url : (SUPA_URL + '/storage/v1/object/public/product-images/' + url);
+          return '<div class="vimg-item" onclick="setVariantImage(' + idx + ',\'' + fullUrl.replace(/'/g, "\\'") + '\')" title="Click to link"><img src="' + fullUrl + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></div>';
         }).join('');
       }
     }
-
-
 
     function setVariantImage(idx, url) {
       const btn = document.getElementById('vimg-' + idx);
