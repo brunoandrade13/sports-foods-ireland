@@ -7978,7 +7978,7 @@
       const brandName = document.getElementById('brandName').value;
       // Check if any products use this brand
       try {
-        const checkRes = await fetch(SUPA_URL + '/rest/v1/products?select=id&brand_id=eq.' + id + '&limit=1', {
+        const checkRes = await fetch(SUPA_URL + '/rest/v1/products?select=id&brand_id=eq.' + id + '&is_active=eq.true&limit=1', {
           headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (await getValidBearerToken()) }
         });
         const linked = await checkRes.json();
