@@ -1868,8 +1868,13 @@
                   type="checkbox" id="brandActive" checked style="width:18px;height:18px;accent-color:var(--accent)">
                 Active</label></div>
           </div>
-          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeBrandModal()">Cancel</button><button
-              class="btn btn-primary" onclick="saveBrand()">Save Brand</button></div>
+          <div class="modal-footer" style="justify-content:space-between">
+            <button class="btn" id="brandDeleteBtn" style="display:none;background:#ef4444;color:#fff" onclick="deleteBrand()">🗑️ Delete Brand</button>
+            <div style="display:flex;gap:8px;margin-left:auto">
+              <button class="btn btn-ghost" onclick="closeBrandModal()">Cancel</button>
+              <button class="btn btn-primary" onclick="saveBrand()">Save Brand</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -7948,6 +7953,7 @@
       document.getElementById('brandWebsite').value = b?.website || '';
       document.getElementById('brandLogo').value = b?.logo_url || '';
       document.getElementById('brandActive').checked = b ? b.is_active : true;
+      document.getElementById('brandDeleteBtn').style.display = b ? '' : 'none';
       document.getElementById('brandModal').style.display = 'flex';
     }
     function closeBrandModal() { document.getElementById('brandModal').style.display = 'none'; }
@@ -7964,6 +7970,34 @@
         if (id) await supaUpdate('brands', id, data); else await supaInsert('brands', data);
         toast(id ? 'Brand updated' : 'Brand created'); closeBrandModal(); await _refreshBrands();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    async function deleteBrand() {
+      const id = document.getElementById('brandId').value;
+      if (!id) return;
+      const brandName = document.getElementById('brandName').value;
+      // Check if any products use this brand
+      try {
+        const checkRes = await fetch(SUPA_URL + '/rest/v1/products?select=id&brand_id=eq.' + id + '&limit=1', {
+          headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (await getValidBearerToken()) }
+        });
+        const linked = await checkRes.json();
+        if (linked && linked.length > 0) {
+          toast('Cannot delete: ' + brandName + ' has products linked. Remove products first.', 'error');
+          return;
+        }
+      } catch(e) {}
+      if (!confirm('Delete brand "' + brandName + '"? This cannot be undone.')) return;
+      try {
+        const res = await fetch(SUPA_URL + '/rest/v1/brands?id=eq.' + id, {
+          method: 'DELETE',
+          headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (await getValidBearerToken()), 'Content-Type': 'application/json' }
+        });
+        if (!res.ok) throw new Error('Delete failed: ' + res.status);
+        toast('Brand "' + brandName + '" deleted');
+        closeBrandModal();
+        await _refreshBrands();
+      } catch(e) { toast('Error: ' + e.message, 'error'); }
     }
 
     function renderStock() {
