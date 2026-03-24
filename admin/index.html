@@ -2457,6 +2457,12 @@
             <!-- Filled dynamically -->
           </div>
         </div>
+        <!-- Brand Filter for Top Products -->
+        <div id="financeTopBrandFilter" style="display:none; margin-bottom:15px; background:var(--surface-2); padding:12px 15px; border-radius:8px;">
+          <div id="financeTopBrandFilterInner" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+            <span style="color:var(--text-muted); font-size:0.9rem;">🏷️ Brand:</span>
+          </div>
+        </div>
         <!-- Product Filter (only for Top Products): clickable field opens list sorted by best sellers -->
         <div id="financeProductFilter" style="display:none; margin-bottom:15px; background:var(--surface-2); padding:12px 15px; border-radius:8px; position:relative;">
           <div id="financeProductFilterInner" style="display:flex; align-items:center; gap:10px;">
@@ -4301,6 +4307,7 @@
     let currentFinanceBrand = null; // selected brand for Revenue by Brand
     let currentFinanceCategory = null; // selected category for Revenue by Category
     let currentFinanceProduct = null; // selected product for Top Products
+    let currentFinanceTopBrand = null; // selected brand filter for Top Products
 
     function getFinanceDateRange() {
       const now = new Date();
@@ -4450,6 +4457,11 @@
       if (!finRawData || !finRawData.length) return [];
       const byProduct = {};
       finRawData.forEach(row => {
+        // Filter by brand if one is selected in Top Products
+        if (currentFinanceTopBrand) {
+          const b = row.brand_name || 'Unknown';
+          if (b !== currentFinanceTopBrand) return;
+        }
         const name = row.product_name || 'Unknown';
         if (!byProduct[name]) byProduct[name] = { rev: 0, qty: 0 };
         byProduct[name].rev += Number(row.total_revenue || 0);
@@ -4458,6 +4470,45 @@
       return Object.entries(byProduct)
         .sort((a, b) => b[1].rev - a[1].rev)
         .map(([name, d]) => ({ name, rev: d.rev, qty: d.qty }));
+    }
+
+    function renderFinanceTopBrandFilter() {
+      const wrap = document.getElementById('financeTopBrandFilter');
+      const inner = document.getElementById('financeTopBrandFilterInner');
+      if (!wrap || !inner) return;
+      if (!finRawData || finRawData.length === 0) { inner.innerHTML = '<span style="color:var(--text-muted);font-size:0.9rem;">No brand data.</span>'; return; }
+      const brandRev = {};
+      finRawData.forEach(row => {
+        const b = row.brand_name || 'Unknown';
+        if (b === 'Unknown' || b === 'Uncategorized') return;
+        brandRev[b] = (brandRev[b] || 0) + Number(row.total_revenue || 0);
+      });
+      const brands = Object.entries(brandRev).sort((a, b) => b[1] - a[1]).map(e => e[0]);
+      if (brands.length === 0) { inner.innerHTML = '<span style="color:var(--text-muted);font-size:0.9rem;">No brand data.</span>'; return; }
+      const allStyle = !currentFinanceTopBrand ? 'background:var(--accent-bg);color:var(--accent);' : '';
+      inner.innerHTML = '<span style="color:var(--text-muted); font-size:0.9rem; margin-right:6px;">\ud83c\udff7\ufe0f Brand:</span>' +
+        '<button class="btn-sm btn-outline" style="padding:6px 14px;' + allStyle + '" onclick="setFinanceTopBrand(null)">All Brands</button>' +
+        brands.map(function(b) {
+          var safe = b.replace(/'/g, "\\'");
+          var isActive = b === currentFinanceTopBrand;
+          var style = isActive ? 'background:var(--accent-bg);color:var(--accent);' : '';
+          return '<button class="btn-sm btn-outline" style="padding:6px 14px;' + style + '" onclick="setFinanceTopBrand(\'' + safe + '\')">' + b + '</button>';
+        }).join('');
+    }
+
+    function setFinanceTopBrand(brand) {
+      currentFinanceTopBrand = brand;
+      currentFinanceProduct = null;
+      renderFinanceTopBrandFilter();
+      renderFinanceProductFilter();
+      const drop = document.getElementById('financeProductDropdown');
+      if (drop) drop.style.display = 'none';
+      if (currentFinanceType === 'topProducts') {
+        const out = document.getElementById('financeOutput');
+        if (out) {
+          out.innerHTML = '<div class="empty-state"><div class="icon">\ud83c\udfc6</div><h3>Select a Product</h3><p>Choose a product above to see revenue by period.</p></div>';
+        }
+      }
     }
 
     function renderFinanceProductFilter() {
@@ -4697,6 +4748,15 @@
           currentFinanceCategory = null;
         }
       }
+      const topBrandFilterEl = document.getElementById('financeTopBrandFilter');
+      if (topBrandFilterEl) {
+        if (type === 'topProducts') {
+          topBrandFilterEl.style.display = '';
+        } else {
+          topBrandFilterEl.style.display = 'none';
+          currentFinanceTopBrand = null;
+        }
+      }
       const productFilterEl = document.getElementById('financeProductFilter');
       if (productFilterEl) {
         if (type === 'topProducts') {
@@ -4774,6 +4834,7 @@
           renderFinanceCategoryFilter();
           renderFinancePeriodList(out);
         } else if (type === 'topProducts') {
+          renderFinanceTopBrandFilter();
           renderFinanceProductFilter();
           renderFinancePeriodList(out);
         }
