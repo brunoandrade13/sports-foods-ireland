@@ -3189,37 +3189,14 @@
           <div id="b2bActiveList" style="color:var(--muted);">Loading...</div>
         </div>
 
-        <!-- B2B Edit Modal -->
+        <!-- B2B Detail Modal -->
         <div class="modal-overlay" id="b2bEditModal" style="display:none" onclick="if(event.target===this)closeB2BEditModal()">
-          <div class="modal" style="max-width:500px">
+          <div class="modal" style="max-width:700px;max-height:92vh;overflow-y:auto">
             <div class="modal-header">
-              <h3>Edit B2B Customer</h3>
+              <h3 id="b2bModalTitle">Customer Details</h3>
               <button class="modal-close" onclick="closeB2BEditModal()">&times;</button>
             </div>
-            <div class="modal-body">
-              <input type="hidden" id="b2bEditId">
-              <div style="margin-bottom:16px;padding:12px;background:var(--surface-2);border-radius:8px">
-                <div style="font-weight:700;font-size:1.05rem" id="b2bEditName"></div>
-                <div style="font-size:0.85rem;color:var(--text-muted)" id="b2bEditEmail"></div>
-              </div>
-              <div class="form-group"><label>Company Name</label><input type="text" id="b2bEditCompany" placeholder="Company name"></div>
-              <div class="form-group"><label>VAT Number</label><input type="text" id="b2bEditVat" placeholder="IE1234567X"></div>
-              <div class="form-group">
-                <label>Customer Type</label>
-                <select id="b2bEditType" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.95rem;width:100%">
-                  <option value="b2b">B2B (Wholesale)</option>
-                  <option value="b2c">B2C (Retail)</option>
-                </select>
-                <div class="hint" style="color:var(--warning)">Changing to B2C will remove wholesale access</div>
-              </div>
-            </div>
-            <div class="modal-footer" style="justify-content:space-between">
-              <button class="btn" style="background:#ef4444;color:#fff" onclick="deleteB2BCustomer()">Delete</button>
-              <div style="display:flex;gap:8px">
-                <button class="btn btn-ghost" onclick="closeB2BEditModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveB2BEdit()">Save Changes</button>
-              </div>
-            </div>
+            <div class="modal-body" id="b2bModalBody" style="padding:0"></div>
           </div>
         </div>
       </div>
@@ -12730,57 +12707,39 @@
     // B2B MANAGEMENT
     // ============================================================
     let b2bCustomers = [];
-    let b2bGroups = []; // grouped by parent
+    let b2bGroups = [];
 
     async function loadB2BData() {
       try {
         const h = getAuthHeaders();
-        const res = await fetch(SUPA_URL + '/rest/v1/rpc/get_b2b_customers_admin', {
-          method: 'POST', headers: h, body: '{}'
-        });
+        const res = await fetch(SUPA_URL + '/rest/v1/rpc/get_b2b_customers_admin', { method: 'POST', headers: h, body: '{}' });
         if (!res.ok) throw new Error('Fetch failed: ' + res.status);
         b2bCustomers = await res.json();
-
-        // Group: parents + their children
-        const parentMap = {}; // parentId -> { parent, children: [], groupRevenue, groupOrders }
-        const orphans = []; // customers with no parent and no children
-        const childIds = new Set();
-
-        // First pass: identify all children
-        b2bCustomers.forEach(function(c) {
-          if (c.parent_customer_id) childIds.add(c.customer_id);
-        });
-
-        // Second pass: build groups
+        const parentMap = {};
         b2bCustomers.forEach(function(c) {
           if (c.parent_customer_id) {
-            // This is a child
             if (!parentMap[c.parent_customer_id]) parentMap[c.parent_customer_id] = { parent: null, children: [], groupRevenue: 0, groupOrders: 0 };
             parentMap[c.parent_customer_id].children.push(c);
             parentMap[c.parent_customer_id].groupRevenue += Number(c.total_revenue || 0);
             parentMap[c.parent_customer_id].groupOrders += Number(c.total_orders || 0);
           } else {
-            // This is a parent or standalone
             if (!parentMap[c.customer_id]) parentMap[c.customer_id] = { parent: null, children: [], groupRevenue: 0, groupOrders: 0 };
             parentMap[c.customer_id].parent = c;
             parentMap[c.customer_id].groupRevenue += Number(c.total_revenue || 0);
             parentMap[c.customer_id].groupOrders += Number(c.total_orders || 0);
           }
         });
-
-        // Build final groups array, sorted by total group revenue
         b2bGroups = Object.values(parentMap).filter(function(g) { return g.parent; });
-        // Sort children by revenue desc
         b2bGroups.forEach(function(g) { g.children.sort(function(a, b) { return Number(b.total_revenue) - Number(a.total_revenue); }); });
-        // Sort groups by total revenue desc
         b2bGroups.sort(function(a, b) { return b.groupRevenue - a.groupRevenue; });
-
         renderB2BList();
       } catch (e) {
         console.error('B2B load error:', e);
         document.getElementById('b2bActiveList').innerHTML = '<div style="color:var(--danger)">Failed to load: ' + e.message + '</div>';
       }
     }
+
+    function b2bFmt(v) { return '\u20ac' + Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
     function renderB2BList() {
       var el = document.getElementById('b2bActiveList');
@@ -12789,97 +12748,131 @@
       if (search.length >= 2) {
         filtered = b2bGroups.filter(function(g) {
           var p = g.parent;
-          var text = ((p.first_name || '') + ' ' + (p.last_name || '') + ' ' + (p.b2b_company_name || '') + ' ' + (p.email || '')).toLowerCase();
+          var text = ((p.first_name||'') + ' ' + (p.last_name||'') + ' ' + (p.b2b_company_name||'') + ' ' + (p.email||'')).toLowerCase();
           if (text.includes(search)) return true;
-          return g.children.some(function(c) {
-            return ((c.first_name || '') + ' ' + (c.last_name || '') + ' ' + (c.email || '')).toLowerCase().includes(search);
-          });
+          return g.children.some(function(c) { return ((c.first_name||'') + ' ' + (c.last_name||'') + ' ' + (c.email||'')).toLowerCase().includes(search); });
         });
       }
       var totalCustomers = b2bGroups.reduce(function(s, g) { return s + 1 + g.children.length; }, 0);
-      document.getElementById('b2bCount').textContent = filtered.length + ' groups / ' + totalCustomers + ' total';
-
-      if (!filtered.length) {
-        el.innerHTML = '<p style="color:var(--muted);padding:12px 0;">No B2B customers found</p>';
-        return;
-      }
-
-      var FMT = function(v) { return '\u20ac' + Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); };
+      document.getElementById('b2bCount').textContent = filtered.length + ' groups / ' + totalCustomers + ' customers';
+      if (!filtered.length) { el.innerHTML = '<p style="color:var(--muted);padding:12px 0;">No B2B customers found</p>'; return; }
       var rows = '';
       filtered.forEach(function(g, gi) {
         var p = g.parent;
-        var name = esc((p.first_name || '') + ' ' + (p.last_name || ''));
+        var name = esc((p.first_name||'') + ' ' + (p.last_name||''));
         var company = esc(p.b2b_company_name || p.company || '');
-        var hasChildren = g.children.length > 0;
-        rows += '<tr style="' + (gi % 2 === 0 ? '' : 'background:var(--surface-2)') + '">' +
-          '<td style="font-weight:700">' + (gi + 1) + '</td>' +
-          '<td><strong>' + name + '</strong>' + (hasChildren ? ' <span style="font-size:0.75rem;color:var(--accent)">(' + (g.children.length + 1) + ' accounts)</span>' : '') + '</td>' +
+        var accounts = 1 + g.children.length;
+        var bgStyle = gi % 2 === 0 ? '' : 'background:var(--surface-2);';
+        rows += '<tr style="cursor:pointer;' + bgStyle + '" onclick="openB2BDetail(\'' + p.customer_id + '\')">' +
+          '<td style="font-weight:700;width:40px">' + (gi + 1) + '</td>' +
+          '<td><strong>' + name + '</strong></td>' +
           '<td>' + company + '</td>' +
-          '<td style="font-size:0.8rem">' + esc(p.email || '') + '</td>' +
-          '<td style="font-family:monospace;font-size:0.85rem">' + esc(p.b2b_vat_number || '') + '</td>' +
-          '<td style="text-align:right;font-weight:600">' + FMT(g.groupRevenue) + '</td>' +
+          '<td style="text-align:center">' + accounts + '</td>' +
+          '<td style="text-align:right;font-weight:600">' + b2bFmt(g.groupRevenue) + '</td>' +
           '<td style="text-align:center">' + g.groupOrders + '</td>' +
-          '<td><button class="btn-sm btn-outline" style="font-size:0.75rem;padding:4px 10px" onclick="openB2BEditModal(\'' + p.customer_id + '\')">\u270f\ufe0f</button></td>' +
           '</tr>';
-        // Children rows
-        g.children.forEach(function(c) {
-          rows += '<tr style="background:var(--surface-2);font-size:0.85rem">' +
-            '<td></td>' +
-            '<td style="padding-left:28px;color:var(--text-muted)">\u2514 ' + esc((c.first_name || '') + ' ' + (c.last_name || '')) + '</td>' +
-            '<td style="color:var(--text-muted)">' + esc(c.b2b_company_name || '') + '</td>' +
-            '<td style="font-size:0.8rem;color:var(--text-muted)">' + esc(c.email || '') + '</td>' +
-            '<td></td>' +
-            '<td style="text-align:right;color:var(--text-muted)">' + FMT(c.total_revenue) + '</td>' +
-            '<td style="text-align:center;color:var(--text-muted)">' + c.total_orders + '</td>' +
-            '<td><button class="btn-sm btn-outline" style="font-size:0.7rem;padding:3px 8px" onclick="openB2BEditModal(\'' + c.customer_id + '\')">\u270f\ufe0f</button></td>' +
-            '</tr>';
-        });
       });
-
       el.innerHTML = '<div style="overflow-x:auto"><table class="data-table"><thead><tr>' +
-        '<th>#</th><th>Name</th><th>Company</th><th>Email</th><th>VAT</th><th style="text-align:right">Revenue</th><th style="text-align:center">Orders</th><th style="width:60px">Edit</th>' +
+        '<th>#</th><th>Name</th><th>Company</th><th style="text-align:center">Accounts</th><th style="text-align:right">Revenue</th><th style="text-align:center">Orders</th>' +
         '</tr></thead><tbody>' + rows + '</tbody></table></div>';
     }
 
-    function openB2BEditModal(customerId) {
-      var c = b2bCustomers.find(function(x) { return x.customer_id === customerId; });
-      if (!c) { toast('Customer not found', 'error'); return; }
-      document.getElementById('b2bEditId').value = c.customer_id;
-      document.getElementById('b2bEditName').textContent = (c.first_name || '') + ' ' + (c.last_name || '');
-      document.getElementById('b2bEditEmail').textContent = c.email || '\u2014';
-      document.getElementById('b2bEditCompany').value = c.b2b_company_name || c.company || '';
-      document.getElementById('b2bEditVat').value = c.b2b_vat_number || '';
-      document.getElementById('b2bEditType').value = c.customer_type || 'b2b';
+    function openB2BDetail(parentId) {
+      var g = b2bGroups.find(function(x) { return x.parent.customer_id === parentId; });
+      if (!g) { toast('Customer not found', 'error'); return; }
+      var p = g.parent;
+      var accounts = [p].concat(g.children);
+      document.getElementById('b2bModalTitle').textContent = (p.first_name||'') + ' ' + (p.last_name||'');
+      var html = '';
+      // Stats bar
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;padding:20px;background:var(--surface-2);border-bottom:1px solid var(--border)">';
+      html += '<div style="text-align:center"><div style="font-size:1.3rem;font-weight:700;color:var(--accent)">' + b2bFmt(g.groupRevenue) + '</div><div style="font-size:0.75rem;color:var(--text-muted)">Total Revenue</div></div>';
+      html += '<div style="text-align:center"><div style="font-size:1.3rem;font-weight:700">' + g.groupOrders + '</div><div style="font-size:0.75rem;color:var(--text-muted)">Total Orders</div></div>';
+      html += '<div style="text-align:center"><div style="font-size:1.3rem;font-weight:700">' + accounts.length + '</div><div style="font-size:0.75rem;color:var(--text-muted)">Accounts</div></div>';
+      var avgOrder = g.groupOrders > 0 ? g.groupRevenue / g.groupOrders : 0;
+      html += '<div style="text-align:center"><div style="font-size:1.3rem;font-weight:700">' + b2bFmt(avgOrder) + '</div><div style="font-size:0.75rem;color:var(--text-muted)">Avg Order</div></div>';
+      html += '</div>';
+      // Account cards
+      html += '<div style="padding:20px">';
+      accounts.forEach(function(acc, ai) {
+        var isMain = ai === 0;
+        var border = isMain ? 'border-left:3px solid var(--accent)' : 'border-left:3px solid var(--border)';
+        html += '<div style="background:var(--surface-2);border-radius:8px;padding:16px;margin-bottom:12px;' + border + '">';
+        // Header row
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+        html += '<span style="font-weight:700;font-size:0.9rem">' + (isMain ? '\ud83d\udc51 Main Account' : '\u2514 Sub-account ' + ai) + '</span>';
+        html += '<div style="display:flex;gap:8px;align-items:center">';
+        html += '<span style="font-size:0.8rem;color:var(--text-muted)">' + b2bFmt(acc.total_revenue) + ' / ' + acc.total_orders + ' orders</span>';
+        var accName = ((acc.first_name||'') + ' ' + (acc.last_name||'')).replace(/'/g, "\\'");
+        html += '<button class="btn-sm" style="background:#ef4444;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:0.7rem;cursor:pointer" onclick="deleteB2BCustomer(\'' + acc.customer_id + '\',\'' + accName + '\')">&#x2715;</button>';
+        html += '</div></div>';
+
+        // Editable fields - row 1: First Name + Last Name
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+        html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">First Name</label><input type="text" data-cid="' + acc.customer_id + '" data-field="first_name" value="' + esc(acc.first_name || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.9rem"></div>';
+        html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Last Name</label><input type="text" data-cid="' + acc.customer_id + '" data-field="last_name" value="' + esc(acc.last_name || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.9rem"></div>';
+        html += '</div>';
+        // Row 2: Email + Company
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">';
+        html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Email</label><input type="text" data-cid="' + acc.customer_id + '" data-field="email" value="' + esc(acc.email || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.85rem"></div>';
+        html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Company</label><input type="text" data-cid="' + acc.customer_id + '" data-field="b2b_company_name" value="' + esc(acc.b2b_company_name || acc.company || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.85rem"></div>';
+        html += '</div>';
+        // Row 3: VAT + Customer Type
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">';
+        html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">VAT Number</label><input type="text" data-cid="' + acc.customer_id + '" data-field="b2b_vat_number" value="' + esc(acc.b2b_vat_number || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.85rem"></div>';
+        html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Customer Type</label><select data-cid="' + acc.customer_id + '" data-field="customer_type" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.85rem"><option value="b2b"' + (acc.customer_type === 'b2b' ? ' selected' : '') + '>B2B (Wholesale)</option><option value="b2c"' + (acc.customer_type === 'b2c' ? ' selected' : '') + '>B2C (Retail)</option></select></div>';
+        html += '</div>';
+        html += '</div>'; // close card
+      });
+      html += '</div>'; // close cards container
+      // Footer with save button
+      html += '<div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">';
+      html += '<button class="btn btn-ghost" onclick="closeB2BEditModal()">Cancel</button>';
+      html += '<button class="btn btn-primary" onclick="saveAllB2BEdits()">Save All Changes</button>';
+      html += '</div>';
+      document.getElementById('b2bModalBody').innerHTML = html;
       document.getElementById('b2bEditModal').style.display = 'flex';
     }
 
     function closeB2BEditModal() { document.getElementById('b2bEditModal').style.display = 'none'; }
 
-    async function saveB2BEdit() {
-      var id = document.getElementById('b2bEditId').value;
-      var newType = document.getElementById('b2bEditType').value;
-      var company = document.getElementById('b2bEditCompany').value.trim();
-      var vat = document.getElementById('b2bEditVat').value.trim();
-      var data = { customer_type: newType, b2b_company_name: company || null, b2b_vat_number: vat || null };
-      if (newType === 'b2c') { data.is_b2b = false; data.b2b_status = null; }
-      try {
-        var h = getAuthHeaders(); h['Prefer'] = 'return=representation';
-        var res = await fetch(SUPA_URL + '/rest/v1/customers?id=eq.' + id, { method: 'PATCH', headers: h, body: JSON.stringify(data) });
-        if (!res.ok) throw new Error('Update failed: ' + res.status);
-        toast(newType === 'b2c' ? 'Customer changed to B2C' : 'Customer updated');
-        closeB2BEditModal(); await loadB2BData();
-      } catch(e) { toast('Error: ' + e.message, 'error'); }
+    async function saveAllB2BEdits() {
+      var inputs = document.querySelectorAll('#b2bModalBody [data-cid]');
+      var changes = {};
+      inputs.forEach(function(inp) {
+        var cid = inp.dataset.cid;
+        var field = inp.dataset.field;
+        var val = inp.tagName === 'SELECT' ? inp.value : inp.value.trim();
+        if (!changes[cid]) changes[cid] = {};
+        changes[cid][field] = val || null;
+      });
+      var h = getAuthHeaders(); h['Prefer'] = 'return=representation';
+      var errors = 0;
+      var total = Object.keys(changes).length;
+      for (var cid in changes) {
+        var data = changes[cid];
+        if (data.customer_type === 'b2c') { data.is_b2b = false; data.b2b_status = null; }
+        try {
+          var res = await fetch(SUPA_URL + '/rest/v1/customers?id=eq.' + cid, { method: 'PATCH', headers: h, body: JSON.stringify(data) });
+          if (!res.ok) errors++;
+        } catch(e) { errors++; }
+      }
+      if (errors > 0) toast(errors + ' error(s) saving', 'error');
+      else toast(total + ' account(s) saved');
+      closeB2BEditModal();
+
+      await loadB2BData();
     }
 
-    async function deleteB2BCustomer() {
-      var id = document.getElementById('b2bEditId').value;
-      var name = document.getElementById('b2bEditName').textContent;
+    async function deleteB2BCustomer(cid, name) {
       if (!confirm('Delete customer "' + name + '"? This cannot be undone.')) return;
       try {
         var h = getAuthHeaders();
-        var res = await fetch(SUPA_URL + '/rest/v1/customers?id=eq.' + id, { method: 'DELETE', headers: h });
+        var res = await fetch(SUPA_URL + '/rest/v1/customers?id=eq.' + cid, { method: 'DELETE', headers: h });
         if (!res.ok) throw new Error('Delete failed: ' + res.status);
-        toast('Customer deleted'); closeB2BEditModal(); await loadB2BData();
+        toast('Customer "' + name + '" deleted');
+        closeB2BEditModal();
+        await loadB2BData();
       } catch(e) { toast('Error: ' + e.message, 'error'); }
     }
 
