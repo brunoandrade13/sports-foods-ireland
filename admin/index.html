@@ -12730,14 +12730,51 @@
     // B2B MANAGEMENT
     // ============================================================
     let b2bCustomers = [];
+    let b2bGroups = []; // grouped by parent
 
     async function loadB2BData() {
       try {
         const h = getAuthHeaders();
-        // Load ALL B2B customers from customers table
-        const res = await fetch(SUPA_URL + '/rest/v1/customers?customer_type=eq.b2b&select=id,first_name,last_name,email,company,customer_type,b2b_company_name,b2b_vat_number,b2b_status,b2b_business_type,b2b_expected_volume,b2b_applied_at,b2b_approved_at,is_b2b&order=first_name.asc&limit=600', { headers: h });
+        const res = await fetch(SUPA_URL + '/rest/v1/rpc/get_b2b_customers_admin', {
+          method: 'POST', headers: h, body: '{}'
+        });
         if (!res.ok) throw new Error('Fetch failed: ' + res.status);
         b2bCustomers = await res.json();
+
+        // Group: parents + their children
+        const parentMap = {}; // parentId -> { parent, children: [], groupRevenue, groupOrders }
+        const orphans = []; // customers with no parent and no children
+        const childIds = new Set();
+
+        // First pass: identify all children
+        b2bCustomers.forEach(function(c) {
+          if (c.parent_customer_id) childIds.add(c.customer_id);
+        });
+
+        // Second pass: build groups
+        b2bCustomers.forEach(function(c) {
+          if (c.parent_customer_id) {
+            // This is a child
+            if (!parentMap[c.parent_customer_id]) parentMap[c.parent_customer_id] = { parent: null, children: [], groupRevenue: 0, groupOrders: 0 };
+            parentMap[c.parent_customer_id].children.push(c);
+            parentMap[c.parent_customer_id].groupRevenue += Number(c.total_revenue || 0);
+            parentMap[c.parent_customer_id].groupOrders += Number(c.total_orders || 0);
+          } else {
+            // This is a parent or standalone
+            if (!parentMap[c.customer_id]) parentMap[c.customer_id] = { parent: null, children: [], groupRevenue: 0, groupOrders: 0 };
+            parentMap[c.customer_id].parent = c;
+            parentMap[c.customer_id].groupRevenue += Number(c.total_revenue || 0);
+            parentMap[c.customer_id].groupOrders += Number(c.total_orders || 0);
+          }
+        });
+
+        // Build final groups array, sorted by total group revenue
+        b2bGroups = Object.values(parentMap).filter(function(g) { return g.parent; });
+        // Sort children by revenue desc
+        b2bGroups.forEach(function(g) { g.children.sort(function(a, b) { return Number(b.total_revenue) - Number(a.total_revenue); }); });
+        // Sort groups by total revenue desc
+        b2bGroups.sort(function(a, b) { return b.groupRevenue - a.groupRevenue; });
+
         renderB2BList();
       } catch (e) {
         console.error('B2B load error:', e);
@@ -12746,45 +12783,68 @@
     }
 
     function renderB2BList() {
-      const el = document.getElementById('b2bActiveList');
-      const search = (document.getElementById('b2bSearch')?.value || '').toLowerCase();
-      let filtered = b2bCustomers;
+      var el = document.getElementById('b2bActiveList');
+      var search = (document.getElementById('b2bSearch')?.value || '').toLowerCase();
+      var filtered = b2bGroups;
       if (search.length >= 2) {
-        filtered = b2bCustomers.filter(c => {
-          const name = ((c.first_name || '') + ' ' + (c.last_name || '') + ' ' + (c.b2b_company_name || '') + ' ' + (c.email || '')).toLowerCase();
-          return name.includes(search);
+        filtered = b2bGroups.filter(function(g) {
+          var p = g.parent;
+          var text = ((p.first_name || '') + ' ' + (p.last_name || '') + ' ' + (p.b2b_company_name || '') + ' ' + (p.email || '')).toLowerCase();
+          if (text.includes(search)) return true;
+          return g.children.some(function(c) {
+            return ((c.first_name || '') + ' ' + (c.last_name || '') + ' ' + (c.email || '')).toLowerCase().includes(search);
+          });
         });
       }
-      document.getElementById('b2bCount').textContent = filtered.length + ' / ' + b2bCustomers.length;
+      var totalCustomers = b2bGroups.reduce(function(s, g) { return s + 1 + g.children.length; }, 0);
+      document.getElementById('b2bCount').textContent = filtered.length + ' groups / ' + totalCustomers + ' total';
+
       if (!filtered.length) {
         el.innerHTML = '<p style="color:var(--muted);padding:12px 0;">No B2B customers found</p>';
         return;
       }
-      el.innerHTML = '<div style="overflow-x:auto"><table class="data-table"><thead><tr>' +
-        '<th>Name</th><th>Company</th><th>Email</th><th>VAT</th><th>Status</th><th style="width:100px">Actions</th>' +
-        '</tr></thead><tbody>' +
-        filtered.map(function(c) {
-          var name = esc((c.first_name || '') + ' ' + (c.last_name || ''));
-          var company = esc(c.b2b_company_name || c.company || '\u2014');
-          var email = esc(c.email || '\u2014');
-          var vat = esc(c.b2b_vat_number || '\u2014');
-          var status = c.b2b_status === 'approved' ? '<span style="color:#22c55e;font-weight:600">Active</span>' : (c.b2b_status || '<span style="color:var(--text-muted)">\u2014</span>');
-          return '<tr>' +
-            '<td><strong>' + name + '</strong></td>' +
-            '<td>' + company + '</td>' +
-            '<td style="font-size:0.8rem">' + email + '</td>' +
-            '<td style="font-family:monospace;font-size:0.8rem">' + vat + '</td>' +
-            '<td>' + status + '</td>' +
-            '<td><button class="btn-sm btn-outline" style="font-size:0.75rem;padding:4px 10px" onclick="openB2BEditModal(\'' + c.id + '\')">\u270f\ufe0f Edit</button></td>' +
+
+      var FMT = function(v) { return '\u20ac' + Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); };
+      var rows = '';
+      filtered.forEach(function(g, gi) {
+        var p = g.parent;
+        var name = esc((p.first_name || '') + ' ' + (p.last_name || ''));
+        var company = esc(p.b2b_company_name || p.company || '');
+        var hasChildren = g.children.length > 0;
+        rows += '<tr style="' + (gi % 2 === 0 ? '' : 'background:var(--surface-2)') + '">' +
+          '<td style="font-weight:700">' + (gi + 1) + '</td>' +
+          '<td><strong>' + name + '</strong>' + (hasChildren ? ' <span style="font-size:0.75rem;color:var(--accent)">(' + (g.children.length + 1) + ' accounts)</span>' : '') + '</td>' +
+          '<td>' + company + '</td>' +
+          '<td style="font-size:0.8rem">' + esc(p.email || '') + '</td>' +
+          '<td style="font-family:monospace;font-size:0.85rem">' + esc(p.b2b_vat_number || '') + '</td>' +
+          '<td style="text-align:right;font-weight:600">' + FMT(g.groupRevenue) + '</td>' +
+          '<td style="text-align:center">' + g.groupOrders + '</td>' +
+          '<td><button class="btn-sm btn-outline" style="font-size:0.75rem;padding:4px 10px" onclick="openB2BEditModal(\'' + p.customer_id + '\')">\u270f\ufe0f</button></td>' +
+          '</tr>';
+        // Children rows
+        g.children.forEach(function(c) {
+          rows += '<tr style="background:var(--surface-2);font-size:0.85rem">' +
+            '<td></td>' +
+            '<td style="padding-left:28px;color:var(--text-muted)">\u2514 ' + esc((c.first_name || '') + ' ' + (c.last_name || '')) + '</td>' +
+            '<td style="color:var(--text-muted)">' + esc(c.b2b_company_name || '') + '</td>' +
+            '<td style="font-size:0.8rem;color:var(--text-muted)">' + esc(c.email || '') + '</td>' +
+            '<td></td>' +
+            '<td style="text-align:right;color:var(--text-muted)">' + FMT(c.total_revenue) + '</td>' +
+            '<td style="text-align:center;color:var(--text-muted)">' + c.total_orders + '</td>' +
+            '<td><button class="btn-sm btn-outline" style="font-size:0.7rem;padding:3px 8px" onclick="openB2BEditModal(\'' + c.customer_id + '\')">\u270f\ufe0f</button></td>' +
             '</tr>';
-        }).join('') +
-        '</tbody></table></div>';
+        });
+      });
+
+      el.innerHTML = '<div style="overflow-x:auto"><table class="data-table"><thead><tr>' +
+        '<th>#</th><th>Name</th><th>Company</th><th>Email</th><th>VAT</th><th style="text-align:right">Revenue</th><th style="text-align:center">Orders</th><th style="width:60px">Edit</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table></div>';
     }
 
     function openB2BEditModal(customerId) {
-      var c = b2bCustomers.find(function(x) { return x.id === customerId; });
+      var c = b2bCustomers.find(function(x) { return x.customer_id === customerId; });
       if (!c) { toast('Customer not found', 'error'); return; }
-      document.getElementById('b2bEditId').value = c.id;
+      document.getElementById('b2bEditId').value = c.customer_id;
       document.getElementById('b2bEditName').textContent = (c.first_name || '') + ' ' + (c.last_name || '');
       document.getElementById('b2bEditEmail').textContent = c.email || '\u2014';
       document.getElementById('b2bEditCompany').value = c.b2b_company_name || c.company || '';
@@ -12800,25 +12860,14 @@
       var newType = document.getElementById('b2bEditType').value;
       var company = document.getElementById('b2bEditCompany').value.trim();
       var vat = document.getElementById('b2bEditVat').value.trim();
-      var data = {
-        customer_type: newType,
-        b2b_company_name: company || null,
-        b2b_vat_number: vat || null
-      };
-      if (newType === 'b2c') {
-        data.is_b2b = false;
-        data.b2b_status = null;
-      }
+      var data = { customer_type: newType, b2b_company_name: company || null, b2b_vat_number: vat || null };
+      if (newType === 'b2c') { data.is_b2b = false; data.b2b_status = null; }
       try {
-        var h = getAuthHeaders();
-        h['Prefer'] = 'return=representation';
-        var res = await fetch(SUPA_URL + '/rest/v1/customers?id=eq.' + id, {
-          method: 'PATCH', headers: h, body: JSON.stringify(data)
-        });
+        var h = getAuthHeaders(); h['Prefer'] = 'return=representation';
+        var res = await fetch(SUPA_URL + '/rest/v1/customers?id=eq.' + id, { method: 'PATCH', headers: h, body: JSON.stringify(data) });
         if (!res.ok) throw new Error('Update failed: ' + res.status);
         toast(newType === 'b2c' ? 'Customer changed to B2C' : 'Customer updated');
-        closeB2BEditModal();
-        await loadB2BData();
+        closeB2BEditModal(); await loadB2BData();
       } catch(e) { toast('Error: ' + e.message, 'error'); }
     }
 
@@ -12830,11 +12879,10 @@
         var h = getAuthHeaders();
         var res = await fetch(SUPA_URL + '/rest/v1/customers?id=eq.' + id, { method: 'DELETE', headers: h });
         if (!res.ok) throw new Error('Delete failed: ' + res.status);
-        toast('Customer deleted');
-        closeB2BEditModal();
-        await loadB2BData();
+        toast('Customer deleted'); closeB2BEditModal(); await loadB2BData();
       } catch(e) { toast('Error: ' + e.message, 'error'); }
     }
+
 
 
     // ============================================================
