@@ -7376,8 +7376,12 @@
       if (typeof window !== 'undefined' && window.scrollTo) {
         window.scrollTo({ top: 0, behavior: 'instant' || 'auto' });
       }
-      // Save page scroll position before opening
+      // Save page scroll position before opening and lock body scroll
       window._savedScrollY = window.scrollY || document.documentElement.scrollTop;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = '-' + window._savedScrollY + 'px';
+      document.body.style.width = '100%';
       modal.classList.add('open');
       // Scroll modal to top
       modal.scrollTop = 0;
@@ -7427,12 +7431,31 @@
 
     function closeProductModal() {
       document.getElementById('productModal').classList.remove('open');
-      // Restore page scroll position
-      if (window._savedScrollY !== undefined) {
-        requestAnimationFrame(() => { window.scrollTo(0, window._savedScrollY); });
-      }
+      // Unlock body scroll and restore position
+      var scrollY = window._savedScrollY || 0;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
     }
     function editProduct(id) { const p = allProducts.find(x => x.id === id); if (p) openProductModal(p); }
+
+    // Observe product modal close and restore scroll
+    (function() {
+      const mo = new MutationObserver(function(mutations) {
+        mutations.forEach(function(m) {
+          if (m.attributeName === 'class') {
+            const modal = document.getElementById('productModal');
+            if (modal && !modal.classList.contains('open') && window._savedScrollY !== undefined) {
+              setTimeout(function() { window.scrollTo(0, window._savedScrollY); }, 30);
+            }
+          }
+        });
+      });
+      const pm = document.getElementById('productModal');
+      if (pm) mo.observe(pm, { attributes: true, attributeFilter: ['class'] });
+    })();
 
     // ============================================================
     // MULTI-IMAGE UPLOAD & MANAGEMENT
@@ -7734,9 +7757,11 @@
         }
         toast(id ? 'Product updated' : 'Product created');
         const state = saveProductListState();
+        const scrollY = window._savedScrollY;
         closeProductModal();
         await _refreshProducts();
         restoreProductListState(state);
+        if (scrollY !== undefined) setTimeout(() => window.scrollTo(0, scrollY), 50);
       } catch (e) { toast('Error: ' + e.message, 'error'); }
     }
 
