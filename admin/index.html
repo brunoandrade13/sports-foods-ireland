@@ -7372,6 +7372,12 @@
         window.scrollTo({ top: 0, behavior: 'instant' || 'auto' });
       }
       modal.classList.add('open');
+      // Scroll modal to top
+      modal.scrollTop = 0;
+      const innerModal = modal.querySelector('.modal');
+      if (innerModal) innerModal.scrollTop = 0;
+      const modalBody = modal.querySelector('.modal-body');
+      if (modalBody) modalBody.scrollTop = 0;
     }
 
     // Save/Restore product list state (page, filters, sort)
