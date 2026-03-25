@@ -7376,6 +7376,8 @@
       if (typeof window !== 'undefined' && window.scrollTo) {
         window.scrollTo({ top: 0, behavior: 'instant' || 'auto' });
       }
+      // Save page scroll position before opening
+      window._savedScrollY = window.scrollY || document.documentElement.scrollTop;
       modal.classList.add('open');
       // Scroll modal to top
       modal.scrollTop = 0;
@@ -7423,7 +7425,13 @@
       renderProducts();
     }
 
-    function closeProductModal() { document.getElementById('productModal').classList.remove('open'); }
+    function closeProductModal() {
+      document.getElementById('productModal').classList.remove('open');
+      // Restore page scroll position
+      if (window._savedScrollY !== undefined) {
+        requestAnimationFrame(() => { window.scrollTo(0, window._savedScrollY); });
+      }
+    }
     function editProduct(id) { const p = allProducts.find(x => x.id === id); if (p) openProductModal(p); }
 
     // ============================================================
