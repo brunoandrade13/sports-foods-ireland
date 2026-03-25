@@ -334,6 +334,7 @@
                     coupon: appliedCoupon || null,
                     preferred_method: paymentMethod === 'klarna' ? 'klarna' : undefined,
                     is_b2b: window._sfiCustomerIsB2B || false,
+                    attribution: typeof sfiGetAttribution === 'function' ? sfiGetAttribution() : {},
                 }),
             });
 
