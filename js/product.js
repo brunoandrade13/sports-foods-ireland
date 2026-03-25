@@ -276,6 +276,9 @@ function renderProduct() {
         allMedia.push({ src, alt: currentProduct.nome, isVideo: isVideoUrl(src) });
     }
 
+    // Store globally for lightbox
+    window._productAllMedia = allMedia;
+
     // Set main media to first in array
     if (allMedia.length > 0) {
         setMainMedia(allMedia[0].src, allMedia[0].alt);
@@ -992,3 +995,159 @@ function updateVariantPrice(btn, product) {
         }
     }
 }
+
+// ============================================================
+// LIGHTBOX / ZOOM
+// ============================================================
+(function() {
+    let lbIndex = 0;
+    let lbMedia = [];
+    let lbZoomed = false;
+    let lbDragStart = null;
+    let lbDragOffset = { x: 0, y: 0 };
+
+    window.openLightbox = function(startIndex) {
+        lbMedia = window._productAllMedia || [];
+        if (!lbMedia.length) return;
+
+        // If clicking main image, find current displayed image
+        if (startIndex === undefined) {
+            const mainSrc = document.getElementById('productMainImage')?.src || '';
+            const idx = lbMedia.findIndex(m => mainSrc.includes(m.src.split('/').pop()));
+            lbIndex = idx >= 0 ? idx : 0;
+        } else {
+            lbIndex = startIndex;
+        }
+
+        renderLightbox();
+        const overlay = document.getElementById('sfiLightbox');
+        overlay.style.display = 'flex';
+        requestAnimationFrame(() => overlay.classList.add('show'));
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeLightbox = function() {
+        const overlay = document.getElementById('sfiLightbox');
+        overlay.classList.remove('show');
+        setTimeout(() => { overlay.style.display = 'none'; }, 250);
+        document.body.style.overflow = '';
+        resetZoom();
+    };
+
+    window.lightboxNav = function(dir) {
+        if (!lbMedia.length) return;
+        resetZoom();
+        lbIndex = (lbIndex + dir + lbMedia.length) % lbMedia.length;
+        renderLightbox();
+    };
+
+    window.lightboxGoTo = function(idx) {
+        resetZoom();
+        lbIndex = idx;
+        renderLightbox();
+    };
+
+    window.toggleLightboxZoom = function(e) {
+        const img = document.getElementById('lightboxImg');
+        if (!img) return;
+
+        if (lbZoomed) {
+            resetZoom();
+        } else {
+            img.classList.add('zoomed');
+            lbZoomed = true;
+            // Center zoom on click point
+            const rect = img.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            img.style.transformOrigin = `${x * 100}% ${y * 100}%`;
+        }
+    };
+
+    function resetZoom() {
+        const img = document.getElementById('lightboxImg');
+        if (!img) return;
+        img.classList.remove('zoomed');
+        img.style.transformOrigin = 'center center';
+        img.style.translate = '';
+        lbZoomed = false;
+        lbDragOffset = { x: 0, y: 0 };
+    }
+
+    function renderLightbox() {
+        const item = lbMedia[lbIndex];
+        if (!item) return;
+        const img = document.getElementById('lightboxImg');
+        img.src = item.src;
+        img.alt = item.alt || '';
+        img.classList.remove('zoomed');
+        img.style.transformOrigin = 'center center';
+        lbZoomed = false;
+
+        // Counter
+        const counter = document.getElementById('lightboxCounter');
+        counter.textContent = lbMedia.length > 1 ? `${lbIndex + 1} / ${lbMedia.length}` : '';
+
+        // Nav buttons visibility
+        const prev = document.querySelector('.lightbox-prev');
+        const next = document.querySelector('.lightbox-next');
+        if (prev) prev.style.display = lbMedia.length > 1 ? 'flex' : 'none';
+        if (next) next.style.display = lbMedia.length > 1 ? 'flex' : 'none';
+
+        // Thumbnails
+        const thumbs = document.getElementById('lightboxThumbs');
+        if (lbMedia.length > 1) {
+            thumbs.innerHTML = lbMedia.map((m, i) =>
+                `<img class="lightbox-thumb ${i === lbIndex ? 'active' : ''}" src="${m.src}" alt="" onclick="lightboxGoTo(${i})" onerror="this.style.display=\u0027none\u0027">`
+            ).join('');
+            thumbs.style.display = 'flex';
+        } else {
+            thumbs.style.display = 'none';
+        }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        const lb = document.getElementById('sfiLightbox');
+        if (!lb || lb.style.display === 'none') return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') lightboxNav(-1);
+        if (e.key === 'ArrowRight') lightboxNav(1);
+    });
+
+    // Drag to pan when zoomed
+    const wrap = document.querySelector('.lightbox-img-wrap');
+    if (wrap) {
+        wrap.addEventListener('mousedown', function(e) {
+            if (!lbZoomed) return;
+            e.preventDefault();
+            lbDragStart = { x: e.clientX - lbDragOffset.x, y: e.clientY - lbDragOffset.y };
+            document.getElementById('lightboxImg').style.cursor = 'grabbing';
+        });
+        document.addEventListener('mousemove', function(e) {
+            if (!lbDragStart || !lbZoomed) return;
+            lbDragOffset.x = e.clientX - lbDragStart.x;
+            lbDragOffset.y = e.clientY - lbDragStart.y;
+            document.getElementById('lightboxImg').style.translate = `${lbDragOffset.x}px ${lbDragOffset.y}px`;
+        });
+        document.addEventListener('mouseup', function() {
+            if (lbDragStart) {
+                lbDragStart = null;
+                const img = document.getElementById('lightboxImg');
+                if (img) img.style.cursor = lbZoomed ? 'move' : 'grab';
+            }
+        });
+    }
+
+    // Touch/swipe support for mobile
+    let touchStartX = 0;
+    document.getElementById('sfiLightbox')?.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+    document.getElementById('sfiLightbox')?.addEventListener('touchend', function(e) {
+        const diff = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(diff) > 50) {
+            lightboxNav(diff > 0 ? -1 : 1);
+        }
+    }, { passive: true });
+})();

@@ -769,7 +769,140 @@
             display: block !important;
             visibility: visible !important;
         }
-    </style>
+
+        /* ===== LIGHTBOX / ZOOM ===== */
+        .zoom-icon {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .product-main-image { position: relative; overflow: hidden; }
+        .product-main-image:hover .zoom-icon { opacity: 1; }
+        .product-main-image:hover { cursor: zoom-in; }
+
+        .lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .lightbox-overlay.show { display: flex; opacity: 1; }
+        .lightbox-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .lightbox-close:hover { background: rgba(255,255,255,0.25); }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 10002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .lightbox-nav:hover { background: rgba(255,255,255,0.25); }
+        .lightbox-prev { left: 16px; }
+        .lightbox-next { right: 16px; }
+        .lightbox-img-wrap {
+            max-width: 90vw;
+            max-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .lightbox-img-wrap img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 4px;
+            transition: transform 0.3s;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .lightbox-img-wrap img.zoomed { cursor: move; transform: scale(2); }
+        .lightbox-counter {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            z-index: 10002;
+        }
+        .lightbox-thumbs {
+            position: absolute;
+            bottom: 44px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10002;
+            max-width: 80vw;
+            overflow-x: auto;
+            padding: 4px;
+        }
+        .lightbox-thumb {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: all 0.2s;
+        }
+        .lightbox-thumb:hover { opacity: 0.8; }
+        .lightbox-thumb.active { border-color: #fff; opacity: 1; }
+
+        @media (max-width: 768px) {
+            .lightbox-nav { width: 36px; height: 36px; font-size: 18px; }
+            .lightbox-prev { left: 8px; }
+            .lightbox-next { right: 8px; }
+            .lightbox-thumbs { display: none; }
+        }
+        </style>
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
@@ -1150,8 +1283,9 @@
                 <div class="product-container">
                     <!-- Product Gallery -->
                     <div class="product-gallery">
-                        <div id="productMainMedia" class="product-main-image">
+                        <div id="productMainMedia" class="product-main-image" onclick="openLightbox()" title="Click to zoom">
                             <img id="productMainImage" src="img/produto1.jpg" alt="Product" loading="eager" style="width:100%;height:100%;object-fit:contain;display:block">
+                            <div class="zoom-icon">🔍</div>
                         </div>
                         <div class="product-thumbnails" id="productThumbnails">
                             <!-- Thumbnails will be loaded by JavaScript -->
@@ -1610,12 +1744,24 @@
 <script src="js/cart.min.js?v=6" defer></script>
     <script src="js/product-card.min.js?v=9" defer></script>
     <script src="js/main.min.js?v=16" defer></script>
-    <script src="js/product.min.js?v=29" defer></script>
+    <script src="js/product.min.js?v=30" defer></script>
     <link rel="stylesheet" href="css/reviews.css">
     <script src="js/reviews.min.js?v=2" defer></script>
     <script src="js/sfi-fixes.min.js?v=6" defer></script>
     <script src="js/sfi-enhancements.min.js" defer></script>
     <script src="js/sfi-analytics.min.js" defer></script>
 <script src="js/brevo-integration.js" defer></script>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox-overlay" id="sfiLightbox" onclick="if(event.target===this)closeLightbox()">
+        <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">✕</button>
+        <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)" aria-label="Previous">‹</button>
+        <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)" aria-label="Next">›</button>
+        <div class="lightbox-img-wrap">
+            <img id="lightboxImg" src="" alt="" onclick="toggleLightboxZoom(event)" draggable="false">
+        </div>
+        <div class="lightbox-thumbs" id="lightboxThumbs"></div>
+        <div class="lightbox-counter" id="lightboxCounter"></div>
+    </div>
 </body>
 </html>
