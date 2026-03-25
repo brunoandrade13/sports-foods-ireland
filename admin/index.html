@@ -3374,8 +3374,13 @@
   <!-- PRODUCT MODAL -->
   <div class="modal-overlay" id="productModal">
     <div class="modal" style="max-width:1000px;width:96%">
-      <div class="modal-header">
-        <h3 id="productModalTitle">Add Product</h3><button class="modal-close" onclick="closeProductModal()">✕</button>
+      <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <h3 id="productModalTitle" style="margin:0">Add Product</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-primary" onclick="saveProduct()" style="font-size:0.85rem;padding:6px 16px">Save Product</button>
+          <button class="btn btn-ghost" onclick="closeProductModal()" style="font-size:0.85rem;padding:6px 12px">Cancel</button>
+          <button class="modal-close" onclick="closeProductModal()">✕</button>
+        </div>
       </div>
       <div class="modal-body">
         <input type="hidden" id="editProductId">
