@@ -1378,6 +1378,9 @@
         <div class="nav-item" data-page="giftcards" onclick="showPage('giftcards')">
           <span class="icon">🎁</span> Gift Cards
         </div>
+        <div class="nav-item" data-page="utm" onclick="showPage('utm')">
+          <span class="icon">🔗</span> UTM Campaigns
+        </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-title">Operations</div>
@@ -2751,6 +2754,37 @@
                   <td colspan="7" class="loading-overlay"><span class="spinner"></span></td>
                 </tr>
               </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- UTM CAMPAIGNS PAGE -->
+      <div class="page" id="page-utm">
+        <div class="page-header">
+          <h1>🔗 UTM Campaign Generator</h1>
+          <div class="actions"><button class="btn btn-primary" onclick="openUtmModal()">+ New Campaign</button></div>
+        </div>
+        <div class="card" style="margin-bottom:20px;padding:16px;">
+          <h3 style="margin-bottom:12px;">Quick Generate</h3>
+          <div style="display:grid;grid-template-columns:1fr 140px 140px 140px 140px;gap:10px;align-items:end;">
+            <div><label style="font-size:0.75rem;color:var(--text-dim);">Landing Page URL</label><input type="text" id="utmBaseUrl" value="https://sportsfoodsireland.ie/shop.html" style="width:100%;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);"></div>
+            <div><label style="font-size:0.75rem;color:var(--text-dim);">Source *</label><select id="utmSource" style="width:100%;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);"><option>instagram</option><option>tiktok</option><option>facebook</option><option>twitter</option><option>newsletter</option><option>google</option><option>linkedin</option><option>whatsapp</option><option>youtube</option></select></div>
+            <div><label style="font-size:0.75rem;color:var(--text-dim);">Medium</label><select id="utmMedium" style="width:100%;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);"><option>social</option><option>email</option><option>cpc</option><option>referral</option><option>display</option><option>video</option></select></div>
+            <div><label style="font-size:0.75rem;color:var(--text-dim);">Campaign</label><input type="text" id="utmCampaign" placeholder="e.g. spring2026" style="width:100%;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);"></div>
+            <button class="btn btn-primary" onclick="generateUtmUrl()" style="height:38px;">Generate URL</button>
+          </div>
+          <div id="utmResultBox" style="display:none;margin-top:14px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;position:relative;">
+            <input type="text" id="utmResultUrl" readonly style="width:calc(100% - 80px);padding:8px;background:transparent;border:none;color:var(--accent);font-family:monospace;font-size:0.85rem;">
+            <button class="btn btn-outline" onclick="copyUtmUrl()" style="position:absolute;right:8px;top:8px;font-size:0.8rem;padding:6px 12px;">📋 Copy</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:12px;">Saved Campaigns</h3>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Name</th><th>Source</th><th>Medium</th><th>Campaign</th><th>URL</th><th>Created</th><th></th></tr></thead>
+              <tbody id="utmTable"><tr><td colspan="7" class="loading-overlay"><span class="spinner"></span></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -6481,6 +6515,7 @@
       reviews: () => renderReviews(),
       coupons: () => renderCoupons(),
       giftcards: () => renderGiftCards(),
+      utm: () => renderUtm(),
       abandoned: () => renderAbandoned(),
       shipping: () => renderShipping(),
       settings: () => renderSettings(),
@@ -12014,6 +12049,72 @@
         <td><span class="stock-badge ${sCls}">${sTxt}</span></td>
         <td><button class="btn-sm btn-outline" onclick="openGiftCardEdit('${g.id}')">Edit</button></td></tr>`;
         }).join('');
+    }
+
+    // ============================================================
+    // UTM CAMPAIGNS
+    // ============================================================
+    let allUtmCampaigns = [];
+
+    async function renderUtm() {
+      try {
+        allUtmCampaigns = await supaGetAll('utm_campaigns', '?order=created_at.desc').catch(() => []);
+      } catch(e) { allUtmCampaigns = []; }
+      const tbody = document.getElementById('utmTable');
+      if (!tbody) return;
+      if (!allUtmCampaigns.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No campaigns yet — create one above!</td></tr>'; return; }
+      tbody.innerHTML = allUtmCampaigns.map(u => `
+        <tr>
+          <td><strong>${esc(u.name || '')}</strong>${u.notes ? '<br><span style="font-size:0.75rem;color:var(--text-dim)">' + esc(u.notes) + '</span>' : ''}</td>
+          <td><span class="stock-badge in" style="font-size:0.75rem">${esc(u.utm_source)}</span></td>
+          <td>${esc(u.utm_medium || '')}</td>
+          <td>${esc(u.utm_campaign || '—')}</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><code style="font-size:0.7rem;cursor:pointer;" onclick="navigator.clipboard.writeText('${esc(u.full_url || '')}');toast('URL copied!')" title="Click to copy">${esc(u.full_url || '')}</code></td>
+          <td style="font-size:0.8rem;">${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
+          <td><button class="btn-sm" style="color:var(--danger);background:none;border:none;cursor:pointer;" onclick="deleteUtmCampaign('${u.id}')">🗑️</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function generateUtmUrl() {
+      const base = document.getElementById('utmBaseUrl')?.value.trim() || 'https://sportsfoodsireland.ie/shop.html';
+      const source = document.getElementById('utmSource')?.value || '';
+      const medium = document.getElementById('utmMedium')?.value || '';
+      const campaign = document.getElementById('utmCampaign')?.value.trim() || '';
+      if (!source) { toast('Source is required', 'error'); return; }
+      let url = base + '?utm_source=' + encodeURIComponent(source) + '&utm_medium=' + encodeURIComponent(medium);
+      if (campaign) url += '&utm_campaign=' + encodeURIComponent(campaign);
+      document.getElementById('utmResultUrl').value = url;
+      document.getElementById('utmResultBox').style.display = 'block';
+    }
+
+    function copyUtmUrl() {
+      const url = document.getElementById('utmResultUrl')?.value;
+      if (url) { navigator.clipboard.writeText(url); toast('URL copied to clipboard!'); }
+    }
+
+    async function openUtmModal() {
+      const name = prompt('Campaign name (e.g. "Instagram Spring Sale"):');
+      if (!name) return;
+      const base = document.getElementById('utmBaseUrl')?.value.trim() || 'https://sportsfoodsireland.ie/shop.html';
+      const source = document.getElementById('utmSource')?.value || 'instagram';
+      const medium = document.getElementById('utmMedium')?.value || 'social';
+      const campaign = document.getElementById('utmCampaign')?.value.trim() || '';
+      const notes = prompt('Notes (optional):') || '';
+      try {
+        await supaInsert('utm_campaigns', { name, base_url: base, utm_source: source, utm_medium: medium, utm_campaign: campaign || null, notes: notes || null });
+        toast('Campaign saved!');
+        renderUtm();
+      } catch(e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    async function deleteUtmCampaign(id) {
+      if (!confirm('Delete this campaign?')) return;
+      try {
+        await supaDelete('utm_campaigns', id);
+        toast('Campaign deleted');
+        renderUtm();
+      } catch(e) { toast('Error: ' + e.message, 'error'); }
     }
 
     function openGiftCardModal() {
