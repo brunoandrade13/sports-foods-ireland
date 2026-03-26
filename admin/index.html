@@ -12810,91 +12810,162 @@
       if (!window.jspdf) return alert('PDF library not loaded. Please refresh the page.');
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-      const PW = 595.28, PH = 841.89, ML = 40, MR = 40, CW = PW - ML - MR;
-      let y = 40, xp;
+      const PW = 595.28, PH = 841.89, ML = 40, MR = 40, MT = 40, MB = 80, CW = PW - ML - MR;
+      const PAGE_BOTTOM = PH - MB;
+      let y = MT, xp, pageNum = 1;
+
+      // ---- Helper: add footer to current page ----
+      function addFooter() {
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(85,85,85);
+        doc.text(SFI_COMPANY.name, PW/2, PH - 52, {align:'center'});
+        doc.text('IBAN: ' + SFI_COMPANY.iban, PW/2, PH - 40, {align:'center'});
+        doc.text('BIC: ' + SFI_COMPANY.bic, PW/2, PH - 28, {align:'center'});
+      }
+
+      // ---- Helper: check if we need a new page ----
+      function checkPage(needed) {
+        if (y + needed > PAGE_BOTTOM) {
+          addFooter();
+          doc.addPage();
+          pageNum++;
+          y = MT;
+          return true;
+        }
+        return false;
+      }
+
+      // ---- Helper: draw item table headers ----
+      function drawItemHeaders() {
+        doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F');
+        doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
+        doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(0,0,0);
+        var xh = ML;
+        ['QTY','ACTIVITY','DESCRIPTION','VAT','RATE','AMOUNT'].forEach(function(h, i) {
+          if ([0,3,4,5].indexOf(i) >= 0) doc.text(h, xh + icW[i] - 4, y + 10, {align:'right'});
+          else doc.text(h, xh + 4, y + 10);
+          xh += icW[i];
+        });
+        y += 16;
+      }
+
+      // ---- HEADER with logo ----
       if (window._sfiLogoB64) {
-        try { doc.addImage(window._sfiLogoB64, 'JPEG', ML, y - 2, 57, 66); } catch(e) { doc.setFontSize(8); doc.setTextColor(255,0,0); doc.text('LOGO ERROR: ' + e.message, ML, y + 20); doc.setTextColor(0,0,0); }
-      } else { doc.setFontSize(8); doc.setTextColor(255,0,0); doc.text('LOGO NOT LOADED', ML, y + 20); doc.setTextColor(0,0,0); }
-      const infoX = ML + 88;
+        try { doc.addImage(window._sfiLogoB64, 'JPEG', ML, y - 2, 57, 66); } catch(e) {}
+      }
+      var infoX = ML + 88;
       doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(0,0,0);
       doc.text(SFI_COMPANY.name, infoX, y + 12);
       doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(85,85,85);
-      [SFI_COMPANY.addr1,SFI_COMPANY.addr2,SFI_COMPANY.eircode,SFI_COMPANY.phone,SFI_COMPANY.email,SFI_COMPANY.website,'VAT Registration No.: '+SFI_COMPANY.vat].forEach((ln,i) => doc.text(ln, infoX, y+24+i*10));
+      [SFI_COMPANY.addr1, SFI_COMPANY.addr2, SFI_COMPANY.eircode, SFI_COMPANY.phone, SFI_COMPANY.email, SFI_COMPANY.website, 'VAT Registration No.: ' + SFI_COMPANY.vat].forEach(function(ln, i) { doc.text(ln, infoX, y + 24 + i * 10); });
       doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(0,0,0);
-      doc.text('Invoice', PW - MR, y + 22, { align: 'right' });
+      doc.text('Invoice', PW - MR, y + 22, {align:'right'});
       y += 100;
-      const boxW = (CW - 20) / 2;
-      const formatAddr = (a, comp) => { const l=[]; const nm=[a.first_name,a.last_name].filter(Boolean).join(' '); if(nm)l.push(nm); if(comp)l.push(comp); if(a.address_1)l.push(a.address_1); if(a.address_2)l.push(a.address_2); const ct=a.city||'',st=a.state||a.county||''; if(ct&&st)l.push(ct+', '+st); else if(ct)l.push(ct); const pc=a.postcode||a.postal_code||'',co=a.country==='IE'?'Ireland':(a.country==='GB'?'United Kingdom':(a.country||'')); if(pc&&co)l.push(pc+' '+co); else if(pc)l.push(pc); else if(co)l.push(co); return l; };
-      [[ML,'INVOICE TO',bill],[ML+boxW+20,'SHIP TO',ship]].forEach(([bx,label,addr])=>{
-        doc.setFillColor(224,224,224); doc.rect(bx,y,boxW,14,'F');
+
+      // ---- INVOICE TO / SHIP TO ----
+      var boxW = (CW - 20) / 2;
+      var formatAddr = function(a, comp) { var l = []; var nm = [a.first_name, a.last_name].filter(Boolean).join(' '); if (nm) l.push(nm); if (comp) l.push(comp); if (a.address_1) l.push(a.address_1); if (a.address_2) l.push(a.address_2); var ct = a.city || '', st = a.state || a.county || ''; if (ct && st) l.push(ct + ', ' + st); else if (ct) l.push(ct); var pc = a.postcode || a.postal_code || '', co = a.country === 'IE' ? 'Ireland' : (a.country === 'GB' ? 'United Kingdom' : (a.country || '')); if (pc && co) l.push(pc + ' ' + co); else if (pc) l.push(pc); else if (co) l.push(co); return l; };
+      [[ML, 'INVOICE TO', bill], [ML + boxW + 20, 'SHIP TO', ship]].forEach(function(cfg) {
+        var bx = cfg[0], label = cfg[1], addr = cfg[2];
+        doc.setFillColor(224,224,224); doc.rect(bx, y, boxW, 14, 'F');
         doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(0,0,0);
-        doc.text(label,bx+4,y+10);
+        doc.text(label, bx + 4, y + 10);
         doc.setFont('helvetica','normal'); doc.setFontSize(8);
-        formatAddr(addr,company).forEach((ln,i)=>doc.text(ln,bx+4,y+26+i*11));
+        formatAddr(addr, company).forEach(function(ln, i) { doc.text(ln, bx + 4, y + 26 + i * 11); });
       });
-      y += 16 + Math.max(formatAddr(bill,company).length, formatAddr(ship,company).length) * 11 + 8;
-      const preSubtotal = items.reduce((s,i) => s + (parseInt(i.quantity)||1) * (parseFloat(i.unit_price)||0), 0);
-      const preVat = Math.round(preSubtotal * 23) / 100;
-      const preTotal = preSubtotal + preVat;
-      const detF=[['INVOICE NO.',invNum],['DATE',fmtD(invDate)],['TOTAL DUE','EUR '+fmtM(preTotal)],['DUE DATE',fmtD(dueDate)],['TERMS','Net 30'],['ENCLOSED','']];
-      const dCW=[CW*0.22,CW*0.13,CW*0.17,CW*0.15,CW*0.13,CW*0.20];
-      doc.setFillColor(224,224,224); doc.rect(ML,y,CW,14,'F'); doc.setDrawColor(204,204,204); doc.rect(ML,y,CW,14,'S');
+      y += 16 + Math.max(formatAddr(bill, company).length, formatAddr(ship, company).length) * 11 + 8;
+
+      // ---- INVOICE DETAILS ROW ----
+      var preSubtotal = items.reduce(function(s, i) { return s + (parseInt(i.quantity) || 1) * (parseFloat(i.unit_price) || 0); }, 0);
+      var preVat = Math.round(preSubtotal * 23) / 100;
+      var preTotal = preSubtotal + preVat;
+      var detF = [['INVOICE NO.', invNum], ['DATE', fmtD(invDate)], ['TOTAL DUE', 'EUR ' + fmtM(preTotal)], ['DUE DATE', fmtD(dueDate)], ['TERMS', 'Net 30'], ['ENCLOSED', '']];
+      var dCW = [CW*0.22, CW*0.13, CW*0.17, CW*0.15, CW*0.13, CW*0.20];
+      doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
       doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(0,0,0);
-      xp=ML; detF.forEach(([l],i)=>{doc.text(l,xp+4,y+10);xp+=dCW[i];}); y+=14;
-      doc.setDrawColor(204,204,204); doc.rect(ML,y,CW,20,'S');
+      xp = ML; detF.forEach(function(f, i) { doc.text(f[0], xp + 4, y + 10); xp += dCW[i]; }); y += 14;
+      doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 20, 'S');
       doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
-      xp=ML; detF.forEach(([,v],i)=>{doc.text(v,xp+4,y+13);xp+=dCW[i];}); y+=26;
-      const sF=[['SHIP DATE',fmtD(invDate)],['SHIP VIA',order.shipping_method||'gls'],['TRACKING NO.',order.tracking_number||'']];
-      const sCW=[CW*0.33,CW*0.33,CW*0.34];
-      doc.setFillColor(224,224,224); doc.rect(ML,y,CW,14,'F'); doc.setDrawColor(204,204,204); doc.rect(ML,y,CW,14,'S');
-      doc.setFont('helvetica','bold'); doc.setFontSize(7); xp=ML; sF.forEach(([l],i)=>{doc.text(l,xp+4,y+10);xp+=sCW[i];}); y+=14;
-      doc.setDrawColor(204,204,204); doc.rect(ML,y,CW,20,'S');
-      xp=ML; sF.forEach(([,v],i)=>{ doc.setFont('helvetica',i===0?'bold':'normal'); doc.setFontSize(8.5); doc.text(v||'',xp+4,y+13); xp+=sCW[i]; }); y+=30;
-      const icW=[35,80,210,35,60,70].map(w=>w*CW/490);
-      doc.setFillColor(224,224,224); doc.rect(ML,y,CW,14,'F'); doc.setDrawColor(204,204,204); doc.rect(ML,y,CW,14,'S');
-      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(0,0,0);
-      xp=ML; ['QTY','ACTIVITY','DESCRIPTION','VAT','RATE','AMOUNT'].forEach((h,i)=>{
-        if([0,3,4,5].includes(i)) doc.text(h,xp+icW[i]-4,y+10,{align:'right'}); else doc.text(h,xp+4,y+10); xp+=icW[i];
-      }); y+=16;
-      let subtotal=0; const FS=7.5,LS=9.5,RPT=3,RPB=2;
-      items.forEach(item=>{
-        const qty=parseInt(item.quantity)||1, sku=item.sku||item.product_sku||'', desc=item.product_name||'', rate=parseFloat(item.unit_price)||0, amount=qty*rate;
-        subtotal+=amount;
-        const dL=[]; if(desc.length<=38){dL.push(desc);}else{const ws=desc.split(' ');let c='';ws.forEach(w=>{const t=(c+' '+w).trim();if(t.length<=38)c=t;else{if(c)dL.push(c);c=w;}});if(c)dL.push(c);} if(!dL.length)dL.push('');
-        const rH=RPT+dL.length*LS+RPB;
-        doc.setDrawColor(204,204,204); doc.line(ML,y,ML+CW,y);
-        const tY=y+RPT+LS-2; xp=ML;
-        doc.setFont('helvetica','normal');doc.setFontSize(FS); doc.text(String(qty),xp+icW[0]-4,tY,{align:'right'}); xp+=icW[0];
-        doc.setFont('helvetica','bold');doc.setFontSize(FS); doc.text(sku,xp+4,tY); xp+=icW[1];
-        doc.setFont('helvetica','normal');doc.setFontSize(FS); dL.forEach((dl,li)=>doc.text(dl,xp+4,tY+li*LS)); xp+=icW[2];
-        doc.text('S',xp+icW[3]-4,tY,{align:'right'}); xp+=icW[3];
-        doc.text(fmtM(rate),xp+icW[4]-4,tY,{align:'right'}); xp+=icW[4];
-        doc.text(fmtM(amount),xp+icW[5]-4,tY,{align:'right'});
-        y+=rH;
+      xp = ML; detF.forEach(function(f, i) { doc.text(f[1], xp + 4, y + 13); xp += dCW[i]; }); y += 26;
+
+      // ---- SHIP DATE ROW ----
+      var sF = [['SHIP DATE', fmtD(invDate)], ['SHIP VIA', order.shipping_method || 'gls'], ['TRACKING NO.', order.tracking_number || '']];
+      var sCW = [CW*0.33, CW*0.33, CW*0.34];
+      doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); xp = ML; sF.forEach(function(f, i) { doc.text(f[0], xp + 4, y + 10); xp += sCW[i]; }); y += 14;
+      doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 20, 'S');
+      xp = ML; sF.forEach(function(f, i) { doc.setFont('helvetica', i === 0 ? 'bold' : 'normal'); doc.setFontSize(8.5); doc.text(f[1] || '', xp + 4, y + 13); xp += sCW[i]; }); y += 30;
+
+      // ---- ITEMS TABLE ----
+      var icW = [35, 80, 210, 35, 60, 70].map(function(w) { return w * CW / 490; });
+      drawItemHeaders();
+
+      var subtotal = 0, FS = 7.5, LS = 9.5, RPT = 3, RPB = 2;
+      items.forEach(function(item) {
+        var qty = parseInt(item.quantity) || 1, sku = item.sku || item.product_sku || '', desc = item.product_name || '', rate = parseFloat(item.unit_price) || 0, amount = qty * rate;
+        subtotal += amount;
+
+        // Word wrap description
+        var dL = [];
+        if (desc.length <= 38) { dL.push(desc); } else {
+          var ws = desc.split(' '); var c = '';
+          ws.forEach(function(w) { var t = (c + ' ' + w).trim(); if (t.length <= 38) c = t; else { if (c) dL.push(c); c = w; } });
+          if (c) dL.push(c);
+        }
+        if (!dL.length) dL.push('');
+
+        var rH = RPT + dL.length * LS + RPB;
+
+        // Check if this item fits on current page
+        if (y + rH > PAGE_BOTTOM) {
+          addFooter();
+          doc.addPage();
+          pageNum++;
+          y = MT;
+          drawItemHeaders();
+        }
+
+        doc.setDrawColor(204,204,204); doc.line(ML, y, ML + CW, y);
+        var tY = y + RPT + LS - 2;
+        xp = ML;
+        doc.setFont('helvetica','normal'); doc.setFontSize(FS); doc.text(String(qty), xp + icW[0] - 4, tY, {align:'right'}); xp += icW[0];
+        doc.setFont('helvetica','bold'); doc.setFontSize(FS); doc.text(sku, xp + 4, tY); xp += icW[1];
+        doc.setFont('helvetica','normal'); doc.setFontSize(FS); dL.forEach(function(dl, li) { doc.text(dl, xp + 4, tY + li * LS); }); xp += icW[2];
+        doc.text('S', xp + icW[3] - 4, tY, {align:'right'}); xp += icW[3];
+        doc.text(fmtM(rate), xp + icW[4] - 4, tY, {align:'right'}); xp += icW[4];
+        doc.text(fmtM(amount), xp + icW[5] - 4, tY, {align:'right'});
+        y += rH;
       });
-      doc.setDrawColor(204,204,204); doc.line(ML,y,ML+CW,y); y+=12;
-      const vatTotal=Math.round(subtotal*23)/100, total=subtotal+vatTotal;
-      const tx=ML+CW-200;
-      [['SUBTOTAL',fmtM(subtotal)],['VAT TOTAL',fmtM(vatTotal)],['TOTAL',fmtM(total)]].forEach(([l,v])=>{
-        doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(0,0,0);
-        doc.text(l,tx+100,y,{align:'right'}); doc.text(v,tx+180,y,{align:'right'}); y+=13;
-      }); y+=6;
-      doc.setFont('helvetica','normal');doc.setFontSize(9); doc.text('BALANCE DUE',tx+40,y,{align:'right'});
-      doc.setFont('helvetica','bold');doc.setFontSize(16); doc.text('EUR '+fmtM(total),tx+185,y,{align:'right'}); y+=30;
-      doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(0,0,0); doc.text('TAX SUMMARY',ML,y); y+=14;
-      const taxCW=[150,100,100],taxTW=350;
-      doc.setFillColor(224,224,224);doc.rect(ML,y,taxTW,14,'F');doc.setDrawColor(204,204,204);doc.rect(ML,y,taxTW,14,'S');
-      doc.setFont('helvetica','bold');doc.setFontSize(7); let txp=ML; ['RATE','TAX','NET'].forEach((h,i)=>{doc.text(h,txp+4,y+10);txp+=taxCW[i];}); y+=14;
-      doc.setDrawColor(204,204,204);doc.rect(ML,y,taxTW,14,'S');
-      doc.setFont('helvetica','normal');doc.setFontSize(8); txp=ML;
-      doc.text('VAT @ 23%',txp+4,y+10);txp+=taxCW[0]; doc.text(fmtM(vatTotal),txp+4,y+10);txp+=taxCW[1]; doc.text(fmtM(subtotal),txp+4,y+10);
-      doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(85,85,85);
-      doc.text(SFI_COMPANY.name,PW/2,PH-52,{align:'center'}); doc.text('IBAN: '+SFI_COMPANY.iban,PW/2,PH-40,{align:'center'}); doc.text('BIC: '+SFI_COMPANY.bic,PW/2,PH-28,{align:'center'});
+
+      doc.setDrawColor(204,204,204); doc.line(ML, y, ML + CW, y); y += 12;
+
+      // ---- TOTALS ----
+      var vatTotal = Math.round(subtotal * 23) / 100, total = subtotal + vatTotal;
+      checkPage(80);
+      var tx = ML + CW - 200;
+      [['SUBTOTAL', fmtM(subtotal)], ['VAT TOTAL', fmtM(vatTotal)], ['TOTAL', fmtM(total)]].forEach(function(r) {
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(0,0,0);
+        doc.text(r[0], tx + 100, y, {align:'right'}); doc.text(r[1], tx + 180, y, {align:'right'}); y += 13;
+      }); y += 6;
+      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('BALANCE DUE', tx + 40, y, {align:'right'});
+      doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text('EUR ' + fmtM(total), tx + 185, y, {align:'right'}); y += 30;
+
+      // ---- TAX SUMMARY ----
+      checkPage(50);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(0,0,0); doc.text('TAX SUMMARY', ML, y); y += 14;
+      var taxCW = [150, 100, 100], taxTW = 350;
+      doc.setFillColor(224,224,224); doc.rect(ML, y, taxTW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, taxTW, 14, 'S');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); var txp = ML; ['RATE', 'TAX', 'NET'].forEach(function(h, i) { doc.text(h, txp + 4, y + 10); txp += taxCW[i]; }); y += 14;
+      doc.setDrawColor(204,204,204); doc.rect(ML, y, taxTW, 14, 'S');
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); txp = ML;
+      doc.text('VAT @ 23%', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(vatTotal), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(subtotal), txp + 4, y + 10);
+
+      // ---- Footer on last page ----
+      addFooter();
       doc.save('Invoice_' + invNum + '_SFI.pdf');
      } catch(err) { console.error('Invoice generation error:', err); alert('Error generating invoice: ' + err.message); }
     }
 
-    async function downloadInvoicePDFFromView() {
+        async function downloadInvoicePDFFromView() {
       const order = _currentInvOrder;
       if (!order) return alert('No order data available for this invoice');
       // Ensure the order is findable in allOrders
