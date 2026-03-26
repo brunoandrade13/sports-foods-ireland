@@ -4091,12 +4091,12 @@
 
   <!-- ORDER MODAL -->
   <div class="modal-overlay" id="orderModal" style="display:none">
-    <div class="modal" style="max-width:800px; width: 90%;">
-      <div class="modal-header">
+    <div class="modal" style="max-width:800px; width:90%; max-height:92vh; display:flex; flex-direction:column;">
+      <div class="modal-header" style="flex-shrink:0">
         <h3 id="omTitle">Order Details</h3>
         <button class="modal-close" onclick="closeOrderModal()">✕</button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="overflow-y:auto;flex:1">
         <div
           style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 20px;">
           <div style="flex: 1; min-width: 200px;">
@@ -13873,12 +13873,12 @@
 
   <!-- Invoice View Modal (full template: logo, Bill To, items, totals, print) -->
   <div class="modal-overlay" id="invoiceViewModal" style="display:none;z-index:210">
-    <div class="modal" style="max-width:700px">
-      <div class="modal-header">
+    <div class="modal" style="max-width:700px;max-height:92vh;display:flex;flex-direction:column">
+      <div class="modal-header" style="flex-shrink:0">
         <h3 id="invoiceViewTitle">Invoice</h3>
         <button class="modal-close" onclick="closeInvoiceModal()">✕</button>
       </div>
-      <div class="modal-body" style="padding:20px">
+      <div class="modal-body" style="padding:20px;overflow-y:auto;flex:1">
         <div id="invoicePrintArea" class="inv-doc"></div>
         <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
           <button type="button" class="btn btn-primary" onclick="printInvoice()">🖨️ Print</button>
