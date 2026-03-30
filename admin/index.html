@@ -9282,18 +9282,24 @@
           const orderName = o.customer_name || o.guest_name || nameFromBilling || nameFromShipping || orderEmail || 'Guest';
           let name = orderName;
           let typeBadge = '';
-          const email = (orderEmail || 'guest').toLowerCase().trim();
+          // Get email from multiple sources
+          const billEmail = (o.billing_address && typeof o.billing_address === 'object') ? (o.billing_address.email || '') : '';
+          const email = (orderEmail || billEmail || '').toLowerCase().trim();
           let matchedCust = null;
 
-          if (typeof allCustomers !== 'undefined' && allCustomers.length > 0) {
-            // Try matching: 1) by customer_id, 2) by exact email, 3) by partial email match
-            matchedCust = allCustomers.find(c => c.id === o.customer_id && o.customer_id)
-              || allCustomers.find(c => {
+          if (typeof allCustomers !== 'undefined' && allCustomers.length > 0 && (o.customer_id || email)) {
+            // 1) Match by customer_id (most reliable)
+            if (o.customer_id) {
+              matchedCust = allCustomers.find(c => c.id === o.customer_id);
+            }
+            // 2) Match by exact email (only if we have a real email)
+            if (!matchedCust && email && email !== 'guest') {
+              matchedCust = allCustomers.find(c => {
                 if (!c.email) return false;
-                const emails = c.email.toLowerCase().split(',').map(e => e.trim());
-                return emails.includes(email) || emails.some(e => email.includes(e));
+                const custEmails = c.email.toLowerCase().split(',').map(e => e.trim()).filter(e => e.length > 3);
+                return custEmails.includes(email);
               });
-
+            }
             if (matchedCust) {
               name = [matchedCust.first_name, matchedCust.last_name].filter(Boolean).join(' ') || matchedCust.company || matchedCust.name || orderName;
             }
@@ -9323,16 +9329,20 @@
             const us = o.attribution_utm_source || '';
             const dv = o.attribution_device_type || '';
             const os = o.order_source || '';
-            if (!st && !us && !os) return '<span style="color:var(--text-dim)">—</span>';
-            if (!st && !us && os) {
+            // If attribution data exists, show it
+            if (st || us) {
+              const icon = st === 'organic' ? '🔍' : st === 'typein' ? '🔗' : st === 'referral' ? '↩️' : st === 'utm' ? '📢' : '🌐';
+              const label = us === '(direct)' ? 'Direct' : us ? us.charAt(0).toUpperCase() + us.slice(1) : st;
+              const dvIcon = dv === 'Mobile' ? '📱' : dv === 'Desktop' ? '💻' : '';
+              return '<span title="' + esc(st + ' | ' + us + (dv ? ' | ' + dv : '')) + '" style="font-size:0.8rem;white-space:nowrap;cursor:default;">' + icon + ' ' + esc(label) + (dvIcon ? ' ' + dvIcon : '') + '</span>';
+            }
+            // Fallback to order_source
+            if (os) {
+              const osIcon = os === 'woocommerce' ? '🛒' : os === 'b2b_portal' ? '🏢' : os === 'shopify' ? '🟢' : os === 'manual' ? '✏️' : '🌐';
               const osLabel = os === 'woocommerce' ? 'WooCommerce' : os === 'b2b_portal' ? 'B2B Portal' : os === 'manual' ? 'Manual' : os.charAt(0).toUpperCase() + os.slice(1);
-              const osIcon = os === 'woocommerce' ? '🛒' : os === 'b2b_portal' ? '🏢' : os === 'manual' ? '✏️' : '🌐';
               return '<span style="font-size:0.8rem;white-space:nowrap;cursor:default;" title="' + esc(os) + '">' + osIcon + ' ' + esc(osLabel) + '</span>';
             }
-            const icon = st === 'organic' ? '🔍' : st === 'typein' ? '🔗' : st === 'referral' ? '↩️' : st === 'utm' ? '📢' : '🌐';
-            const label = us === '(direct)' ? 'Direct' : us ? us.charAt(0).toUpperCase() + us.slice(1) : st;
-            const dvIcon = dv === 'Mobile' ? '📱' : dv === 'Desktop' ? '💻' : '';
-            return '<span title="' + esc(st + ' | ' + us + (dv ? ' | ' + dv : '')) + '" style="font-size:0.8rem;white-space:nowrap;cursor:default;">' + icon + ' ' + esc(label) + (dvIcon ? ' ' + dvIcon : '') + '</span>';
+            return '<span style="color:var(--text-dim)">—</span>';
           })()}</td>
           <td style="text-align:center;">
              <button class="btn-sm btn-outline" onclick="openOrderModal(this.closest('tr').dataset.orderId)">View</button>
