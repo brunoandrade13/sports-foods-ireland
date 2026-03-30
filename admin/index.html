@@ -1240,6 +1240,37 @@
       font-size: 0.85rem;
     }
 
+    /* HAMBURGER MENU (hidden on desktop) */
+    .admin-hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      margin-right: 4px;
+    }
+    .admin-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2.5px;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+    .admin-hamburger.active span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+    .admin-hamburger.active span:nth-child(2) { opacity: 0; }
+    .admin-hamburger.active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+    .admin-sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 999;
+    }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
       .app {
@@ -1247,8 +1278,32 @@
       }
 
       .sidebar {
-        display: none;
+        display: block;
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 270px;
+        height: 100vh;
+        z-index: 1000;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        transition: left 0.3s ease;
+        padding-top: 16px;
+        box-shadow: none;
       }
+      .sidebar.open {
+        left: 0;
+        box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+      }
+      .admin-hamburger {
+        display: flex !important;
+      }
+      .admin-sidebar-overlay.open {
+        display: block;
+      }
+      .topbar-right .user-info { display: none; }
+      .topbar-right .btn-sm.btn-outline { display: none; }
 
       .form-grid {
         grid-template-columns: 1fr;
@@ -1314,6 +1369,9 @@
     <!-- TOPBAR -->
     <div class="topbar">
       <div class="topbar-left">
+        <button class="admin-hamburger" id="adminHamburger" onclick="toggleAdminSidebar()">
+          <span></span><span></span><span></span>
+        </button>
         <span class="logo">⚡ SFI</span>
         <h2 id="pageTitle">Dashboard</h2>
       </div>
@@ -1324,8 +1382,11 @@
       </div>
     </div>
 
+    <!-- MOBILE SIDEBAR OVERLAY -->
+    <div class="admin-sidebar-overlay" id="adminSidebarOverlay" onclick="toggleAdminSidebar()"></div>
+
     <!-- SIDEBAR - EXPANDED -->
-    <div class="sidebar">
+    <div class="sidebar" id="adminSidebar">
       <div class="nav-section">
         <div class="nav-section-title">Overview</div>
         <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
@@ -4176,6 +4237,32 @@
   </div>
 
   <script>
+    // ============================================================
+    // MOBILE SIDEBAR TOGGLE
+    // ============================================================
+    function toggleAdminSidebar() {
+      var sidebar = document.getElementById('adminSidebar');
+      var overlay = document.getElementById('adminSidebarOverlay');
+      var btn = document.getElementById('adminHamburger');
+      if (!sidebar) return;
+      var isOpen = sidebar.classList.contains('open');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+      if (btn) btn.classList.toggle('active');
+    }
+    // Close sidebar when clicking a nav item on mobile
+    document.addEventListener('click', function(e) {
+      var navItem = e.target.closest('.nav-item');
+      if (navItem && window.innerWidth <= 768) {
+        var sidebar = document.getElementById('adminSidebar');
+        var overlay = document.getElementById('adminSidebarOverlay');
+        var btn = document.getElementById('adminHamburger');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('open');
+        if (btn) btn.classList.remove('active');
+      }
+    });
+
     // ============================================================
     // QUILL RICH TEXT EDITOR - Product Description
     // ============================================================
