@@ -1314,20 +1314,44 @@ const B2B = (function() {
         Array.from(brands).sort().forEach(function(b) { brandSel.innerHTML += '<option value="' + b + '">' + b + '</option>'; });
         brandSel.value = curVal;
       }
+      // Build subcategory filter
+      updateSubcatFilter(products);
       filterPortalShop();
     } catch(e) {
       grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444;">Error loading products.</p>';
     }
   }
 
+  function updateSubcatFilter(products) {
+    var subcatSel = document.getElementById('portalShopSubcat');
+    if (!subcatSel) return;
+    var catFilter = document.getElementById('portalShopCat')?.value || '';
+    var subcats = new Set();
+    (products || portalShopAll).forEach(function(p) {
+      var sc = p.subcategories?.name || p.subcategoria || '';
+      var cat = p.categories?.name || p.categoria || '';
+      if (sc && (!catFilter || cat === catFilter)) subcats.add(sc);
+    });
+    var curVal = subcatSel.value;
+    subcatSel.innerHTML = '<option value="">All Subcategories</option>';
+    Array.from(subcats).sort().forEach(function(sc) {
+      subcatSel.innerHTML += '<option value="' + sc + '">' + sc + '</option>';
+    });
+    subcatSel.value = subcats.has(curVal) ? curVal : '';
+  }
+
   function filterPortalShop() {
     var brand = document.getElementById('portalShopBrand')?.value || '';
+    var subcat = document.getElementById('portalShopSubcat')?.value || '';
     var sort = document.getElementById('portalShopSort')?.value || 'freq';
     var q = (document.getElementById('portalShopSearch')?.value || '').toLowerCase().trim();
+    // Update subcategory options based on current category
+    updateSubcatFilter();
     var filtered = portalShopAll.filter(function(p) {
       var matchB = !brand || (p.brands?.name || p.marca || '') === brand;
-      var matchQ = !q || (p.nome||'').toLowerCase().includes(q) || (p.marca||'').toLowerCase().includes(q);
-      return matchB && matchQ;
+      var matchSC = !subcat || (p.subcategories?.name || p.subcategoria || '') === subcat;
+      var matchQ = !q || (p.nome||'').toLowerCase().includes(q) || (p.marca||'').toLowerCase().includes(q) || (p.subcategoria||'').toLowerCase().includes(q);
+      return matchB && matchSC && matchQ;
     });
     filtered.sort(function(a, b) {
       if (sort === 'freq') {
@@ -1933,7 +1957,7 @@ const B2B = (function() {
     sendSupport, showNotices, toggleFavourites, removeFavourite, addFavToCart,
     toggleInlineShop, loadInlineShop, searchInlineShop, addInlineToCart,
     toggleRecommended, addRecToCart,
-    loadPortalShop, filterPortalShop, searchPortalShop, addShopToCart,
+    loadPortalShop, filterPortalShop, searchPortalShop, updateSubcatFilter, addShopToCart,
     showProductModal, closeProductModal, b2bAddWithVariants,
     showFinTab, filterFinInvoices, clearFinInvoiceFilters, showFinInvoiceDetail, closeInvoiceModal, downloadInvoicePDF,
     showMktTab,
