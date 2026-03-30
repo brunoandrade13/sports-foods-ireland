@@ -9286,22 +9286,23 @@
           let matchedCust = null;
 
           if (typeof allCustomers !== 'undefined' && allCustomers.length > 0) {
-            matchedCust = allCustomers.find(c => {
-              if (c.id === o.customer_id && o.customer_id) return true;
-              if (c.email) {
-                const cE = c.email.toLowerCase().trim();
-                return cE === email || email.includes(cE);
-              }
-              return false;
-            });
+            // Try matching: 1) by customer_id, 2) by exact email, 3) by partial email match
+            matchedCust = allCustomers.find(c => c.id === o.customer_id && o.customer_id)
+              || allCustomers.find(c => {
+                if (!c.email) return false;
+                const emails = c.email.toLowerCase().split(',').map(e => e.trim());
+                return emails.includes(email) || emails.some(e => email.includes(e));
+              });
 
             if (matchedCust) {
               name = [matchedCust.first_name, matchedCust.last_name].filter(Boolean).join(' ') || matchedCust.company || matchedCust.name || orderName;
-              typeBadge = matchedCust.customer_type === 'b2b'
-                ? '<span class="stock-badge in" style="background:#4b0082;color:white;font-size:0.7rem;padding:2px 5px;margin-left:4px">B2B</span>'
-                : '<span class="stock-badge out" style="font-size:0.7rem;padding:2px 5px;margin-left:4px">B2C</span>';
             }
           }
+          // ALWAYS show B2B or B2C badge
+          const isB2B = matchedCust ? matchedCust.customer_type === 'b2b' : (o.is_b2b === true);
+          typeBadge = isB2B
+            ? '<span class="stock-badge in" style="background:#4b0082;color:white;font-size:0.7rem;padding:2px 5px;margin-left:4px">B2B</span>'
+            : '<span class="stock-badge out" style="font-size:0.7rem;padding:2px 5px;margin-left:4px">B2C</span>';
 
           const openOrder = orderId ? "event.preventDefault(); openOrderModal(this.closest('tr').dataset.orderId); return false;" : "return false;";
           const custLink = orderId ? `<a href="#" onclick="${openOrder}" style="color:var(--primary-color);text-decoration:none;cursor:pointer;"><strong>${esc(name)}</strong></a>` : `<strong>${esc(name)}</strong>`;
