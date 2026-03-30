@@ -9288,20 +9288,32 @@
           let matchedCust = null;
 
           if (typeof allCustomers !== 'undefined' && allCustomers.length > 0 && (o.customer_id || email)) {
-            // 1) Match by customer_id (most reliable)
+            // 1) Match by customer_id directly
             if (o.customer_id) {
               matchedCust = allCustomers.find(c => c.id === o.customer_id);
             }
-            // 2) Match by exact email (only if we have a real email)
-            if (!matchedCust && email && email !== 'guest') {
+            // 2) If not found, check if it's a child customer → find parent
+            if (!matchedCust && o.customer_id && window.customerIdToGroupId) {
+              const parentId = window.customerIdToGroupId[o.customer_id];
+              if (parentId) matchedCust = allCustomers.find(c => c.id === parentId);
+            }
+            // 3) Match by exact email
+            if (!matchedCust && email && email.length > 3) {
               matchedCust = allCustomers.find(c => {
                 if (!c.email) return false;
                 const custEmails = c.email.toLowerCase().split(',').map(e => e.trim()).filter(e => e.length > 3);
                 return custEmails.includes(email);
               });
             }
+            // 4) If still no match, check email → parent group
+            if (!matchedCust && email && email.length > 3 && window.emailToGroupId) {
+              const parentId = window.emailToGroupId[email];
+              if (parentId) matchedCust = allCustomers.find(c => c.id === parentId);
+            }
             if (matchedCust) {
-              name = [matchedCust.first_name, matchedCust.last_name].filter(Boolean).join(' ') || matchedCust.company || matchedCust.name || orderName;
+              // Use order's own name if available, otherwise customer record name
+              const custName = [matchedCust.first_name, matchedCust.last_name].filter(Boolean).join(' ') || matchedCust.company || matchedCust.name || '';
+              name = orderName !== 'Guest' && orderName !== email ? orderName : (custName || orderName);
             }
           }
           // ALWAYS show B2B or B2C badge
