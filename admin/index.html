@@ -4404,18 +4404,27 @@
     let currentFinanceBrand = null; // selected brand for Revenue by Brand
     let currentFinanceCategory = null; // selected category for Revenue by Category
     let currentFinanceProduct = null; // selected product for Top Products
-    // Auto-calculate EUR cost from USD
+    // Auto-calculate EUR cost from USD (rate: 1 USD = 0.92 EUR)
     function autoCalcCostFromUsd() {
-      const usdVal = parseFloat(document.getElementById('editCostPriceUsd')?.value) || 0;
-      if (usdVal > 0) {
-        document.getElementById('editCostPrice').value = (usdVal * 0.92).toFixed(2);
+      var usdField = document.getElementById('editCostPriceUsd');
+      var eurField = document.getElementById('editCostPrice');
+      if (!usdField || !eurField) return;
+      var usdVal = parseFloat(usdField.value);
+      if (!isNaN(usdVal) && usdVal > 0) {
+        eurField.value = (usdVal * 0.92).toFixed(2);
       }
     }
-    // Auto-calculate EUR cost from GBP
+    // Auto-calculate EUR cost from GBP (rate: 1 GBP = 1.17 EUR)
     function autoCalcCostFromGbp() {
-      const gbpVal = parseFloat(document.getElementById('editCostPriceGbp')?.value) || 0;
-      if (gbpVal > 0) {
-        document.getElementById('editCostPrice').value = (gbpVal * 1.17).toFixed(2);
+      var gbpField = document.getElementById('editCostPriceGbp');
+      var eurField = document.getElementById('editCostPrice');
+      if (!gbpField || !eurField) return;
+      var gbpVal = parseFloat(gbpField.value);
+      if (!isNaN(gbpVal) && gbpVal > 0) {
+        eurField.value = (gbpVal * 1.17).toFixed(2);
+        eurField.style.background = '';
+      } else {
+        // Don't clear EUR if user manually set it
       }
     }
 
@@ -7262,9 +7271,18 @@
         document.getElementById('editImage').value = product.image_url || '';
         loadProductImages(product.id);
         document.getElementById('editDiscount').value = product.discount_percent || 0;
-        document.getElementById('editCostPrice').value = product.cost_price_eur || '';
         document.getElementById('editCostPriceGbp').value = product.cost_price_gbp || '';
         document.getElementById('editCostPriceUsd').value = product.cost_price_usd || '';
+        // Set EUR: use stored value, or auto-calculate from GBP/USD if EUR is empty
+        if (product.cost_price_eur) {
+          document.getElementById('editCostPrice').value = product.cost_price_eur;
+        } else if (product.cost_price_gbp && parseFloat(product.cost_price_gbp) > 0) {
+          document.getElementById('editCostPrice').value = (parseFloat(product.cost_price_gbp) * 1.17).toFixed(2);
+        } else if (product.cost_price_usd && parseFloat(product.cost_price_usd) > 0) {
+          document.getElementById('editCostPrice').value = (parseFloat(product.cost_price_usd) * 0.92).toFixed(2);
+        } else {
+          document.getElementById('editCostPrice').value = '';
+        }
         document.getElementById('editVatRate').value = product.vat_rate != null ? product.vat_rate : '';
         document.getElementById('editQbTaxCode').value = product.qb_sales_tax_code || '';
         document.getElementById('editWholesalePrice').value = product.wholesale_price_eur || '';
@@ -7438,6 +7456,20 @@
       }
     }
     function editProduct(id) { const p = allProducts.find(x => x.id === id); if (p) openProductModal(p); }
+
+    // Backup: attach cost conversion listeners via JS (in case inline oninput fails)
+    document.addEventListener('DOMContentLoaded', function() {
+      var gbpInput = document.getElementById('editCostPriceGbp');
+      var usdInput = document.getElementById('editCostPriceUsd');
+      if (gbpInput) {
+        gbpInput.addEventListener('input', autoCalcCostFromGbp);
+        gbpInput.addEventListener('change', autoCalcCostFromGbp);
+      }
+      if (usdInput) {
+        usdInput.addEventListener('input', autoCalcCostFromUsd);
+        usdInput.addEventListener('change', autoCalcCostFromUsd);
+      }
+    });
 
 
 
