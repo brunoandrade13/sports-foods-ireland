@@ -1243,26 +1243,36 @@
     /* HAMBURGER MENU (hidden on desktop) */
     .admin-hamburger {
       display: none;
-      flex-direction: column;
-      justify-content: center;
-      gap: 5px;
+      align-items: center;
+      gap: 8px;
       background: none;
-      border: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
       cursor: pointer;
-      padding: 6px;
-      margin-right: 4px;
+      padding: 8px 12px;
+      margin-right: 8px;
     }
-    .admin-hamburger span {
+    .admin-hamburger-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .admin-hamburger-lines span {
       display: block;
-      width: 22px;
-      height: 2.5px;
-      background: var(--text-primary);
+      width: 20px;
+      height: 2px;
+      background: #fff;
       border-radius: 2px;
       transition: 0.3s;
     }
-    .admin-hamburger.active span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
-    .admin-hamburger.active span:nth-child(2) { opacity: 0; }
-    .admin-hamburger.active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+    .admin-hamburger-label {
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .admin-hamburger.active .admin-hamburger-lines span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .admin-hamburger.active .admin-hamburger-lines span:nth-child(2) { opacity: 0; }
+    .admin-hamburger.active .admin-hamburger-lines span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
     .admin-sidebar-overlay {
       display: none;
       position: fixed;
@@ -1370,7 +1380,8 @@
     <div class="topbar">
       <div class="topbar-left">
         <button class="admin-hamburger" id="adminHamburger" onclick="toggleAdminSidebar()">
-          <span></span><span></span><span></span>
+          <div class="admin-hamburger-lines"><span></span><span></span><span></span></div>
+          <span class="admin-hamburger-label">Menu</span>
         </button>
         <span class="logo">⚡ SFI</span>
         <h2 id="pageTitle">Dashboard</h2>
