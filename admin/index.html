@@ -9310,7 +9310,7 @@
           return `
         <tr style="background:var(--surface);" data-order-id="${esc(orderId)}">
           <td>${orderId ? `<a href="#" onclick="${openOrder}" style="color:var(--accent);text-decoration:none;cursor:pointer;font-weight:600;">${esc(o.order_number || o.id?.slice(0, 8))}</a>` : `<code>${esc(o.order_number || o.id?.slice(0, 8))}</code>`}</td>
-          <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${esc(name)}">
+          <td style="max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${esc(name)}">
              ${custLink}${typeBadge}
           </td>
           <td>${items}</td>
@@ -9322,7 +9322,13 @@
             const st = o.attribution_source_type || '';
             const us = o.attribution_utm_source || '';
             const dv = o.attribution_device_type || '';
-            if (!st && !us) return '<span style="color:var(--text-dim)">—</span>';
+            const os = o.order_source || '';
+            if (!st && !us && !os) return '<span style="color:var(--text-dim)">—</span>';
+            if (!st && !us && os) {
+              const osLabel = os === 'woocommerce' ? 'WooCommerce' : os === 'b2b_portal' ? 'B2B Portal' : os === 'manual' ? 'Manual' : os.charAt(0).toUpperCase() + os.slice(1);
+              const osIcon = os === 'woocommerce' ? '🛒' : os === 'b2b_portal' ? '🏢' : os === 'manual' ? '✏️' : '🌐';
+              return '<span style="font-size:0.8rem;white-space:nowrap;cursor:default;" title="' + esc(os) + '">' + osIcon + ' ' + esc(osLabel) + '</span>';
+            }
             const icon = st === 'organic' ? '🔍' : st === 'typein' ? '🔗' : st === 'referral' ? '↩️' : st === 'utm' ? '📢' : '🌐';
             const label = us === '(direct)' ? 'Direct' : us ? us.charAt(0).toUpperCase() + us.slice(1) : st;
             const dvIcon = dv === 'Mobile' ? '📱' : dv === 'Desktop' ? '💻' : '';
