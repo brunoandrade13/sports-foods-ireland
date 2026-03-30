@@ -1326,11 +1326,16 @@ const B2B = (function() {
     var subcatSel = document.getElementById('portalShopSubcat');
     if (!subcatSel) return;
     var catFilter = document.getElementById('portalShopCat')?.value || '';
+    var brandFilter = document.getElementById('portalShopBrand')?.value || '';
     var subcats = new Set();
     (products || portalShopAll).forEach(function(p) {
       var sc = p.subcategories?.name || p.subcategoria || '';
       var cat = p.categories?.name || p.categoria || '';
-      if (sc && (!catFilter || cat === catFilter)) subcats.add(sc);
+      var brand = p.brands?.name || p.marca || '';
+      if (!sc) return;
+      if (catFilter && cat !== catFilter) return;
+      if (brandFilter && brand !== brandFilter) return;
+      subcats.add(sc);
     });
     var curVal = subcatSel.value;
     subcatSel.innerHTML = '<option value="">All Subcategories</option>';
@@ -1342,11 +1347,12 @@ const B2B = (function() {
 
   function filterPortalShop() {
     var brand = document.getElementById('portalShopBrand')?.value || '';
-    var subcat = document.getElementById('portalShopSubcat')?.value || '';
     var sort = document.getElementById('portalShopSort')?.value || 'freq';
     var q = (document.getElementById('portalShopSearch')?.value || '').toLowerCase().trim();
-    // Update subcategory options based on current category
+    // Update subcategory options based on current category + brand
     updateSubcatFilter();
+    // Read subcat AFTER update (may have been reset if no longer valid)
+    var subcat = document.getElementById('portalShopSubcat')?.value || '';
     var filtered = portalShopAll.filter(function(p) {
       var matchB = !brand || (p.brands?.name || p.marca || '') === brand;
       var matchSC = !subcat || (p.subcategories?.name || p.subcategoria || '') === subcat;
