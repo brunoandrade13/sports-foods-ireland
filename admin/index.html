@@ -760,6 +760,8 @@
     #editDescEditor .ql-editor h1 { font-size: 1.6rem; font-weight: 700; margin: 12px 0 8px; color: #0f172a !important; }
     #editDescEditor .ql-editor h2 { font-size: 1.3rem; font-weight: 600; margin: 10px 0 6px; color: #0f172a !important; }
     #editDescEditor .ql-editor h3 { font-size: 1.1rem; font-weight: 600; margin: 8px 0 4px; color: #0f172a !important; }
+    #editDescEditor .ql-editor h4 { font-size: 1rem; font-weight: 600; margin: 8px 0 4px; color: #0f172a !important; }
+    #editDescEditor .ql-editor li { color: #1e293b !important; }
     #editDescEditor .ql-editor p { margin-bottom: 8px; }
     #editDescEditor .ql-editor ul, #editDescEditor .ql-editor ol { padding-left: 20px; margin-bottom: 8px; }
     .form-grid {
@@ -3497,7 +3499,7 @@
         <div class="form-group full"><label>Description</label>
           <div id="editDescToolbar">
             <span class="ql-formats">
-              <select class="ql-header"><option value="">Normal</option><option value="1">Heading 1</option><option value="2">Heading 2</option><option value="3">Heading 3</option></select>
+              <select class="ql-header"><option value="">Normal</option><option value="1">Heading 1</option><option value="2">Heading 2</option><option value="3">Heading 3</option><option value="4">Heading 4</option></select>
               <select class="ql-size"><option value="small">Small</option><option value="">Normal</option><option value="large">Large</option><option value="huge">Huge</option></select>
             </span>
             <span class="ql-formats">
@@ -4188,10 +4190,9 @@
     }
     function setDescQuill(htmlContent) {
       if (!descQuill) initDescQuill();
-      if (htmlContent) {
-        descQuill.root.innerHTML = htmlContent;
-      } else {
-        descQuill.root.innerHTML = '';
+      descQuill.setContents([]);
+      if (htmlContent && htmlContent.trim()) {
+        descQuill.clipboard.dangerouslyPasteHTML(0, htmlContent);
       }
     }
     function getDescQuill() {
