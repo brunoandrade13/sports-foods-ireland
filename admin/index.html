@@ -753,6 +753,15 @@
     }
 
     /* FORM */
+    /* Quill Editor Styling */
+    #editDescToolbar { background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px 6px 0 0; }
+    #editDescToolbar .ql-formats { margin-right: 8px; }
+    #editDescEditor .ql-editor { font-size: 14px; line-height: 1.6; min-height: 150px; }
+    #editDescEditor .ql-editor h1 { font-size: 1.6rem; font-weight: 700; margin: 12px 0 8px; }
+    #editDescEditor .ql-editor h2 { font-size: 1.3rem; font-weight: 600; margin: 10px 0 6px; }
+    #editDescEditor .ql-editor h3 { font-size: 1.1rem; font-weight: 600; margin: 8px 0 4px; }
+    #editDescEditor .ql-editor p { margin-bottom: 8px; }
+    #editDescEditor .ql-editor ul, #editDescEditor .ql-editor ol { padding-left: 20px; margin-bottom: 8px; }
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1272,6 +1281,8 @@
   </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 </head>
 
 <body>
@@ -3483,8 +3494,29 @@
         </div>
         <div class="form-group full"><label>Short Description</label><input type="text" id="editShortDesc"
             placeholder="Brief product summary"></div>
-        <div class="form-group full"><label>Description</label><textarea id="editDesc" rows="3"
-            placeholder="Full product description"></textarea></div>
+        <div class="form-group full"><label>Description</label>
+          <div id="editDescToolbar">
+            <span class="ql-formats">
+              <select class="ql-header"><option value="">Normal</option><option value="1">Heading 1</option><option value="2">Heading 2</option><option value="3">Heading 3</option></select>
+              <select class="ql-size"><option value="small">Small</option><option value="">Normal</option><option value="large">Large</option><option value="huge">Huge</option></select>
+            </span>
+            <span class="ql-formats">
+              <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button><button class="ql-strike"></button>
+            </span>
+            <span class="ql-formats">
+              <select class="ql-color"></select><select class="ql-background"></select>
+            </span>
+            <span class="ql-formats">
+              <button class="ql-list" value="ordered"></button><button class="ql-list" value="bullet"></button>
+              <select class="ql-align"><option value=""></option><option value="center"></option><option value="right"></option><option value="justify"></option></select>
+            </span>
+            <span class="ql-formats">
+              <button class="ql-link"></button><button class="ql-clean"></button>
+            </span>
+          </div>
+          <div id="editDescEditor" style="min-height:150px;max-height:400px;overflow-y:auto;background:#fff;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;"></div>
+          <textarea id="editDesc" style="display:none;"></textarea>
+        </div>
 
         <!-- NUTRITION & DIETARY INFO -->
         <div id="nutritionBlock" style="margin-top:16px; padding:16px; background:var(--surface-2); border-radius:8px; border:1px solid var(--border); display:none">
@@ -4142,6 +4174,32 @@
   </div>
 
   <script>
+    // ============================================================
+    // QUILL RICH TEXT EDITOR - Product Description
+    // ============================================================
+    let descQuill = null;
+    function initDescQuill() {
+      if (descQuill) return;
+      descQuill = new Quill('#editDescEditor', {
+        modules: { toolbar: '#editDescToolbar' },
+        theme: 'snow',
+        placeholder: 'Write your product description here...'
+      });
+    }
+    function setDescQuill(htmlContent) {
+      if (!descQuill) initDescQuill();
+      if (htmlContent) {
+        descQuill.root.innerHTML = htmlContent;
+      } else {
+        descQuill.root.innerHTML = '';
+      }
+    }
+    function getDescQuill() {
+      if (!descQuill) return '';
+      var html = descQuill.root.innerHTML;
+      return (html === '<p><br></p>' || html === '<p></p>') ? '' : html;
+    }
+
     // ============================================================
     // SUPABASE CONFIG
     // ============================================================
@@ -7289,7 +7347,9 @@
         document.getElementById('editBulkPrice').value = product.bulk_price_eur || '';
         document.getElementById('editWooSales').value = product.woo_total_sales || 0;
         document.getElementById('editShortDesc').value = product.short_description || '';
-        document.getElementById('editDesc').value = product.description || '';
+        // Use Quill editor for description
+        initDescQuill();
+        setDescQuill(product.description || '');
         document.getElementById('editActive').checked = product.is_active !== false;
         document.getElementById('editFeatured').checked = product.is_featured || false;
         document.getElementById('editNew').checked = product.is_new || false;
@@ -7740,7 +7800,7 @@
         wholesale_price_eur: parseFloat(document.getElementById('editWholesalePrice').value) || null,
         bulk_price_eur: parseFloat(document.getElementById('editBulkPrice').value) || null,
         short_description: document.getElementById('editShortDesc').value.trim() || null,
-        description: document.getElementById('editDesc').value.trim() || null,
+        description: getDescQuill() || null,
         // Nutrition & Dietary
         ingredients: document.getElementById('editIngredients').value.trim() || null,
         nutritional_info: document.getElementById('editNutritionalInfo').value.trim() || null,
