@@ -80,15 +80,12 @@ const B2B = (function() {
         if (profile.phone) parts.push('📞 ' + profile.phone);
         const addr = [profile.address, profile.city, profile.country].filter(Boolean).join(', ');
         if (addr) parts.push('📍 ' + addr);
-        infoEl.innerHTML = parts.join('<br>');
+        infoEl.innerHTML = parts.join('<br>')
+          + '<br><button onclick="B2B.logout()" style="margin-top:10px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.4);padding:8px 20px;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;backdrop-filter:blur(4px);transition:background 0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.25)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.15)\'">Sign Out</button>';
       }
 
       document.getElementById('portalLoading').style.display = 'none';
       document.getElementById('portalContent').style.display = 'block';
-
-      // Mostrar botão de logout no header desktop
-      const headerLogoutBtn = document.getElementById('headerLogoutBtn');
-      if (headerLogoutBtn) headerLogoutBtn.style.display = 'inline-flex';
 
       // Hide Sub-Accounts tab if this user is a sub-account (has parent)
       if (profile.parent_customer_id) {
