@@ -37,8 +37,10 @@
             // Map type
             const typeMap = { 'percentage': 'percent', 'fixed_amount': 'fixed', 'fixed': 'fixed', 'free_shipping': 'shipping', 'percent': 'percent' };
             const type = typeMap[dc.discount_type] || dc.discount_type;
-            const label = type === 'percent' ? dc.discount_value + '% off' : type === 'fixed' ? '€' + Number(dc.discount_value).toFixed(2) + ' off' : 'Free shipping';
-            return { type, value: Number(dc.discount_value), label, dbId: dc.id };
+            const freeShip = dc.free_shipping || false;
+            let label = type === 'percent' ? dc.discount_value + '% off' : type === 'fixed' ? '€' + Number(dc.discount_value).toFixed(2) + ' off' : 'Free delivery';
+            if (freeShip && type !== 'shipping') label += ' + Free delivery';
+            return { type, value: Number(dc.discount_value), label, dbId: dc.id, freeShipping: freeShip };
         } catch (e) {
             console.error('Coupon lookup error:', e);
             return null;
@@ -83,6 +85,7 @@
             if (appliedCoupon.type === 'percent') discount = subtotal * appliedCoupon.value / 100;
             else if (appliedCoupon.type === 'fixed') discount = appliedCoupon.value;
             else if (appliedCoupon.type === 'shipping') shipCost = 0;
+            if (appliedCoupon.freeShipping) shipCost = 0;
         }
         const total = subtotal - discount + shipCost;
         const taxIncluded = total - (total / 1.23);
@@ -175,6 +178,7 @@
                 if (appliedCoupon.type === 'percent') discount = subtotal * appliedCoupon.value / 100;
                 else if (appliedCoupon.type === 'fixed') discount = appliedCoupon.value;
                 else if (appliedCoupon.type === 'shipping') shipCost = 0;
+                if (appliedCoupon.freeShipping) shipCost = 0;
             }
             const total = subtotal - discount + shipCost;
 

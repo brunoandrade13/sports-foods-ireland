@@ -3792,9 +3792,14 @@
               placeholder="Optional description"></div>
           <div class="form-group"><label>Starts At</label><input type="datetime-local" id="discountStartsAt"></div>
           <div class="form-group"><label>Ends At</label><input type="datetime-local" id="discountEndsAt"></div>
-          <div class="form-group full"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input
+          <div class="form-group full" style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input
                 type="checkbox" id="discountActive" checked style="width:18px;height:18px;accent-color:var(--accent)">
-              Active</label></div>
+              Active</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 14px;border:2px solid #059669;border-radius:8px;background:#ecfdf5"><input
+                type="checkbox" id="discountFreeShipping" style="width:18px;height:18px;accent-color:#059669">
+              🚚 Free Delivery</label>
+          </div>
         </div>
       </div>
       <div class="modal-footer"><button class="btn btn-ghost" onclick="closeDiscountModal()">Cancel</button><button
@@ -8920,12 +8925,13 @@
         ? '<tr><td colspan="7" class="empty-state">No discount codes yet</td></tr>'
         : discountCodes.map(d => {
           const typeLabel = d.discount_type === 'percentage' ? `${d.discount_value}%` : `€${d.discount_value}`;
+          const freeShipBadge = d.free_shipping ? ' <span style="background:#059669;color:#fff;padding:1px 6px;border-radius:4px;font-size:0.7rem">🚚 Free Delivery</span>' : '';
           const now = new Date();
           const expired = d.ends_at && new Date(d.ends_at) < now;
           const statusCls = !d.is_active ? 'out' : expired ? 'low' : 'in';
           const statusTxt = !d.is_active ? 'Inactive' : expired ? 'Expired' : 'Active';
           return `<tr><td><code style="font-size:0.85rem;background:var(--surface);padding:2px 8px;border-radius:4px">${esc(d.code)}</code></td>
-        <td>${esc(d.discount_type || '—')}</td>
+<td>${esc(d.discount_type || '—')}${freeShipBadge}</td>
         <td>${typeLabel}</td>
         <td>${d.min_order_value ? '€' + d.min_order_value : '—'}</td>
         <td>${d.times_used || 0}${d.max_uses ? '/' + d.max_uses : ''}</td>
@@ -8947,6 +8953,7 @@
       document.getElementById('discountId').value = d.id;
       document.getElementById('discountCode').value = d.code || '';
       document.getElementById('discountType').value = d.discount_type || 'percentage';
+      document.getElementById('discountFreeShipping').checked = d.free_shipping || false;
       document.getElementById('discountValue').value = d.discount_value || '';
       document.getElementById('discountMinOrder').value = d.min_order_value || '';
       document.getElementById('discountMaxUses').value = d.max_uses || '';
@@ -8963,7 +8970,7 @@
       if (!code) { toast('Code is required', 'error'); return; }
       const id = document.getElementById('discountId').value;
       const data = {
-        code, discount_type: document.getElementById('discountType').value,
+        code, discount_type: document.getElementById('discountType').value, free_shipping: document.getElementById('discountFreeShipping').checked,
         discount_value: parseFloat(document.getElementById('discountValue').value) || 0,
         min_order_value: parseFloat(document.getElementById('discountMinOrder').value) || null,
         max_uses: parseInt(document.getElementById('discountMaxUses').value) || null,
