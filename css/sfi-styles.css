@@ -4572,9 +4572,9 @@ html {
 
 .brands-subtitle {
     text-align: center;
-    /* Subtítulo também em branco para boa visibilidade sobre o laranja */
     color: #ffffff !important;
-    font-size: 16px;
+    font-size: 20px;
+    font-weight: 700;
     margin-bottom: var(--space-xl);
 }
 
@@ -4624,14 +4624,17 @@ html {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    /* mix-blend-mode: multiply faz o fundo branco de logos sem alpha ficar transparente */
-    mix-blend-mode: multiply;
     opacity: 0.85;
     transition: all 0.3s ease;
 }
 
 .brand-item:hover img {
     opacity: 1;
+}
+
+/* Apenas para logos com fundo branco incorporado (ex: iGPSPORT) */
+.brand-item--blend img {
+    mix-blend-mode: multiply;
 }
 
 @media (max-width: 767px) {
