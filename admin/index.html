@@ -1451,6 +1451,9 @@
         <div class="nav-item" data-page="receivables" onclick="showPage('receivables')">
           <span class="icon">📋</span> Accounts Receivable
         </div>
+        <div class="nav-item" data-page="backorders" onclick="showPage('backorders')">
+          <span class="icon">📦</span> Backorders
+        </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-title">Marketing</div>
@@ -2746,6 +2749,45 @@
         </div>
       </div>
 
+
+      <!-- BACKORDERS PAGE -->
+      <div class="page" id="page-backorders">
+        <div class="page-header">
+          <h2>📦 Pending Backorders</h2>
+          <button class="btn btn-primary" onclick="loadBackorders()">↻ Refresh</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px">
+          <div class="stat-card" style="border-left:3px solid #f59e0b"><div class="label">Pending Backorder Items</div><div class="value" id="boTotalItems">—</div></div>
+          <div class="stat-card" style="border-left:3px solid var(--danger)"><div class="label">Orders with Backorders</div><div class="value" id="boTotalOrders">—</div></div>
+          <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Total Value Pending</div><div class="value" id="boTotalValue">—</div></div>
+          <div class="stat-card" style="border-left:3px solid var(--info)"><div class="label">Oldest Backorder</div><div class="value" id="boOldest">—</div></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+          <input type="text" id="boSearch" placeholder="Search customer or product..." oninput="filterBackorders()" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text)">
+          <select id="boFilter" onchange="filterBackorders()" style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text)">
+            <option value="all">All Backorders</option>
+            <option value="pending">Pending Only</option>
+            <option value="ordered">Ordered from Supplier</option>
+            <option value="partial">Partially Shipped</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table id="boTable" style="width:100%;font-size:0.85rem">
+            <thead><tr>
+              <th>Order #</th>
+              <th>Customer</th>
+              <th>Product</th>
+              <th style="text-align:center">Qty</th>
+              <th style="text-align:right">Value</th>
+              <th>Order Date</th>
+              <th>Status</th>
+              <th>Notes</th>
+              <th>Action</th>
+            </tr></thead>
+            <tbody id="boBody"></tbody>
+          </table>
+        </div>
+      </div>
 
       <!-- ACCOUNTS RECEIVABLE PAGE -->
       <div class="page" id="page-receivables">
@@ -6797,7 +6839,7 @@
       const titles = {
         dashboard: 'Dashboard', analytics: 'Analytics', products: 'Products', brands: 'Brands', categories: 'Categories',
         reviews: 'Reviews', orders: 'Orders', customers: 'Customers', abandoned: 'Abandoned Carts', discounts: 'Discount Codes',
-        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', settings: 'Settings'
+        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', settings: 'Settings'
       };
       document.getElementById('pageTitle').textContent = titles[page] || page;
 
@@ -6810,6 +6852,7 @@
       if (page === 'b2b') loadB2BData();
       if (page === 'site-analytics') loadSAReport(saCurrentReport);
       if (page === 'receivables') loadReceivables();
+      if (page === 'backorders') loadBackorders();
     }
 
     // ============================================================
@@ -14316,6 +14359,140 @@
         toast(orderNumber + ' marked as paid');
         loadReceivables();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+
+    // ============================================================
+    // BACKORDERS MANAGEMENT
+    // ============================================================
+    let _boData = [];
+
+    async function loadBackorders() {
+      try {
+        // Fetch order items that are marked as backorder and not yet fulfilled
+        const items = await supaGet('order_items', '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at&is_backorder=eq.true&order=created_at.desc');
+
+        // Also fetch orders with has_backorder_items flag
+        const orders = await supaGet('orders', '?select=id,order_number,customer_name,customer_email,created_at,fulfillment_status&has_backorder_items=eq.true&order=created_at.desc');
+        const orderMap = {};
+        orders.forEach(o => { orderMap[o.id] = o; });
+
+        // Also check for items with fulfillment_status = 'backordered' or 'pending_backorder'
+        let extraItems = [];
+        try {
+          extraItems = await supaGet('order_items', '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at&fulfillment_status=eq.backordered&order=created_at.desc');
+        } catch(e) {}
+
+        // Merge and deduplicate
+        const allItems = [...items];
+        const existingIds = new Set(items.map(i => i.id));
+        extraItems.forEach(i => { if (!existingIds.has(i.id)) allItems.push(i); });
+
+        // Fetch order details for items that don't have order info
+        const missingOrderIds = [...new Set(allItems.map(i => i.order_id).filter(id => !orderMap[id]))];
+        if (missingOrderIds.length) {
+          for (let i = 0; i < missingOrderIds.length; i += 20) {
+            const batch = missingOrderIds.slice(i, i + 20);
+            const ords = await supaGet('orders', '?select=id,order_number,customer_name,customer_email,created_at&id=in.(' + batch.join(',') + ')');
+            ords.forEach(o => { orderMap[o.id] = o; });
+          }
+        }
+
+        _boData = allItems.map(item => ({
+          ...item,
+          order: orderMap[item.order_id] || {}
+        })).filter(item => !item.backorder_fulfilled_at); // Exclude already fulfilled
+
+        renderBackordersSummary();
+        filterBackorders();
+      } catch (e) {
+        console.error('loadBackorders:', e);
+        toast('Failed to load backorders', 'error');
+      }
+    }
+
+    function renderBackordersSummary() {
+      const pending = _boData.filter(i => !i.backorder_fulfilled_at);
+      const totalValue = pending.reduce((s, i) => s + Number(i.total_price || 0), 0);
+      const orderIds = new Set(pending.map(i => i.order_id));
+      const oldest = pending.length ? pending[pending.length - 1] : null;
+      const oldestDate = oldest?.order?.created_at || oldest?.created_at;
+
+      document.getElementById('boTotalItems').textContent = pending.length;
+      document.getElementById('boTotalOrders').textContent = orderIds.size;
+      document.getElementById('boTotalValue').textContent = '\u20ac' + totalValue.toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+      document.getElementById('boOldest').textContent = oldestDate ? new Date(oldestDate).toLocaleDateString('en-IE') : '—';
+    }
+
+    function filterBackorders() {
+      const search = (document.getElementById('boSearch').value || '').toLowerCase();
+      const filter = document.getElementById('boFilter').value;
+
+      let filtered = _boData.filter(item => {
+        if (search) {
+          const cust = (item.order?.customer_name || '').toLowerCase();
+          const prod = (item.product_name || '').toLowerCase();
+          const orderNum = (item.order?.order_number || '').toLowerCase();
+          if (!cust.includes(search) && !prod.includes(search) && !orderNum.includes(search)) return false;
+        }
+        const status = (item.backorder_status || 'pending').toLowerCase();
+        if (filter === 'pending' && status !== 'pending' && status !== '') return false;
+        if (filter === 'ordered' && status !== 'ordered_from_supplier') return false;
+        if (filter === 'partial' && status !== 'partially_shipped') return false;
+        return true;
+      });
+
+      const tbody = document.getElementById('boBody');
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-dim)"><div style="font-size:40px;margin-bottom:12px">\u2705</div><div style="font-size:16px;font-weight:600">No pending backorders</div><div style="font-size:13px;margin-top:6px">All items have been shipped!</div></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        const o = item.order || {};
+        const status = item.backorder_status || 'pending';
+        const statusBadge = status === 'pending' ? '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">PENDING</span>'
+          : status === 'ordered_from_supplier' ? '<span style="background:#dbeafe;color:#2563eb;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">ORDERED</span>'
+          : status === 'partially_shipped' ? '<span style="background:#e0e7ff;color:#4f46e5;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">PARTIAL</span>'
+          : '<span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">' + status.toUpperCase() + '</span>';
+
+        return '<tr>' +
+          '<td><a href="#" onclick="openOrderFromList(\'' + (o.order_number || '') + '\');return false" style="color:var(--accent);font-weight:600">' + (o.order_number || '—') + '</a></td>' +
+          '<td>' + (o.customer_name || '—') + '</td>' +
+          '<td style="font-weight:600">' + (item.product_name || '—') + '</td>' +
+          '<td style="text-align:center">' + (item.quantity || 1) + '</td>' +
+          '<td style="text-align:right;font-weight:600">\u20ac' + Number(item.total_price || 0).toFixed(2) + '</td>' +
+          '<td>' + (o.created_at ? new Date(o.created_at).toLocaleDateString('en-IE') : '—') + '</td>' +
+          '<td>' + statusBadge + '</td>' +
+          '<td><input type="text" value="' + (item.backorder_notes || '').replace(/"/g, '&quot;') + '" placeholder="Add note..." onchange="updateBackorderNote(\'' + item.id + '\', this.value)" style="width:100%;padding:4px 6px;font-size:0.8rem;border:1px solid var(--border);border-radius:4px;background:var(--surface-2);color:var(--text)"></td>' +
+          '<td style="white-space:nowrap"><select onchange="updateBackorderStatus(\'' + item.id + '\', this.value)" style="padding:4px;font-size:0.75rem;border:1px solid var(--border);border-radius:4px;background:var(--surface-2);color:var(--text)"><option value="pending"' + (status==='pending'?' selected':'') + '>Pending</option><option value="ordered_from_supplier"' + (status==='ordered_from_supplier'?' selected':'') + '>Ordered</option><option value="partially_shipped"' + (status==='partially_shipped'?' selected':'') + '>Partial</option><option value="fulfilled"' + '>Fulfilled</option></select></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    async function updateBackorderStatus(itemId, status) {
+      try {
+        const data = { backorder_status: status };
+        if (status === 'fulfilled') data.backorder_fulfilled_at = new Date().toISOString();
+        const h = getAuthHeaders();
+        h['Prefer'] = 'return=representation';
+        const r = await fetch(SUPA_URL + '/rest/v1/order_items?id=eq.' + itemId, {
+          method: 'PATCH', headers: h, body: JSON.stringify(data)
+        });
+        if (!r.ok) throw new Error('Update failed');
+        if (status === 'fulfilled') { toast('Item marked as fulfilled'); loadBackorders(); }
+        else toast('Status updated');
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    async function updateBackorderNote(itemId, note) {
+      try {
+        const h = getAuthHeaders();
+        h['Prefer'] = 'return=representation';
+        await fetch(SUPA_URL + '/rest/v1/order_items?id=eq.' + itemId, {
+          method: 'PATCH', headers: h, body: JSON.stringify({ backorder_notes: note })
+        });
+      } catch (e) { toast('Error saving note', 'error'); }
     }
 
 </script>
