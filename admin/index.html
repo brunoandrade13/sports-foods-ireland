@@ -1448,6 +1448,9 @@
         <div class="nav-item" data-page="finance" onclick="showPage('finance')">
           <span class="icon">💰</span> Financial Reports
         </div>
+        <div class="nav-item" data-page="receivables" onclick="showPage('receivables')">
+          <span class="icon">📋</span> Accounts Receivable
+        </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-title">Marketing</div>
@@ -2741,6 +2744,47 @@
             </table>
           </div>
         </div>
+      </div>
+
+
+      <!-- ACCOUNTS RECEIVABLE PAGE -->
+      <div class="page" id="page-receivables">
+        <div class="page-header">
+          <h2>📋 Accounts Receivable</h2>
+          <button class="btn btn-primary" onclick="loadReceivables()">↻ Refresh</button>
+        </div>
+        <div id="receivablesSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px">
+          <div class="stat-card" style="border-left:3px solid var(--danger)"><div class="label">Total Pending</div><div class="value" id="recTotalPending">—</div></div>
+          <div class="stat-card" style="border-left:3px solid #f59e0b"><div class="label">Overdue (>30d)</div><div class="value" id="recOverdue">—</div></div>
+          <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Pending Orders</div><div class="value" id="recOrderCount">—</div></div>
+          <div class="stat-card" style="border-left:3px solid var(--info)"><div class="label">Customers with Balance</div><div class="value" id="recCustomerCount">—</div></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+          <input type="text" id="recSearch" placeholder="Search customer..." oninput="filterReceivables()" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text)">
+          <select id="recFilter" onchange="filterReceivables()" style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text)">
+            <option value="all">All Pending</option>
+            <option value="overdue">Overdue Only</option>
+            <option value="due_soon">Due in 7 Days</option>
+            <option value="b2b">B2B Only</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table id="receivablesTable" style="width:100%;font-size:0.85rem">
+            <thead><tr>
+              <th style="cursor:pointer" onclick="sortReceivables('customer')">Customer ↕</th>
+              <th>Order #</th>
+              <th style="text-align:right;cursor:pointer" onclick="sortReceivables('total')">Amount ↕</th>
+              <th>Payment Method</th>
+              <th style="cursor:pointer" onclick="sortReceivables('created')">Order Date ↕</th>
+              <th style="cursor:pointer" onclick="sortReceivables('due')">Due Date ↕</th>
+              <th>Days</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr></thead>
+            <tbody id="receivablesBody"></tbody>
+          </table>
+        </div>
+        <div id="recByCustomer" style="margin-top:24px"></div>
       </div>
 
       <!-- DISCOUNTS PAGE (existing discount_codes) -->
@@ -6753,7 +6797,7 @@
       const titles = {
         dashboard: 'Dashboard', analytics: 'Analytics', products: 'Products', brands: 'Brands', categories: 'Categories',
         reviews: 'Reviews', orders: 'Orders', customers: 'Customers', abandoned: 'Abandoned Carts', discounts: 'Discount Codes',
-        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', settings: 'Settings'
+        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', settings: 'Settings'
       };
       document.getElementById('pageTitle').textContent = titles[page] || page;
 
@@ -6765,6 +6809,7 @@
       // B2B and site-analytics always reload on visit (they fetch fresh data)
       if (page === 'b2b') loadB2BData();
       if (page === 'site-analytics') loadSAReport(saCurrentReport);
+      if (page === 'receivables') loadReceivables();
     }
 
     // ============================================================
@@ -14124,7 +14169,127 @@
     }
 
 
-  </script>
+  
+    // ============================================================
+    // ACCOUNTS RECEIVABLE
+    // ============================================================
+    let _recData = [];
+    let _recSortField = 'due';
+    let _recSortDir = 'asc';
+
+    async function loadReceivables() {
+      try {
+        const { data, error } = await supabase.from('orders')
+          .select('order_number,customer_name,customer_email,total,financial_status,payment_method,order_source,created_at,payment_due_date,notes')
+          .eq('financial_status', 'pending')
+          .order('payment_due_date', { ascending: true, nullsFirst: false });
+        if (error) throw error;
+        _recData = data || [];
+        renderReceivablesSummary();
+        filterReceivables();
+      } catch (e) { console.error('loadReceivables:', e); toast('Failed to load receivables', 'error'); }
+    }
+
+    function renderReceivablesSummary() {
+      const now = new Date();
+      const totalPending = _recData.reduce((s, o) => s + Number(o.total), 0);
+      const overdue = _recData.filter(o => o.payment_due_date && new Date(o.payment_due_date) < now);
+      const overdueAmount = overdue.reduce((s, o) => s + Number(o.total), 0);
+      const customers = new Set(_recData.map(o => o.customer_name || o.customer_email)).size;
+
+      document.getElementById('recTotalPending').textContent = '\u20ac' + totalPending.toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+      document.getElementById('recOverdue').textContent = '\u20ac' + overdueAmount.toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+      document.getElementById('recOrderCount').textContent = _recData.length;
+      document.getElementById('recCustomerCount').textContent = customers;
+
+      // Customer breakdown
+      const byCustomer = {};
+      _recData.forEach(o => {
+        const key = o.customer_name || o.customer_email || 'Unknown';
+        if (!byCustomer[key]) byCustomer[key] = { name: key, email: o.customer_email, total: 0, orders: 0, oldest: o.created_at };
+        byCustomer[key].total += Number(o.total);
+        byCustomer[key].orders++;
+        if (o.created_at < byCustomer[key].oldest) byCustomer[key].oldest = o.created_at;
+      });
+      const sorted = Object.values(byCustomer).sort((a, b) => b.total - a.total);
+      let custHtml = '<h3 style="margin-bottom:12px">Balances by Customer</h3><table style="width:100%;font-size:0.85rem"><thead><tr><th>Customer</th><th>Email</th><th style="text-align:right">Open Orders</th><th style="text-align:right">Total Owed</th></tr></thead><tbody>';
+      sorted.forEach(c => {
+        custHtml += '<tr><td style="font-weight:600">' + (c.name || '—') + '</td><td>' + (c.email || '—') + '</td><td style="text-align:right">' + c.orders + '</td><td style="text-align:right;font-weight:700;color:var(--danger)">\u20ac' + c.total.toFixed(2) + '</td></tr>';
+      });
+      custHtml += '</tbody></table>';
+      document.getElementById('recByCustomer').innerHTML = custHtml;
+    }
+
+    function filterReceivables() {
+      const search = (document.getElementById('recSearch').value || '').toLowerCase();
+      const filter = document.getElementById('recFilter').value;
+      const now = new Date();
+      let filtered = _recData.filter(o => {
+        if (search && !(o.customer_name || '').toLowerCase().includes(search) && !(o.customer_email || '').toLowerCase().includes(search) && !(o.order_number || '').toLowerCase().includes(search)) return false;
+        if (filter === 'overdue' && (!o.payment_due_date || new Date(o.payment_due_date) >= now)) return false;
+        if (filter === 'due_soon') { const due = o.payment_due_date ? new Date(o.payment_due_date) : null; if (!due || due < now || due > new Date(now.getTime() + 7*86400000)) return false; }
+        if (filter === 'b2b' && o.order_source !== 'b2b_portal' && o.order_source !== 'quickbooks' && !(o.payment_method || '').toLowerCase().includes('account')) return false;
+        return true;
+      });
+
+      // Sort
+      filtered.sort((a, b) => {
+        let va, vb;
+        if (_recSortField === 'customer') { va = (a.customer_name || '').toLowerCase(); vb = (b.customer_name || '').toLowerCase(); }
+        else if (_recSortField === 'total') { va = Number(a.total); vb = Number(b.total); }
+        else if (_recSortField === 'created') { va = a.created_at || ''; vb = b.created_at || ''; }
+        else { va = a.payment_due_date || '9999'; vb = b.payment_due_date || '9999'; }
+        if (va < vb) return _recSortDir === 'asc' ? -1 : 1;
+        if (va > vb) return _recSortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      const tbody = document.getElementById('receivablesBody');
+      tbody.innerHTML = filtered.map(o => {
+        const due = o.payment_due_date ? new Date(o.payment_due_date) : null;
+        const daysUntilDue = due ? Math.ceil((due - now) / 86400000) : null;
+        const isOverdue = daysUntilDue !== null && daysUntilDue < 0;
+        const isDueSoon = daysUntilDue !== null && daysUntilDue >= 0 && daysUntilDue <= 7;
+
+        const statusBadge = isOverdue
+          ? '<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">OVERDUE</span>'
+          : isDueSoon
+          ? '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">DUE SOON</span>'
+          : '<span style="background:#dbeafe;color:#2563eb;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">PENDING</span>';
+
+        const daysText = daysUntilDue !== null ? (isOverdue ? '<span style="color:#dc2626;font-weight:700">' + Math.abs(daysUntilDue) + 'd overdue</span>' : daysUntilDue + 'd') : '—';
+
+        return '<tr>' +
+          '<td style="font-weight:600">' + (o.customer_name || '—') + '</td>' +
+          '<td><a href="#" onclick="openOrderFromList(\'' + o.order_number + '\');return false" style="color:var(--accent)">' + o.order_number + '</a></td>' +
+          '<td style="text-align:right;font-weight:700">\u20ac' + Number(o.total).toFixed(2) + '</td>' +
+          '<td>' + (o.payment_method || '—') + '</td>' +
+          '<td>' + new Date(o.created_at).toLocaleDateString('en-IE') + '</td>' +
+          '<td>' + (due ? due.toLocaleDateString('en-IE') : '—') + '</td>' +
+          '<td>' + daysText + '</td>' +
+          '<td>' + statusBadge + '</td>' +
+          '<td><button class="btn btn-sm" onclick="markOrderPaid(\'' + o.order_number + '\')" style="padding:4px 10px;font-size:0.75rem;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer">Mark Paid</button></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function sortReceivables(field) {
+      if (_recSortField === field) _recSortDir = _recSortDir === 'asc' ? 'desc' : 'asc';
+      else { _recSortField = field; _recSortDir = 'asc'; }
+      filterReceivables();
+    }
+
+    async function markOrderPaid(orderNumber) {
+      if (!confirm('Mark order ' + orderNumber + ' as PAID?')) return;
+      try {
+        const { error } = await supabase.from('orders').update({ financial_status: 'paid', payment_status: 'paid' }).eq('order_number', orderNumber);
+        if (error) throw error;
+        toast(orderNumber + ' marked as paid');
+        loadReceivables();
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+</script>
   <!-- Month Detail Modal -->
   <div class="modal-overlay" id="monthDetailModal" style="display:none;z-index:260">
     <div class="modal" style="max-width:900px">
