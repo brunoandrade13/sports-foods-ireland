@@ -12,12 +12,38 @@
     let checkoutData = { contact: {}, shipping: {}, payment: {} };
     let appliedCoupon = null;
 
-    const COUPONS = {
-        'WELCOME10': { type: 'percent', value: 10, label: '10% off' },
-        'SFI20': { type: 'percent', value: 20, label: '20% off' },
-        'FIVER': { type: 'fixed', value: 5, label: '€5 off' },
-        'FREESHIP': { type: 'shipping', value: 0, label: 'Free shipping' }
-    };
+    const SUPABASE_COUPON_URL = 'https://styynhgzrkyoioqjssuw.supabase.co/rest/v1/discount_codes';
+    const SUPABASE_COUPON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
+
+    async function fetchCouponFromDB(code) {
+        try {
+            const res = await fetch(
+                SUPABASE_COUPON_URL + '?code=eq.' + encodeURIComponent(code) + '&is_active=eq.true&select=*',
+                { headers: { 'apikey': SUPABASE_COUPON_KEY, 'Authorization': 'Bearer ' + SUPABASE_COUPON_KEY } }
+            );
+            const rows = await res.json();
+            if (!rows || !rows.length) return null;
+            const dc = rows[0];
+            // Check expiry
+            const now = new Date();
+            if (dc.starts_at && new Date(dc.starts_at) > now) return null;
+            if (dc.ends_at && new Date(dc.ends_at) < now) return null;
+            // Check usage limit
+            if (dc.max_uses && dc.current_uses >= dc.max_uses) return null;
+            // Check minimum order
+            const cart = getCart();
+            const subtotal = cart.reduce((s, i) => s + (Number(i.preco) || 0) * (i.quantidade || 1), 0);
+            if (dc.min_order_value && subtotal < Number(dc.min_order_value)) return { error: 'Minimum order of €' + Number(dc.min_order_value).toFixed(2) + ' required' };
+            // Map type
+            const typeMap = { 'percentage': 'percent', 'fixed_amount': 'fixed', 'fixed': 'fixed', 'free_shipping': 'shipping', 'percent': 'percent' };
+            const type = typeMap[dc.discount_type] || dc.discount_type;
+            const label = type === 'percent' ? dc.discount_value + '% off' : type === 'fixed' ? '€' + Number(dc.discount_value).toFixed(2) + ' off' : 'Free shipping';
+            return { type, value: Number(dc.discount_value), label, dbId: dc.id };
+        } catch (e) {
+            console.error('Coupon lookup error:', e);
+            return null;
+        }
+    }
 
     function renderCheckout() {
         const cart = getCart();
@@ -276,17 +302,26 @@
 
     window.goStep = function (n) { step = n; renderCheckout(); };
 
-    window.applyCoupon = function () {
+    window.applyCoupon = async function () {
         const input = document.getElementById('couponInput');
         if (!input) return;
         const code = input.value.trim().toUpperCase();
-        if (COUPONS[code]) {
-            appliedCoupon = { ...COUPONS[code], code };
+        if (!code) return;
+        // Show loading
+        const btn = input.nextElementSibling;
+        if (btn) { btn.textContent = '...'; btn.disabled = true; }
+        const result = await fetchCouponFromDB(code);
+        if (btn) { btn.textContent = 'Apply'; btn.disabled = false; }
+        if (result && result.error) {
+            input.style.borderColor = '#ef4444';
+            if (typeof showNotification === 'function') showNotification(result.error, 'error');
+        } else if (result) {
+            appliedCoupon = { ...result, code };
             renderCheckout();
-            if (typeof showNotification === 'function') showNotification('Coupon applied: ' + appliedCoupon.label, 'success');
+            if (typeof showNotification === 'function') showNotification('Coupon applied: ' + result.label, 'success');
         } else {
             input.style.borderColor = '#ef4444';
-            if (typeof showNotification === 'function') showNotification('Invalid coupon code', 'error');
+            if (typeof showNotification === 'function') showNotification('Invalid or expired coupon code', 'error');
         }
     };
 
