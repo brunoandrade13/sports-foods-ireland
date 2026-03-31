@@ -41,13 +41,13 @@ function checkAuthState() {
 
 function showLoginForms() {
     show(loginCard); hide(registerCard); hide(dashboard); show(guestCard);
+    document.body.classList.remove('account-logged-in');
 }
 
 function showDashboard() {
     hide(loginCard); hide(registerCard); show(dashboard); hide(guestCard);
-    // Widen wrapper for dashboard layout
-    const wrapper = document.querySelector('.account-wrapper');
-    if (wrapper) { wrapper.style.maxWidth = '1200px'; wrapper.style.width = '100%'; wrapper.style.padding = '0 24px'; }
+    // Full-width dashboard mode
+    document.body.classList.add('account-logged-in');
     loadProfile();
 }
 

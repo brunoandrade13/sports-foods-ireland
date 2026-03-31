@@ -198,11 +198,25 @@
   })();
 </script>
 <style>
-    #accountDashboard { max-width: 1100px !important; }
-    .account-wrapper:has(#accountDashboard[style*="display:block"], #accountDashboard[style*="display: block"]) {
-        max-width: 1200px !important; width: 100% !important; padding: 0 24px !important;
+    body.account-logged-in .page-hero { display: none !important; }
+    body.account-logged-in .account-wrapper { max-width: 1200px !important; width: 100% !important; padding: 0 !important; margin: 0 auto !important; }
+    body.account-logged-in .container { max-width: 1280px !important; padding: 0 32px !important; }
+    body.account-logged-in main { max-width: 100% !important; }
+    body.account-logged-in #accountDashboard { padding-top: 24px; }
+    
+    /* Dashboard sidebar tabs */
+    #dashGrid .dash-tab.active { background: #f0fdf4 !important; color: #166534 !important; font-weight: 600 !important; }
+    #dashGrid .dash-tab:hover:not(.active) { background: #f8fafc !important; }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        #dashGrid { grid-template-columns: 1fr !important; }
+        #dashGrid > div:first-child { position: static !important; display: flex; flex-wrap: wrap; gap: 4px; padding: 8px !important; }
+        #dashGrid > div:first-child .dash-tab,
+        #dashGrid > div:first-child a { padding: 8px 12px !important; font-size: 0.8rem !important; flex: 1; min-width: fit-content; text-align: center !important; justify-content: center !important; }
+        #tab-support > div:first-child { grid-template-columns: 1fr !important; }
+        #tab-overview > div:nth-child(3) { grid-template-columns: 1fr !important; }
     }
-    .account-wrapper { transition: max-width 0.3s; }
 </style>
 </head>
 
@@ -435,7 +449,7 @@
     </section>
 
     <main>
-        <section class="page-hero">
+        <section class="page-hero" id="accountHero">
             <div class="container">
                 <h1>My Account</h1>
                 <p>Sign in to your account or create a new one</p>
