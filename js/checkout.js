@@ -350,6 +350,11 @@
             const SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
             const SUPABASE_ANON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
 
+            // Send correct base URL for redirect (handles GitHub Pages subpath)
+            const pathParts = window.location.pathname.split('/');
+            pathParts.pop(); // remove filename
+            const returnBase = window.location.origin + pathParts.join('/');
+
             const endpoint = paymentMethod === 'paypal' 
                 ? `${SUPABASE_URL}/functions/v1/create-paypal-checkout`
                 : `${SUPABASE_URL}/functions/v1/create-checkout`;
@@ -367,6 +372,7 @@
                     shippingAddress: checkoutData.shipping,
                     contact: checkoutData.contact,
                     coupon: appliedCoupon || null,
+                    return_base: returnBase,
                     preferred_method: paymentMethod === 'klarna' ? 'klarna' : undefined,
                     is_b2b: window._sfiCustomerIsB2B || false,
                     attribution: typeof sfiGetAttribution === 'function' ? sfiGetAttribution() : {},
