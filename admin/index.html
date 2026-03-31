@@ -14174,14 +14174,14 @@
     // ACCOUNTS RECEIVABLE
     // ============================================================
     let _recData = [];
-    let _recSortField = 'due';
-    let _recSortDir = 'asc';
+    let _recSortField = 'created';
+    let _recSortDir = 'desc';
 
     async function loadReceivables() {
       try {
         // Only show genuine accounts receivable (B2B invoices, Net 30, COD, Check)
         // Exclude abandoned online payments (PayPal, Stripe, Google Pay, Credit Card)
-        const allPending = await supaGet('orders', '?select=order_number,customer_name,customer_email,total,financial_status,payment_method,order_source,created_at,payment_due_date,notes&financial_status=eq.pending&order=payment_due_date.asc.nullslast');
+        const allPending = await supaGet('orders', '?select=order_number,customer_name,customer_email,total,financial_status,payment_method,order_source,created_at,payment_due_date,notes&financial_status=eq.pending&order=created_at.desc');
         _recData = allPending.filter(o => {
           const pm = (o.payment_method || '').toLowerCase();
           const src = (o.order_source || '').toLowerCase();
