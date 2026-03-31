@@ -14179,12 +14179,7 @@
 
     async function loadReceivables() {
       try {
-        const { data, error } = await supabase.from('orders')
-          .select('order_number,customer_name,customer_email,total,financial_status,payment_method,order_source,created_at,payment_due_date,notes')
-          .eq('financial_status', 'pending')
-          .order('payment_due_date', { ascending: true, nullsFirst: false });
-        if (error) throw error;
-        _recData = data || [];
+        _recData = await supaGet('orders', '?select=order_number,customer_name,customer_email,total,financial_status,payment_method,order_source,created_at,payment_due_date,notes&financial_status=eq.pending&order=payment_due_date.asc.nullslast');
         renderReceivablesSummary();
         filterReceivables();
       } catch (e) { console.error('loadReceivables:', e); toast('Failed to load receivables', 'error'); }
@@ -14282,8 +14277,12 @@
     async function markOrderPaid(orderNumber) {
       if (!confirm('Mark order ' + orderNumber + ' as PAID?')) return;
       try {
-        const { error } = await supabase.from('orders').update({ financial_status: 'paid', payment_status: 'paid' }).eq('order_number', orderNumber);
-        if (error) throw error;
+        const h = getAuthHeaders();
+        h['Prefer'] = 'return=representation';
+        const r = await fetch(SUPA_URL + '/rest/v1/orders?order_number=eq.' + encodeURIComponent(orderNumber), {
+          method: 'PATCH', headers: h, body: JSON.stringify({ financial_status: 'paid', payment_status: 'paid' })
+        });
+        if (!r.ok) throw new Error('Update failed: ' + r.status);
         toast(orderNumber + ' marked as paid');
         loadReceivables();
       } catch (e) { toast('Error: ' + e.message, 'error'); }
