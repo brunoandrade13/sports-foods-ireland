@@ -4594,25 +4594,21 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Cartões mantêm fundo branco para destacar as marcas */
-    background: #fff;
+    background: transparent;
     border-radius: 8px;
     padding: var(--space-md);
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .brand-item:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
 .brand-logo-placeholder {
     font-family: var(--font-title);
     font-size: 12px;
     font-weight: 700;
-    /* Nomes das marcas em verde da identidade para se destacar sobre o cartão branco */
-    color: var(--color-primary-600);
+    color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 1px;
     opacity: 0.7;
@@ -4621,20 +4617,20 @@ html {
 
 .brand-item:hover .brand-logo-placeholder {
     opacity: 1;
-    color: var(--color-primary);
+    color: #ffffff;
 }
 
 .brand-item img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    filter: grayscale(100%);
-    opacity: 0.6;
+    /* mix-blend-mode: multiply faz o fundo branco de logos sem alpha ficar transparente */
+    mix-blend-mode: multiply;
+    opacity: 0.85;
     transition: all 0.3s ease;
 }
 
 .brand-item:hover img {
-    filter: grayscale(0%);
     opacity: 1;
 }
 
