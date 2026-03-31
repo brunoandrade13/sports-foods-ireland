@@ -86,6 +86,10 @@ const B2B = (function() {
       document.getElementById('portalLoading').style.display = 'none';
       document.getElementById('portalContent').style.display = 'block';
 
+      // Mostrar botão de logout no header desktop
+      const headerLogoutBtn = document.getElementById('headerLogoutBtn');
+      if (headerLogoutBtn) headerLogoutBtn.style.display = 'inline-flex';
+
       // Hide Sub-Accounts tab if this user is a sub-account (has parent)
       if (profile.parent_customer_id) {
         var saTab = document.querySelector('.b2b-tab[data-tab="subaccounts"]');
@@ -1955,6 +1959,20 @@ const B2B = (function() {
   }
 
 
+  function logout() {
+    if (!confirm('Are you sure you want to log out?')) return;
+    if (typeof sfi !== 'undefined' && sfi.auth) {
+      sfi.auth.signOut();
+    } else {
+      // Fallback manual cleanup
+      localStorage.removeItem('sfi_token');
+      localStorage.removeItem('sfi_user');
+      localStorage.removeItem('sfi_refresh');
+      localStorage.removeItem('sfi_token_exp');
+    }
+    window.location.href = '../account.html';
+  }
+
   return {
     showTab, filterOrders, clearOrderFilters, openReorder, openReorderForOrder,
     updateQty, closeReorder, addReorderToCart, addTopProduct, toast,
@@ -1969,6 +1987,7 @@ const B2B = (function() {
     showMktTab,
     showSupTab, submitTicket,
     showAddSubAccount, addSubAccount, closeAddSubModal, updateSubRolePerms,
-    toggleSubDetail, showSubPermissions, showSubOrders
+    toggleSubDetail, showSubPermissions, showSubOrders,
+    logout
   };
 })();
