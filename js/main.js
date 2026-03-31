@@ -870,6 +870,7 @@ function initHeroCarousel() {
 function initHeroCarouselComplete() {
     initHeroCarousel();
     switchToMobileImages();
+    if (typeof switchHeroBannerImages === 'function') switchHeroBannerImages();
 }
 
 function initHeroCarouselWhenReady() {
@@ -885,7 +886,68 @@ function initHeroCarouselWhenReady() {
 
 // Will be called from unified DOMContentLoaded at end of file
 
-// Trocar imagens do banner para mobile/desktop
+// ── Hero banner: troca robusta de imagens mobile ↔ desktop ──────────────────
+// O <picture> element nem sempre funciona (DPR alto, cache, browsers).
+// Esta função força a troca diretamente no src/srcset do <img>.
+function switchHeroBannerImages() {
+    var isMobile = window.innerWidth <= 767;
+    var slides = document.querySelectorAll('.carousel-slide[data-slide]');
+
+    slides.forEach(function(slide) {
+        var picture = slide.querySelector('picture');
+        if (!picture) return;
+
+        var img = picture.querySelector('img');
+        var source = picture.querySelector('source[media]');
+        if (!img || !source) return;
+
+        var mobileSrc = source.getAttribute('srcset');
+        if (!mobileSrc) return;
+
+        // Guardar src e srcset desktop na primeira execução
+        if (!img.dataset.desktopSrc) {
+            img.dataset.desktopSrc = img.getAttribute('src') || '';
+        }
+        if (!img.dataset.desktopSrcset) {
+            img.dataset.desktopSrcset = img.getAttribute('srcset') || '';
+        }
+
+        if (isMobile) {
+            // Mobile: forçar imagem mobile e remover srcset (evita browser usar srcset desktop)
+            if (img.getAttribute('src') !== mobileSrc) {
+                img.setAttribute('src', mobileSrc);
+            }
+            if (img.getAttribute('srcset')) {
+                img.removeAttribute('srcset');
+            }
+            if (img.getAttribute('sizes')) {
+                img.removeAttribute('sizes');
+            }
+        } else {
+            // Desktop: restaurar src e srcset originais
+            var dSrc = img.dataset.desktopSrc;
+            var dSrcset = img.dataset.desktopSrcset;
+            if (dSrc && img.getAttribute('src') !== dSrc) {
+                img.setAttribute('src', dSrc);
+            }
+            if (dSrcset && img.getAttribute('srcset') !== dSrcset) {
+                img.setAttribute('srcset', dSrcset);
+                img.setAttribute('sizes', '100vw');
+            }
+        }
+    });
+}
+
+// Debounce para resize
+(function() {
+    var _heroResizeTimer = null;
+    window.addEventListener('resize', function() {
+        if (_heroResizeTimer) clearTimeout(_heroResizeTimer);
+        _heroResizeTimer = setTimeout(switchHeroBannerImages, 150);
+    });
+})();
+
+// Trocar imagens do banner para mobile/desktop (slides com background-image)
 function switchToMobileImages() {
     const athleteSlide = document.querySelector('.slide-image-athlete-mobile');
     const saleSlide = document.querySelector('.slide-image-sale-mobile');
@@ -3252,6 +3314,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 2. Mobile image switching
     if (typeof switchToMobileImages === 'function') switchToMobileImages();
+
+    // 2b. Hero banner picture src switching (garante imagem mobile nos <picture>)
+    if (typeof switchHeroBannerImages === 'function') switchHeroBannerImages();
 
     // 3. Benefits bar animation
     if (typeof setupBenefitsAnimation === 'function') setupBenefitsAnimation();

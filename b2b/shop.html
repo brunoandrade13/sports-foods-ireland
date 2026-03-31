@@ -5,12 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="B2B Wholesale Portal — Sports Foods Ireland">
 <title>B2B Wholesale Portal — Sports Foods Ireland</title>
+<link rel="alternate" hreflang="en-IE" href="https://www.sportsfoodsireland.ie/shop.html">
+<link rel="alternate" hreflang="en-GB" href="https://www.sportsfoodsireland.ie/shop.html">
+<link rel="alternate" hreflang="en" href="https://www.sportsfoodsireland.ie/shop.html">
+<link rel="alternate" hreflang="x-default" href="https://www.sportsfoodsireland.ie/shop.html">
 <link rel="canonical" href="https://www.sportsfoodsireland.ie/b2b/shop.html">
 <link rel="icon" type="image/png" href="../img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/sfi-styles.min.css?v=23">
+<link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
+href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../css/sfi-styles.min.css?v=25">
 <style>
 .b2b-shop { font-family: 'Inter', sans-serif; color: #1e293b; }
 .b2b-banner { background: linear-gradient(135deg, #1B4332, #2D6A4F); color: #fff; padding: 20px 24px; text-align: center; }
@@ -74,7 +80,7 @@
 .b2b-cat-card.active span { color: #1B4332; }
 @media (max-width: 768px) { .b2b-cat-grid { grid-template-columns: repeat(3, 1fr); } }
 </style>
-<!-- Brevo Tracker -->
+
 <script>
   (function() {
     window.sib = { equeue: [], client_key: "jfcdi8jged7s2zao8cikjk5i" };
@@ -85,115 +91,122 @@
     s.parentNode.insertBefore(n, s);
   })();
 </script>
+<link rel="prefetch" href="produto.html">
+<link rel="prefetch" href="cart.html">
+
+<link rel="preconnect" href="https://styynhgzrkyoioqjssuw.supabase.co" crossorigin>
+<link rel="dns-prefetch" href="https://styynhgzrkyoioqjssuw.supabase.co">
 </head>
 <body class="b2b-shop">
 
-<!-- Banner -->
 <div class="b2b-banner" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-  <div>
-    <h2>🏢 B2B Wholesale Portal</h2>
-    <div class="company" id="companyName">Loading...</div>
-  </div>
-  <div style="display:flex;gap:10px">
-    <a href="portal.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:rgba(255,255,255,0.15);color:#fff;border-radius:8px;font-size:0.85rem;font-weight:600;text-decoration:none;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">📊 My Account</a>
-  </div>
+<div>
+<h2>🏢 B2B Wholesale Portal</h2>
+<div class="company" id="companyName">Loading...</div>
+</div>
+<div style="display:flex;gap:10px">
+<a href="portal.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:rgba(255,255,255,0.15);color:#fff;border-radius:8px;font-size:0.85rem;font-weight:600;text-decoration:none;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">📊 My Account</a>
+</div>
 </div>
 
-<!-- Access Denied (hidden) -->
 <div class="b2b-access-denied" id="accessDenied" style="display:none;">
-  <h2>🔒 Wholesale Access Required</h2>
-  <p>You need an approved B2B account to access the wholesale portal.</p>
-  <a href="../register-b2b.html">Apply for B2B Access</a>
+<h2>🔒 Wholesale Access Required</h2>
+<p>You need an approved B2B account to access the wholesale portal.</p>
+<a href="../register-b2b.html">Apply for B2B Access</a>
 </div>
 
-<!-- Main Content (hidden until verified) -->
 <div id="shopContent" style="display:none;">
 
-  <!-- Category Buttons -->
-  <div class="b2b-categories">
-    <div class="b2b-cat-grid">
-      <button class="b2b-cat-card active" data-cat="" onclick="filterByCategory(this)">
-        <div class="b2b-cat-icon">🏪</div>
-        <span>All Products</span>
-      </button>
-      <button class="b2b-cat-card" data-cat="Nutrition" onclick="filterByCategory(this)">
-        <img src="../img/cat-nutrition.webp" alt="Nutrition">
-        <span>Nutrition</span>
-      </button>
-      <button class="b2b-cat-card" data-cat="Swimming" onclick="filterByCategory(this)">
-        <img src="../img/cat-swimming.webp" alt="Swimming">
-        <span>Swimming</span>
-      </button>
-      <button class="b2b-cat-card" data-cat="Cycling" onclick="filterByCategory(this)">
-        <img src="../img/cat-cycling.webp" alt="Cycling">
-        <span>Cycling</span>
-      </button>
-      <button class="b2b-cat-card" data-cat="Running" onclick="filterByCategory(this)">
-        <img src="../img/cat-running.webp" alt="Running">
-        <span>Running</span>
-      </button>
-    </div>
-  </div>
+<div class="b2b-categories">
+<div class="b2b-cat-grid">
+<button class="b2b-cat-card active" data-cat="" onclick="filterByCategory(this)">
+<div class="b2b-cat-icon">🏪</div>
+<span>All Products</span>
+</button>
+<button class="b2b-cat-card" data-cat="Nutrition" onclick="filterByCategory(this)">
+<img src="../img/cat-nutrition.webp" alt="Nutrition">
+<span>Nutrition</span>
+</button>
+<button class="b2b-cat-card" data-cat="Swimming" onclick="filterByCategory(this)">
+<img src="../img/cat-swimming.webp" alt="Swimming">
+<span>Swimming</span>
+</button>
+<button class="b2b-cat-card" data-cat="Cycling" onclick="filterByCategory(this)">
+<img src="../img/cat-cycling.webp" alt="Cycling">
+<span>Cycling</span>
+</button>
+<button class="b2b-cat-card" data-cat="Running" onclick="filterByCategory(this)">
+<img src="../img/cat-running.webp" alt="Running">
+<span>Running</span>
+</button>
+</div>
+</div>
 
-  <div class="b2b-container">
-    <!-- Sidebar Filters -->
-    <aside class="b2b-sidebar">
-      <div class="filter-group">
-        <h3>🔍 Search</h3>
-        <input type="text" id="b2bSearch" placeholder="Search products..." oninput="debounceSearch()" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;color:#1e293b;">
-      </div>
-      <div class="filter-group">
-        <h3>Category</h3>
-        <div id="filterCategories">
-          <label><input type="radio" name="cat" value="" checked> All Categories</label>
-        </div>
-      </div>
-      <div class="filter-group" id="subcategoryFilterGroup" style="display:none;">
-        <h3>Subcategory</h3>
-        <div id="filterSubcategories"></div>
-      </div>
-      <div class="filter-group">
-        <h3>Brand</h3>
-        <div id="filterBrands">
-          <label><input type="radio" name="brand" value="" checked> All Brands</label>
-        </div>
-      </div>
-      <div class="filter-group">
-        <h3>Availability</h3>
-        <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;cursor:pointer;">
-          <input type="checkbox" id="showOutOfStock" checked onchange="loadProducts()" style="accent-color:#2D6A4F;width:16px;height:16px;">
-          Show out of stock (backorder)
-        </label>
-      </div>
-    </aside>
+<div class="b2b-container">
 
-    <!-- Products Area -->
-    <main>
-      <div class="b2b-mobile-search" style="display:none;margin-bottom:16px;">
-        <input type="text" id="b2bSearchMobile" placeholder="🔍 Search products..." oninput="document.getElementById('b2bSearch').value=this.value;debounceSearch()" style="width:100%;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:0.9rem;">
-      </div>
-      <div class="b2b-sort-bar">
-        <span class="count" id="productCount">Loading products...</span>
-        <select id="sortSelect" onchange="loadProducts()">
-          <option value="name_asc">Name A–Z</option>
-          <option value="name_desc">Name Z–A</option>
-          <option value="price_asc">Price: Low → High</option>
-          <option value="price_desc">Price: High → Low</option>
-        </select>
-      </div>
-      <div class="b2b-grid" id="productGrid"></div>
-      <div class="b2b-pagination" id="pagination"></div>
-    </main>
-  </div>
+<aside class="b2b-sidebar">
+<div class="filter-group">
+<h3>🔍 Search</h3>
+<input type="text" id="b2bSearch" placeholder="Search products..." oninput="debounceSearch()" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;color:#1e293b;">
+</div>
+<div class="filter-group">
+<h3>Category</h3>
+<div id="filterCategories">
+<label><input type="radio" name="cat" value="" checked> All Categories</label>
+</div>
+</div>
+<div class="filter-group" id="subcategoryFilterGroup" style="display:none;">
+<h3>Subcategory</h3>
+<div id="filterSubcategories"></div>
+</div>
+<div class="filter-group">
+<h3>Brand</h3>
+<div id="filterBrands">
+<label><input type="radio" name="brand" value="" checked> All Brands</label>
+</div>
+</div>
+<div class="filter-group">
+<h3>Availability</h3>
+<label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;cursor:pointer;">
+<input type="checkbox" id="showOutOfStock" checked onchange="loadProducts()" style="accent-color:#2D6A4F;width:16px;height:16px;">
+Show out of stock (backorder)
+</label>
+</div>
+</aside>
 
-  <div class="b2b-footer-note">
-    B2B prices are exclusive to approved wholesale customers. All prices are ex-VAT.
-  </div>
+<main>
+<div class="b2b-mobile-search" style="display:none;margin-bottom:16px;">
+<input type="text" id="b2bSearchMobile" placeholder="🔍 Search products..." oninput="document.getElementById('b2bSearch').value=this.value;debounceSearch()" style="width:100%;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:0.9rem;">
+</div>
+<div class="b2b-sort-bar">
+<span class="count" id="productCount">Loading products...</span>
+<select id="sortSelect" onchange="loadProducts()">
+<option value="name_asc">Name A–Z</option>
+<option value="name_desc">Name Z–A</option>
+<option value="price_asc">Price: Low → High</option>
+<option value="price_desc">Price: High → Low</option>
+</select>
+</div>
+<div class="b2b-grid" id="productGrid"></div>
+<div class="b2b-pagination" id="pagination"></div>
+</main>
+</div>
+
+<div class="b2b-footer-note">
+B2B prices are exclusive to approved wholesale customers. All prices are ex-VAT.
+</div>
 </div>
 
 <script src="../js/sfi-api.min.js?v=12"></script>
 <script src="../js/main.min.js?v=7"></script>
 <script src="b2b-shop.js?v=5"></script>
-<script src="../js/brevo-integration.js" defer></script>
+<script src="../js/brevo-integration.min.js" defer></script>
+<script>
+if('serviceWorker' in navigator){
+window.addEventListener('load',function(){
+navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
+});
+}
+</script>
 </body>
 </html>

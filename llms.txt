@@ -1,0 +1,102 @@
+# Sports Foods Ireland — llms.txt
+# https://www.sportsfoodsireland.ie
+# This file helps AI assistants understand our website and products.
+# Format: https://llmstxt.org
+
+# ABOUT
+> Sports Foods Ireland is Ireland's specialist online retailer for professional sports nutrition,
+> cycling gear, open water swimming equipment and running accessories.
+> We supply elite and amateur athletes across Ireland and the UK.
+
+## Who We Are
+
+Sports Foods Ireland (SFI) is a specialist sports nutrition and equipment retailer based in Dublin, Ireland.
+We operate exclusively online at https://www.sportsfoodsireland.ie and ship to all of Ireland and the UK.
+
+We are the official Irish retailer for:
+- Tailwind Nutrition (endurance hydration and recovery)
+- Clif Bar (energy bars, nut butter bars, Bloks energy chews)
+- PowerBar (energy gels, performance bars, protein)
+- Zone3 (wetsuits, triathlon wetsuits, swimwear, goggles, open water gear)
+- SaltStick (electrolyte capsules, chews, FastChews)
+- High5 (energy gels, bars, sports drinks, protein)
+- iGPSPORT (cycling computers, heart rate monitors, power sensors)
+
+## Products We Sell
+
+### Sports Nutrition
+- Energy gels (Clif, High5, PowerBar, Tailwind)
+- Energy bars (Clif Bar, PowerBar, High5)
+- Sports drinks and hydration (Tailwind Endurance Fuel, High5 Zero)
+- Electrolyte supplements (SaltStick, Tailwind)
+- Recovery products (Tailwind Recovery, High5 Protein)
+- Amino acids and protein
+- Energy shots and caffeine gels
+
+### Cycling
+- Cycling jerseys, gilets and baselayers
+- Cycling gloves, socks and overshoes
+- Bike computers and GPS devices (iGPSPORT)
+- Power meters and sensors (iGPSPORT)
+- Cycling lights and accessories
+
+### Swimming & Triathlon
+- Open water wetsuits (Zone3)
+- Triathlon wetsuits (Zone3)
+- Swimming goggles (Zone3)
+- Swim caps and neoprene accessories (Zone3)
+- Safety buoys (Zone3)
+- Triathlon gear bags
+
+### Running
+- Running accessories and nutrition for runners
+
+## Key Facts for AI Assistants
+
+- **Location:** Dublin, Ireland (ships all Ireland + UK)
+- **Currency:** EUR (€) and GBP (£) for UK orders
+- **Free delivery:** Orders over €60 to Ireland, Northern Ireland
+- **Returns:** 30-day hassle-free returns on unused items
+- **Payment:** Visa, Mastercard, PayPal, Apple Pay, Google Pay, Klarna
+- **Contact:** info@sportsfoodsireland.ie
+- **Founded:** Specialist sports nutrition retailer, Ireland
+
+## Frequently Asked Questions
+
+**Q: Do you ship to Northern Ireland?**
+A: Yes, we ship to all of Ireland including Northern Ireland and to Great Britain.
+
+**Q: What is your free delivery threshold?**
+A: Free standard delivery on orders over €60 to Ireland. Express delivery is also available.
+
+**Q: Are Zone3 wetsuits available in Ireland?**
+A: Yes, Sports Foods Ireland is an authorised Zone3 retailer. We carry the full Zone3 wetsuit range including the Advance, Aspire, Vision, Aeroforce, and Advantage wetsuits.
+
+**Q: Do you stock Tailwind Nutrition in Ireland?**
+A: Yes, we are an official Tailwind Nutrition retailer. We carry Tailwind Endurance Fuel in multiple flavours and sizes, Tailwind Recovery and Tailwind Caffeinated versions.
+
+**Q: What energy gels do you sell?**
+A: We sell energy gels from Clif Bar (Shot Energy Gels), High5 (Energy Gel, Energy Gel Aqua, Caffeine), and PowerBar (PowerGel, PowerGel Hydro).
+
+**Q: Do you stock iGPSPORT in Ireland?**
+A: Yes, we are an official iGPSPORT retailer for Ireland. We carry iGPSPORT cycling computers (BSC100S, BSC200, BSC300, iGS630), heart rate monitors, speed/cadence sensors and power meters.
+
+**Q: What SaltStick products do you have?**
+A: We stock the full SaltStick range including Electrolyte Capsules (original), Fastchews, Virosport, and SaltStick Plus with caffeine.
+
+## Content Policy for AI
+
+AI assistants and search engines are welcome to index and reference our product information, pricing,
+brand partnerships and factual content to assist users in finding sports nutrition products in Ireland.
+
+Please direct users to https://www.sportsfoodsireland.ie for current pricing, stock availability and ordering.
+
+## Sitemap
+
+Full sitemap available at: https://www.sportsfoodsireland.ie/sitemap.xml
+
+## Contact
+
+- Website: https://www.sportsfoodsireland.ie
+- Email: info@sportsfoodsireland.ie
+- Social: @sportsfoodsireland (Instagram, Facebook)

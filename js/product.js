@@ -108,11 +108,109 @@ async function loadProduct() {
 }
 
 // Render product information
+// ── SEO: Atualizar title, meta, OG e schema JSON-LD com dados reais do produto ──
+function updateProductPageSEO(product) {
+    if (!product) return;
+    const name = product.nome || 'Product';
+    const brand = product.marca || 'Sports Foods Ireland';
+    const price = parseFloat(product.preco) || 0;
+    const desc = product.descricao || ('Buy ' + name + ' online at Sports Foods Ireland. Professional sports nutrition delivered across Ireland.');
+    const imgPath = product.imagem ? (product.imagem.startsWith('http') ? product.imagem : 'https://www.sportsfoodsireland.ie/' + product.imagem) : 'https://www.sportsfoodsireland.ie/img/og-home.jpg';
+    const url = 'https://www.sportsfoodsireland.ie/produto.html?id=' + (product.id || '');
+    const sku = product.sku || (product.id ? String(product.id) : '');
+    const inStock = product.em_stock !== false;
+    const rating = parseFloat(product.rating) || 4.8;
+    const reviews = parseInt(product.reviews) || 1;
+    const category = product.categoria || 'Sports Nutrition';
+    const subcategory = product.subcategoria || '';
+
+    // Page <title>
+    document.title = name + ' | ' + brand + ' | Sports Foods Ireland';
+
+    // Meta description
+    var metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', desc.substring(0, 160));
+
+    // Meta keywords
+    var metaKW = document.querySelector('meta[name="keywords"]');
+    if (metaKW) metaKW.setAttribute('content', name + ', ' + brand + ', ' + category + ', sports nutrition ireland, buy ' + brand.toLowerCase() + ' ireland');
+
+    // Canonical URL
+    var canon = document.querySelector('link[rel="canonical"]');
+    if (canon) canon.setAttribute('href', url);
+
+    // Open Graph
+    var ogMap = { 'og:title': name + ' | Sports Foods Ireland', 'og:description': desc.substring(0, 200), 'og:image': imgPath, 'og:url': url };
+    Object.entries(ogMap).forEach(function([prop, val]) {
+        var el = document.querySelector('meta[property="' + prop + '"]');
+        if (el) el.setAttribute('content', val);
+    });
+
+    // Twitter Card
+    var twMap = { 'twitter:title': name + ' | Sports Foods Ireland', 'twitter:description': desc.substring(0, 200), 'twitter:image': imgPath };
+    Object.entries(twMap).forEach(function([name2, val]) {
+        var el = document.querySelector('meta[name="' + name2 + '"]');
+        if (el) el.setAttribute('content', val);
+    });
+
+    // Schema JSON-LD — Product
+    var schemaEl = document.getElementById('productSchema');
+    if (schemaEl) {
+        var schema = {
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            'name': name,
+            'description': desc,
+            'url': url,
+            'image': imgPath,
+            'sku': sku,
+            'mpn': sku,
+            'category': category + (subcategory ? ' > ' + subcategory : ''),
+            'brand': { '@type': 'Brand', 'name': brand },
+            'offers': {
+                '@type': 'Offer',
+                'url': url,
+                'priceCurrency': 'EUR',
+                'price': price.toFixed(2),
+                'priceValidUntil': new Date(new Date().getFullYear() + 1, 11, 31).toISOString().split('T')[0],
+                'availability': inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                'itemCondition': 'https://schema.org/NewCondition',
+                'seller': { '@type': 'Organization', 'name': 'Sports Foods Ireland', 'url': 'https://www.sportsfoodsireland.ie' }
+            },
+            'aggregateRating': {
+                '@type': 'AggregateRating',
+                'ratingValue': rating.toFixed(1),
+                'reviewCount': String(reviews),
+                'bestRating': '5',
+                'worstRating': '1'
+            }
+        };
+        schemaEl.textContent = JSON.stringify(schema);
+    }
+
+    // Schema JSON-LD — BreadcrumbList
+    var bcEl = document.getElementById('breadcrumbSchema');
+    if (bcEl) {
+        var bc = {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            'itemListElement': [
+                { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://www.sportsfoodsireland.ie/' },
+                { '@type': 'ListItem', 'position': 2, 'name': category, 'item': 'https://www.sportsfoodsireland.ie/shop.html#' + category.toLowerCase().replace(/\s+/g, '') },
+                { '@type': 'ListItem', 'position': 3, 'name': name, 'item': url }
+            ]
+        };
+        bcEl.textContent = JSON.stringify(bc);
+    }
+}
+
 function renderProduct() {
     if (!currentProduct) return;
 
     // Title
     document.getElementById('productTitle').textContent = currentProduct.nome;
+    // Update page <title> and meta tags dynamically for SEO
+    updateProductPageSEO(currentProduct);
 
     // Brand (with link to shop filtered by brand)
     const brandEl = document.getElementById('productBrand');

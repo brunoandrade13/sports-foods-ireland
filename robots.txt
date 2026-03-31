@@ -1,29 +1,57 @@
 # Sports Foods Ireland - robots.txt
-# https://sportsfoodsireland.ie
+# https://www.sportsfoodsireland.ie
 
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://sportsfoodsireland.ie/sitemap.xml
+Sitemap: https://www.sportsfoodsireland.ie/sitemap.xml
+Sitemap: https://www.sportsfoodsireland.ie/sitemap-images.xml
 
 # Block dev/internal files
 Disallow: /dev-archive/
 Disallow: /admin/
 Disallow: /templates/
+Disallow: /scripts/
+Disallow: /automation/
 
-# Block utility pages from indexing
+# Block utility pages from indexing (no SEO value)
 Disallow: /checkout.html
 Disallow: /account.html
 Disallow: /cart.html
+Disallow: /register-b2b.html
+Disallow: /tracking.html
+Disallow: /wishlist.html
+Disallow: /compare.html
 
-# Block scripts and data files
+# Block scripts and binary data files (allow dados-slim.json for product rendering)
 Disallow: /*.py$
-Disallow: /*.json$
 Disallow: /*.md$
 Disallow: /*.zip$
+Disallow: /*.sh$
+Disallow: /js/dados.json
 
 # Allow CSS/JS/images for rendering
 Allow: /css/
 Allow: /js/
+Allow: /img/
+Allow: /js/dados-slim.json
+
+# Specific bot rules
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Googlebot-Image
 Allow: /img/

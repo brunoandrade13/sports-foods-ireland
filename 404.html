@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Not Found - Sports Foods Ireland</title>
-    <meta name="description" content="Page not found. Browse Sports Foods Ireland for sports nutrition, cycling gear, swimming equipment and more.">
-    <meta name="robots" content="noindex">
-    <link rel="preload" href="css/sfi-styles.min.css?v=24" as="style">
-    <link rel="stylesheet" href="css/sfi-styles.min.css?v=24">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <meta property="og:title" content="Page Not Found - Sports Foods Ireland">
-    <meta property="og:description" content="The page you're looking for doesn't exist. Browse our sports nutrition, cycling gear, and swimming equipment.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://sportsfoodsireland.ie/404.html">
-    <meta property="og:image" content="https://sportsfoodsireland.ie/img/og-default.jpg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page Not Found - Sports Foods Ireland</title>
+<meta name="description" content="Page not found. Browse Sports Foods Ireland for sports nutrition, cycling gear, swimming equipment and more.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://www.sportsfoodsireland.ie/404.html">
+<link rel="preload" href="css/sfi-styles.min.css?v=25" as="style">
+<link rel="stylesheet" href="css/sfi-styles.min.css?v=25" media="print" onload="this.media=\'all\'">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta property="og:title" content="Page Not Found - Sports Foods Ireland">
+<meta property="og:description" content="The page you're looking for doesn't exist. Browse our sports nutrition, cycling gear, and swimming equipment.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sportsfoodsireland.ie/404.html">
+<meta property="og:image" content="https://sportsfoodsireland.ie/img/og-default.jpg">
     <style>
         .error-page {
             display: flex;
@@ -86,18 +87,16 @@
             transition: border-color 0.2s;
         }
         .error-search input:focus { border-color: var(--color-primary, #2D6A4F); }
-    </style>
+</style>
 
-    <!-- Security -->
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 
-    <!-- PWA / Mobile -->
-    <link rel="manifest" href="site.webmanifest">
-    <link rel="apple-touch-icon" href="img/logo.png">
-    <meta name="theme-color" content="#2D6A4F">
-<!-- Brevo Tracker -->
+<link rel="manifest" href="site.webmanifest">
+<link rel="apple-touch-icon" href="img/logo.png">
+<meta name="theme-color" content="#2D6A4F">
+
 <script>
   (function() {
     window.sib = { equeue: [], client_key: "jfcdi8jged7s2zao8cikjk5i" };
@@ -110,27 +109,34 @@
 </script>
 </head>
 <body>
-    <a href="#main-content" class="skip-to-content">Skip to main content</a>
-    
-    <main id="main-content">
-        <div class="error-page">
-            <div class="error-code">404</div>
-            <h1 class="error-title">Page Not Found</h1>
-            <p class="error-message">
-                Sorry, the page you're looking for doesn't exist or has been moved. 
-                Let's get you back on track!
-            </p>
-            <div class="error-actions">
-                <a href="index.html" class="btn-home">← Back to Home</a>
-                <a href="shop.html" class="btn-shop">Browse Shop</a>
-            </div>
-            <div class="error-search">
-                <form action="shop.html" method="get">
-                    <input type="text" name="search" placeholder="Search for products..." aria-label="Search products">
-                </form>
-            </div>
-        </div>
-    </main>
-<script src="js/brevo-integration.js" defer></script>
+<a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+<main id="main-content">
+<div class="error-page">
+<div class="error-code">404</div>
+<h1 class="error-title">Page Not Found</h1>
+<p class="error-message">
+Sorry, the page you're looking for doesn't exist or has been moved.
+Let's get you back on track!
+</p>
+<div class="error-actions">
+<a href="index.html" class="btn-home">← Back to Home</a>
+<a href="shop.html" class="btn-shop">Browse Shop</a>
+</div>
+<div class="error-search">
+<form action="shop.html" method="get">
+<input type="text" name="search" placeholder="Search for products..." aria-label="Search products">
+</form>
+</div>
+</div>
+</main>
+<script src="js/brevo-integration.min.js" defer></script>
+<script>
+if('serviceWorker' in navigator){
+window.addEventListener('load',function(){
+navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
+});
+}
+</script>
 </body>
 </html>

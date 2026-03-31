@@ -2,6 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Apply for B2B wholesale access at Sports Foods Ireland.">
 <meta property="og:type" content="website">
@@ -13,8 +14,10 @@
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/sfi-styles.min.css?v=24">
+<link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
+href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="css/sfi-styles.min.css?v=25" media="print" onload="this.media=\'all\'">
 <style>
 .b2b-reg-wrap { max-width: 600px; margin: 40px auto; padding: 0 20px 60px; }
 .b2b-badge { display: inline-flex; align-items: center; gap: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #1B4332; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; margin-bottom: 24px; }
@@ -53,7 +56,7 @@
 .alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 12px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 16px; display: none; }
 @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } .b2b-reg-card { padding: 24px 20px; } }
 </style>
-<!-- Brevo Tracker -->
+
 <script>
   (function() {
     window.sib = { equeue: [], client_key: "jfcdi8jged7s2zao8cikjk5i" };
@@ -64,149 +67,147 @@
     s.parentNode.insertBefore(n, s);
   })();
 </script>
+<link rel="preconnect" href="https://styynhgzrkyoioqjssuw.supabase.co" crossorigin>
+<link rel="dns-prefetch" href="https://styynhgzrkyoioqjssuw.supabase.co">
 </head>
 <body>
 
-<!-- B2B Registration Form -->
 <div class="b2b-reg-wrap">
-  <div class="b2b-badge">🏢 Apply for B2B Wholesale Access</div>
+<div class="b2b-badge">🏢 Apply for B2B Wholesale Access</div>
 
-  <div class="b2b-reg-card" id="formCard">
-    <h1>B2B Registration</h1>
-    <p class="subtitle">Create your wholesale account to access exclusive pricing.</p>
+<div class="b2b-reg-card" id="formCard">
+<h1>B2B Registration</h1>
+<p class="subtitle">Create your wholesale account to access exclusive pricing.</p>
 
-    <!-- Wizard Steps Indicator -->
-    <div class="wizard-steps">
-      <div class="wizard-step active" id="stepBar1"></div>
-      <div class="wizard-step" id="stepBar2"></div>
-    </div>
+<div class="wizard-steps">
+<div class="wizard-step active" id="stepBar1"></div>
+<div class="wizard-step" id="stepBar2"></div>
+</div>
 
-    <div class="alert-error" id="formError"></div>
+<div class="alert-error" id="formError"></div>
 
-    <form id="b2bForm" autocomplete="off">
-      <!-- STEP 1: Personal + Company Info -->
-      <div class="step-panel active" id="step1">
-        <h3 style="font-size:1rem;color:#2D6A4F;margin-bottom:16px;">Step 1 — Your Details & Company</h3>
+<form id="b2bForm" autocomplete="off">
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="b2bFirstName">First Name *</label>
-            <input type="text" id="b2bFirstName" required placeholder="John">
-          </div>
-          <div class="form-group">
-            <label for="b2bLastName">Last Name *</label>
-            <input type="text" id="b2bLastName" required placeholder="Doe">
-          </div>
-        </div>
+<div class="step-panel active" id="step1">
+<h3 style="font-size:1rem;color:#2D6A4F;margin-bottom:16px;">Step 1 — Your Details & Company</h3>
 
-        <div class="form-group">
-          <label for="b2bEmail">Email Address *</label>
-          <input type="email" id="b2bEmail" required placeholder="you@company.com">
-        </div>
+<div class="form-row">
+<div class="form-group">
+<label for="b2bFirstName">First Name *</label>
+<input type="text" id="b2bFirstName" required placeholder="John">
+</div>
+<div class="form-group">
+<label for="b2bLastName">Last Name *</label>
+<input type="text" id="b2bLastName" required placeholder="Doe">
+</div>
+</div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="b2bPassword">Password *</label>
-            <input type="password" id="b2bPassword" required placeholder="Min. 8 characters">
-            <small>At least 8 characters with 1 number</small>
-          </div>
-          <div class="form-group">
-            <label for="b2bConfirmPw">Confirm Password *</label>
-            <input type="password" id="b2bConfirmPw" required placeholder="••••••••">
-          </div>
-        </div>
+<div class="form-group">
+<label for="b2bEmail">Email Address *</label>
+<input type="email" id="b2bEmail" required placeholder="you@company.com">
+</div>
 
-        <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;">
+<div class="form-row">
+<div class="form-group">
+<label for="b2bPassword">Password *</label>
+<input type="password" id="b2bPassword" required placeholder="Min. 8 characters">
+<small>At least 8 characters with 1 number</small>
+</div>
+<div class="form-group">
+<label for="b2bConfirmPw">Confirm Password *</label>
+<input type="password" id="b2bConfirmPw" required placeholder="••••••••">
+</div>
+</div>
 
-        <div class="form-group">
-          <label for="b2bCompany">Company Name *</label>
-          <input type="text" id="b2bCompany" required placeholder="Acme Fitness Ltd.">
-        </div>
+<hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;">
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="b2bVat">VAT Number *</label>
-            <input type="text" id="b2bVat" required placeholder="IE1234567T">
-            <small>Irish or EU VAT number</small>
-          </div>
-          <div class="form-group">
-            <label for="b2bWebsite">Business Website</label>
-            <input type="url" id="b2bWebsite" placeholder="https://yourcompany.ie">
-          </div>
-        </div>
+<div class="form-group">
+<label for="b2bCompany">Company Name *</label>
+<input type="text" id="b2bCompany" required placeholder="Acme Fitness Ltd.">
+</div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="b2bType">Business Type *</label>
-            <select id="b2bType" required>
-              <option value="">Select...</option>
-              <option>Gym / Fitness Centre</option>
-              <option>Sports Club</option>
-              <option>Retail Store</option>
-              <option>Online Store</option>
-              <option>Physiotherapist</option>
-              <option>Personal Trainer</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="b2bVolume">Expected Monthly Volume *</label>
-            <select id="b2bVolume" required>
-              <option value="">Select...</option>
-              <option>Under €500</option>
-              <option>€500 – €2,000</option>
-              <option>€2,000 – €5,000</option>
-              <option>Over €5,000</option>
-            </select>
-          </div>
-        </div>
+<div class="form-row">
+<div class="form-group">
+<label for="b2bVat">VAT Number *</label>
+<input type="text" id="b2bVat" required placeholder="IE1234567T">
+<small>Irish or EU VAT number</small>
+</div>
+<div class="form-group">
+<label for="b2bWebsite">Business Website</label>
+<input type="url" id="b2bWebsite" placeholder="https://yourcompany.ie">
+</div>
+</div>
 
-        <div class="wizard-actions">
-          <button type="button" class="btn-b2b" onclick="goToStep(2)">Continue →</button>
-        </div>
-      </div>
+<div class="form-row">
+<div class="form-group">
+<label for="b2bType">Business Type *</label>
+<select id="b2bType" required>
+<option value="">Select...</option>
+<option>Gym / Fitness Centre</option>
+<option>Sports Club</option>
+<option>Retail Store</option>
+<option>Online Store</option>
+<option>Physiotherapist</option>
+<option>Personal Trainer</option>
+<option>Other</option>
+</select>
+</div>
+<div class="form-group">
+<label for="b2bVolume">Expected Monthly Volume *</label>
+<select id="b2bVolume" required>
+<option value="">Select...</option>
+<option>Under €500</option>
+<option>€500 – €2,000</option>
+<option>€2,000 – €5,000</option>
+<option>Over €5,000</option>
+</select>
+</div>
+</div>
 
-      <!-- STEP 2: Review & Submit -->
-      <div class="step-panel" id="step2">
-        <h3 style="font-size:1rem;color:#2D6A4F;margin-bottom:16px;">Step 2 — Review & Submit</h3>
+<div class="wizard-actions">
+<button type="button" class="btn-b2b" onclick="goToStep(2)">Continue →</button>
+</div>
+</div>
 
-        <div id="reviewSummary" style="background:#f8f9fa;border-radius:8px;padding:16px;margin-bottom:20px;font-size:0.9rem;color:#495057;line-height:1.8;"></div>
+<div class="step-panel" id="step2">
+<h3 style="font-size:1rem;color:#2D6A4F;margin-bottom:16px;">Step 2 — Review & Submit</h3>
 
-        <div class="form-group">
-          <label for="b2bAbout">Tell us about your business (optional)</label>
-          <textarea id="b2bAbout" placeholder="What products are you most interested in? How did you hear about us?"></textarea>
-        </div>
+<div id="reviewSummary" style="background:#f8f9fa;border-radius:8px;padding:16px;margin-bottom:20px;font-size:0.9rem;color:#495057;line-height:1.8;"></div>
 
-        <div class="form-group">
-          <label class="checkbox-label">
-            <input type="checkbox" id="b2bTerms" required>
-            <span>I agree to the <a href="terms.html" target="_blank" style="color:#2D6A4F;">Terms & Conditions</a> and <a href="privacy.html" target="_blank" style="color:#2D6A4F;">B2B Trade Conditions</a>.</span>
-          </label>
-        </div>
+<div class="form-group">
+<label for="b2bAbout">Tell us about your business (optional)</label>
+<textarea id="b2bAbout" placeholder="What products are you most interested in? How did you hear about us?"></textarea>
+</div>
 
-        <div class="wizard-actions">
-          <button type="button" class="btn-b2b btn-outline-b2b" onclick="goToStep(1)">← Back</button>
-          <button type="submit" class="btn-b2b" id="submitBtn">Submit Application</button>
-        </div>
-      </div>
-    </form>
-  </div>
+<div class="form-group">
+<label class="checkbox-label">
+<input type="checkbox" id="b2bTerms" required>
+<span>I agree to the <a href="terms.html" target="_blank" style="color:#2D6A4F;">Terms & Conditions</a> and <a href="privacy.html" target="_blank" style="color:#2D6A4F;">B2B Trade Conditions</a>.</span>
+</label>
+</div>
 
-  <!-- Success Screen (hidden by default) -->
-  <div class="b2b-reg-card" id="successCard" style="display:none;">
-    <div class="success-screen">
-      <div class="icon">✅</div>
-      <h2>Application Submitted!</h2>
-      <p>We'll review your application within <strong>24–48 hours</strong> and contact you at <strong id="successEmail"></strong>.</p>
-      <p style="margin-top:16px;">You'll receive an email once your wholesale account is approved.</p>
-      <a href="account.html" class="btn-b2b" style="display:inline-block;max-width:260px;margin-top:24px;text-decoration:none;text-align:center;">Go to My Account</a>
-    </div>
-  </div>
+<div class="wizard-actions">
+<button type="button" class="btn-b2b btn-outline-b2b" onclick="goToStep(1)">← Back</button>
+<button type="submit" class="btn-b2b" id="submitBtn">Submit Application</button>
+</div>
+</div>
+</form>
+</div>
 
-  <div class="links-bottom">
-    <p>Already have a B2B account? <a href="account.html">Sign in</a></p>
-    <p style="margin-top:6px;">Looking for regular registration? <a href="account.html">Register here</a></p>
-  </div>
+<div class="b2b-reg-card" id="successCard" style="display:none;">
+<div class="success-screen">
+<div class="icon">✅</div>
+<h2>Application Submitted!</h2>
+<p>We'll review your application within <strong>24–48 hours</strong> and contact you at <strong id="successEmail"></strong>.</p>
+<p style="margin-top:16px;">You'll receive an email once your wholesale account is approved.</p>
+<a href="account.html" class="btn-b2b" style="display:inline-block;max-width:260px;margin-top:24px;text-decoration:none;text-align:center;">Go to My Account</a>
+</div>
+</div>
+
+<div class="links-bottom">
+<p>Already have a B2B account? <a href="account.html">Sign in</a></p>
+<p style="margin-top:6px;">Looking for regular registration? <a href="account.html">Register here</a></p>
+</div>
 </div>
 
 <script src="js/sfi-api.min.js?v=12" defer></script>
@@ -318,6 +319,13 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-<script src="js/brevo-integration.js" defer></script>
+<script src="js/brevo-integration.min.js" defer></script>
+<script>
+if('serviceWorker' in navigator){
+window.addEventListener('load',function(){
+navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
+});
+}
+</script>
 </body>
 </html>

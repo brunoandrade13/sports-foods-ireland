@@ -6,7 +6,9 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Product — B2B | Sports Foods Ireland</title>
 <link rel="icon" type="image/png" href="../img/favicon.png">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
+href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="../css/cart-modal.css?v=2">
 <style>
 :root{--g:#2D6A4F;--gd:#1B4332;--ga:#40916C;--bg:#f8faf9;--sf:#fff;--bd:#e2e8f0;--tx:#1e293b;--mt:#636E72;--rd:10px}
@@ -14,7 +16,7 @@
 body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--tx)}
 a{color:var(--g);text-decoration:none}
 </style>
-<!-- Brevo Tracker -->
+
 <script>
   (function() {
     window.sib = { equeue: [], client_key: "jfcdi8jged7s2zao8cikjk5i" };
@@ -25,6 +27,8 @@ a{color:var(--g);text-decoration:none}
     s.parentNode.insertBefore(n, s);
   })();
 </script>
+<link rel="prefetch" href="cart.html">
+<link rel="prefetch" href="shop.html">
 </head>
 <body>
 <style>
@@ -95,71 +99,64 @@ a{color:var(--g);text-decoration:none}
 .loading .spinner{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--g);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
-<!-- Top Bar -->
+
 <div class="b2b-topbar">
-  <a href="portal.html">← Back to Portal</a>
-  <span class="logo">SFI <span style="color:#a7f3d0;font-weight:500">B2B</span></span>
-  <a href="portal.html" style="font-size:.8rem">🛒 <span id="cartCount">0</span></a>
+<a href="portal.html">← Back to Portal</a>
+<span class="logo">SFI <span style="color:#a7f3d0;font-weight:500">B2B</span></span>
+<a href="portal.html" style="font-size:.8rem">🛒 <span id="cartCount">0</span></a>
 </div>
 
-<!-- Breadcrumb -->
 <div class="bc">
-  <a href="portal.html">B2B Portal</a><span>/</span>
-  <a href="portal.html" id="bcBrand">Brand</a><span>/</span>
-  <span id="bcProduct">Product</span>
+<a href="portal.html">B2B Portal</a><span>/</span>
+<a href="portal.html" id="bcBrand">Brand</a><span>/</span>
+<span id="bcProduct">Product</span>
 </div>
 
-<!-- Loading -->
 <div class="loading" id="loadingState">
-  <div class="spinner"></div>
-  <p>Loading product details...</p>
+<div class="spinner"></div>
+<p>Loading product details...</p>
 </div>
 
-<!-- Product -->
 <div class="product-wrap" id="productWrap" style="display:none">
-  <div class="prod-img-box">
-    <span class="badge-b2b">B2B PRICE</span>
-    <img id="prodImg" src="../img/placeholder.webp" alt="" onerror="this.src='../img/placeholder.webp'">
-  </div>
-  <div class="prod-info">
-    <div class="brand" id="prodBrand"></div>
-    <h1 id="prodName">Loading...</h1>
-    <div class="sku" id="prodSku"></div>
-    <div class="stock-row">
-      <span id="prodStock"></span>
-      <span id="prodStockQty" style="color:var(--mt)"></span>
-    </div>
-    <!-- Price -->
-    <div class="price-box">
-      <div class="price-label">Your B2B Price</div>
-      <span class="price-b2b" id="prodPrice">€0.00</span>
-      <span class="price-rrp" id="prodRrp"></span>
-    </div>
-
-    <!-- Variants -->
-    <div id="prodVariants"></div>
-
-    <!-- Meta -->
-    <div class="meta-grid" id="prodMeta" style="display:none">
-      <div><strong>Category:</strong> <span id="metaCat"></span></div>
-      <div><strong>Subcategory:</strong> <span id="metaSub"></span></div>
-    </div>
-
-    <!-- Add to Cart -->
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
-      <input type="number" id="prodQty" value="1" min="1" max="99" style="width:64px;padding:12px;border:1px solid var(--bd);border-radius:var(--rd);font-size:1rem;text-align:center;font-family:inherit">
-      <button class="btn-cart" id="btnCart" onclick="addProductToCart()">🛒 Add to Cart</button>
-    </div>
-    <a class="btn-back" href="portal.html">← Continue shopping</a>
-
-    <!-- Description -->
-    <div class="details" id="prodDetails" style="display:none">
-      <h3>Product Description</h3>
-      <div class="details-content" id="prodDesc"></div>
-    </div>
-  </div>
+<div class="prod-img-box">
+<span class="badge-b2b">B2B PRICE</span>
+<img id="prodImg" src="../img/placeholder.webp" alt="" onerror="this.src='../img/placeholder.webp'">
 </div>
-<!-- Scripts -->
+<div class="prod-info">
+<div class="brand" id="prodBrand"></div>
+<h1 id="prodName">Loading...</h1>
+<div class="sku" id="prodSku"></div>
+<div class="stock-row">
+<span id="prodStock"></span>
+<span id="prodStockQty" style="color:var(--mt)"></span>
+</div>
+
+<div class="price-box">
+<div class="price-label">Your B2B Price</div>
+<span class="price-b2b" id="prodPrice">€0.00</span>
+<span class="price-rrp" id="prodRrp"></span>
+</div>
+
+<div id="prodVariants"></div>
+
+<div class="meta-grid" id="prodMeta" style="display:none">
+<div><strong>Category:</strong> <span id="metaCat"></span></div>
+<div><strong>Subcategory:</strong> <span id="metaSub"></span></div>
+</div>
+
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+<input type="number" id="prodQty" value="1" min="1" max="99" style="width:64px;padding:12px;border:1px solid var(--bd);border-radius:var(--rd);font-size:1rem;text-align:center;font-family:inherit">
+<button class="btn-cart" id="btnCart" onclick="addProductToCart()">🛒 Add to Cart</button>
+</div>
+<a class="btn-back" href="portal.html">← Continue shopping</a>
+
+<div class="details" id="prodDetails" style="display:none">
+<h3>Product Description</h3>
+<div class="details-content" id="prodDesc"></div>
+</div>
+</div>
+</div>
+
 <script src="../js/sfi-api.min.js?v=12" defer></script>
 <script src="../js/cart.min.js?v=4" defer></script>
 <script>
@@ -314,6 +311,13 @@ function addProductToCart() {
   }
 }
 </script>
-<script src="../js/brevo-integration.js" defer></script>
+<script src="../js/brevo-integration.min.js" defer></script>
+<script>
+if('serviceWorker' in navigator){
+window.addEventListener('load',function(){
+navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
+});
+}
+</script>
 </body>
 </html>

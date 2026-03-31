@@ -42,13 +42,28 @@ echo "  ✓ $(ls "$DEPLOY_DIR"/js/*.min.js | wc -l | tr -d ' ') JS min files + 2
 cp -r "$SITE_DIR/img" "$DEPLOY_DIR/img"
 echo "  ✓ img/ directory"
 
+# Remover PNGs que têm versão WebP (economiza ~58MB no servidor)
+echo "  🗜️  Removendo PNGs redundantes (já convertidos para WebP)..."
+removed=0
+for webp_file in "$DEPLOY_DIR/img/"*.webp; do
+    png_file="${webp_file%.webp}.png"
+    if [ -f "$png_file" ]; then
+        rm "$png_file"
+        removed=$((removed + 1))
+    fi
+done
+echo "  ✓ $removed PNGs redundantes removidos do pacote de deploy"
+
 # Root files
 cp "$SITE_DIR/robots.txt" "$DEPLOY_DIR/"
 cp "$SITE_DIR/sitemap.xml" "$DEPLOY_DIR/"
+cp "$SITE_DIR/sitemap-images.xml" "$DEPLOY_DIR/"
+cp "$SITE_DIR/llms.txt" "$DEPLOY_DIR/"
+cp "$SITE_DIR/sw.js" "$DEPLOY_DIR/"
 cp "$SITE_DIR/favicon.ico" "$DEPLOY_DIR/"
 cp "$SITE_DIR/site.webmanifest" "$DEPLOY_DIR/"
 cp "$SITE_DIR/.htaccess" "$DEPLOY_DIR/"
-echo "  ✓ robots.txt, sitemap.xml, favicon.ico, site.webmanifest, .htaccess"
+echo "  ✓ robots.txt, sitemap.xml, sitemap-images.xml, llms.txt, sw.js, favicon.ico, site.webmanifest, .htaccess"
 
 # B2B portal
 cp -r "$SITE_DIR/b2b" "$DEPLOY_DIR/b2b"

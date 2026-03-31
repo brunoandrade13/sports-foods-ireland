@@ -77,3 +77,7 @@ supabase/.temp/
 auditoria_custos.html
 relatorio_investimento_marketing.html
 relatorio_roi_consolidado.html
+
+# === Ficheiros sensíveis a excluir do deploy ===
+deploy.sh
+.env.example
