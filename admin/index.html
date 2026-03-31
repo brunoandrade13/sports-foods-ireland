@@ -1038,7 +1038,7 @@
 
     .variant-row {
       display: grid;
-      grid-template-columns: 36px 100px 160px 100px 75px 75px 70px 55px 30px 30px;
+      grid-template-columns: 36px 100px 180px 100px 75px 75px 70px 55px 30px;
       gap: 6px;
       align-items: center;
       padding: 8px 0;
@@ -3664,7 +3664,6 @@
           <span>B2B €</span>
           <span>Cost €</span>
           <span>Stock</span>
-          <span>Def</span>
           <span></span>
         </div>
         <div id="variantRows"></div>
@@ -8053,7 +8052,6 @@
     <input type="number" id="vb2b-${idx}" step="0.01" min="0" placeholder="B2B" value="${existing?.wholesale_price || ''}">
     <input type="number" id="vcost-${idx}" step="0.01" min="0" placeholder="Cost" value="${existing?.cost_price || ''}">
     <input type="number" id="vstock-${idx}" min="0" placeholder="0" value="${existing?.stock || 0}">
-    <input type="radio" name="vdefault" class="variant-default-radio" id="vdef-${idx}" ${existing?.is_default ? 'checked' : ''}>
     <button class="remove-btn" onclick="removeVariantRow(${idx})">✕</button>`;
       } else {
         row.classList.add('parent-variant');
@@ -8064,7 +8062,6 @@
     <input type="number" id="vb2b-${idx}" step="0.01" min="0" placeholder="B2B" value="${existing?.wholesale_price || ''}">
     <input type="number" id="vcost-${idx}" step="0.01" min="0" placeholder="Cost" value="${existing?.cost_price || ''}">
     <input type="number" id="vstock-${idx}" min="0" placeholder="0" value="${existing?.stock || 0}">
-    <input type="radio" name="vdefault" class="variant-default-radio" id="vdef-${idx}" ${existing?.is_default ? 'checked' : ''}>
     <button class="remove-btn" style="font-size:0.7rem;color:var(--info);width:auto;padding:2px 6px" onclick="addChildVariant(${idx})" title="Add sub-variant (size/pack)">+Sub</button>
     <button class="remove-btn" onclick="removeVariantRow(${idx})">✕</button>`;
       }
@@ -8178,7 +8175,7 @@
           wholesale_price: parseFloat(document.getElementById(`vb2b-${idx}`)?.value) || null,
           cost_price: parseFloat(document.getElementById(`vcost-${idx}`)?.value) || null,
           stock_quantity: parseInt(document.getElementById(`vstock-${idx}`)?.value) || 0,
-          is_default: document.getElementById(`vdef-${idx}`)?.checked || false,
+          is_default: false,
           is_child: isChild,
           parent_row_idx: parentRowIdx,
           image_url: document.getElementById(`vimg-${idx}`)?.dataset?.url || null,
