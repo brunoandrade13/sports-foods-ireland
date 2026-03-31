@@ -183,6 +183,8 @@ function loadProfile() {
     document.getElementById('profFirstName').value = meta.first_name || '';
     document.getElementById('profLastName').value = meta.last_name || '';
     document.getElementById('profPhone').value = meta.phone || '';
+    const emailField = document.getElementById('profEmail');
+    if (emailField) emailField.value = user.email || '';
     loadOrders();
     loadAddresses();
 
@@ -271,23 +273,73 @@ async function loadOrders() {
             el.innerHTML = '<p class="empty-state">You haven\'t placed any orders yet. <a href="shop.html">Start shopping</a></p>';
             return;
         }
-        el.innerHTML = orders.map(o => `
-            <div class="order-card">
-                <div class="order-header">
-                    <span><strong>Order #${o.id?.slice(0,8)}</strong></span>
-                    <span>${new Date(o.created_at).toLocaleDateString('en-IE')}</span>
-                    <span class="order-status ${o.status || 'pending'}">${(o.status || 'pending').toUpperCase()}</span>
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center">
-                    <span>${o.order_items?.length || 0} item(s)</span>
-                    <strong>€${(o.total || 0).toFixed(2)}</strong>
-                </div>
-            </div>
-        `).join('');
+        el.innerHTML = orders.map(o => {
+            const orderNum = o.order_number || ('#' + (o.id?.slice(0,8) || ''));
+            const date = new Date(o.created_at).toLocaleDateString('en-IE', { day:'numeric', month:'short', year:'numeric' });
+            const status = o.status || o.financial_status || 'pending';
+            const statusColor = status === 'paid' || status === 'processing' ? '#169B62' : status === 'pending' ? '#d97706' : status === 'cancelled' ? '#dc2626' : '#636E72';
+            const items = o.order_items || [];
+            const fulfillment = o.fulfillment_status || 'unfulfilled';
+            const fulfillBadge = fulfillment === 'fulfilled' ? '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:600">DELIVERED</span>'
+                : fulfillment === 'partial' ? '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:600">PARTIAL</span>'
+                : '<span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:600">PROCESSING</span>';
+            const payBadge = '<span style="background:' + (status==='paid'?'#d1fae5;color:#065f46':'#fef3c7;color:#92400e') + ';padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:600">' + (o.financial_status||status).toUpperCase() + '</span>';
+
+            const itemsHtml = items.length ? items.map(it => {
+                const name = it.product_name || it.name || 'Product';
+                const qty = it.quantity || 1;
+                const price = Number(it.unit_price || it.price || 0).toFixed(2);
+                return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:0.85rem"><span style="color:#334155">' + name + ' <span style="color:#94a3b8">x' + qty + '</span></span><span style="font-weight:600;color:#1e293b">€' + price + '</span></div>';
+            }).join('') : '<div style="padding:8px 0;color:#94a3b8;font-size:0.85rem">Order details not available</div>';
+
+            const itemsData = JSON.stringify(items.map(it => ({
+                id: it.product_id, name: it.product_name || it.name, price: Number(it.unit_price || it.price || 0), qty: it.quantity || 1
+            }))).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+            return '<div class="order-card" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">' +
+                    '<div><span style="font-weight:700;color:#1e293b;font-size:1.05rem">' + orderNum + '</span><span style="color:#94a3b8;margin-left:10px;font-size:0.85rem">' + date + '</span></div>' +
+                    '<div style="display:flex;gap:6px">' + payBadge + fulfillBadge + '</div>' +
+                '</div>' +
+                '<div style="margin-bottom:12px">' + itemsHtml + '</div>' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:2px solid #f1f5f9">' +
+                    '<div><span style="color:#64748b;font-size:0.85rem">Payment: </span><span style="color:#334155;font-size:0.85rem;font-weight:500">' + (o.payment_method || '—') + '</span></div>' +
+                    '<div style="display:flex;align-items:center;gap:12px"><span style="font-weight:700;font-size:1.1rem;color:#169B62">€' + (Number(o.total)||0).toFixed(2) + '</span>' +
+                    '<button onclick="reorderItems(\''+itemsData+'\')" style="background:#FF883E;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer">🔄 Reorder</button></div>' +
+                '</div>' +
+            '</div>';
+        }).join('');
     } catch (err) {
+        console.error('loadOrders:', err);
         el.innerHTML = '<p class="empty-state">Unable to load orders.</p>';
     }
 }
+
+// ---- REORDER ----
+window.reorderItems = function(itemsJson) {
+    try {
+        const items = JSON.parse(itemsJson.replace(/&quot;/g, '"'));
+        if (!items || !items.length) { alert('No items to reorder'); return; }
+        const cart = JSON.parse(localStorage.getItem('sfi_cart') || '[]');
+        let added = 0;
+        items.forEach(item => {
+            if (!item.name) return;
+            const existing = cart.find(c => c.nome === item.name);
+            if (existing) {
+                existing.quantidade = (existing.quantidade || 1) + (item.qty || 1);
+            } else {
+                cart.push({ id: item.id, nome: item.name, preco: item.price || 0, quantidade: item.qty || 1, imagem: '' });
+            }
+            added++;
+        });
+        localStorage.setItem('sfi_cart', JSON.stringify(cart));
+        if (typeof window.updateCartCount === 'function') window.updateCartCount();
+        alert(added + ' item(s) added to your cart!');
+    } catch (e) {
+        console.error('Reorder error:', e);
+        alert('Could not reorder. Please try again.');
+    }
+};
 
 // ---- ADDRESSES ----
 async function loadAddresses() {
