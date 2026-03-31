@@ -214,7 +214,7 @@
             if (!addBtn) return;
             
             // Obter info do produto
-            const productName = document.querySelector('.produto-titulo, h1')?.textContent?.trim() || 'Produto';
+            const productName = document.querySelector('.produto-titulo, h1')?.textContent?.trim() || 'Product';
             const productPrice = document.querySelector('.produto-preco, .preco-atual')?.textContent?.trim() || '';
             const productImg = document.querySelector('.produto-imagem img')?.src || '';
             
@@ -501,7 +501,7 @@ function searchProducts(query, container) {
     } else {
         container.innerHTML = results.map(p => `
             <a href="produto.html?id=${p.id}" class="search-suggestion-item">
-                <img src="${p.imagem && /^https?:\/\//i.test(p.imagem) ? p.imagem : 'img/' + (p.imagem || 'produto1.jpg')}" alt="${p.nome}" class="search-suggestion-img" onerror="this.src='img/produto1.jpg'">
+                <img src="${p.imagem && /^https?:\/\//i.test(p.imagem) ? p.imagem : 'img/' + (p.imagem || 'product1.jpg')}" alt="${p.nome}" class="search-suggestion-img" onerror="this.src='img/produto1.jpg'">
                 <div class="search-suggestion-info">
                     <div class="search-suggestion-name">${p.nome}</div>
                     <div class="search-suggestion-price">€${p.preco.toFixed(2)}</div>
@@ -726,7 +726,7 @@ function initProductSchema() {
             addProductSchema({
                 nome: productName.textContent.trim(),
                 preco: price,
-                imagem: document.querySelector('.produto-imagem img')?.src?.split('/').pop() || 'produto1.jpg',
+                imagem: document.querySelector('.produto-imagem img')?.src?.split('/').pop() || 'product1.jpg',
                 stock: 10,
                 rating: 4.5
             });

@@ -1556,7 +1556,7 @@
 
           <!-- INVENTORY GROUP -->
           <div class="dash-group">
-            <div class="dash-group-title">📊 Inventário & Estoque</div>
+            <div class="dash-group-title">📊 Inventory & Stock</div>
             <div class="stats-grid">
               <div class="stat-card">
                 <div class="label">Stock Value</div>
@@ -1723,9 +1723,9 @@
           </div>
         </div>
 
-        <!-- Group 3: Performance de Produtos -->
+        <!-- Group 3: Product Performance -->
         <div class="dash-group">
-          <div class="dash-group-title">🛍️ Performance de Produtos</div>
+          <div class="dash-group-title">🛍️ Product Performance</div>
           <div class="table-wrap">
             <div class="table-toolbar"><strong>✨ Most Viewed Products</strong></div>
             <table>
@@ -1783,23 +1783,23 @@
         <!-- Products Summary Header -->
         <div class="stats-grid" style="margin-bottom: 24px; display: grid; width: 100%;">
           <div class="stat-card">
-            <div class="label">Total de Produtos</div>
+            <div class="label">Total Products</div>
             <div class="value" id="prodTotalCount">0</div>
           </div>
           <div class="stat-card">
-            <div class="label">Valor em Estoque (Custo)</div>
+            <div class="label">Stock Value (Cost)</div>
             <div class="value" id="prodTotalStockValue">€0.00</div>
           </div>
           <div class="stat-card">
-            <div class="label">Estoque Baixo (&lt;10)</div>
+            <div class="label">Low Stock (&lt;10)</div>
             <div class="value" id="prodLowStock">0</div>
           </div>
           <div class="stat-card">
-            <div class="label">Sem Estoque</div>
+            <div class="label">Out of Stock</div>
             <div class="value" id="prodOutOfStock">0</div>
           </div>
           <div class="stat-card">
-            <div class="label">Preço Médio (Venda)</div>
+            <div class="label">Avg Sell Price</div>
             <div class="value" id="prodAvgPrice">€0.00</div>
           </div>
         </div>
@@ -1931,7 +1931,7 @@
             <div class="dash-group-title" style="margin-top:20px;margin-bottom:8px">👤 Top 15 clientes desta marca</div>
             <div style="overflow-x:auto;max-height:320px;overflow-y:auto">
               <table style="width:100%">
-                <thead><tr><th>#</th><th>Cliente</th><th>Email</th><th style="text-align:right">Unid.</th><th style="text-align:right">Receita</th></tr></thead>
+                <thead><tr><th>#</th><th>Customer</th><th>Email</th><th style="text-align:right">Units</th><th style="text-align:right">Revenue</th></tr></thead>
                 <tbody id="brandTopClientsBody"></tbody>
               </table>
             </div>
@@ -2883,7 +2883,7 @@
         <div class="page-header">
           <h1>Stock Management</h1>
           <div class="actions">
-            <button type="button" class="btn btn-outline" id="btnB2BReport" onclick="runB2BPriceReport()">📋 Relatório preços B2B (QB + WC)</button>
+            <button type="button" class="btn btn-outline" id="btnB2BReport" onclick="runB2BPriceReport()">📋 B2B Price Report (QB + WC)</button>
           </div>
         </div>
 
@@ -2902,11 +2902,11 @@
             <div class="value" id="stkTotalValue">—</div>
           </div>
           <div class="stat-card" style="border-left:3px solid #a78bfa">
-            <div class="label">Valor Estoque B2B</div>
+            <div class="label">B2B Stock Value</div>
             <div class="value" id="stkTotalValueB2B">—</div>
           </div>
           <div class="stat-card" style="border-left:3px solid #f59e0b">
-            <div class="label">Valor Estoque (Custo)</div>
+            <div class="label">Stock Value (Cost)</div>
             <div class="value" id="stkTotalValueCost">—</div>
           </div>
           <div class="stat-card" style="border-left:3px solid var(--info)">
@@ -2940,11 +2940,11 @@
             <table>
               <thead>
                 <tr>
-                  <th>Produto</th>
+                  <th>Product</th>
                   <th>Brand</th>
                   <th style="text-align:right">Stock atual</th>
                   <th style="text-align:right">Vendido (90d)</th>
-                  <th style="text-align:right">Pedidos (90d)</th>
+                  <th style="text-align:right">Orders (90d)</th>
                   <th style="text-align:right">Cobertura (dias)</th>
                   <th style="text-align:right">Sugestão de reposição</th>
                 </tr>
@@ -2998,11 +2998,11 @@
           </table>
         </div>
 
-        <!-- Modal: Estoque por Categoria / Marca -->
+        <!-- Modal: Stock by Category / Brand -->
         <div class="modal-overlay" id="stockDetailModal" style="display:none">
           <div class="modal" style="max-width:900px;max-height:90vh;display:flex;flex-direction:column">
             <div class="modal-header">
-              <h3 id="stockDetailModalTitle">Estoque</h3>
+              <h3 id="stockDetailModalTitle">Stock</h3>
               <button class="modal-close" onclick="closeStockDetailModal()">✕</button>
             </div>
             <div class="modal-body" style="padding:16px;overflow:auto;flex:1">
@@ -3010,11 +3010,11 @@
               <table style="width:100%">
                 <thead>
                   <tr>
-                    <th>Produto</th>
+                    <th>Product</th>
                     <th>SKU</th>
-                    <th style="text-align:right">Preço</th>
+                    <th style="text-align:right">Price</th>
                     <th style="text-align:right">Stock</th>
-                    <th style="text-align:right">Valor</th>
+                    <th style="text-align:right">Value</th>
                     <th>Estado</th>
                   </tr>
                 </thead>
@@ -3024,29 +3024,29 @@
           </div>
         </div>
 
-        <!-- Modal: Produto — Estoque, fluxo de venda e últimas ordens -->
+        <!-- Modal: Product — Stock, Sales Flow & Recent Orders -->
         <div class="modal-overlay" id="productStockSalesModal" style="display:none">
           <div class="modal" style="max-width:880px;max-height:90vh;display:flex;flex-direction:column">
             <div class="modal-header">
-              <h3 id="productStockSalesModalTitle">Produto</h3>
+              <h3 id="productStockSalesModalTitle">Product</h3>
               <button class="modal-close" onclick="closeProductStockSalesModal()">✕</button>
             </div>
             <div class="modal-body" style="padding:16px;overflow:auto;flex:1">
-              <div class="dash-group-title" style="margin-bottom:8px">📦 Estoque</div>
+              <div class="dash-group-title" style="margin-bottom:8px">📦 Stock</div>
               <div id="productStockSalesKpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px"></div>
               <div class="dash-group-title" style="margin-bottom:8px">📈 Fluxo de venda</div>
               <div id="productStockSalesFlow" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:16px"></div>
               <div class="dash-group-title" style="margin-bottom:8px">🛒 Últimas ordens</div>
               <div style="overflow-x:auto;margin-bottom:16px">
                 <table style="width:100%">
-                  <thead><tr><th>Encomenda</th><th>Data</th><th style="text-align:right">Qtd</th><th style="text-align:right">Preço un.</th><th style="text-align:right">Total</th></tr></thead>
+                  <thead><tr><th>PO #</th><th>Date</th><th style="text-align:right">Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Total</th></tr></thead>
                   <tbody id="productStockSalesOrdersBody"></tbody>
                 </table>
               </div>
               <div class="dash-group-title" style="margin-bottom:8px">👤 Top 10 clientes deste produto</div>
               <div style="overflow-x:auto">
                 <table style="width:100%">
-                  <thead><tr><th>#</th><th>Cliente</th><th>Email</th><th style="text-align:right">Unid.</th><th style="text-align:right">Receita</th></tr></thead>
+                  <thead><tr><th>#</th><th>Customer</th><th>Email</th><th style="text-align:right">Units</th><th style="text-align:right">Revenue</th></tr></thead>
                   <tbody id="productTopClientsBody"></tbody>
                 </table>
               </div>
@@ -3117,11 +3117,11 @@
         </div>
       </div>
 
-      <!-- Modal: Produtos sem preço B2B -->
+      <!-- Modal: Products without B2B price -->
       <div class="modal-overlay" id="noB2BModal" style="display:none;z-index:200">
         <div class="modal" style="max-width:900px;width:95%">
           <div class="modal-header">
-            <h3>Produtos sem preço B2B (wholesale_price_eur)</h3>
+            <h3>Products without B2B Price (wholesale_price_eur)</h3>
             <button class="modal-close" onclick="closeNoB2BModal()">✕</button>
           </div>
           <div class="modal-body">
@@ -3132,7 +3132,7 @@
             <div style="max-height:60vh;overflow:auto">
               <table>
                 <thead>
-                  <tr><th>Nome</th><th>SKU</th><th>Marca</th><th>Categoria</th><th>Preço (EUR)</th><th>Ação</th></tr>
+                  <tr><th>Name</th><th>SKU</th><th>Brand</th><th>Category</th><th>Price (EUR)</th><th>Action</th></tr>
                 </thead>
                 <tbody id="noB2BTableBody"></tbody>
               </table>
@@ -3141,11 +3141,11 @@
         </div>
       </div>
 
-      <!-- Modal: Relatório B2B (QB + WC) -->
+      <!-- Modal: B2B Report (QB + WC) -->
       <div class="modal-overlay" id="b2bReportModal" style="display:none;z-index:210">
         <div class="modal" style="max-width:920px;width:95%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column">
           <div class="modal-header">
-            <h3>Relatório: preços B2B no QuickBooks e WooCommerce vs Supabase</h3>
+            <h3>B2B Price Report: QuickBooks & WooCommerce vs Supabase</h3>
             <button class="modal-close" onclick="closeB2BReportModal()">✕</button>
           </div>
           <div class="modal-body" id="b2bReportBody" style="overflow:auto;flex:1">
@@ -4062,7 +4062,7 @@
         <div
           style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 20px;">
           <div style="flex: 1; min-width: 200px;">
-            <p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Nome</p>
+            <p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Name</p>
             <strong id="cpName" style="font-size: 1.1rem;">Customer Name</strong>
             <div id="cpCompany" style="margin-top:4px;color:var(--text-muted);font-size:0.9rem;"></div>
             <div id="cpTypeBadge" style="margin-top:5px;"></div>
@@ -8489,7 +8489,7 @@
           let data;
           try { data = await resp.json(); } catch (_) { data = { success: false, error: resp.status + ' ' + resp.statusText + ' (resposta não JSON)' }; }
           if (!resp.ok) throw new Error(data.error || 'Erro ' + resp.status);
-          if (!data.success) throw new Error(data.error || 'Relatório falhou');
+          if (!data.success) throw new Error(data.error || 'Report failed');
           const r = data.report || {};
           const sup = r.supabase || {};
           const qb = r.quickbooks || {};
@@ -8501,14 +8501,14 @@
           html += '<div class="stat-card"><div class="label">Supabase: sem preço B2B</div><div class="value">' + (sup.without_wholesale != null ? sup.without_wholesale : '—') + '</div></div>';
           html += '</div>';
 
-          html += '<h4 style="margin:16px 0 8px 0;color:var(--accent)">📋 Preços que aparecem no QuickBooks</h4>';
+          html += '<h4 style="margin:16px 0 8px 0;color:var(--accent)">📋 Prices listed in QuickBooks</h4>';
           if (qb.error) {
             html += '<p style="color:var(--danger)">Erro QB: ' + (qb.error || '') + '</p>';
           } else {
             let qbPrices = qb.prices_found || [];
             html += '<p>Total de itens lidos do QB: <strong>' + qbPrices.length + '</strong>. Itens com preço de venda &gt; 0: <strong>' + (qb.items_with_unit_price != null ? qb.items_with_unit_price : 0) + '</strong>.</p>';
             if (qbPrices.length > 0) {
-              html += '<div style="max-height:320px;overflow:auto;margin-top:8px;border:1px solid var(--border);border-radius:8px;padding:8px"><table style="width:100%;font-size:0.85rem"><thead><tr><th>ID</th><th>Nome</th><th>SKU</th><th>Preço (€)</th><th>Custo (€)</th></tr></thead><tbody>';
+              html += '<div style="max-height:320px;overflow:auto;margin-top:8px;border:1px solid var(--border);border-radius:8px;padding:8px"><table style="width:100%;font-size:0.85rem"><thead><tr><th>ID</th><th>Name</th><th>SKU</th><th>Price (€)</th><th>Cost (€)</th></tr></thead><tbody>';
               qbPrices.forEach(function(row) {
                 html += '<tr><td>' + esc(row.qb_id || '') + '</td><td>' + esc(row.qb_name || '—') + '</td><td>' + esc(row.qb_sku || '—') + '</td><td class="price">' + (row.unit_price != null && row.unit_price > 0 ? '€' + Number(row.unit_price).toFixed(2) : '—') + '</td><td class="price">' + (row.purchase_cost != null ? '€' + Number(row.purchase_cost).toFixed(2) : '—') + '</td></tr>';
               });
@@ -8526,7 +8526,7 @@
             }
           }
 
-          html += '<h4 style="margin:24px 0 8px 0;color:var(--accent)">🛒 Preços B2B que aparecem no WooCommerce</h4>';
+          html += '<h4 style="margin:24px 0 8px 0;color:var(--accent)">🛒 B2B Prices listed in WooCommerce</h4>';
           if (!wc.configured) {
             html += '<p style="color:var(--text-muted)">WooCommerce não configurado. Defina WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY e WOOCOMMERCE_CONSUMER_SECRET (ou WOO_URL, WOO_CK, WOO_CS) nas variáveis da Edge Function.</p>';
           } else if (wc.error) {
@@ -8535,7 +8535,7 @@
             let wcPrices = wc.prices_found || [];
             html += '<p>Total de produtos com preço wholesale na meta: <strong>' + wcPrices.length + '</strong>.</p>';
             if (wcPrices.length > 0) {
-              html += '<div style="max-height:320px;overflow:auto;margin-top:8px;border:1px solid var(--border);border-radius:8px;padding:8px"><table style="width:100%;font-size:0.85rem"><thead><tr><th>ID</th><th>Nome</th><th>SKU</th><th>Preço B2B (€)</th></tr></thead><tbody>';
+              html += '<div style="max-height:320px;overflow:auto;margin-top:8px;border:1px solid var(--border);border-radius:8px;padding:8px"><table style="width:100%;font-size:0.85rem"><thead><tr><th>ID</th><th>Name</th><th>SKU</th><th>B2B Price (€)</th></tr></thead><tbody>';
               wcPrices.forEach(function(row) {
                 html += '<tr><td>' + (row.woo_id || '') + '</td><td>' + esc(row.woo_name || '—') + '</td><td>' + esc(row.woo_sku || '—') + '</td><td class="price">€' + (row.wholesale_price != null ? Number(row.wholesale_price).toFixed(2) : '') + '</td></tr>';
               });
@@ -8557,7 +8557,7 @@
         } catch (e) {
           body.innerHTML = '<p style="color:var(--danger)">Erro: ' + (e && e.message ? e.message : String(e)) + '</p><p style="color:var(--text-muted);font-size:0.9rem">Confirme que a Edge Function b2b-price-report está publicada e que QuickBooks (qb_integration) está configurado.</p>';
         }
-        if (btn) { btn.disabled = false; btn.textContent = '📋 Relatório preços B2B (QB + WC)'; }
+        if (btn) { btn.disabled = false; btn.textContent = '📋 B2B Price Report (QB + WC)'; }
       };
       window.closeB2BReportModal = function closeB2BReportModal() {
         const modal = document.getElementById('b2bReportModal');
@@ -8687,14 +8687,14 @@
       const kpiEl = document.getElementById('stockDetailKpis');
       const tbody = document.getElementById('stockDetailTableBody');
       if (!titleEl || !kpiEl || !tbody) return;
-      titleEl.textContent = type === 'category' ? 'Estoque — ' + key : 'Estoque — ' + key;
+      titleEl.textContent = type === 'category' ? 'Stock — ' + key : 'Stock — ' + key;
       const products = data.products;
       const totalUnits = data.units || 0;
       const totalValue = data.value || 0;
       const totalValueB2B = products.reduce((s, p) => s + ((p.wholesale_price_eur != null && p.wholesale_price_eur > 0 ? p.wholesale_price_eur : p.price_eur || 0) * (p.stock_quantity || 0)), 0);
       const totalValueCost = products.reduce((s, p) => s + ((p.cost_price_eur || 0) * (p.stock_quantity || 0)), 0);
       kpiEl.innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Produtos</div><div class="value">${products.length}</div></div>
+        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Products</div><div class="value">${products.length}</div></div>
         <div class="stat-card"><div class="label">Unidades</div><div class="value">${totalUnits.toLocaleString()}</div></div>
         <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Valor (EUR)</div><div class="value">€${totalValue.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
         <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="label">Valor B2B</div><div class="value">€${totalValueB2B.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
@@ -8737,7 +8737,7 @@
       const topClientsBody = document.getElementById('productTopClientsBody');
       if (!titleEl || !kpiEl || !flowEl || !ordersBody) return;
 
-      titleEl.textContent = p.name || 'Produto';
+      titleEl.textContent = p.name || 'Product';
       const val = (p.price_eur || 0) * (p.stock_quantity || 0);
       const valB2B = (p.wholesale_price_eur != null && p.wholesale_price_eur > 0 ? p.wholesale_price_eur : p.price_eur || 0) * (p.stock_quantity || 0);
       const valCost = (p.cost_price_eur || 0) * (p.stock_quantity || 0);
@@ -8745,10 +8745,10 @@
       const statusLbl = p.stock_quantity <= 0 ? 'Sem stock' : p.stock_quantity < 10 ? 'Baixo' : 'Em stock';
       kpiEl.innerHTML = `
         <div class="stat-card"><div class="label">SKU</div><div class="value" style="font-size:0.85rem">${esc(p.sku || '—')}</div></div>
-        <div class="stat-card"><div class="label">Marca</div><div class="value" style="font-size:0.85rem">${esc(p.brands?.name || '—')}</div></div>
-        <div class="stat-card"><div class="label">Categoria</div><div class="value" style="font-size:0.85rem">${esc(p.categories?.name || '—')}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Preço (EUR)</div><div class="value">€${(p.price_eur || 0).toFixed(2)}</div></div>
-        <div class="stat-card"><div class="label">Preço B2B</div><div class="value">€${(p.wholesale_price_eur || p.price_eur || 0).toFixed(2)}</div></div>
+        <div class="stat-card"><div class="label">Brand</div><div class="value" style="font-size:0.85rem">${esc(p.brands?.name || '—')}</div></div>
+        <div class="stat-card"><div class="label">Category</div><div class="value" style="font-size:0.85rem">${esc(p.categories?.name || '—')}</div></div>
+        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Price (EUR)</div><div class="value">€${(p.price_eur || 0).toFixed(2)}</div></div>
+        <div class="stat-card"><div class="label">B2B Price</div><div class="value">€${(p.wholesale_price_eur || p.price_eur || 0).toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">Custo</div><div class="value">€${(p.cost_price_eur || 0).toFixed(2)}</div></div>
         <div class="stat-card" style="border-left:3px solid #4ade80"><div class="label">Stock</div><div class="value">${p.stock_quantity || 0}</div></div>
         <div class="stat-card"><div class="label">Valor estoque (venda)</div><div class="value">€${val.toFixed(2)}</div></div>
@@ -14148,7 +14148,7 @@
           <h4 style="margin:0 0 10px 0;color:var(--text-color)">👤 Top 20 clientes deste produto</h4>
           <div style="max-height:320px;overflow:auto">
             <table style="width:100%;font-size:0.9rem">
-              <thead><tr><th>#</th><th>Cliente</th><th>Email</th><th style="text-align:right">Unid.</th><th style="text-align:right">Receita</th><th></th></tr></thead>
+              <thead><tr><th>#</th><th>Customer</th><th>Email</th><th style="text-align:right">Units</th><th style="text-align:right">Revenue</th><th></th></tr></thead>
               <tbody id="reportDetailTopClientsBody"></tbody>
             </table>
           </div>
