@@ -7277,7 +7277,16 @@
       const stock = document.getElementById('productStockFilter').value;
       const status = document.getElementById('productStatusFilter').value;
       filteredProducts = allProducts.filter(p => {
-        if (search && !p.name.toLowerCase().includes(search) && !(p.sku || '').toLowerCase().includes(search)) return false;
+        if (search) {
+          const nameMatch = p.name.toLowerCase().includes(search);
+          const skuMatch = (p.sku || '').toLowerCase().includes(search);
+          if (!nameMatch && !skuMatch) {
+            // Also search variant SKUs and labels
+            const vars = productVariantsCache[p.id] || [];
+            const variantMatch = vars.some(v => (v.sku || '').toLowerCase().includes(search) || (v.label || '').toLowerCase().includes(search));
+            if (!variantMatch) return false;
+          }
+        }
         if (cat && p.categories?.name !== cat) return false;
         if (brand && p.brands?.name !== brand) return false;
         if (stock === 'in' && p.stock_quantity < 10) return false;
