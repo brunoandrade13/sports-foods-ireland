@@ -199,10 +199,9 @@ async function checkB2BStatus() {
         const applyLink = document.getElementById('b2bApplyLink');
 
         if (profile?.is_b2b && profile?.b2b_status === 'approved') {
-            // Show B2B portal buttons
-            if (accessBtn) accessBtn.style.display = 'block';
-            const shopBtn = document.getElementById('b2bShopBtn');
-            if (shopBtn) shopBtn.style.display = 'block';
+            // B2B approved: redirect directly to B2B portal
+            window.location.href = 'b2b/portal.html';
+            return;
         } else if (profile?.b2b_status === 'pending') {
             // Show pending badge
             if (pendingBadge) pendingBadge.style.display = 'block';
