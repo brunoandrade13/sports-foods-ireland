@@ -6123,10 +6123,11 @@ html {
    ============================================ */
 
 .account-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: var(--space-xl);
-    max-width: 900px;
+    max-width: 1000px;
     margin: var(--space-xxl) auto;
     padding: 0 var(--space-md);
 }
@@ -6136,6 +6137,9 @@ html {
     border-radius: 16px;
     padding: var(--space-xl);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    flex: 0 0 460px;
+    max-width: 460px;
+    width: 100%;
 }
 
 .account-card h2 {
