@@ -14179,7 +14179,23 @@
 
     async function loadReceivables() {
       try {
-        _recData = await supaGet('orders', '?select=order_number,customer_name,customer_email,total,financial_status,payment_method,order_source,created_at,payment_due_date,notes&financial_status=eq.pending&order=payment_due_date.asc.nullslast');
+        // Only show genuine accounts receivable (B2B invoices, Net 30, COD, Check)
+        // Exclude abandoned online payments (PayPal, Stripe, Google Pay, Credit Card)
+        const allPending = await supaGet('orders', '?select=order_number,customer_name,customer_email,total,financial_status,payment_method,order_source,created_at,payment_due_date,notes&financial_status=eq.pending&order=payment_due_date.asc.nullslast');
+        _recData = allPending.filter(o => {
+          const pm = (o.payment_method || '').toLowerCase();
+          const src = (o.order_source || '').toLowerCase();
+          // Include: QuickBooks invoices, B2B portal orders, Check payments, Account payments
+          if (src === 'quickbooks') return true;
+          if (src === 'b2b_portal') return true;
+          if (pm.includes('net 30') || pm.includes('invoice')) return true;
+          if (pm.includes('cash on delivery') || pm.includes('cod')) return true;
+          if (pm.includes('check') || pm.includes('cheque')) return true;
+          if (pm.includes('account')) return true;
+          if (pm.includes('bank transfer') || pm.includes('wire')) return true;
+          // Exclude: PayPal, Stripe, Google Pay, Apple Pay, Credit Card, Klarna
+          return false;
+        });
         renderReceivablesSummary();
         filterReceivables();
       } catch (e) { console.error('loadReceivables:', e); toast('Failed to load receivables', 'error'); }
