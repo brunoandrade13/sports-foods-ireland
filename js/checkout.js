@@ -236,6 +236,27 @@
                     <img src="img/payment-icons/card_paypal.svg" style="height:26px;" alt="PayPal" onerror="this.textContent='PayPal'">
                 </label>
                 ${klarnaHtml}
+                ${isB2B ? `
+                <div style="margin-top:8px;padding-top:12px;border-top:2px dashed #e2e8f0;">
+                    <div style="font-size:11px;font-weight:700;color:#2D6A4F;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">\u{1F3E2} B2B Payment Options</div>
+                </div>
+                <label class="ck-payment-option" style="display:flex;align-items:center;gap:14px;padding:16px 20px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;background:#fff;transition:all 0.2s;">
+                    <input type="radio" name="paymentMethod" value="net30" style="accent-color:#2563eb;width:18px;height:18px;">
+                    <div style="flex:1;">
+                        <div style="font-weight:600;font-size:14px;color:#1e293b;margin-bottom:4px;">\u{1F4C4} Net 30 \u2014 Invoice Payment</div>
+                        <div style="font-size:12px;color:#636E72;">Pay within 30 days from invoice date</div>
+                    </div>
+                    <span style="font-size:24px;">\u{1F4C4}</span>
+                </label>
+                <label class="ck-payment-option" style="display:flex;align-items:center;gap:14px;padding:16px 20px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;background:#fff;transition:all 0.2s;">
+                    <input type="radio" name="paymentMethod" value="cod" style="accent-color:#059669;width:18px;height:18px;">
+                    <div style="flex:1;">
+                        <div style="font-weight:600;font-size:14px;color:#1e293b;margin-bottom:4px;">\u{1F69A} Cash on Delivery</div>
+                        <div style="font-size:12px;color:#636E72;">Pay when your order is delivered</div>
+                    </div>
+                    <span style="font-size:24px;">\u{1F69A}</span>
+                </label>
+                ` : ''}
             </div>
             <div style="background:#f8f9fa;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;margin-bottom:20px;text-align:center;">
                 <span style="font-size:13px;color:#636E72;">🔒 Your payment is processed securely. We never store your card details.</span>
@@ -287,13 +308,13 @@
                 });
                 const opt = this.closest('.ck-payment-option');
                 opt.classList.add('active');
-                const colors = { stripe: '#2D6A4F', paypal: '#0070ba', klarna: '#FFB3C7' };
-                const bgs = { stripe: '#f0fdf4', paypal: '#f0f7ff', klarna: '#fff5f7' };
+                const colors = { stripe: '#2D6A4F', paypal: '#0070ba', klarna: '#FFB3C7', net30: '#2563eb', cod: '#059669' };
+                const bgs = { stripe: '#f0fdf4', paypal: '#f0f7ff', klarna: '#fff5f7', net30: '#eff6ff', cod: '#ecfdf5' };
                 opt.style.borderColor = colors[this.value] || '#2D6A4F';
                 opt.style.background = bgs[this.value] || '#f0fdf4';
                 const btn = document.querySelector('.ck-pay-btn');
                 if (btn) {
-                    const labels = { stripe: 'Proceed to Secure Payment', paypal: 'Proceed to PayPal', klarna: 'Proceed to Klarna' };
+                    const labels = { stripe: 'Proceed to Secure Payment', paypal: 'Proceed to PayPal', klarna: 'Proceed to Klarna', net30: 'Place Order (Net 30)', cod: 'Place Order (Cash on Delivery)' };
                     btn.textContent = (labels[this.value] || 'Pay') + ' (' + btn.textContent.split('(').pop();
                 }
             });
@@ -332,9 +353,16 @@
 
     async function placeOrder() {
         const btn = document.querySelector('.ck-pay-btn');
-        if (btn) { btn.textContent = 'Redirecting to payment...'; btn.disabled = true; }
-
         const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'stripe';
+
+        if (paymentMethod === 'net30' || paymentMethod === 'cod') {
+            if (btn) { btn.textContent = 'Placing order...'; btn.disabled = true; }
+            try { await placeB2BDirectOrder(paymentMethod); }
+            catch (err) { alert('Order failed: ' + err.message); if (btn) { btn.textContent = 'Retry'; btn.disabled = false; } }
+            return;
+        }
+
+        if (btn) { btn.textContent = 'Redirecting to payment...'; btn.disabled = true; }
         const cart = getCart();
         const currency = window.sfi?.currency || 'EUR';
 
@@ -470,6 +498,44 @@
                 window._sfiCustomerIsB2B = !!isB2B;
             }).catch(() => {});
         }
+    }
+
+    async function placeB2BDirectOrder(method) {
+        const SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
+        const cart = getCart();
+        const currency = window.sfi?.currency || 'EUR';
+        const items = cart.map(i => ({ id: i.id || i._id, name: i.nome, price: Number(i.preco), quantity: i.quantidade || 1 }));
+
+        const res = await fetch(SUPABASE_URL + '/functions/v1/create-b2b-order', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                items, email: checkoutData.contact.email, currency,
+                shippingAddress: checkoutData.shipping, contact: checkoutData.contact,
+                coupon: appliedCoupon || null, payment_method: method,
+            })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Order creation failed');
+
+        localStorage.removeItem('sfi_cart');
+        if (typeof window.updateCartCount === 'function') window.updateCartCount();
+
+        const methodLabel = data.payment_method || (method === 'net30' ? 'Net 30 (Invoice)' : 'Cash on Delivery');
+        const successMsg = method === 'net30'
+            ? '<p style="color:#2563eb;font-size:14px;margin-bottom:24px">An invoice will be sent to your email. Payment is due within 30 days.</p>'
+            : '<p style="color:#059669;font-size:14px;margin-bottom:24px">Payment will be collected upon delivery of your order.</p>';
+
+        document.getElementById('checkoutContainer').innerHTML =
+            '<div style="text-align:center;padding:60px 20px">' +
+            '<div style="font-size:64px;margin-bottom:20px">\u2705</div>' +
+            '<h2 style="color:#1e293b;margin-bottom:12px">Order Placed Successfully!</h2>' +
+            '<p style="color:#636E72;font-size:16px;margin-bottom:8px">Order <strong>' + data.order_number + '</strong></p>' +
+            '<p style="color:#636E72;font-size:14px;margin-bottom:24px">Payment Method: <strong>' + methodLabel + '</strong></p>' +
+            successMsg +
+            '<a href="shop.html" class="btn-account-primary" style="display:inline-block;text-decoration:none;margin-top:16px">Continue Shopping</a>' +
+            '</div>';
     }
 
     // Check if returning from Stripe before rendering checkout
