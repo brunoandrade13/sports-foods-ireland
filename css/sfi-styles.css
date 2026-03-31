@@ -6339,7 +6339,7 @@ html {
     display: inline-block;
     padding: 12px 32px;
     background: var(--color-text);
-    color: #fff;
+    color: #ffffff !important;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
@@ -6348,6 +6348,7 @@ html {
 
 .btn-guest:hover {
     background: #333;
+    color: #ffffff !important;
     transform: translateY(-2px);
 }
 
