@@ -45,6 +45,9 @@ function showLoginForms() {
 
 function showDashboard() {
     hide(loginCard); hide(registerCard); show(dashboard); hide(guestCard);
+    // Widen wrapper for dashboard layout
+    const wrapper = document.querySelector('.account-wrapper');
+    if (wrapper) { wrapper.style.maxWidth = '1200px'; wrapper.style.width = '100%'; wrapper.style.padding = '0 24px'; }
     loadProfile();
 }
 
@@ -187,6 +190,7 @@ function loadProfile() {
     if (emailField) emailField.value = user.email || '';
     loadOrders();
     loadAddresses();
+    loadOverview();
 
     // --- B2B status check ---
     checkB2BStatus();
@@ -264,6 +268,31 @@ document.getElementById('profileForm')?.addEventListener('submit', async functio
 });
 
 // ---- LOAD ORDERS ----
+async function loadOverview() {
+    try {
+        const orders = await sfi.orders.myOrders();
+        const count = orders?.length || 0;
+        const el = document.getElementById('overviewOrderCount');
+        if (el) el.textContent = count + ' orders';
+        
+        // Recent orders (last 3)
+        const recent = document.getElementById('overviewRecentOrders');
+        if (recent && orders && orders.length > 0) {
+            recent.innerHTML = orders.slice(0, 3).map(o => {
+                const num = o.order_number || '#' + (o.id?.slice(0,8) || '');
+                const date = new Date(o.created_at).toLocaleDateString('en-IE', {day:'numeric',month:'short'});
+                const status = o.financial_status || o.status || 'pending';
+                const color = status === 'paid' ? '#169B62' : '#d97706';
+                return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9">' +
+                    '<div><span style="font-weight:600;color:#1e293b">' + num + '</span><span style="color:#94a3b8;margin-left:8px;font-size:0.85rem">' + date + '</span></div>' +
+                    '<div style="display:flex;align-items:center;gap:12px"><span style="font-weight:600;color:#1e293b">€' + (Number(o.total)||0).toFixed(2) + '</span><span style="background:' + color + '20;color:' + color + ';padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:600">' + status.toUpperCase() + '</span></div></div>';
+            }).join('');
+        } else if (recent) {
+            recent.innerHTML = '<p style="color:#94a3b8;font-size:0.9rem">No orders yet. <a href="shop.html" style="color:#FF883E;font-weight:600">Start shopping →</a></p>';
+        }
+    } catch(e) { console.warn('loadOverview:', e); }
+}
+
 async function loadOrders() {
     const el = document.getElementById('ordersList');
     if (!el) return;
