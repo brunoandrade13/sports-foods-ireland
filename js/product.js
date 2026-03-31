@@ -86,7 +86,8 @@ async function loadProduct() {
             oldPrice: parseFloat(product.preco_antigo) || null,
             discount: product.desconto || 0,
             inStock: product.em_stock !== false,
-            stockQty: calculateTotalStock(product)
+            stockQty: calculateTotalStock(product),
+            backorderAvailable: product.backorder_available || false
         };
         window.currentProduct = currentProduct; // Expose for reviews.js
 
@@ -336,7 +337,7 @@ function renderProduct() {
                 </tr>
                 <tr>
                     <td>Stock</td>
-                    <td>${currentProduct.stockQty != null ? (currentProduct.stockQty > 0 ? '<span style="color:#2D6A4F;font-weight:600">In Stock</span>' : '<span style="color:#d97706;font-weight:600">📋 Backorder Available</span>') : (currentProduct.inStock ? 'In Stock' : '<span style="color:#d97706;font-weight:600">📋 Backorder Available</span>')}</td>
+                    <td>${currentProduct.stockQty != null ? (currentProduct.stockQty > 0 ? '<span style="color:#2D6A4F;font-weight:600">In Stock</span>' : (currentProduct.backorderAvailable ? '<span style="color:#d97706;font-weight:600">📋 Backorder Available</span>' : '<span style="color:#ef4444;font-weight:600">Out of Stock</span>')) : (currentProduct.inStock ? 'In Stock' : (currentProduct.backorderAvailable ? '<span style="color:#d97706;font-weight:600">📋 Backorder Available</span>' : '<span style="color:#ef4444;font-weight:600">Out of Stock</span>'))}</td>
                 </tr>
             </table>
         `;
@@ -784,6 +785,7 @@ function renderSimpleVariants(container, variants, product) {
     container.innerHTML = variants.map((group, gi) => {
         const optionsHtml = group.options.map(opt => {
             const outOfStock = opt.stock != null && opt.stock <= 0;
+            if (outOfStock && !currentProduct.backorderAvailable) return '';
             const priceAttr = opt.price ? `data-price="${opt.price}"` : '';
             const oldPriceAttr = opt.compare_at_price ? `data-old-price="${opt.compare_at_price}"` : '';
             const skuAttr = opt.sku ? `data-sku="${opt.sku}"` : '';
@@ -888,6 +890,8 @@ function renderCompoundVariants(container, variants, product) {
         const matchingOpts = allOptions.filter(o => o.level1 === val);
         const totalStock = matchingOpts.reduce((s, o) => s + (o.stock || 0), 0);
         const outOfStock = totalStock <= 0;
+        // For parent level1: hide if ALL children out of stock AND no backorder
+        if (outOfStock && !currentProduct.backorderAvailable) return '';
         return `<button type="button" class="variant-option${outOfStock ? ' backorder-variant' : ''}"
             data-level1="${val}" data-image-url="${(matchingOpts.find(o => o.image_url) || {}).image_url || ''}" ${outOfStock ? 'data-backorder="true"' : ''}>${val}${outOfStock ? ' (Backorder)' : ''}</button>`;
     }).join('');
@@ -939,6 +943,7 @@ function renderCompoundVariants(container, variants, product) {
 
             level2Opts.innerHTML = matching.map(opt => {
                 const outOfStock = opt.stock != null && opt.stock <= 0;
+                if (outOfStock && !currentProduct.backorderAvailable) return '';
                 const priceAttr = opt.price ? `data-price="${opt.price}"` : '';
                 const oldPriceAttr = opt.compare_at_price ? `data-old-price="${opt.compare_at_price}"` : '';
                 const imgAttr = opt.image_url ? `data-image-url="${opt.image_url}"` : '';

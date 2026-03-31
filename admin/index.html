@@ -3644,6 +3644,11 @@
               style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox"
                 id="editNew" style="width:18px;height:18px;accent-color:var(--info)"> New Product</label>
           </div>
+          <div class="form-group" style="margin-bottom:0"><label
+              style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox"
+                id="editBackorder" style="width:18px;height:18px;accent-color:#f59e0b"> 📋 Backorder Available</label>
+            <div class="hint" style="margin-left:26px">If enabled, out-of-stock variants can still be ordered.</div>
+          </div>
         </div>
       </div>
       <!-- Variants -->
@@ -7461,6 +7466,7 @@
         document.getElementById('editActive').checked = product.is_active !== false;
         document.getElementById('editFeatured').checked = product.is_featured || false;
         document.getElementById('editNew').checked = product.is_new || false;
+        document.getElementById('editBackorder').checked = product.backorder_available || false;
 
         // Subcategory
         updateSubcategoryDropdown();
@@ -7531,6 +7537,7 @@
         document.getElementById('editActive').checked = true;
         document.getElementById('editFeatured').checked = true;
         document.getElementById('editNew').checked = false;
+        document.getElementById('editBackorder').checked = false;
         document.getElementById('editStock').value = 0;
         document.getElementById('editDiscount').value = 0;
         // Reset new fields
@@ -7928,6 +7935,7 @@
         is_active: document.getElementById('editActive').checked,
         is_featured: document.getElementById('editFeatured').checked,
         is_new: document.getElementById('editNew').checked,
+        backorder_available: document.getElementById('editBackorder').checked,
         in_stock: parseInt(document.getElementById('editStock').value) > 0
       };
       try {

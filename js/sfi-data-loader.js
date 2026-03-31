@@ -202,7 +202,8 @@
       _supabase_id: p.id,
       _slug: p.slug,
       _currency: CURRENCY,
-      _stock_qty: p.stock_quantity
+      _stock_qty: p.stock_quantity,
+      backorder_available: p.backorder_available || false
     };
   }
 
