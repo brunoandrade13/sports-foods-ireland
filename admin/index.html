@@ -14290,6 +14290,20 @@
       filterReceivables();
     }
 
+    async function openOrderFromList(orderNumber) {
+      // Try to find in allOrders first
+      let order = allOrders.find(o => o.order_number === orderNumber);
+      if (order) { openOrderModal(order.id); return; }
+      // Fetch from Supabase if not loaded
+      try {
+        const data = await supaGet('orders', '?order_number=eq.' + encodeURIComponent(orderNumber) + '&select=*&limit=1');
+        if (data && data.length) {
+          allOrders.push(data[0]);
+          openOrderModal(data[0].id);
+        } else { toast('Order not found', 'error'); }
+      } catch (e) { toast('Error loading order: ' + e.message, 'error'); }
+    }
+
     async function markOrderPaid(orderNumber) {
       if (!confirm('Mark order ' + orderNumber + ' as PAID?')) return;
       try {
