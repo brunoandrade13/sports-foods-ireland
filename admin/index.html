@@ -8083,7 +8083,7 @@ Loading items...
       const typeOpts = variantTypes.map(vt => `<option value="${vt.id}" ${vt.id === vtId ? 'selected' : ''}>${vt.name}</option>`).join('');
 
       if (isChild) {
-        row.innerHTML = `<button type="button" class="variant-img-btn child-img-btn" id="vimg-${idx}" data-url="${existing?.image_url || ''}" onclick="openVariantImagePicker(${idx})" title="Set image">${existing?.image_url ? '<img src=\"'+existing.image_url+'\">' : '<span class=\"placeholder\">↳</span>'}</button>
+        row.innerHTML = `<button type="button" class="variant-img-btn child-img-btn" id="vimg-${idx}" data-url="${existing?.image_url || ''}" title="Set image">${existing?.image_url ? '<img src=\"'+existing.image_url+'\">' : '<span class=\"placeholder\">↳</span>'}</button>
     <select id="vtype-${idx}">${typeOpts}</select>
     <input type="text" id="vval-${idx}" placeholder="e.g. 30 Serv Bag..." value="${esc(label)}">
     <input type="text" id="vsku-${idx}" placeholder="SKU" value="${esc(existingSku || '')}">
@@ -8095,7 +8095,7 @@ Loading items...
     <button class="remove-btn" onclick="removeVariantRow(${idx})">✕</button>`;
       } else {
         row.classList.add('parent-variant');
-        row.innerHTML = `<button type="button" class="variant-img-btn" id="vimg-${idx}" data-url="${existing?.image_url || ''}" onclick="openVariantImagePicker(${idx})" title="Set image">${existing?.image_url ? '<img src=\"'+existing.image_url+'\">' : '<span class=\"placeholder\">📷</span>'}</button><select id="vtype-${idx}">${typeOpts}</select>
+        row.innerHTML = `<button type="button" class="variant-img-btn" id="vimg-${idx}" data-url="${existing?.image_url || ''}" title="Set image">${existing?.image_url ? '<img src=\"'+existing.image_url+'\">' : '<span class=\"placeholder\">📷</span>'}</button><select id="vtype-${idx}">${typeOpts}</select>
     <input type="text" id="vval-${idx}" placeholder="e.g. Berry, Blue..." value="${esc(label)}">
     <input type="text" id="vsku-${idx}" placeholder="SKU" value="${esc(existingSku || '')}">
     <input type="number" id="vprice-${idx}" step="0.01" min="0" placeholder="€" value="${existing?.price || ''}">
@@ -8124,6 +8124,16 @@ Loading items...
         container.appendChild(row);
       }
       updateVariantCountLabel();
+
+      // Wire up img button via addEventListener (avoids inline onclick scope issues)
+      const imgBtn = document.getElementById('vimg-' + idx);
+      if (imgBtn) {
+        imgBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openVariantImagePicker(idx);
+        });
+      }
+
       return idx;
     }
 
