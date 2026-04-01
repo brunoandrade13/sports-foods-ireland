@@ -1038,15 +1038,16 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 
     .variant-row {
       display: grid;
-      grid-template-columns: 36px 100px 180px 100px 75px 75px 70px 55px 30px;
-      gap: 6px;
+      grid-template-columns: 32px 130px 1fr 80px 68px 68px 62px 52px 28px;
+      gap: 4px;
       align-items: center;
-      padding: 8px 0;
+      padding: 6px 0;
       border-bottom: 1px solid var(--border);
+      min-width: 0;
     }
     .variant-row.child-variant {
-      grid-template-columns: 36px 20px 120px 180px 120px 80px 36px 1px 36px;
-      padding-left: 10px;
+      grid-template-columns: 32px 16px 110px 1fr 80px 68px 68px 62px 28px;
+      padding-left: 8px;
       background: var(--surface-2);
       border-radius: 4px;
       margin: 2px 0;
@@ -1113,14 +1114,16 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 
     .variant-row input,
     .variant-row select {
-      padding: 7px 10px;
+      padding: 5px 6px;
       background: var(--surface-2);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       color: var(--text);
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       width: 100%;
+      min-width: 0;
       outline: none;
+      box-sizing: border-box;
     }
 
     .variant-row input:focus,
@@ -1131,14 +1134,15 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
     .variant-row .remove-btn {
       background: none;
       color: var(--text-dim);
-      font-size: 1.1rem;
-      padding: 4px;
+      font-size: 1rem;
+      padding: 3px;
       border-radius: var(--radius);
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     .variant-row .remove-btn:hover {
@@ -3667,15 +3671,16 @@ id="editBackorder" style="width:18px;height:18px;accent-color:#f59e0b"> 📋 Bac
 <div class="variants-section">
 <h4>Variants <span class="count" id="variantCountLabel">No variants</span></h4>
 <div class="variant-type-tabs" id="variantTypeTabs"></div>
+<div style="overflow-x:auto;">
 <div class="variant-row header">
 <span></span>
-<span>Type</span>
 <span>Value</span>
 <span>SKU</span>
 <span>Price €</span>
 <span>B2B €</span>
 <span>Cost €</span>
 <span>Stock</span>
+<span></span>
 <span></span>
 </div>
 <div id="variantRows"></div>
