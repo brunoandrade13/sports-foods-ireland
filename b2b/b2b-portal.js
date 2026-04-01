@@ -1404,7 +1404,7 @@ const B2B = (function() {
       var freqBadge = freq ? '<div style="font-size:0.6rem;color:#2D6A4F;font-weight:700;background:#f0fdf4;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;">🔁 Ordered ' + freq.orders + 'x</div>' : '';
       var isFav = favs.some(function(f) { return f.id === p.id; });
       var stockBadge = inStock ? '' : (backorderOk ? '<div style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;background:#fffbeb;color:#92400e;">📋 Backorder Available</div>' : '<div style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;background:#fee2e2;color:#991b1b;">Out of Stock</div>');
-      return '<div onclick="B2B.showProductModal(' + (p.id||0) + ')" style="background:#fff;border:1px solid ' + (freq ? '#86efac' : '#e2e8f0') + ';border-radius:10px;overflow:hidden;position:relative;cursor:pointer;transition:box-shadow 0.2s;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
+      return '<div onclick="B2B.showProductModal(\'' + (p.id||0) + '\')" style="background:#fff;border:1px solid ' + (freq ? '#86efac' : '#e2e8f0') + ';border-radius:10px;overflow:hidden;position:relative;cursor:pointer;transition:box-shadow 0.2s;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
         '<button onclick="event.stopPropagation();toggleFav(' + p.id + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\',\'' + (brand||'').replace(/'/g,"\\'") + '\',this)" style="position:absolute;top:8px;right:8px;background:#fff;border:1px solid #e2e8f0;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isFav ? '#f59e0b' : '#d1d5db') + ';z-index:2;">' + (isFav ? '★' : '☆') + '</button>' +
         '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#f8f9fa;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
         '<div style="padding:12px;flex:1;display:flex;flex-direction:column;">' +
@@ -1436,13 +1436,16 @@ const B2B = (function() {
 
     try {
       var cachedList = portalShopAll.length ? portalShopAll : inlineShopProducts;
-      var p = cachedList.find(function(x) { return x.id === legacyId || x._id === legacyId; });
+      var p = cachedList.find(function(x) { return x.id === legacyId || x.id == legacyId || x._id === legacyId; });
       var fullData = null;
       try {
         await sfi.auth.ensureAuth();
         var SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
         var SUPABASE_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
-        var _isUuid = typeof legacyId === 'string' && legacyId.includes('-');
+        // ID pode chegar como number (310), string numérica ('310') ou UUID ('6cac7ce6-...')
+        var _numericId = parseInt(legacyId);
+        var _isUuid = isNaN(_numericId) || String(_numericId) !== String(legacyId).trim();
+        if (!_isUuid) legacyId = _numericId; // normalizar para número
         var _productFilter = _isUuid ? 'id=eq.' + legacyId : 'legacy_id=eq.' + legacyId;
         var res = await fetch(SUPABASE_URL + '/rest/v1/products?' + _productFilter + '&select=*,brands(name),categories(name),subcategories(name)', {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
@@ -1811,7 +1814,7 @@ const B2B = (function() {
         var badgeColor = isLapsed ? '#fef3c7' : (p.sort_priority === 1 ? '#dbeafe' : '#f0fdf4');
         var badgeText = isLapsed ? '#92400e' : (p.sort_priority === 1 ? '#1e40af' : '#166534');
         var borderColor = isLapsed ? '#fde68a' : (p.sort_priority === 1 ? '#93c5fd' : '#e2e8f0');
-        html += '<div onclick="B2B.showProductModal(' + (p.legacy_id||0) + ')" style="background:#fff;border:1px solid ' + borderColor + ';border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
+        html += '<div onclick="B2B.showProductModal(\'' + (p.legacy_id||p.id||0) + '\')" style="background:#fff;border:1px solid ' + borderColor + ';border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
           '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#f8f9fa;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
           '<div style="padding:12px;">' +
           '<div style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;background:' + badgeColor + ';color:' + badgeText + ';">' + (p.reason||'') + '</div>' +
@@ -1912,7 +1915,7 @@ const B2B = (function() {
       var backorderOk = p.backorder_available === true;
       var freq = frequentMap[p.id];
       var freqBadge = freq ? '<div style="font-size:0.65rem;color:#2D6A4F;font-weight:700;background:#f0fdf4;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;">🔁 Ordered ' + freq.orders + 'x</div>' : '';
-      return '<div onclick="B2B.showProductModal(' + (p.id||0) + ')" style="background:#fff;border:1px solid ' + (freq ? '#86efac' : '#e2e8f0') + ';border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
+      return '<div onclick="B2B.showProductModal(\'' + (p.id||0) + '\')" style="background:#fff;border:1px solid ' + (freq ? '#86efac' : '#e2e8f0') + ';border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
         '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#f8f9fa;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
         '<div style="padding:12px;flex:1;display:flex;flex-direction:column;">' +
         freqBadge +
@@ -1952,7 +1955,7 @@ const B2B = (function() {
     grid.innerHTML = favs.map(function(p) {
       var img = p.image || '../img/placeholder.webp';
       if (img && !img.startsWith('http') && !img.startsWith('../')) img = '../' + img;
-      return '<div onclick="B2B.showProductModal(' + p.id + ')" style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;position:relative;cursor:pointer;transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
+      return '<div onclick="B2B.showProductModal(\'' + (p.id||0) + '\')" style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;position:relative;cursor:pointer;transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
         '<button onclick="event.stopPropagation();B2B.removeFavourite(' + p.id + ')" style="position:absolute;top:8px;right:8px;background:#fff;border:1px solid #e2e8f0;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;z-index:2;" title="Remove">✕</button>' +
         '<img src="' + img + '" alt="" style="width:100%;height:140px;object-fit:contain;background:#f8f9fa;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
         '<div style="padding:12px;">' +
@@ -1986,7 +1989,9 @@ const B2B = (function() {
     if (_b2bVarCache[lid] !== undefined) return _b2bVarCache[lid];
     try {
       var U = 'https://styynhgzrkyoioqjssuw.supabase.co', K = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
-      var _uuid = typeof lid === 'string' && lid.includes('-');
+      var _numLid = parseInt(lid);
+      var _uuid = isNaN(_numLid) || String(_numLid) !== String(lid).trim();
+      if (!_uuid) lid = _numLid;
       var _filt = _uuid ? 'id=eq.' + lid : 'legacy_id=eq.' + lid;
       var r = await fetch(U + '/rest/v1/products?' + _filt + '&select=id,product_variants(id,sku,label,price,wholesale_price,cost_price,compare_at_price,stock,is_default,sort_order,image_url,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: { 'apikey': K, 'Authorization': 'Bearer ' + K } });
       var a = await r.json(), pv = (a && a[0] && a[0].product_variants) || [];
