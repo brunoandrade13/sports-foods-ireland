@@ -1560,7 +1560,13 @@ const B2B = (function() {
             '<div id="pmSkuRow"' + (skuToShow ? '' : ' style="display:none"') + '><strong>SKU:</strong> <span id="pmSkuVal" style="font-family:\'JetBrains Mono\',monospace;">' + skuToShow + '</span></div>' +
             (cat ? '<div><strong>Category:</strong> ' + cat + '</div>' : '') +
             (subcat ? '<div><strong>Subcategory:</strong> ' + subcat + '</div>' : '') +
-            '<div id="pmStockRow"><strong>Stock:</strong> ' + (inStock ? '<span style="color:#166534;">\u2713 In Stock</span>' : (backorderOk ? '<span style="color:#d97706;">\ud83d\udccb Backorder Available</span>' : '<span style="color:#ef4444;">Out of Stock</span>')) + '</div>' +
+            '<div id="pmStockRow"><strong>Stock:</strong> ' + (function(){
+            if (!inStock) return backorderOk ? '<span style="color:#d97706;">\ud83d\udccb Backorder Available</span>' : '<span style="color:#ef4444;">Out of Stock</span>';
+            var totalVarStock = 0;
+            if (vGroups) vGroups.forEach(function(g){ (g.options||[]).forEach(function(o){ if(o.stock > 0) totalVarStock += o.stock; }); });
+            if (totalVarStock > 0 && totalVarStock <= 10) return '<span style="color:#d97706;">\u26a0\ufe0f Low Stock</span>';
+            return '<span style="color:#166534;">\u2713 In Stock</span>';
+          })() + '</div>' +
             (dietaryTags.length ? '<div style="grid-column:1/-1"><strong>Dietary:</strong> ' + dietaryTags.join(', ') + '</div>' : '') +
           '</div>' +
 
@@ -1704,7 +1710,10 @@ const B2B = (function() {
             var sr = document.getElementById('pmStockRow');
             if (sr && vs !== undefined && vs !== '') {
               var vsi = parseInt(vs);
-              if (!isNaN(vsi)) sr.innerHTML = '<strong>Stock:</strong> ' + (vsi > 0 ? '<span style="color:#166534;">\u2713 In Stock (' + vsi + ')</span>' : '<span style="color:#d97706;">\ud83d\udccb Backorder</span>');
+              if (!isNaN(vsi)) {
+                var stockLabel = vsi > 10 ? '<span style="color:#166534;">\u2713 In Stock</span>' : (vsi > 0 ? '<span style="color:#d97706;">⚠️ Low Stock</span>' : (backorderOk ? '<span style="color:#d97706;">\ud83d\udccb Backorder Available</span>' : '<span style="color:#ef4444;">Out of Stock</span>'));
+                sr.innerHTML = '<strong>Stock:</strong> ' + stockLabel;
+              }
             }
           });
         });
