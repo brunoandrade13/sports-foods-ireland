@@ -135,7 +135,10 @@ function createProductCardHTML(rawProd, opts = {}) {
                     ${oldPrice}
                     <span class="new-price">€${prod.price.toFixed(2)}</span>
                 </div>
-                <button class="btn-basket" data-product-id="${prodId}">ADD TO BASKET</button>
+                ${(prod.em_stock === false || prod.em_stock === 0)
+                    ? `<button class="btn-basket btn-out-of-stock" data-product-id="${prodId}" disabled style="background:#94a3b8;cursor:not-allowed;opacity:0.7;">Out of Stock</button>`
+                    : `<button class="btn-basket" data-product-id="${prodId}">ADD TO BASKET</button>`
+                }
             </article>`;
 }
 

@@ -546,7 +546,10 @@ function renderProducts() {
                     ${oldPrice}
                     <span class="new-price">€${product.price.toFixed(2)}</span>
                 </div>
-                <button class="btn-basket" data-product-id="${product.id}">ADD TO BASKET</button>
+                ${product.inStock === false
+                    ? `<button class="btn-basket btn-out-of-stock" data-product-id="${product.id}" disabled style="background:#94a3b8;cursor:not-allowed;opacity:0.7;">Out of Stock</button>`
+                    : `<button class="btn-basket" data-product-id="${product.id}">ADD TO BASKET</button>`
+                }
             </article>
         `;
     }).join('');
@@ -604,6 +607,15 @@ function renderProducts() {
             if (productId) {
                 // Buscar produto nos dados carregados do shop
                 const product = allProducts.find(p => p.id === productId || p.id == productId || p._supabase_id === rawId);
+                // Bloquear se produto sem stock
+                if (product && product.inStock === false) {
+                    btn.textContent = 'Out of Stock';
+                    btn.disabled = true;
+                    btn.style.background = '#94a3b8';
+                    btn.style.cursor = 'not-allowed';
+                    return;
+                }
+
                 if (product && typeof window.addToCart === 'function') {
                     const imagemProcessada = getShopProductImage(product.imagem, productId);
                     const shopProductData = { nome: product.nome, preco: product.preco || product.price, imagem: imagemProcessada };
