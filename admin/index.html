@@ -6827,7 +6827,7 @@ Loading items...
           supaGet('subcategories', '?select=*,categories(name)&order=name').catch(() => []),
           supaGet('discount_codes', '?order=created_at.desc'),
           supaGet('variant_types', '?order=sort_order').catch(() => []),
-          supaGet('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => []),
+          supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => []),
           supaGetAll('customers', '?parent_customer_id=is.null&order=created_at.desc').catch(() => []),
           supaGetAll('orders', '?order=created_at.desc').catch(() => [])
         ]);
@@ -6949,7 +6949,7 @@ Loading items...
     async function _refreshProducts() {
       const [prods, pv] = await Promise.all([
         supaGet('products', '?select=*,brands(name),categories(name)&is_active=eq.true&order=name'),
-        supaGet('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => [])
+        supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => [])
       ]);
       allProducts = (prods || []).filter(p => p.is_active !== false);
       filteredProducts = [...allProducts];
