@@ -312,11 +312,7 @@ function renderProduct() {
             addBtn.style.opacity = '0.7';
         }
         if (buyBtn) {
-            buyBtn.textContent = 'Out of Stock';
-            buyBtn.disabled = true;
-            buyBtn.style.background = '#94a3b8';
-            buyBtn.style.cursor = 'not-allowed';
-            buyBtn.style.opacity = '0.7';
+            buyBtn.style.display = 'none';
         }
         // Show out of stock message near quantity
         const qtyWrapper = document.querySelector('.quantity-wrapper, .product-quantity, #productQuantity');
