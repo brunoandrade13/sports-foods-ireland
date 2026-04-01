@@ -1436,13 +1436,15 @@ const B2B = (function() {
 
     try {
       var cachedList = portalShopAll.length ? portalShopAll : inlineShopProducts;
-      var p = cachedList.find(function(x) { return x.id === legacyId; });
+      var p = cachedList.find(function(x) { return x.id === legacyId || x._id === legacyId; });
       var fullData = null;
       try {
         await sfi.auth.ensureAuth();
         var SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
         var SUPABASE_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
-        var res = await fetch(SUPABASE_URL + '/rest/v1/products?legacy_id=eq.' + legacyId + '&select=*,brands(name),categories(name),subcategories(name)', {
+        var _isUuid = typeof legacyId === 'string' && legacyId.includes('-');
+        var _productFilter = _isUuid ? 'id=eq.' + legacyId : 'legacy_id=eq.' + legacyId;
+        var res = await fetch(SUPABASE_URL + '/rest/v1/products?' + _productFilter + '&select=*,brands(name),categories(name),subcategories(name)', {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
         });
         var arr = await res.json();
@@ -1984,7 +1986,9 @@ const B2B = (function() {
     if (_b2bVarCache[lid] !== undefined) return _b2bVarCache[lid];
     try {
       var U = 'https://styynhgzrkyoioqjssuw.supabase.co', K = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
-      var r = await fetch(U + '/rest/v1/products?legacy_id=eq.' + lid + '&select=id,product_variants(id,sku,label,price,wholesale_price,cost_price,compare_at_price,stock,is_default,sort_order,image_url,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: { 'apikey': K, 'Authorization': 'Bearer ' + K } });
+      var _uuid = typeof lid === 'string' && lid.includes('-');
+      var _filt = _uuid ? 'id=eq.' + lid : 'legacy_id=eq.' + lid;
+      var r = await fetch(U + '/rest/v1/products?' + _filt + '&select=id,product_variants(id,sku,label,price,wholesale_price,cost_price,compare_at_price,stock,is_default,sort_order,image_url,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: { 'apikey': K, 'Authorization': 'Bearer ' + K } });
       var a = await r.json(), pv = (a && a[0] && a[0].product_variants) || [];
       if (!pv.length) { _b2bVarCache[lid] = null; return null; }
       var g = {}; pv.forEach(function(v) { var t = v.variant_types || { name: 'Option', slug: 'option' }; var k = t.slug || 'option'; if (!g[k]) g[k] = { type: t.name, slug: k, options: [] }; g[k].options.push({ id: v.id, label: v.label, price: v.price, wholesale_price: v.wholesale_price, stock: v.stock, is_default: v.is_default, sku: v.sku, image_url: v.image_url || '' }); });
