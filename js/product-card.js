@@ -635,6 +635,14 @@ function showSupabaseVariantModal(product, onConfirm) {
     const imgSrc = getCardProductImage(product.imagem || product.image || '', product.id || 0);
     const variants = product.variantes;
     const currency = (window._sfiCurrency === 'GBP') ? '£' : '€';
+    const backorderAllowed = product.backorder_available === true || product.backorderAvailable === true;
+
+    // Se produto sem stock e sem backorder — não abrir modal
+    if (!backorderAllowed) {
+        const allOptions = (variants || []).flatMap(g => g.options || []);
+        const hasAvailable = allOptions.some(o => o.stock == null || o.stock > 0);
+        if (!hasAvailable) return; // Sem opções disponíveis — bloquear
+    }
 
     // Detect compound variants (labels with " / " and multiple distinct level1+level2)
     let isCompound = false;
@@ -720,6 +728,7 @@ function showSupabaseVariantModal(product, onConfirm) {
             const matching = allCompoundOpts.filter(o => o.l1 === selL1);
             level2Opts.innerHTML = matching.map(opt => {
                 const outOfStock = opt.stock != null && opt.stock <= 0;
+                if (outOfStock && !backorderAllowed) return '';
                 return `<button class="variant-option${outOfStock ? ' backorder-variant' : ''}" type="button"
                     data-variant-id="${opt.id}" data-label="${opt.label.replace(/"/g, '&quot;')}"
                     data-price="${opt.price || ''}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.l2}${outOfStock ? ' (Backorder)' : ''}</button>`;
@@ -745,6 +754,8 @@ function showSupabaseVariantModal(product, onConfirm) {
             const hidden = gi > 0 ? 'style="display:none"' : '';
             const optsHtml = group.options.map(opt => {
                 const outOfStock = opt.stock != null && opt.stock <= 0;
+                // Se sem stock E backorder não activo → não mostrar
+                if (outOfStock && !backorderAllowed) return '';
                 return `<button class="variant-option${outOfStock ? ' backorder-variant' : ''}" type="button"
                     data-variant-id="${opt.id}" data-label="${(opt.label || '').replace(/"/g, '&quot;')}"
                     data-price="${opt.price || ''}" data-group="${gi}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.label}${outOfStock ? ' (Backorder)' : ''}</button>`;
