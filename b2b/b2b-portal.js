@@ -2102,11 +2102,13 @@ const B2B = (function() {
       });
       var groups = typeOrder.map(function(k) { return g[k]; });
 
-      // Se exactamente 2 grupos (ex: Flavor + Pack), reconstruir compostos a partir da ordem no array
-      if (groups.length === 2) {
-        var primaryType = pv[0].variant_types ? (pv[0].variant_types.name || 'Option') : groups[0].type;
-        var secondaryType = groups.find(function(gr) { return gr.type !== primaryType; });
-        secondaryType = secondaryType ? secondaryType.type : groups[1].type;
+      // Detectar par primário+secundário para compostos
+      // Ignora grupos singleton (1 opção); aceita 2+ grupos reais
+      var realGroups = groups.filter(function(gr) { return gr.options.length > 1; });
+      if (realGroups.length >= 2) {
+        // Usar os 2 primeiros grupos reais como Flavor+Pack
+        var primaryType   = realGroups[0].type;
+        var secondaryType = realGroups[1].type;
         var compoundOpts = [], curPrimary = null;
         pv.forEach(function(v) {
           var vt = v.variant_types ? (v.variant_types.name || 'Option') : 'Option';
