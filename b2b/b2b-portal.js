@@ -1514,7 +1514,7 @@ const B2B = (function() {
             '<div id="pmSkuRow"' + (skuToShow ? '' : ' style="display:none"') + '><strong>SKU:</strong> <span id="pmSkuVal" style="font-family:\'JetBrains Mono\',monospace;">' + skuToShow + '</span></div>' +
             (cat ? '<div><strong>Category:</strong> ' + cat + '</div>' : '') +
             (subcat ? '<div><strong>Subcategory:</strong> ' + subcat + '</div>' : '') +
-            '<div id="pmStockRow"><strong>Stock:</strong> ' + (inStock ? '<span style="color:#166534;">\u2713 In Stock</span>' + (stockQty != null ? ' (' + stockQty + ')' : '') : '<span style="color:#d97706;">\ud83d\udccb Backorder Available</span>') + '</div>' +
+            '<div id="pmStockRow"><strong>Stock:</strong> ' + (inStock ? '<span style="color:#166534;">\u2713 In Stock</span>' + (stockQty != null ? ' (' + stockQty + ')' : '') : (backorderOk ? '<span style="color:#d97706;">\ud83d\udccb Backorder Available</span>' : '<span style="color:#ef4444;">Out of Stock</span>')) + '</div>' +
             (dietaryTags.length ? '<div style="grid-column:1/-1"><strong>Dietary:</strong> ' + dietaryTags.join(', ') + '</div>' : '') +
           '</div>' +
 
@@ -1530,7 +1530,7 @@ const B2B = (function() {
           '</div>' +
 
           '<div style="display:flex;gap:10px;margin-bottom:20px;">' +
-            '<button id="pmAddBtn" style="flex:1;padding:14px;background:' + (inStock ? '#2D6A4F' : (backorderOk ? '#92400e' : '#94a3b8')) + ';color:#fff;border:none;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:' + (!inStock && !backorderOk ? 'not-allowed' : 'pointer') + ';">' + (inStock ? '\ud83d\uded2 Add to Cart' : '\ud83d\udccb Backorder') + '</button>' +
+            '<button id="pmAddBtn" style="flex:1;padding:14px;background:' + (inStock ? '#2D6A4F' : (backorderOk ? '#92400e' : '#94a3b8')) + ';color:#fff;border:none;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:' + (!inStock && !backorderOk ? 'not-allowed' : 'pointer') + ';">' + (inStock ? '\ud83d\uded2 Add to Cart' : (backorderOk ? '\ud83d\udccb Backorder' : 'Out of Stock')) + '</button>' +
           '</div>' +
         '</div>' +
       '</div>' +
