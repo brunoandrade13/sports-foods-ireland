@@ -418,7 +418,7 @@
             }
 
             // Security: validate redirect URL before navigating
-            const allowedDomains = ['checkout.stripe.com', 'sportsfoodsireland.ie', 'www.sportsfoodsireland.ie'];
+            const allowedDomains = ['checkout.stripe.com', 'sportsfoodsireland.ie', 'www.sportsfoodsireland.ie', 'www.paypal.com', 'www.sandbox.paypal.com'];
             try {
                 const redirectUrl = new URL(data.url);
                 if (!allowedDomains.some(d => redirectUrl.hostname === d || redirectUrl.hostname.endsWith('.' + d))) {
@@ -440,30 +440,86 @@
         }
     }
 
+    // ---- Shared success screen ----
+    function showPaymentSuccess(provider, captureId) {
+        container.innerHTML = `
+        <div class="ck-confirmation">
+            <div class="ck-check">✓</div>
+            <h2>Payment Successful!</h2>
+            <p class="ck-order-id">Thank you for your order.</p>
+            <p>A confirmation email will be sent to you shortly. Your order is being processed.</p>
+            <div class="ck-confirm-details">
+                <div><strong>Payment via</strong><br>${provider}${captureId ? ' · ' + captureId : ''}</div>
+                <div><strong>What's next?</strong><br>You'll receive a shipping confirmation email within 1-2 business days.</div>
+                <div><strong>Questions?</strong><br>Contact us at <a href="mailto:info@sportsfoodsireland.ie">info@sportsfoodsireland.ie</a> or call +353 1 840 0403</div>
+            </div>
+            <a href="shop.html" class="btn-account-primary" style="display:inline-block;margin-top:24px;text-decoration:none">Continue Shopping</a>
+            <a href="account.html" class="btn-account-outline" style="display:inline-block;margin-top:12px;margin-left:8px;text-decoration:none">View Orders</a>
+        </div>`;
+    }
+
     // ---- Handle Payment return (Stripe + PayPal) ----
 
     function handleStripeReturn() {
         const params = new URLSearchParams(window.location.search);
 
         if (params.get('success') === 'true' || params.get('paypal_success') === 'true') {
+            const isPayPal = !!params.get('paypal_success');
+            const paypalToken = params.get('token'); // PayPal appends token=ORDER_ID
+
+            if (isPayPal && paypalToken) {
+                // Must capture PayPal payment before confirming
+                container.innerHTML = `
+                <div class="ck-confirmation" style="text-align:center;padding:60px 20px;">
+                    <div style="font-size:48px;margin-bottom:16px;">⏳</div>
+                    <h2>Processing your PayPal payment...</h2>
+                    <p>Please wait, do not close this page.</p>
+                </div>`;
+
+                const SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
+                const SUPABASE_ANON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
+
+                fetch(`${SUPABASE_URL}/functions/v1/paypal-capture`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: paypalToken })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'COMPLETED') {
+                        localStorage.setItem('cart', '[]');
+                        if (typeof updateCartCount === 'function') updateCartCount();
+                        showPaymentSuccess('PayPal', data.capture_id);
+                    } else {
+                        container.innerHTML = `
+                        <div class="ck-confirmation" style="text-align:center;padding:60px 20px;">
+                            <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+                            <h2>Payment could not be completed</h2>
+                            <p>PayPal returned an error. Your cart has been saved.</p>
+                            <p style="color:#ef4444;font-size:14px;margin-top:8px;">${data.error || 'Please try again or contact us.'}</p>
+                            <a href="checkout.html" class="btn-account-primary" style="display:inline-block;margin-top:24px;text-decoration:none">Try Again</a>
+                            <a href="mailto:info@sportsfoodsireland.ie" class="btn-account-outline" style="display:inline-block;margin-top:12px;margin-left:8px;text-decoration:none">Contact Support</a>
+                        </div>`;
+                    }
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                })
+                .catch(err => {
+                    console.error('[paypal-capture] Error:', err);
+                    container.innerHTML = `
+                    <div class="ck-confirmation" style="text-align:center;padding:60px 20px;">
+                        <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+                        <h2>Connection error</h2>
+                        <p>We couldn't confirm your payment. Please contact us with your PayPal confirmation.</p>
+                        <a href="mailto:info@sportsfoodsireland.ie" class="btn-account-primary" style="display:inline-block;margin-top:24px;text-decoration:none">Contact Support</a>
+                    </div>`;
+                });
+                return true;
+            }
+
+            // Stripe success (or PayPal without token — fallback)
             localStorage.setItem('cart', '[]');
             if (typeof updateCartCount === 'function') updateCartCount();
-
-            const provider = params.get('paypal_success') ? 'PayPal' : 'Stripe';
-            container.innerHTML = `
-            <div class="ck-confirmation">
-                <div class="ck-check">✓</div>
-                <h2>Payment Successful!</h2>
-                <p class="ck-order-id">Thank you for your order.</p>
-                <p>A confirmation email will be sent to you shortly. Your order is being processed.</p>
-                <div class="ck-confirm-details">
-                    <div><strong>Payment via</strong><br>${provider}</div>
-                    <div><strong>What's next?</strong><br>You'll receive a shipping confirmation email within 1-2 business days.</div>
-                    <div><strong>Questions?</strong><br>Contact us at <a href="mailto:info@sportsfoodsireland.ie">info@sportsfoodsireland.ie</a> or call +353 1 840 0403</div>
-                </div>
-                <a href="shop.html" class="btn-account-primary" style="display:inline-block;margin-top:24px;text-decoration:none">Continue Shopping</a>
-                <a href="account.html" class="btn-account-outline" style="display:inline-block;margin-top:12px;margin-left:8px;text-decoration:none">View Orders</a>
-            </div>`;
+            showPaymentSuccess(isPayPal ? 'PayPal' : 'Stripe');
             return true;
         }
 
