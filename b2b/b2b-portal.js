@@ -1560,13 +1560,7 @@ const B2B = (function() {
             '<div id="pmSkuRow"' + (skuToShow ? '' : ' style="display:none"') + '><strong>SKU:</strong> <span id="pmSkuVal" style="font-family:\'JetBrains Mono\',monospace;">' + skuToShow + '</span></div>' +
             (cat ? '<div><strong>Category:</strong> ' + cat + '</div>' : '') +
             (subcat ? '<div><strong>Subcategory:</strong> ' + subcat + '</div>' : '') +
-            '<div id="pmStockRow"><strong>Stock:</strong> ' + (function(){
-            if (!inStock) return backorderOk ? '<span style="color:#d97706;">\ud83d\udccb Backorder Available</span>' : '<span style="color:#ef4444;">Out of Stock</span>';
-            var totalVarStock = 0;
-            if (vGroups) vGroups.forEach(function(g){ (g.options||[]).forEach(function(o){ if(o.stock > 0) totalVarStock += o.stock; }); });
-            if (totalVarStock > 0 && totalVarStock <= 10) return '<span style="color:#d97706;">\u26a0\ufe0f Low Stock</span>';
-            return '<span style="color:#166534;">\u2713 In Stock</span>';
-          })() + '</div>' +
+            '<div id="pmStockRow"><strong>Stock:</strong> ' + (inStock ? '<span style="color:#166534;">\u2713 In Stock</span>' : (backorderOk ? '<span style="color:#d97706;">\ud83d\udccb Backorder Available</span>' : '<span style="color:#ef4444;">Out of Stock</span>')) + '</div>' +
             (dietaryTags.length ? '<div style="grid-column:1/-1"><strong>Dietary:</strong> ' + dietaryTags.join(', ') + '</div>' : '') +
           '</div>' +
 
@@ -1672,6 +1666,16 @@ const B2B = (function() {
           var skuR = document.getElementById('pmSkuRow');
           var skuV = document.getElementById('pmSkuVal');
           if (skuR && skuV && _pmSelVar.sku) { skuV.textContent = _pmSelVar.sku; skuR.style.display = ''; }
+          // Update pmStockRow with first variant's actual stock (consistent with click behaviour)
+          var vs0 = allBtns[0].dataset.stock;
+          var sr0 = document.getElementById('pmStockRow');
+          if (sr0 && vs0 !== undefined && vs0 !== '') {
+            var vsi0 = parseInt(vs0);
+            if (!isNaN(vsi0)) {
+              var lbl0 = vsi0 > 10 ? '<span style="color:#166534;">\u2713 In Stock</span>' : (vsi0 > 0 ? '<span style="color:#d97706;">\u26a0\ufe0f Low Stock</span>' : (backorderOk ? '<span style="color:#d97706;">\ud83d\udccb Backorder Available</span>' : '<span style="color:#ef4444;">Out of Stock</span>'));
+              sr0.innerHTML = '<strong>Stock:</strong> ' + lbl0;
+            }
+          }
         }
         allBtns.forEach(function(btn) {
           btn.addEventListener('click', function() {
