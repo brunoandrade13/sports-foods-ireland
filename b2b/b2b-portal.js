@@ -1406,7 +1406,7 @@ const B2B = (function() {
       var stockBadge = inStock ? '' : (backorderOk ? '<div style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;background:#fffbeb;color:#92400e;">📋 Backorder Available</div>' : '<div style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;background:#fee2e2;color:#991b1b;">Out of Stock</div>');
       return '<div onclick="B2B.showProductModal(\'' + (p.id||0) + '\')" style="background:#fff;border:1px solid ' + (freq ? '#86efac' : '#e2e8f0') + ';border-radius:10px;overflow:hidden;position:relative;cursor:pointer;transition:box-shadow 0.2s;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
         '<button onclick="event.stopPropagation();toggleFav(' + p.id + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\',\'' + (brand||'').replace(/'/g,"\\'") + '\',this)" style="position:absolute;top:8px;right:8px;background:#fff;border:1px solid #e2e8f0;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isFav ? '#f59e0b' : '#d1d5db') + ';z-index:2;">' + (isFav ? '★' : '☆') + '</button>' +
-        '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#f8f9fa;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
+        '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#ffffff;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
         '<div style="padding:12px;flex:1;display:flex;flex-direction:column;">' +
         freqBadge + stockBadge +
         '<div style="font-size:0.6rem;text-transform:uppercase;color:#94a3b8;">' + brand + '</div>' +
@@ -1545,7 +1545,7 @@ const B2B = (function() {
 
       body.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;">' +
         '<div>' +
-          '<img id="pmMainImg" src="' + img + '" alt="" style="width:100%;border-radius:10px;background:#f8f9fa;padding:16px;object-fit:contain;max-height:400px;transition:opacity 0.25s;" onerror="this.src=\'../img/placeholder.webp\'">' +
+          '<img id="pmMainImg" src="' + img + '" alt="" style="width:100%;border-radius:10px;background:#ffffff;padding:16px;object-fit:contain;max-height:400px;transition:opacity 0.25s;" onerror="this.src=\'../img/placeholder.webp\'">' +
         '</div>' +
         '<div>' +
           '<div style="font-size:0.75rem;text-transform:uppercase;color:#94a3b8;letter-spacing:0.5px;margin-bottom:4px;">' + brand + '</div>' +
@@ -1829,7 +1829,7 @@ const B2B = (function() {
         var badgeText = isLapsed ? '#92400e' : (p.sort_priority === 1 ? '#1e40af' : '#166534');
         var borderColor = isLapsed ? '#fde68a' : (p.sort_priority === 1 ? '#93c5fd' : '#e2e8f0');
         html += '<div onclick="B2B.showProductModal(\'' + (p.legacy_id||p.id||0) + '\')" style="background:#fff;border:1px solid ' + borderColor + ';border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
-          '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#f8f9fa;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
+          '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#ffffff;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
           '<div style="padding:12px;">' +
           '<div style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;background:' + badgeColor + ';color:' + badgeText + ';">' + (p.reason||'') + '</div>' +
           '<div style="font-size:0.65rem;text-transform:uppercase;color:#94a3b8;">' + (p.brand_name||'') + '</div>' +
@@ -1930,7 +1930,7 @@ const B2B = (function() {
       var freq = frequentMap[p.id];
       var freqBadge = freq ? '<div style="font-size:0.65rem;color:#2D6A4F;font-weight:700;background:#f0fdf4;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;">🔁 Ordered ' + freq.orders + 'x</div>' : '';
       return '<div onclick="B2B.showProductModal(\'' + (p.id||0) + '\')" style="background:#fff;border:1px solid ' + (freq ? '#86efac' : '#e2e8f0') + ';border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
-        '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#f8f9fa;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
+        '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#ffffff;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
         '<div style="padding:12px;flex:1;display:flex;flex-direction:column;">' +
         freqBadge +
         '<div style="font-size:0.65rem;text-transform:uppercase;color:#94a3b8;">' + brand + '</div>' +
@@ -1971,7 +1971,7 @@ const B2B = (function() {
       if (img && !img.startsWith('http') && !img.startsWith('../')) img = '../' + img;
       return '<div onclick="B2B.showProductModal(\'' + (p.id||0) + '\')" style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;position:relative;cursor:pointer;transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
         '<button onclick="event.stopPropagation();B2B.removeFavourite(' + p.id + ')" style="position:absolute;top:8px;right:8px;background:#fff;border:1px solid #e2e8f0;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;z-index:2;" title="Remove">✕</button>' +
-        '<img src="' + img + '" alt="" style="width:100%;height:140px;object-fit:contain;background:#f8f9fa;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
+        '<img src="' + img + '" alt="" style="width:100%;height:140px;object-fit:contain;background:#ffffff;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
         '<div style="padding:12px;">' +
         '<div style="font-size:0.7rem;text-transform:uppercase;color:#94a3b8;">' + (p.brand || '') + '</div>' +
         '<div style="font-weight:600;font-size:0.85rem;color:#1e293b;margin-bottom:6px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + (p.name || '') + '</div>' +
