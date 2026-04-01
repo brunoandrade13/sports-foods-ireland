@@ -3417,6 +3417,14 @@ Add Sub-Account</button>
 
 <div class="b2b-panel" id="tab-company">
 <h3 style="margin-bottom:20px;color:#1e293b;">Company Details</h3>
+
+<!-- Edit Profile Button -->
+<div style="margin-bottom:20px;">
+  <button onclick="B2B.openEditProfile()" style="display:inline-flex;align-items:center;gap:8px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#245a42'" onmouseout="this.style.background='#2D6A4F'">
+    ✏️ Edit Profile
+  </button>
+</div>
+
 <div class="info-grid">
 <div class="info-card">
 <h4>🏢 Company Information</h4>
@@ -3466,6 +3474,67 @@ id="infoCreditLimit">—</span></div>
 on file</div>
 </div>
 </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" onclick="if(event.target===this)B2B.closeEditProfile()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:12px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #e2e8f0;">
+      <h3 style="margin:0;color:#1e293b;font-size:1.1rem;">✏️ Edit Profile</h3>
+      <button onclick="B2B.closeEditProfile()" style="background:#f1f5f9;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#64748b;display:flex;align-items:center;justify-content:center;z-index:10;">×</button>
+    </div>
+    <div style="padding:24px;">
+      <div id="editProfileError" style="display:none;background:#fef2f2;color:#dc2626;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:0.9rem;"></div>
+      <div id="editProfileSuccess" style="display:none;background:#f0fdf4;color:#16a34a;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:0.9rem;"></div>
+
+      <!-- Name -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;">First Name</label>
+          <input id="epFirstName" type="text" placeholder="First name" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;color:#1e293b;background:#f8fafc;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#2D6A4F'" onblur="this.style.borderColor='#e2e8f0'">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;">Last Name</label>
+          <input id="epLastName" type="text" placeholder="Last name" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;color:#1e293b;background:#f8fafc;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#2D6A4F'" onblur="this.style.borderColor='#e2e8f0'">
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:0.8rem;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;">Phone</label>
+        <input id="epPhone" type="tel" placeholder="+353 1 234 5678" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;color:#1e293b;background:#f8fafc;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#2D6A4F'" onblur="this.style.borderColor='#e2e8f0'">
+      </div>
+
+      <!-- VAT Number -->
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:0.8rem;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;">VAT Number</label>
+        <input id="epVat" type="text" placeholder="IE1234567A" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;color:#1e293b;background:#f8fafc;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#2D6A4F'" onblur="this.style.borderColor='#e2e8f0'">
+      </div>
+
+      <!-- Address -->
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:0.8rem;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;">Address</label>
+        <input id="epAddress" type="text" placeholder="Street address" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;color:#1e293b;background:#f8fafc;box-sizing:border-box;outline:none;margin-bottom:8px;" onfocus="this.style.borderColor='#2D6A4F'" onblur="this.style.borderColor='#e2e8f0'">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;">City</label>
+          <input id="epCity" type="text" placeholder="City" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;color:#1e293b;background:#f8fafc;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#2D6A4F'" onblur="this.style.borderColor='#e2e8f0'">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;">Country</label>
+          <input id="epCountry" type="text" placeholder="Ireland" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;color:#1e293b;background:#f8fafc;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#2D6A4F'" onblur="this.style.borderColor='#e2e8f0'">
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="B2B.closeEditProfile()" style="flex:1;padding:12px;background:#f1f5f9;color:#374151;border:none;border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;">Cancel</button>
+        <button onclick="B2B.saveEditProfile()" id="epSaveBtn" style="flex:2;padding:12px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#245a42'" onmouseout="this.style.background='#2D6A4F'">Save Changes</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="b2b-panel" id="tab-discounts" style="display:none !important;">

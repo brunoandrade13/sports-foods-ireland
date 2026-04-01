@@ -879,7 +879,89 @@ const B2B = (function() {
     document.getElementById('infoLifetime').textContent = FMT(total);
 
     const addr = [p.address_1, p.address_2, p.city, p.state, p.postcode, p.country].filter(Boolean);
-    if (addr.length) document.getElementById('defaultAddress').innerHTML = addr.join('<br>');
+    if (addr.length) {
+      document.getElementById('defaultAddress').innerHTML = addr.join('<br>');
+    } else {
+      document.getElementById('defaultAddress').textContent = 'No address on file';
+    }
+  }
+
+  // ── Edit Profile ──
+  function openEditProfile() {
+    if (!profile) return;
+    const p = profile;
+    document.getElementById('epFirstName').value = p.first_name || '';
+    document.getElementById('epLastName').value = p.last_name || '';
+    document.getElementById('epPhone').value = p.phone || '';
+    document.getElementById('epVat').value = p.b2b_vat_number || p.vat_number || '';
+    document.getElementById('epAddress').value = p.address || p.address_1 || '';
+    document.getElementById('epCity').value = p.city || '';
+    document.getElementById('epCountry').value = p.country || '';
+    document.getElementById('editProfileError').style.display = 'none';
+    document.getElementById('editProfileSuccess').style.display = 'none';
+    const modal = document.getElementById('editProfileModal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEditProfile() {
+    document.getElementById('editProfileModal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  async function saveEditProfile() {
+    const btn = document.getElementById('epSaveBtn');
+    const errEl = document.getElementById('editProfileError');
+    const okEl = document.getElementById('editProfileSuccess');
+    errEl.style.display = 'none'; okEl.style.display = 'none';
+    btn.disabled = true; btn.textContent = 'Saving…';
+
+    const firstName = document.getElementById('epFirstName').value.trim();
+    const lastName  = document.getElementById('epLastName').value.trim();
+    const phone     = document.getElementById('epPhone').value.trim();
+    const vat       = document.getElementById('epVat').value.trim();
+    const address   = document.getElementById('epAddress').value.trim();
+    const city      = document.getElementById('epCity').value.trim();
+    const country   = document.getElementById('epCountry').value.trim();
+
+    if (!firstName && !lastName) {
+      errEl.textContent = 'Please enter at least a first or last name.';
+      errEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Save Changes'; return;
+    }
+    try {
+      await sfi.auth.ensureAuth();
+      const token = localStorage.getItem('sfi_token');
+      const res = await fetch('https://styynhgzrkyoioqjssuw.supabase.co/rest/v1/customers?id=eq.' + profile.id, {
+        method: 'PATCH',
+        headers: {
+          'apikey': 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH',
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          first_name: firstName || null,
+          last_name:  lastName  || null,
+          phone:      phone     || null,
+          b2b_vat_number: vat   || null,
+          address:    address   || null,
+          city:       city      || null,
+          country:    country   || null
+        })
+      });
+      if (!res.ok) throw new Error('Save failed (' + res.status + ')');
+      const updated = await res.json();
+      if (updated && updated[0]) { profile = Object.assign({}, profile, updated[0]); loadCompanyInfo(); }
+      okEl.textContent = '✓ Profile updated successfully!';
+      okEl.style.display = 'block';
+      setTimeout(() => closeEditProfile(), 1500);
+    } catch(e) {
+      errEl.textContent = 'Error: ' + (e.message || 'Please try again.');
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Save Changes';
+    }
   }
 
   // ── Tier System ──
@@ -2142,6 +2224,7 @@ const B2B = (function() {
     toggleRecommended, addRecToCart,
     loadPortalShop, filterPortalShop, searchPortalShop, updateSubcatFilter, addShopToCart,
     showProductModal, closeProductModal, b2bAddWithVariants,
+    openEditProfile, closeEditProfile, saveEditProfile,
     showFinTab, filterFinInvoices, clearFinInvoiceFilters, showFinInvoiceDetail, closeInvoiceModal, downloadInvoicePDF,
     showMktTab,
     showSupTab, submitTicket,
