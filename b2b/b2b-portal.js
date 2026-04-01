@@ -1996,8 +1996,40 @@ const B2B = (function() {
       var r = await fetch(U + '/rest/v1/products?' + _filt + '&select=id,product_variants(id,sku,label,price,wholesale_price,cost_price,compare_at_price,stock,is_default,sort_order,image_url,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: { 'apikey': K, 'Authorization': 'Bearer ' + K } });
       var a = await r.json(), pv = (a && a[0] && a[0].product_variants) || [];
       if (!pv.length) { _b2bVarCache[lid] = null; return null; }
-      var g = {}; pv.forEach(function(v) { var t = v.variant_types || { name: 'Option', slug: 'option' }; var k = t.slug || 'option'; if (!g[k]) g[k] = { type: t.name, slug: k, options: [] }; g[k].options.push({ id: v.id, label: v.label, price: v.price, wholesale_price: v.wholesale_price, stock: v.stock, is_default: v.is_default, sku: v.sku, image_url: v.image_url || '' }); });
-      var res = Object.values(g); _b2bVarCache[lid] = res; return res;
+      // Agrupar por tipo mantendo a ordem original
+      var g = {}, typeOrder = [];
+      pv.forEach(function(v) {
+        var t = v.variant_types || { name: 'Option', slug: 'option' };
+        var k = t.slug || 'option'; var tname = t.name || 'Option';
+        if (!g[k]) { g[k] = { type: tname, slug: k, options: [] }; typeOrder.push(k); }
+        g[k].options.push(v);
+      });
+      var groups = typeOrder.map(function(k) { return g[k]; });
+
+      // Se exactamente 2 grupos (ex: Flavor + Pack), reconstruir compostos a partir da ordem no array
+      if (groups.length === 2) {
+        var primaryType = pv[0].variant_types ? (pv[0].variant_types.name || 'Option') : groups[0].type;
+        var secondaryType = groups.find(function(gr) { return gr.type !== primaryType; });
+        secondaryType = secondaryType ? secondaryType.type : groups[1].type;
+        var compoundOpts = [], curPrimary = null;
+        pv.forEach(function(v) {
+          var vt = v.variant_types ? (v.variant_types.name || 'Option') : 'Option';
+          if (vt === primaryType) { curPrimary = v; }
+          else if (vt === secondaryType && curPrimary) {
+            compoundOpts.push(Object.assign({}, v, {
+              label: curPrimary.label + ' / ' + v.label,
+              l1: curPrimary.label, l2: v.label, _primaryStock: curPrimary.stock
+            }));
+          }
+        });
+        if (compoundOpts.length > 0) {
+          var compGroup = [{ type: primaryType, options: compoundOpts, _isCompound: true, _secondaryType: secondaryType }];
+          _b2bVarCache[lid] = compGroup; return compGroup;
+        }
+      }
+
+      var res = groups;
+      _b2bVarCache[lid] = res; return res;
     } catch (e) { _b2bVarCache[lid] = null; return null; }
   }
   function b2bShowVariantModal(pInfo, vGroups, onConfirm) {
