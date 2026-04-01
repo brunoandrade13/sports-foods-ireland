@@ -3640,7 +3640,7 @@ placeholder="Brief product summary"></div>
 
 <div
 style="display:flex; gap:20px; flex-wrap:wrap; margin-top:10px; background:var(--surface-2); padding:15px; border-radius:8px; border:1px solid var(--border)">
-<div class="form-group" style="margin-bottom:0"><label
+<div class="form-group" style="margin-bottom:0;display:none"><label
 style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox"
 id="editActive" checked style="width:18px;height:18px;accent-color:var(--accent)">
 Product Active</label>
@@ -3648,9 +3648,9 @@ Product Active</label>
 </div>
 <div class="form-group" style="margin-bottom:0"><label
 style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox"
-id="editFeatured" style="width:18px;height:18px;accent-color:var(--primary-color)">
-Available on Site</label>
-<div class="hint" style="margin-left:26px">Controls visibility on the online store.</div>
+id="editFeatured" style="width:18px;height:18px;accent-color:#ef4444">
+🚫 Disable / Hide from Store</label>
+<div class="hint" style="margin-left:26px">When checked, product is hidden from the shop and does not appear anywhere on the site.</div>
 </div>
 <div class="form-group" style="margin-bottom:0"><label
 style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox"
@@ -7495,7 +7495,8 @@ Loading items...
         initDescQuill();
         setDescQuill(product.description || '');
         document.getElementById('editActive').checked = product.is_active !== false;
-        document.getElementById('editFeatured').checked = product.is_featured || false;
+        // editFeatured = "Disable from Store" — checked means HIDDEN (is_active=false)
+        document.getElementById('editFeatured').checked = product.is_active === false;
         document.getElementById('editNew').checked = product.is_new || false;
         document.getElementById('editBackorder').checked = product.backorder_available || false;
 
@@ -7566,7 +7567,7 @@ Loading items...
         document.getElementById('editProductId').value = '';
         document.querySelectorAll('#productModal input:not([type=checkbox]):not([type=radio]), #productModal textarea').forEach(el => el.value = '');
         document.getElementById('editActive').checked = true;
-        document.getElementById('editFeatured').checked = true;
+        document.getElementById('editFeatured').checked = false; // new products visible by default
         document.getElementById('editNew').checked = false;
         document.getElementById('editBackorder').checked = false;
         document.getElementById('editStock').value = 0;
@@ -7960,9 +7961,9 @@ Loading items...
         meta_title: document.getElementById('editMetaTitle').value.trim() || null,
         meta_description: document.getElementById('editMetaDesc').value.trim() || null,
         seo_keywords: document.getElementById('editSeoKeywords').value.trim() ? document.getElementById('editSeoKeywords').value.split(',').map(s => s.trim()).filter(Boolean) : null,
-        // Status
-        is_active: document.getElementById('editActive').checked,
-        is_featured: document.getElementById('editFeatured').checked,
+        // Status — editFeatured = "Disable from Store": checked = hidden (is_active=false)
+        is_active: !document.getElementById('editFeatured').checked,
+        is_featured: false,
         is_new: document.getElementById('editNew').checked,
         backorder_available: document.getElementById('editBackorder').checked,
         in_stock: parseInt(document.getElementById('editStock').value) > 0
