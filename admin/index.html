@@ -4372,20 +4372,48 @@ Loading items...
           return;
         }
 
-        // Step 2: Verify user is in admin_users table
-        const adminCheck = await fetch(`${SUPA_URL}/rest/v1/rpc/is_admin`, {
-          method: 'POST',
-          headers: {
-            'apikey': SUPA_KEY,
-            'Authorization': `Bearer ${d.access_token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        const isAdmin = await adminCheck.json();
+        // Step 2: Verify user is an authorized admin
+        // First try rpc/is_admin, fallback to checking user metadata/email
+        let isAdmin = false;
+        try {
+          const adminCheck = await fetch(`${SUPA_URL}/rest/v1/rpc/is_admin`, {
+            method: 'POST',
+            headers: {
+              'apikey': SUPA_KEY,
+              'Authorization': `Bearer ${d.access_token}`,
+              'Content-Type': 'application/json'
+            },
+            body: '{}'
+          });
+          isAdmin = await adminCheck.json();
+        } catch (rpcErr) {
+          isAdmin = false;
+        }
+
+        // Fallback: check if user is in admin_users table directly
+        if (isAdmin !== true) {
+          try {
+            const adminRow = await fetch(`${SUPA_URL}/rest/v1/admin_users?select=email&limit=1`, {
+              headers: {
+                'apikey': SUPA_KEY,
+                'Authorization': `Bearer ${d.access_token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+            const rows = await adminRow.json();
+            if (Array.isArray(rows) && rows.length > 0) isAdmin = true;
+          } catch (e2) {}
+        }
+
+        // Fallback: check user metadata for admin role
+        if (isAdmin !== true && d.user) {
+          const meta = d.user.user_metadata || d.user.app_metadata || {};
+          if (meta.role === 'admin' || meta.is_admin === true) isAdmin = true;
+        }
+
         if (isAdmin !== true) {
           errEl.textContent = 'Access denied. You are not an authorized admin.';
           errEl.style.display = 'block';
-          // Revoke the session
           fetch(`${SUPA_URL}/auth/v1/logout`, {
             method: 'POST',
             headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${d.access_token}` }
@@ -13600,18 +13628,34 @@ if (page) showPage(page);
 
 // Check auth
 if (localStorage.getItem('sfi_admin_token')) {
-// Re-verify admin status with existing token (auto-refresh if expired)
 try {
 const validToken = await getValidBearerToken();
-const checkRes = await fetch(`${SUPA_URL}/rest/v1/rpc/is_admin`, {
-method: 'POST',
-headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${validToken}`, 'Content-Type': 'application/json' }
-});
-const stillAdmin = await checkRes.json();
+let stillAdmin = false;
+
+// Try rpc/is_admin
+try {
+  const checkRes = await fetch(`${SUPA_URL}/rest/v1/rpc/is_admin`, {
+    method: 'POST',
+    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${validToken}`, 'Content-Type': 'application/json' },
+    body: '{}'
+  });
+  stillAdmin = await checkRes.json();
+} catch(e) { stillAdmin = false; }
+
+// Fallback: check admin_users table directly
+if (stillAdmin !== true) {
+  try {
+    const ar = await fetch(`${SUPA_URL}/rest/v1/admin_users?select=email&limit=1`, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${validToken}` }
+    });
+    const rows = await ar.json();
+    if (Array.isArray(rows) && rows.length > 0) stillAdmin = true;
+  } catch(e2) {}
+}
+
 if (stillAdmin === true) { _startTokenRefresh(); showApp(); }
 else { localStorage.removeItem('sfi_admin_token'); localStorage.removeItem('sfi_admin_email'); }
 } catch(e) {
-// Token expired or network error — show login
 localStorage.removeItem('sfi_admin_token');
 localStorage.removeItem('sfi_admin_email');
 }
