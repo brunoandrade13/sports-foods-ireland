@@ -299,7 +299,35 @@ function renderProduct() {
     // ── Variants ──
     renderProductVariants(currentProduct);
 
-    // Description (in accordion) — supports HTML or plain text
+    // ── Stock / Out of Stock button state ──
+    const addBtn  = document.getElementById('addToCartBtn');
+    const buyBtn  = document.getElementById('buyNowBtn');
+    const isOutOfStock = !currentProduct.inStock && !currentProduct.backorderAvailable;
+    if (isOutOfStock) {
+        if (addBtn) {
+            addBtn.textContent = 'Out of Stock';
+            addBtn.disabled = true;
+            addBtn.style.background = '#94a3b8';
+            addBtn.style.cursor = 'not-allowed';
+            addBtn.style.opacity = '0.7';
+        }
+        if (buyBtn) {
+            buyBtn.textContent = 'Out of Stock';
+            buyBtn.disabled = true;
+            buyBtn.style.background = '#94a3b8';
+            buyBtn.style.cursor = 'not-allowed';
+            buyBtn.style.opacity = '0.7';
+        }
+        // Show out of stock message near quantity
+        const qtyWrapper = document.querySelector('.quantity-wrapper, .product-quantity, #productQuantity');
+        if (qtyWrapper && !document.getElementById('outOfStockMsg')) {
+            const msg = document.createElement('p');
+            msg.id = 'outOfStockMsg';
+            msg.style.cssText = 'color:#ef4444;font-weight:600;font-size:0.9rem;margin:8px 0;';
+            msg.textContent = '⚠️ This product is currently out of stock.';
+            qtyWrapper.parentNode.insertBefore(msg, qtyWrapper);
+        }
+    }
     const descriptionFull = document.getElementById('productDescriptionFull');
     if (descriptionFull) {
         const desc = currentProduct.descricao_detalhada || 'No description available.';
@@ -795,6 +823,18 @@ function productPageAddToCart(productId) {
                 }
             })
             .catch(error => console.error('Error fetching product data:', error));
+        return;
+    }
+
+    // Block if out of stock
+    if (!currentProduct.inStock && !currentProduct.backorderAvailable) {
+        const addBtn = document.getElementById('addToCartBtn');
+        if (addBtn) {
+            addBtn.textContent = 'Out of Stock';
+            addBtn.disabled = true;
+            addBtn.style.background = '#94a3b8';
+            addBtn.style.cursor = 'not-allowed';
+        }
         return;
     }
 
