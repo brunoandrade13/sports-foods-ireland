@@ -1526,7 +1526,7 @@ const B2B = (function() {
             }).map(function(o) {
               var oos = o.stock != null && o.stock <= 0;
               return '<button type="button" class="pm-var-btn' + (oos ? ' pm-var-backorder' : '') + '" ' +
-                'data-vid="' + o.id + '" data-lbl="' + (o.label||'') + '" data-pr="' + (o.price||'') + '" data-b2bpr="' + (o.wholesale_price||'') + '" data-sku="' + (o.sku||'') + '" data-imgurl="' + (o.image_url||'') + '" ' +
+                'data-vid="' + o.id + '" data-lbl="' + (o.label||'') + '" data-stock="' + (o.stock != null ? o.stock : '') + '" data-pr="' + (o.price||'') + '" data-b2bpr="' + (o.wholesale_price||'') + '" data-sku="' + (o.sku||'') + '" data-imgurl="' + (o.image_url||'') + '" ' +
                 'style="padding:8px 16px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;cursor:pointer;font-size:0.85rem;color:#1e293b;transition:all 0.15s;">' +
                 (o.label||'') + (oos ? (backorderOk ? ' (Backorder)' : '') : '') + '</button>';
             }).join('');
@@ -1606,6 +1606,7 @@ const B2B = (function() {
             if (oos && !backorderOk) return '';
             return '<button type="button" class="pm-var-btn pm-var-l2' + (oos ? ' pm-var-backorder' : '') + '" ' +
               'data-vid="' + o.id + '" data-lbl="' + o.label.replace(/"/g,'&quot;') + '" ' +
+              'data-stock="' + (o.stock != null ? o.stock : '') + '" ' +
               'data-pr="' + (o.price||'') + '" data-b2bpr="' + (o.wholesale_price||'') + '" ' +
               'data-sku="' + (o.sku||'') + '" data-imgurl="' + (o.image_url||'') + '" ' +
               'style="padding:8px 16px;border:2px solid ' + (oos ? '#fbbf24' : '#e0e0e0') + ';border-radius:8px;background:' + (oos ? '#fffbeb' : '#fff') + ';cursor:pointer;font-size:0.85rem;color:#1e293b;transition:all 0.15s;">' +
@@ -1701,9 +1702,9 @@ const B2B = (function() {
             // Update stock display
             var vs = this.dataset.stock;
             var sr = document.getElementById('pmStockRow');
-            if (sr && vs !== '') {
+            if (sr && vs !== undefined && vs !== '') {
               var vsi = parseInt(vs);
-              sr.innerHTML = '<strong>Stock:</strong> ' + (vsi > 0 ? '<span style="color:#166534;">\u2713 In Stock (' + vsi + ')</span>' : '<span style="color:#d97706;">\ud83d\udccb Backorder</span>');
+              if (!isNaN(vsi)) sr.innerHTML = '<strong>Stock:</strong> ' + (vsi > 0 ? '<span style="color:#166534;">\u2713 In Stock (' + vsi + ')</span>' : '<span style="color:#d97706;">\ud83d\udccb Backorder</span>');
             }
           });
         });
