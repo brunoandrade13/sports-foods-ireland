@@ -1474,22 +1474,63 @@ const B2B = (function() {
             var b2bStr = b2bPrice != null ? currency + Number(b2bPrice).toFixed(2) : 'N/A';
       var dietaryTags = fullData && fullData.dietary_tags ? fullData.dietary_tags : [];
 
-      // Build variant buttons HTML
+      // Build variant buttons HTML — suporte a compostos (Flavor / Pack)
       var variantsHtml = '';
       if (hasVariants) {
-        variantsHtml = vGroups.map(function(g) {
-          var optBtns = g.options.map(function(o) {
-            var oos = o.stock != null && o.stock <= 0;
-            return '<button type="button" class="pm-var-btn' + (oos ? ' pm-var-backorder' : '') + '" ' +
-              'data-vid="' + o.id + '" data-lbl="' + (o.label||'') + '" data-pr="' + (o.price||'') + '" data-b2bpr="' + (o.wholesale_price||'') + '" data-sku="' + (o.sku||'') + '" data-stock="' + (o.stock!=null?o.stock:'') + '" data-imgurl="' + (o.image_url||'') + '" ' +
-              'style="padding:8px 16px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;cursor:pointer;font-size:0.88rem;color:#333;transition:all .15s;user-select:none;' + (oos?'border-color:#fbbf24;color:#92400e;background:#fffbeb;':'') + '">' +
-              (o.label||'') + (oos ? (backorderOk ? ' (Backorder)' : '') : '') + '</button>';
+        // Detectar variantes compostas (label com " / ")
+        var allOpts = [];
+        vGroups.forEach(function(g) { g.options.forEach(function(o) { if (o.label) allOpts.push(o); }); });
+        var compoundOpts = allOpts.filter(function(o) { return o.label && o.label.includes(' / '); });
+        var isCompound = compoundOpts.length >= 2;
+
+        if (isCompound) {
+          // Cascata: Nível 1 = parte antes do " / ", Nível 2 = parte depois
+          var parts = compoundOpts.map(function(o) {
+            var sp = o.label.split(' / ');
+            return Object.assign({}, o, { l1: sp[0].trim(), l2: (sp[1] || '').trim() });
+          });
+          var type1 = vGroups[0] ? vGroups[0].type : 'Option';
+          // Inferir nome do nível 2
+          var t1low = type1.toLowerCase();
+          var type2 = t1low.includes('size') ? 'Color' : (t1low.includes('flavor') || t1low.includes('flavour') ? 'Pack' : 'Size');
+          var level1Values = [];
+          parts.forEach(function(o) { if (level1Values.indexOf(o.l1) < 0) level1Values.push(o.l1); });
+
+          var l1Html = level1Values.map(function(val) {
+            return '<button type="button" class="pm-var-btn pm-var-l1" data-l1="' + val.replace(/"/g,'&quot;') + '" ' +
+              'style="padding:8px 16px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;cursor:pointer;font-size:0.85rem;color:#1e293b;transition:all 0.15s;">' +
+              val + '</button>';
           }).join('');
-          return '<div style="margin-bottom:12px;">' +
-            '<div style="font-size:0.8rem;font-weight:600;color:#636E72;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">' + g.type + '</div>' +
-            '<div style="display:flex;flex-wrap:wrap;gap:8px;">' + optBtns + '</div>' +
+
+          variantsHtml =
+            '<div style="margin-bottom:12px;">' +
+              '<div style="font-size:0.8rem;font-weight:600;color:#636E72;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">' + type1 + '</div>' +
+              '<div style="display:flex;flex-wrap:wrap;gap:8px;" id="pmL1Wrap">' + l1Html + '</div>' +
+            '</div>' +
+            '<div style="margin-bottom:12px;display:none;" id="pmL2Wrap">' +
+              '<div style="font-size:0.8rem;font-weight:600;color:#636E72;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">' + type2 + '</div>' +
+              '<div style="display:flex;flex-wrap:wrap;gap:8px;" id="pmL2Opts"></div>' +
             '</div>';
-        }).join('');
+
+        } else {
+          // Variantes simples — render normal
+          variantsHtml = vGroups.map(function(g) {
+            var optBtns = g.options.filter(function(o) {
+              var oos = o.stock != null && o.stock <= 0;
+              return !oos || backorderOk;
+            }).map(function(o) {
+              var oos = o.stock != null && o.stock <= 0;
+              return '<button type="button" class="pm-var-btn' + (oos ? ' pm-var-backorder' : '') + '" ' +
+                'data-vid="' + o.id + '" data-lbl="' + (o.label||'') + '" data-pr="' + (o.price||'') + '" data-b2bpr="' + (o.wholesale_price||'') + '" data-sku="' + (o.sku||'') + '" data-imgurl="' + (o.image_url||'') + '" ' +
+                'style="padding:8px 16px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;cursor:pointer;font-size:0.85rem;color:#1e293b;transition:all 0.15s;">' +
+                (o.label||'') + (oos ? (backorderOk ? ' (Backorder)' : '') : '') + '</button>';
+            }).join('');
+            return '<div style="margin-bottom:12px;">' +
+              '<div style="font-size:0.8rem;font-weight:600;color:#636E72;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">' + g.type + '</div>' +
+              '<div style="display:flex;flex-wrap:wrap;gap:8px;">' + optBtns + '</div>' +
+              '</div>';
+          }).join('');
+        }
       }
 
       // SKU row in info box
@@ -1514,7 +1555,7 @@ const B2B = (function() {
             '<div id="pmSkuRow"' + (skuToShow ? '' : ' style="display:none"') + '><strong>SKU:</strong> <span id="pmSkuVal" style="font-family:\'JetBrains Mono\',monospace;">' + skuToShow + '</span></div>' +
             (cat ? '<div><strong>Category:</strong> ' + cat + '</div>' : '') +
             (subcat ? '<div><strong>Subcategory:</strong> ' + subcat + '</div>' : '') +
-            '<div id="pmStockRow"><strong>Stock:</strong> ' + (inStock ? '<span style="color:#166534;">\u2713 In Stock</span>' + (stockQty != null ? ' (' + stockQty + ')' : '') : (backorderOk ? '<span style="color:#d97706;">\ud83d\udccb Backorder Available</span>' : '<span style="color:#ef4444;">Out of Stock</span>')) + '</div>' +
+            '<div id="pmStockRow"><strong>Stock:</strong> ' + (inStock ? '<span style="color:#166534;">\u2713 In Stock</span>' : (backorderOk ? '<span style="color:#d97706;">\ud83d\udccb Backorder Available</span>' : '<span style="color:#ef4444;">Out of Stock</span>')) + '</div>' +
             (dietaryTags.length ? '<div style="grid-column:1/-1"><strong>Dietary:</strong> ' + dietaryTags.join(', ') + '</div>' : '') +
           '</div>' +
 
@@ -1540,8 +1581,70 @@ const B2B = (function() {
       var _pmSelVar = null;
       var _pmBasePrice = b2bPrice;
 
-      // Variant buttons
-      if (hasVariants) {
+      // Compound variant cascade logic (Flavor → Pack)
+      if (hasVariants && isCompound) {
+        var l1Wrap = body.querySelector('#pmL1Wrap');
+        var l2Wrap = body.querySelector('#pmL2Wrap');
+        var l2Opts = body.querySelector('#pmL2Opts');
+
+        function selectL1Btn(btn) {
+          l1Wrap.querySelectorAll('.pm-var-l1').forEach(function(b) {
+            b.style.borderColor = '#e0e0e0'; b.style.background = '#fff'; b.style.fontWeight = 'normal';
+          });
+          btn.style.borderColor = '#2D6A4F'; btn.style.background = '#e8f5ee'; btn.style.fontWeight = '600';
+        }
+
+        function renderL2(selectedL1) {
+          var matching = parts.filter(function(o) { return o.l1 === selectedL1; });
+          l2Opts.innerHTML = matching.map(function(o) {
+            var oos = o.stock != null && o.stock <= 0;
+            if (oos && !backorderOk) return '';
+            return '<button type="button" class="pm-var-btn pm-var-l2' + (oos ? ' pm-var-backorder' : '') + '" ' +
+              'data-vid="' + o.id + '" data-lbl="' + o.label.replace(/"/g,'&quot;') + '" ' +
+              'data-pr="' + (o.price||'') + '" data-b2bpr="' + (o.wholesale_price||'') + '" ' +
+              'data-sku="' + (o.sku||'') + '" data-imgurl="' + (o.image_url||'') + '" ' +
+              'style="padding:8px 16px;border:2px solid ' + (oos ? '#fbbf24' : '#e0e0e0') + ';border-radius:8px;background:' + (oos ? '#fffbeb' : '#fff') + ';cursor:pointer;font-size:0.85rem;color:#1e293b;transition:all 0.15s;">' +
+              o.l2 + (oos ? (backorderOk ? ' (Backorder)' : '') : '') + '</button>';
+          }).join('');
+          l2Wrap.style.display = '';
+          // Reset selection
+          _pmSelVar = null;
+          // Wire level2 click
+          l2Opts.querySelectorAll('.pm-var-btn').forEach(function(b2) {
+            b2.addEventListener('click', function() {
+              l2Opts.querySelectorAll('.pm-var-btn').forEach(function(b) {
+                var isBO = b.classList.contains('pm-var-backorder');
+                b.style.borderColor = isBO ? '#fbbf24' : '#e0e0e0';
+                b.style.background = isBO ? '#fffbeb' : '#fff'; b.style.fontWeight = 'normal';
+              });
+              this.style.borderColor = '#2D6A4F'; this.style.background = '#e8f5ee'; this.style.fontWeight = '600';
+              var vb2b = parseFloat(this.dataset.b2bpr); var vpr = parseFloat(this.dataset.pr);
+              var displayP = (vb2b > 0) ? vb2b : vpr;
+              _pmSelVar = { id: this.dataset.vid, label: this.dataset.lbl, price: displayP || b2bPrice, sku: this.dataset.sku };
+              var pe = document.getElementById('pmPrice');
+              if (pe && displayP) pe.textContent = currency + Number(displayP).toFixed(2);
+              var skuRow = document.getElementById('pmSkuRow'); var skuVal = document.getElementById('pmSkuVal');
+              if (skuRow && skuVal && _pmSelVar.sku) { skuVal.textContent = _pmSelVar.sku; skuRow.style.display = ''; }
+            });
+          });
+        }
+
+        // Wire level1 click
+        if (l1Wrap) {
+          l1Wrap.querySelectorAll('.pm-var-l1').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              selectL1Btn(this);
+              renderL2(this.dataset.l1);
+            });
+          });
+          // Auto-select first level1
+          var firstL1 = l1Wrap.querySelector('.pm-var-l1');
+          if (firstL1) { selectL1Btn(firstL1); renderL2(firstL1.dataset.l1); }
+        }
+      }
+
+      // Variant buttons (simple / non-compound)
+      if (hasVariants && !isCompound) {
         var allBtns = body.querySelectorAll('.pm-var-btn');
         // Auto-select first variant
         if (allBtns.length > 0) {
