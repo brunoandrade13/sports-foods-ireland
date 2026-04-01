@@ -85,7 +85,7 @@ async function loadProduct() {
             price: parseFloat(product.preco) || 0,
             oldPrice: parseFloat(product.preco_antigo) || null,
             discount: product.desconto || 0,
-            inStock: product.em_stock !== false,
+            inStock: product.em_stock === true,
             stockQty: calculateTotalStock(product),
             backorderAvailable: product.backorder_available || false
         };
@@ -118,7 +118,7 @@ function updateProductPageSEO(product) {
     const imgPath = product.imagem ? (product.imagem.startsWith('http') ? product.imagem : 'https://www.sportsfoodsireland.ie/' + product.imagem) : 'https://www.sportsfoodsireland.ie/img/og-home.jpg';
     const url = 'https://www.sportsfoodsireland.ie/produto.html?id=' + (product.id || '');
     const sku = product.sku || (product.id ? String(product.id) : '');
-    const inStock = product.em_stock !== false;
+    const inStock = product.em_stock === true;
     const rating = parseFloat(product.rating) || 4.8;
     const reviews = parseInt(product.reviews) || 1;
     const category = product.categoria || 'Sports Nutrition';

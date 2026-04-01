@@ -129,8 +129,7 @@ async function loadProducts() {
                     price: parseFloat(product.preco) || 0,
                     oldPrice: parseFloat(product.preco_antigo) || null,
                     discount: product.desconto || 0,
-                    inStock: product.em_stock !== false
-                };
+                    inStock: product.em_stock === true};
             });
             
             // Aplicar filtro de marca via URL (ex.: shop.html?brand=Clif)
@@ -203,7 +202,7 @@ async function loadProducts() {
                 price: parseFloat(product.preco) || 0,
                 oldPrice: parseFloat(product.preco_antigo) || null,
                 discount: product.desconto || 0,
-                inStock: product.em_stock !== false
+                inStock: product.em_stock === true
             };
         });
         
