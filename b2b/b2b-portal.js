@@ -1398,11 +1398,12 @@ const B2B = (function() {
       var img = rawImg ? (rawImg.startsWith('http') ? rawImg : '../' + rawImg) : '../img/placeholder.webp';
       var price = p.b2b_price != null ? currency + Number(p.b2b_price).toFixed(2) : 'N/A';
       var brand = p.brands?.name || p.marca || '';
-      var inStock = p.em_stock !== false;
+      var inStock = p.em_stock === true;
+      var backorderOk = p.backorder_available === true;
       var freq = frequentMap[p.id];
       var freqBadge = freq ? '<div style="font-size:0.6rem;color:#2D6A4F;font-weight:700;background:#f0fdf4;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;">🔁 Ordered ' + freq.orders + 'x</div>' : '';
       var isFav = favs.some(function(f) { return f.id === p.id; });
-      var stockBadge = inStock ? '' : '<div style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;background:#fffbeb;color:#92400e;">📋 Backorder Available</div>';
+      var stockBadge = inStock ? '' : (backorderOk ? '<div style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;background:#fffbeb;color:#92400e;">📋 Backorder Available</div>' : '<div style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;background:#fee2e2;color:#991b1b;">Out of Stock</div>');
       return '<div onclick="B2B.showProductModal(' + (p.id||0) + ')" style="background:#fff;border:1px solid ' + (freq ? '#86efac' : '#e2e8f0') + ';border-radius:10px;overflow:hidden;position:relative;cursor:pointer;transition:box-shadow 0.2s;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
         '<button onclick="event.stopPropagation();toggleFav(' + p.id + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\',\'' + (brand||'').replace(/'/g,"\\'") + '\',this)" style="position:absolute;top:8px;right:8px;background:#fff;border:1px solid #e2e8f0;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isFav ? '#f59e0b' : '#d1d5db') + ';z-index:2;">' + (isFav ? '★' : '☆') + '</button>' +
         '<img src="' + img + '" alt="" style="width:100%;height:130px;object-fit:contain;background:#f8f9fa;padding:8px;" onerror="this.src=\'../img/placeholder.webp\'">' +
@@ -1416,7 +1417,7 @@ const B2B = (function() {
         '</div>' +
         (inStock
           ? '<button onclick="event.stopPropagation();B2B.addShopToCart(' + (p.id||0) + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\')" style="width:100%;padding:8px;background:#2D6A4F;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer;">Add to Cart</button>'
-          : '<button onclick="event.stopPropagation();B2B.addShopToCart(' + (p.id||0) + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\')" style="width:100%;padding:8px;background:#92400e;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer;">📋 Backorder</button>'
+          : (backorderOk ? '<button onclick="event.stopPropagation();B2B.addShopToCart(' + (p.id||0) + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\')" style="width:100%;padding:8px;background:#92400e;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer;">📋 Backorder</button>' : '<button disabled style="width:100%;padding:8px;background:#94a3b8;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:not-allowed;opacity:0.7;">Out of Stock</button>')
         ) +
         '</div></div></div>';
     }).join('');
@@ -1461,7 +1462,8 @@ const B2B = (function() {
       var b2bPrice = (p && p.b2b_price != null) ? p.b2b_price : (fullData && fullData.wholesale_price_eur);
       var retailPrice = (p && p.retail_price) || (fullData && fullData.price_eur);
       var brand = (p && p.brands && p.brands.name) || (p && p.marca) || (fullData && fullData.brands && fullData.brands.name) || '';
-      var inStock = p ? p.em_stock !== false : (fullData ? fullData.in_stock !== false : true);
+      var inStock = p ? p.em_stock === true : (fullData ? fullData.in_stock === true : false);
+      var backorderOk = p ? p.backorder_available === true : (fullData ? fullData.backorder_available === true : false);
       var freq = frequentMap[legacyId];
       var desc = (fullData && fullData.description) || '';
       var shortDesc = (fullData && fullData.short_description) || '';
@@ -1481,7 +1483,7 @@ const B2B = (function() {
             return '<button type="button" class="pm-var-btn' + (oos ? ' pm-var-backorder' : '') + '" ' +
               'data-vid="' + o.id + '" data-lbl="' + (o.label||'') + '" data-pr="' + (o.price||'') + '" data-b2bpr="' + (o.wholesale_price||'') + '" data-sku="' + (o.sku||'') + '" data-stock="' + (o.stock!=null?o.stock:'') + '" data-imgurl="' + (o.image_url||'') + '" ' +
               'style="padding:8px 16px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;cursor:pointer;font-size:0.88rem;color:#333;transition:all .15s;user-select:none;' + (oos?'border-color:#fbbf24;color:#92400e;background:#fffbeb;':'') + '">' +
-              (o.label||'') + (oos ? ' (Backorder)' : '') + '</button>';
+              (o.label||'') + (oos ? (backorderOk ? ' (Backorder)' : '') : '') + '</button>';
           }).join('');
           return '<div style="margin-bottom:12px;">' +
             '<div style="font-size:0.8rem;font-weight:600;color:#636E72;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">' + g.type + '</div>' +
@@ -1528,7 +1530,7 @@ const B2B = (function() {
           '</div>' +
 
           '<div style="display:flex;gap:10px;margin-bottom:20px;">' +
-            '<button id="pmAddBtn" style="flex:1;padding:14px;background:' + (inStock ? '#2D6A4F' : '#92400e') + ';color:#fff;border:none;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:pointer;">' + (inStock ? '\ud83d\uded2 Add to Cart' : '\ud83d\udccb Backorder') + '</button>' +
+            '<button id="pmAddBtn" style="flex:1;padding:14px;background:' + (inStock ? '#2D6A4F' : (backorderOk ? '#92400e' : '#94a3b8')) + ';color:#fff;border:none;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:' + (!inStock && !backorderOk ? 'not-allowed' : 'pointer') + ';">' + (inStock ? '\ud83d\uded2 Add to Cart' : '\ud83d\udccb Backorder') + '</button>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -1801,7 +1803,8 @@ const B2B = (function() {
       var img = rawImg ? (rawImg.startsWith('http') ? rawImg : '../' + rawImg) : '../img/placeholder.webp';
       var price = p.b2b_price != null ? currency + Number(p.b2b_price).toFixed(2) : 'N/A';
       var brand = p.brands?.name || p.marca || '';
-      var inStock = p.em_stock !== false;
+      var inStock = p.em_stock === true;
+      var backorderOk = p.backorder_available === true;
       var freq = frequentMap[p.id];
       var freqBadge = freq ? '<div style="font-size:0.65rem;color:#2D6A4F;font-weight:700;background:#f0fdf4;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;">🔁 Ordered ' + freq.orders + 'x</div>' : '';
       return '<div onclick="B2B.showProductModal(' + (p.id||0) + ')" style="background:#fff;border:1px solid ' + (freq ? '#86efac' : '#e2e8f0') + ';border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'">' +
@@ -1816,7 +1819,7 @@ const B2B = (function() {
         '</div>' +
         (inStock
           ? '<button onclick="event.stopPropagation();B2B.addInlineToCart(' + (p.id||0) + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\')" style="width:100%;padding:8px;background:#2D6A4F;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer;">Add to Cart</button>'
-          : '<button onclick="event.stopPropagation();B2B.addInlineToCart(' + (p.id||0) + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\')" style="width:100%;padding:8px;background:#92400e;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer;">📋 Backorder</button>'
+          : (backorderOk ? '<button onclick="event.stopPropagation();B2B.addInlineToCart(' + (p.id||0) + ',\'' + (p.nome||'').replace(/'/g,"\\'") + '\',' + (p.b2b_price||0) + ',\'' + (rawImg||'').replace(/'/g,"\\'") + '\')" style="width:100%;padding:8px;background:#92400e;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer;">📋 Backorder</button>' : '<button disabled style="width:100%;padding:8px;background:#94a3b8;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:not-allowed;opacity:0.7;">Out of Stock</button>')
         ) +
         '</div></div></div>';
     }).join('');

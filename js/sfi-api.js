@@ -631,6 +631,7 @@ const sfi = {
           has_wholesale: wsEur !== null && wsEur < retailEur,
           b2b_min_qty: 1,
           em_stock: p.in_stock,
+          backorder_available: p.backorder_available || false,
           desconto: p.discount_percent,
           _id: p.id,
           _slug: p.slug,
