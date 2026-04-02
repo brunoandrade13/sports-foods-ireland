@@ -425,6 +425,17 @@
                 if (!allowedDomains.some(d => redirectUrl.hostname === d || redirectUrl.hostname.endsWith('.' + d))) {
                     throw new Error('Untrusted redirect domain: ' + redirectUrl.hostname);
                 }
+                // Save checkout data for PayPal capture (lost after redirect)
+                if (paymentMethod === 'paypal') {
+                    try {
+                        localStorage.setItem('sfi_paypal_checkout', JSON.stringify({
+                            items, email: checkoutData.contact.email, contact: checkoutData.contact,
+                            shippingAddress: checkoutData.shipping, coupon: appliedCoupon || null,
+                            is_b2b: window._sfiCustomerIsB2B || false,
+                            attribution: typeof sfiGetAttribution === 'function' ? sfiGetAttribution() : {},
+                        }));
+                    } catch(e) { console.warn('[checkout] Could not save PayPal data:', e); }
+                }
                 window.location.href = data.url;
             } catch (urlErr) {
                 console.error('[checkout] URL validation failed:', urlErr.message, 'URL:', data.url, 'Response:', JSON.stringify(data));
@@ -481,15 +492,20 @@
                 const SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
                 const SUPABASE_ANON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
 
+                // Retrieve saved checkout data from before PayPal redirect
+                let ppData = {};
+                try { ppData = JSON.parse(localStorage.getItem('sfi_paypal_checkout') || '{}'); } catch(e) {}
+
                 fetch(`${SUPABASE_URL}/functions/v1/paypal-capture`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ order_id: paypalToken })
+                    body: JSON.stringify({ order_id: paypalToken, ...ppData })
                 })
                 .then(r => r.json())
                 .then(data => {
                     if (data.status === 'COMPLETED') {
                         localStorage.setItem('cart', '[]');
+                        localStorage.removeItem('sfi_paypal_checkout');
                         if (typeof updateCartCount === 'function') updateCartCount();
                         showPaymentSuccess('PayPal', data.capture_id);
                     } else {
