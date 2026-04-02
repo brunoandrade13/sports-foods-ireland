@@ -589,8 +589,7 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.7);
       z-index: 100;
       display: none;
       align-items: flex-start;
@@ -654,7 +653,7 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
     }
 
     .modal-overlay.open {
-      display: flex;
+      display: flex !important;
     }
 
     .invoice-doc-link {
@@ -1888,11 +1887,11 @@ oninput="filterProducts()">
 </div>
 </div>
 
-<div class="modal-overlay" id="brandDetailModal" style="display:none">
+<div class="modal-overlay" id="brandDetailModal">
 <div class="modal" style="max-width:720px">
 <div class="modal-header">
 <h3 id="brandDetailTitle">Brand Details</h3>
-<button class="modal-close" onclick="document.getElementById('brandDetailModal').style.display='none'">✕</button>
+<button class="modal-close" onclick="document.getElementById('brandDetailModal').classList.remove('open');">✕</button>
 </div>
 <div class="modal-body" style="padding:16px">
 
@@ -1929,7 +1928,7 @@ oninput="filterProducts()">
 </div>
 </div>
 
-<div class="modal-overlay" id="brandModal" style="display:none">
+<div class="modal-overlay" id="brandModal">
 <div class="modal" style="max-width:460px">
 <div class="modal-header">
 <h3 id="brandModalTitle">New Brand</h3><button class="modal-close" onclick="closeBrandModal()">✕</button>
@@ -1986,7 +1985,7 @@ Active</label></div>
 </div>
 </div>
 
-<div class="modal-overlay" id="categoryModal" style="display:none">
+<div class="modal-overlay" id="categoryModal">
 <div class="modal" style="max-width:460px">
 <div class="modal-header">
 <h3 id="categoryModalTitle">New Category</h3><button class="modal-close"
@@ -2013,11 +2012,11 @@ class="btn btn-primary" onclick="saveCategory()">Save Category</button></div>
 </div>
 </div>
 
-<div class="modal-overlay" id="catDetailModal" style="display:none">
+<div class="modal-overlay" id="catDetailModal">
 <div class="modal" style="max-width:720px">
 <div class="modal-header">
 <h3 id="catDetailTitle">Category Details</h3>
-<button class="modal-close" onclick="document.getElementById('catDetailModal').style.display='none'">✕</button>
+<button class="modal-close" onclick="document.getElementById('catDetailModal').classList.remove('open');">✕</button>
 </div>
 <div class="modal-body" style="padding:16px">
 <div id="catKpiCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px"></div>
@@ -2215,7 +2214,7 @@ style="cursor:help;font-size:0.85rem">ℹ️</span></th>
 </div>
 </div>
 
-<div class="modal-overlay" id="manualOrderModal" style="display:none">
+<div class="modal-overlay" id="manualOrderModal">
 <div class="modal" style="max-width:640px">
 <div class="modal-header">
 <h3 id="moTitle">Create Manual Order</h3>
@@ -3041,7 +3040,7 @@ Janela: últimos 90 dias · apenas pedidos pagos
 </table>
 </div>
 
-<div class="modal-overlay" id="stockDetailModal" style="display:none">
+<div class="modal-overlay" id="stockDetailModal">
 <div class="modal" style="max-width:900px;max-height:90vh;display:flex;flex-direction:column">
 <div class="modal-header">
 <h3 id="stockDetailModalTitle">Stock</h3>
@@ -3066,7 +3065,7 @@ Janela: últimos 90 dias · apenas pedidos pagos
 </div>
 </div>
 
-<div class="modal-overlay" id="productStockSalesModal" style="display:none">
+<div class="modal-overlay" id="productStockSalesModal">
 <div class="modal" style="max-width:880px;max-height:90vh;display:flex;flex-direction:column">
 <div class="modal-header">
 <h3 id="productStockSalesModalTitle">Product</h3>
@@ -3343,7 +3342,7 @@ style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;backgro
 <div id="b2bActiveList" style="color:var(--muted);">Loading...</div>
 </div>
 
-<div class="modal-overlay" id="b2bEditModal" style="display:none" onclick="if(event.target===this)closeB2BEditModal()">
+<div class="modal-overlay" id="b2bEditModal" onclick="if(event.target===this)closeB2BEditModal()">
 <div class="modal" style="max-width:700px;max-height:92vh;overflow-y:auto">
 <div class="modal-header">
 <h3 id="b2bModalTitle">Customer Details</h3>
@@ -3367,7 +3366,7 @@ style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;backgro
 <div id="b2cActiveList" style="color:var(--muted);">Loading...</div>
 <div id="b2cPagination" style="display:flex;justify-content:center;gap:6px;margin-top:16px"></div>
 </div>
-<div class="modal-overlay" id="b2cEditModal" style="display:none" onclick="if(event.target===this)closeB2CEditModal()">
+<div class="modal-overlay" id="b2cEditModal" onclick="if(event.target===this)closeB2CEditModal()">
 <div class="modal" style="max-width:600px;max-height:92vh;overflow-y:auto">
 <div class="modal-header">
 <h3 id="b2cModalTitle">Customer Details</h3>
@@ -3782,8 +3781,9 @@ style="max-height:300px; overflow-y:auto; border:1px solid var(--border); border
 </div>
 </div>
 </div>
+</div>
 
-<div class="modal-overlay" id="discountModal" style="display:none">
+<div class="modal-overlay" id="discountModal">
 <div class="modal" style="max-width:520px">
 <div class="modal-header">
 <h3 id="discountModalTitle">New Discount Code</h3><button class="modal-close"
@@ -3823,7 +3823,7 @@ class="btn btn-primary" onclick="saveDiscount()">Save Discount</button></div>
 </div>
 </div>
 
-<div class="modal-overlay" id="couponModal" style="display:none">
+<div class="modal-overlay" id="couponModal">
 <div class="modal" style="max-width:560px">
 <div class="modal-header">
 <h3 id="couponModalTitle">New Coupon</h3><button class="modal-close" onclick="closeCouponModal()">✕</button>
@@ -3866,7 +3866,7 @@ class="btn btn-primary" onclick="saveCoupon()">Save Coupon</button></div>
 </div>
 </div>
 
-<div class="modal-overlay" id="giftCardModal" style="display:none">
+<div class="modal-overlay" id="giftCardModal">
 <div class="modal" style="max-width:460px">
 <div class="modal-header">
 <h3 id="gcModalTitle">New Gift Card</h3><button class="modal-close" onclick="closeGiftCardModal()">✕</button>
@@ -3893,7 +3893,7 @@ class="btn btn-primary" onclick="saveGiftCard()">Save Gift Card</button></div>
 </div>
 </div>
 
-<div class="modal-overlay" id="shippingModal" style="display:none">
+<div class="modal-overlay" id="shippingModal">
 <div class="modal" style="max-width:520px">
 <div class="modal-header">
 <h3 id="shippingModalTitle">New Shipping Zone</h3><button class="modal-close"
@@ -3924,7 +3924,7 @@ class="btn btn-primary" onclick="saveShippingZone()">Save Zone</button></div>
 </div>
 </div>
 
-<div class="modal-overlay" id="supplierModal" style="display:none">
+<div class="modal-overlay" id="supplierModal">
 <div class="modal" style="max-width:560px">
 <div class="modal-header">
 <h3 id="supplierModalTitle">New Supplier</h3><button class="modal-close"
@@ -3972,7 +3972,7 @@ class="btn btn-primary" onclick="saveSupplier()">Save Supplier</button></div>
 </div>
 </div>
 
-<div class="modal-overlay" id="poModal" style="display:none">
+<div class="modal-overlay" id="poModal">
 <div class="modal" style="max-width:900px">
 <div class="modal-header">
 <h3 id="poModalTitle">New Purchase Order</h3><button class="modal-close" onclick="closePOModal()">✕</button>
@@ -4070,7 +4070,7 @@ Draft</button>
 </div>
 </div>
 
-<div class="modal-overlay" id="customerProfileModal" style="display:none">
+<div class="modal-overlay" id="customerProfileModal">
 <div class="modal" style="max-width:960px; width: 95%;">
 <div class="modal-header">
 <h3 id="cpTitle">Customer Profile</h3>
@@ -4210,7 +4210,7 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 </div>
 </div>
 
-<div class="modal-overlay" id="orderModal" style="display:none">
+<div class="modal-overlay" id="orderModal">
 <div class="modal" style="max-width:800px; width:90%; max-height:92vh; display:flex; flex-direction:column;">
 <div class="modal-header" style="flex-shrink:0">
 <h3 id="omTitle">Order Details</h3>
@@ -4930,69 +4930,32 @@ Loading items...
       const toISO = d => d.toISOString();
 
       const paidStatuses = ['paid', 'partially_refunded', 'partially_paid'];
-      const sumRevenue = (fromIso, toIso) => {
-        const fromD = new Date(fromIso);
-        const toD = new Date(toIso);
-        let rev = 0, ord = 0;
-        (allOrders || []).forEach(o => {
-          if (!paidStatuses.includes(o.financial_status)) return;
-          const d = new Date(o.created_at);
-          if (d < fromD || d > toD) return;
-          rev += parseFloat(o.total || 0);
-          ord++;
-        });
-        return { rev, ord };
-      };
 
-      const { from: curFrom, to: curTo } = getFinanceDateRange();
-      const curStats = sumRevenue(curFrom, curTo);
-      const lastMonthStats = sumRevenue(toISO(startOfLastMonth), toISO(endOfLastMonth));
-      const lastYearStats = sumRevenue(toISO(oneYearAgo), now.toISOString());
-
-      const fetchProfit = async (fromIso, toIso) => {
-        const h = getAuthHeaders();
+      const fetchStats = async (fromIso, toIso) => {
         try {
-          const res = await fetch(`${SUPA_URL}/rest/v1/rpc/get_financial_report`, {
+          const h = getAuthHeaders();
+          const res = await fetch(`${SUPA_URL}/rest/v1/rpc/get_financial_summary`, {
             method: 'POST', headers: h,
             body: JSON.stringify({ date_from: fromIso, date_to: toIso })
           });
           if (res.ok) {
-            const raw = await res.json();
-            const rows = Array.isArray(raw) ? raw : (raw && raw.data) || [];
-            let gross = 0, profit = 0;
-            rows.forEach(r => {
-              gross += Number(r.total_revenue || 0);
-              const rev = Number(r.total_revenue || 0);
-              const cost = Number(r.total_cost != null ? r.total_cost : 0);
-              profit += r.net_profit != null ? Number(r.net_profit) : (rev - cost);
-            });
-            return { gross, profit };
+            const rows = await res.json();
+            const r = Array.isArray(rows) ? rows[0] : rows;
+            if (r) return { rev: Number(r.total_revenue || 0), profit: Number(r.net_profit || 0), ord: Number(r.order_count || 0) };
           }
         } catch (_) {}
-        try {
-          const res = await fetch(`${SUPA_URL}/rest/v1/rpc/get_financial_analytics`, {
-            method: 'POST', headers: h,
-            body: JSON.stringify({ date_from: fromIso, date_to: toIso })
-          });
-          if (!res.ok) throw new Error('analytics rpc failed');
-          const raw = await res.json();
-          const rows = Array.isArray(raw) ? raw : (raw && raw.data) || [];
-          let gross = 0, profit = 0;
-          rows.forEach(r => {
-            gross += Number(r.gross_revenue || 0);
-            profit += Number(r.net_profit || 0);
-          });
-          return { gross, profit };
-        } catch (_) {
-          return { gross: 0, profit: 0 };
-        }
+        return { rev: 0, profit: 0, ord: 0 };
       };
 
-      const [curProfit, lastMonthProfit, lastYearProfit] = await Promise.all([
-        fetchProfit(curFrom, curTo),
-        fetchProfit(toISO(startOfLastMonth), toISO(endOfLastMonth)),
-        fetchProfit(toISO(oneYearAgo), now.toISOString())
+      const { from: curFrom, to: curTo } = getFinanceDateRange();
+      const [curStats, lastMonthStats, lastYearStats] = await Promise.all([
+        fetchStats(curFrom, curTo),
+        fetchStats(toISO(startOfLastMonth), toISO(endOfLastMonth)),
+        fetchStats(toISO(oneYearAgo), now.toISOString())
       ]);
+      const curProfit = curStats;
+      const lastMonthProfit = lastMonthStats;
+      const lastYearProfit = lastYearStats;
 
       const fmt = v => '€' + Number(v || 0).toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const curLabel = { thisMonth:'This Month', lastMonth:'Last Month', quarter:'Last 3 Months', semester:'Last 6 Months', year:'Last 12 Months', all:'All Time', custom:'Custom Period' }[currentFinancePeriod] || 'All Time';
@@ -5006,7 +4969,7 @@ Loading items...
         <div class="stat-card" style="border-left:3px solid #16a34a">
           <div class="label">Net Profit (${curLabel})</div>
           <div class="value" style="color:#16a34a">${fmt(curProfit.profit)}</div>
-          <div style="font-size:0.75rem;color:var(--text-muted)">Margin: ${curProfit.gross > 0 ? ((curProfit.profit/curProfit.gross)*100).toFixed(1) : '0.0'}%</div>
+          <div style="font-size:0.75rem;color:var(--text-muted)">Margin: ${curProfit.rev > 0 ? ((curProfit.profit/curProfit.rev)*100).toFixed(1) : '0.0'}%</div>
         </div>
         <div class="stat-card" style="border-left:3px solid #0ea5e9">
           <div class="label">Revenue Last 12 Months</div>
@@ -5021,12 +4984,12 @@ Loading items...
         <div class="stat-card" style="border-left:3px solid #22c55e">
           <div class="label">Profit Last 12 Months</div>
           <div class="value" style="color:#22c55e">${fmt(lastYearProfit.profit)}</div>
-          <div style="font-size:0.75rem;color:var(--text-muted)">Margin: ${lastYearProfit.gross > 0 ? ((lastYearProfit.profit/lastYearProfit.gross)*100).toFixed(1) : '0.0'}%</div>
+          <div style="font-size:0.75rem;color:var(--text-muted)">Margin: ${lastYearProfit.rev > 0 ? ((lastYearProfit.profit/lastYearProfit.rev)*100).toFixed(1) : '0.0'}%</div>
         </div>
         <div class="stat-card" style="border-left:3px solid #e11d48">
           <div class="label">Profit Last Month</div>
           <div class="value" style="color:#e11d48">${fmt(lastMonthProfit.profit)}</div>
-          <div style="font-size:0.75rem;color:var(--text-muted)">Margin: ${lastMonthProfit.gross > 0 ? ((lastMonthProfit.profit/lastMonthProfit.gross)*100).toFixed(1) : '0.0'}%</div>
+          <div style="font-size:0.75rem;color:var(--text-muted)">Margin: ${lastMonthProfit.rev > 0 ? ((lastMonthProfit.profit/lastMonthProfit.rev)*100).toFixed(1) : '0.0'}%</div>
         </div>
       `;
     }
@@ -5111,20 +5074,17 @@ Loading items...
         }
 
         // Fetch data: prefer get_financial_report (revenue + profit per month/product); fallback to get_financial_monthly
-        const h = getAuthHeaders();
-        let r = await fetch(`${SUPA_URL}/rest/v1/rpc/get_financial_report`, {
-          method: 'POST', headers: h,
-          body: JSON.stringify({ date_from: from, date_to: to })
-        });
-        if (!r.ok) {
-          r = await fetch(`${SUPA_URL}/rest/v1/rpc/get_financial_monthly`, {
-            method: 'POST', headers: h,
-            body: JSON.stringify({ date_from: from, date_to: to })
-          });
+        // Use supaRpcAll to get ALL rows (bypasses 1000-row PostgREST limit)
+        try {
+          finRawData = await supaRpcAll('get_financial_report', { date_from: from, date_to: to });
+        } catch (e1) {
+          try {
+            finRawData = await supaRpcAll('get_financial_monthly', { date_from: from, date_to: to });
+          } catch (e2) {
+            throw new Error('RPC failed: ' + e2.message);
+          }
         }
-        if (!r.ok) throw new Error(`RPC failed: ${r.status}`);
-        const rawJson = await r.json();
-        finRawData = Array.isArray(rawJson) ? rawJson : (rawJson && rawJson.data) || [];
+        finRawData = Array.isArray(finRawData) ? finRawData : [];
 
         if (!finRawData || finRawData.length === 0) {
           out.innerHTML = '<div class="empty-state"><div class="icon">🏜️</div><h3>No Data</h3><p>No financial data for this period.</p></div>';
@@ -5135,14 +5095,8 @@ Loading items...
         const hasProfitInRow = finRawData[0] && ('net_profit' in finRawData[0] || 'total_cost' in finRawData[0]);
         if (!hasProfitInRow) {
           try {
-            const pr = await fetch(`${SUPA_URL}/rest/v1/rpc/get_financial_analytics`, {
-              method: 'POST', headers: h,
-              body: JSON.stringify({ date_from: from, date_to: to })
-            });
-            if (pr.ok) {
-              const prJson = await pr.json();
-              finProfitData = Array.isArray(prJson) ? prJson : (prJson && prJson.data) || [];
-            } else { finProfitData = null; }
+            finProfitData = await supaRpcAll('get_financial_analytics', { date_from: from, date_to: to });
+            finProfitData = Array.isArray(finProfitData) ? finProfitData : [];
           } catch (e) { finProfitData = null; }
         } else {
           finProfitData = null;
@@ -5717,13 +5671,14 @@ Loading items...
     }
 
     // ---- FINANCE MONTH DRILL-DOWN ----
-    function closeFinMonth(){ document.getElementById('finMonthModal').style.display='none'; if(finMonthChart2){finMonthChart2.destroy();finMonthChart2=null;} }
+    function closeFinMonth(){ document.getElementById('finMonthModal').classList.remove('open'); if(finMonthChart2){finMonthChart2.destroy();finMonthChart2=null;} }
 
     function openFinMonth(mk, label) {
       const [yr, mo] = mk.split('-').map(Number);
       finMCtx = { mk, yr, mo, yoyActive:false };
       document.getElementById('finMonthTitle').textContent = `📊 ${label} — Daily Breakdown`;
-      document.getElementById('finMonthModal').style.display = 'flex';
+      document.getElementById('finMonthModal').classList.add('open');
+      document.getElementById('finMonthModal').scrollTop = 0;
       document.getElementById('btnFinMonthYoY').textContent = '📊 Compare vs Same Month Last Year';
       document.getElementById('btnFinMonthYoY').style.background = '';
       if(finMonthChart2){finMonthChart2.destroy();finMonthChart2=null;}
@@ -6453,7 +6408,7 @@ Loading items...
     let saDrillChart = null;
 
     function closeSADrill() {
-      document.getElementById('saDrillModal').style.display = 'none';
+      document.getElementById('saDrillModal').classList.remove('open');
       if(saDrillChart){saDrillChart.destroy();saDrillChart=null;}
     }
 
@@ -6702,7 +6657,7 @@ Loading items...
       return r.json();
     }
     async function supaGetAll(table, query = '') {
-      let all = []; let from = 0; const batch = 1000;
+      let all = []; let from = 0; const batch = 5000;
       while (true) {
         const h = getAuthHeaders();
         h['Range'] = `${from}-${from + batch - 1}`;
@@ -6713,6 +6668,21 @@ Loading items...
         all = all.concat(rows);
         if (rows.length < batch) break;
         from += batch;
+      }
+      return all;
+    }
+    async function supaRpcAll(funcName, params = {}) {
+      let all = []; let offset = 0; const batch = 1000;
+      while (true) {
+        const h = getAuthHeaders();
+        const r = await fetch(`${SUPA_URL}/rest/v1/rpc/${funcName}?limit=${batch}&offset=${offset}`, {
+          method: 'POST', headers: h, body: JSON.stringify(params)
+        });
+        if (!r.ok) throw new Error(`RPC ${funcName} failed: ${r.status}`);
+        const rows = await r.json();
+        all = all.concat(rows);
+        if (rows.length < batch) break;
+        offset += batch;
       }
       return all;
     }
@@ -6815,6 +6785,14 @@ Loading items...
     }
 
     // ============================================================
+    // SMART ORDER LOADING: only recent 500 + count
+    // ============================================================
+    async function loadOrdersSmart() {
+      const ords = await supaGet('orders', '?order=created_at.desc&limit=500').catch(() => []);
+      return ords || [];
+    }
+
+    // ============================================================
     // DATA LOADING
     // ============================================================
     async function loadAllData() {
@@ -6829,7 +6807,7 @@ Loading items...
           supaGet('variant_types', '?order=sort_order').catch(() => []),
           supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => []),
           supaGetAll('customers', '?parent_customer_id=is.null&order=created_at.desc').catch(() => []),
-          supaGetAll('orders', '?order=created_at.desc').catch(() => [])
+          loadOrdersSmart()
         ]);
 
         allProducts = (prods || []).filter(p => p.is_active !== false);
@@ -7021,7 +6999,7 @@ Loading items...
     }
 
     async function _refreshShippingZones() {
-      allShippingZones = await supaGet('shipping_zones', '?order=sort_order').catch(() => allShippingZones);
+      allShippingZones = await supaGet('shipping_zones', '?order=name').catch(() => allShippingZones);
       if (_renderedPages.has('shipping')) renderShipping();
     }
 
@@ -7032,12 +7010,12 @@ Loading items...
           supaGet('coupons', '?order=created_at.desc').catch(() => []),
           supaGet('gift_cards', '?order=created_at.desc').catch(() => []),
           supaGet('abandoned_carts', '?order=created_at.desc&limit=200').catch(() => []),
-          supaGet('shipping_zones', '?order=sort_order').catch(() => []),
+          supaGet('shipping_zones', '?order=name').catch(() => []),
           supaGetAll('vendors', '?order=name').catch(() => []),
-          supaGetAll('purchase_orders', '?order=order_date.desc').catch(() => []),
-          supaGetAll('suppliers', '?order=name').catch(() => []),
+          supaGetAll('purchase_orders', '?order=txn_date.desc').catch(() => []),
+          Promise.resolve([]),
           supaGet('v_all_sales', '?order=txn_date.desc&limit=1000').catch(() => []),
-          supaGetAll('customer_product_prices', '?order=created_at.desc').catch(() => [])
+          Promise.resolve([])
         ]);
 
         allReviews = revs || []; filteredReviews = [...allReviews];
@@ -7154,11 +7132,12 @@ Loading items...
       const avgPrice = prices.length ? (prices.reduce((s, v) => s + v, 0) / prices.length) : 0;
       const stockVal = active.reduce((s, p) => s + (p.price_eur || 0) * (p.stock_quantity || 0), 0);
 
-      // Revenue and Orders
-      const paidOrders = (allOrders || []).filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status));
-      const totalRev = paidOrders.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
-      const avgOrder = paidOrders.length > 0 ? (totalRev / paidOrders.length) : 0;
+      // Revenue and Orders — use RPC for accurate all-time totals
+      const paidOrders500 = (allOrders || []).filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status));
       const pendOrd = (allOrders || []).filter(o => o.fulfillment_status === 'unfulfilled').length;
+      // Temporary values from loaded orders; will be overridden by RPC below
+      let totalRev = paidOrders500.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
+      let avgOrder = paidOrders500.length > 0 ? (totalRev / paidOrders500.length) : 0;
 
       // Sales Timeframes
       const now = new Date();
@@ -7198,6 +7177,27 @@ Loading items...
 
       const pendR = (allReviews || []).filter(r => r.review_status === 'pending').length;
       document.getElementById('statPendingReviews').textContent = pendR;
+
+      // Override revenue/avgOrder with accurate server-side totals
+      (async () => {
+        try {
+          const h = getAuthHeaders();
+          const res = await fetch(`${SUPA_URL}/rest/v1/rpc/get_financial_summary`, {
+            method: 'POST', headers: h,
+            body: JSON.stringify({ date_from: '2000-01-01', date_to: new Date().toISOString() })
+          });
+          if (res.ok) {
+            const rows = await res.json();
+            const r = Array.isArray(rows) ? rows[0] : rows;
+            if (r) {
+              const rev = Number(r.total_revenue || 0);
+              const cnt = Number(r.order_count || 1);
+              document.getElementById('statRevenue').textContent = '€' + rev.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+              document.getElementById('statAvgOrder').textContent = '€' + (rev / cnt).toFixed(2);
+            }
+          }
+        } catch(e) {}
+      })();
 
       // Brand breakdown
       const brandCounts = {};
@@ -7615,6 +7615,7 @@ Loading items...
 
       // 2. Open modal
       modal.classList.add('open');
+      modal.scrollTop = 0;
 
       // 3. Scroll modal content to top (NOT the page)
       modal.scrollTop = 0;
@@ -8211,7 +8212,7 @@ Loading items...
       if (btn) { btn.dataset.url = ''; btn.innerHTML = '<span class="placeholder">\ud83d\udcf7</span>'; }
     }
 
-    function closeVimgModal() { document.getElementById('variantImgModal').style.display = 'none'; }
+    function closeVimgModal() { document.getElementById('variantImgModal').classList.remove('open'); }
 
         function updateVariantCountLabel() {
       const count = document.querySelectorAll('#variantRows .variant-row').length;
@@ -8360,9 +8361,10 @@ Loading items...
       document.getElementById('brandLogo').value = b?.logo_url || '';
       document.getElementById('brandActive').checked = b ? b.is_active : true;
       document.getElementById('brandDeleteBtn').style.display = b ? '' : 'none';
-      document.getElementById('brandModal').style.display = 'flex';
+      document.getElementById('brandModal').classList.add('open');
+      document.getElementById('brandModal').scrollTop = 0;
     }
-    function closeBrandModal() { document.getElementById('brandModal').style.display = 'none'; }
+    function closeBrandModal() { document.getElementById('brandModal').classList.remove('open'); }
     async function saveBrand() {
       const name = document.getElementById('brandName').value.trim();
       if (!name) { toast('Brand name required', 'error'); return; }
@@ -8527,11 +8529,12 @@ Loading items...
         tbody.innerHTML = list.length === 0
           ? '<tr><td colspan="6" class="empty-state">Nenhum produto ativo sem preço B2B.</td></tr>'
           : list.map(p => '<tr><td>' + esc(p.name || '—') + '</td><td>' + esc(p.sku || '—') + '</td><td>' + esc((p.brands && p.brands.name) || '—') + '</td><td>' + esc((p.categories && p.categories.name) || '—') + '</td><td class="price">€' + (p.price_eur != null ? Number(p.price_eur).toFixed(2) : '0.00') + '</td><td><button type="button" class="btn-sm btn-outline" onclick="closeNoB2BModal(); editProduct(\'' + p.id + '\')">Editar</button></td></tr>').join('');
-        modal.style.display = 'flex';
+        modal.classList.add('open');
+      modal.scrollTop = 0;
       };
       window.closeNoB2BModal = function closeNoB2BModal() {
         const modal = document.getElementById('noB2BModal');
-        if (modal) modal.style.display = 'none';
+        if (modal) modal.classList.remove('open');
       };
       window.exportNoB2BCSV = function exportNoB2BCSV() {
         const list = window._noB2BProducts || [];
@@ -8560,7 +8563,8 @@ Loading items...
         const body = document.getElementById('b2bReportBody');
         const modal = document.getElementById('b2bReportModal');
         if (!body || !modal) return;
-        modal.style.display = 'flex';
+        modal.classList.add('open');
+      modal.scrollTop = 0;
         body.innerHTML = '<p style="color:var(--text-muted)"><span class="spinner"></span> A consultar QuickBooks e WooCommerce…</p>';
         if (btn) { btn.disabled = true; btn.textContent = 'A carregar…'; }
         try {
@@ -8641,7 +8645,7 @@ Loading items...
       };
       window.closeB2BReportModal = function closeB2BReportModal() {
         const modal = document.getElementById('b2bReportModal');
-        if (modal) modal.style.display = 'none';
+        if (modal) modal.classList.remove('open');
       };
 
       // Delegated click: abrir modal ao clicar no nome da categoria ou da marca
@@ -8800,11 +8804,12 @@ Loading items...
           <td><span class="stock-badge ${cls}">${lbl}</span></td>
         </tr>`;
       }).join('');
-      document.getElementById('stockDetailModal').style.display = 'flex';
+      document.getElementById('stockDetailModal').classList.add('open');
+      document.getElementById('stockDetailModal').scrollTop = 0;
     }
 
     function closeStockDetailModal() {
-      document.getElementById('stockDetailModal').style.display = 'none';
+      document.getElementById('stockDetailModal').classList.remove('open');
     }
 
     async function openProductStockSalesModal(productId) {
@@ -8839,7 +8844,8 @@ Loading items...
       flowEl.innerHTML = '<div style="grid-column:1/-1;color:var(--text-muted)">A carregar...</div>';
       ordersBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">A carregar...</td></tr>';
       if (topClientsBody) topClientsBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">A carregar...</td></tr>';
-      document.getElementById('productStockSalesModal').style.display = 'flex';
+      document.getElementById('productStockSalesModal').classList.add('open');
+      document.getElementById('productStockSalesModal').scrollTop = 0;
 
       try {
         const query = `?product_id=eq.${productId}&select=order_id,quantity,unit_price,total_price,total,orders(order_number,created_at,financial_status,total,customer_id,customer_email)&limit=200`;
@@ -8921,7 +8927,7 @@ Loading items...
     }
 
     function closeProductStockSalesModal() {
-      document.getElementById('productStockSalesModal').style.display = 'none';
+      document.getElementById('productStockSalesModal').classList.remove('open');
     }
 
     document.addEventListener('click', function(e) {
@@ -9006,7 +9012,8 @@ Loading items...
       document.getElementById('discountId').value = '';
       document.querySelectorAll('#discountModal input:not([type=checkbox]), #discountModal select').forEach(el => el.value = el.tagName === 'SELECT' ? el.options[0]?.value : '');
       document.getElementById('discountActive').checked = true;
-      document.getElementById('discountModal').style.display = 'flex';
+      document.getElementById('discountModal').classList.add('open');
+      document.getElementById('discountModal').scrollTop = 0;
     }
     function openDiscountEdit(id) {
       const d = discountCodes.find(x => x.id === id); if (!d) return;
@@ -9022,9 +9029,10 @@ Loading items...
       document.getElementById('discountStartsAt').value = d.starts_at ? d.starts_at.slice(0, 16) : '';
       document.getElementById('discountEndsAt').value = d.ends_at ? d.ends_at.slice(0, 16) : '';
       document.getElementById('discountActive').checked = d.is_active !== false;
-      document.getElementById('discountModal').style.display = 'flex';
+      document.getElementById('discountModal').classList.add('open');
+      document.getElementById('discountModal').scrollTop = 0;
     }
-    function closeDiscountModal() { document.getElementById('discountModal').style.display = 'none'; }
+    function closeDiscountModal() { document.getElementById('discountModal').classList.remove('open'); }
 
     async function saveDiscount() {
       const code = document.getElementById('discountCode').value.trim().toUpperCase();
@@ -9093,9 +9101,10 @@ Loading items...
       document.getElementById('categoryName').value = c?.name || '';
       document.getElementById('categorySlug').value = c?.slug || '';
       document.getElementById('categoryActive').checked = c ? c.is_active : true;
-      document.getElementById('categoryModal').style.display = 'flex';
+      document.getElementById('categoryModal').classList.add('open');
+      document.getElementById('categoryModal').scrollTop = 0;
     }
-    function closeCategoryModal() { document.getElementById('categoryModal').style.display = 'none'; }
+    function closeCategoryModal() { document.getElementById('categoryModal').classList.remove('open'); }
 
     async function saveCategory() {
       const name = document.getElementById('categoryName').value.trim();
@@ -9962,7 +9971,8 @@ Loading items...
       document.getElementById('btnCompareYoY').style.background = '';
       document.getElementById('monthDetailTitle').textContent = `📊 ${label} — Daily Sales`;
       const monthDetailEl = document.getElementById('monthDetailModal');
-      monthDetailEl.style.display = 'flex';
+      monthDetailEl.classList.add('open');
+      monthDetailEl.scrollTop = 0;
       monthDetailEl.style.zIndex = '350';
       document.getElementById('monthDetailKPIs').innerHTML = '<div style="color:var(--text-muted);padding:12px">Loading...</div>';
       document.getElementById('monthDailyTable').querySelector('tbody').innerHTML = '';
@@ -10317,7 +10327,7 @@ Loading items...
     // ============================================================
     let rptChart = null;
     let rptCtx = { type:'', key:'', label:'', monthData:[], yoyActive:false };
-    function closeReportDetail() { document.getElementById('reportDetailModal').style.display='none'; if(rptChart){rptChart.destroy();rptChart=null;} }
+    function closeReportDetail() { document.getElementById('reportDetailModal').classList.remove('open'); if(rptChart){rptChart.destroy();rptChart=null;} }
 
     async function openReportDetail(type, key, label, productId) {
       const dateRange = window.reportDetailDateRange || null;
@@ -10326,7 +10336,8 @@ Loading items...
       const periodSuffix = (dateFrom && dateTo) ? ` (${new Date(dateFrom).toLocaleDateString('en-GB',{month:'short',year:'numeric'})} – ${new Date(dateTo).toLocaleDateString('en-GB',{month:'short',year:'numeric'})})` : '';
       rptCtx = { type, key, label, productId: productId||null, monthData:[], yoyActive:false, dateFrom, dateTo };
       document.getElementById('reportDetailTitle').textContent = `📊 ${label} — Performance${periodSuffix}`;
-      document.getElementById('reportDetailModal').style.display = 'flex';
+      document.getElementById('reportDetailModal').classList.add('open');
+      document.getElementById('reportDetailModal').scrollTop = 0;
       document.getElementById('reportDetailKPIs').innerHTML = '<div style="color:var(--text-muted);padding:12px">Loading...</div>';
       document.getElementById('reportDetailTable').querySelector('tbody').innerHTML = '';
       let topClientsWrap = document.getElementById('reportDetailTopClientsWrap');
@@ -10583,13 +10594,14 @@ Loading items...
     // ============================================================
     let rdChart = null;
     let rdCtx = { sk:'', dayData:[], yoyActive:false };
-    function closeReportDay() { document.getElementById('reportDayModal').style.display='none'; if(rdChart){rdChart.destroy();rdChart=null;} }
+    function closeReportDay() { document.getElementById('reportDayModal').classList.remove('open'); if(rdChart){rdChart.destroy();rdChart=null;} }
 
     async function openReportDay(sortKey, monthLabel) {
       const {type,key,label,productId}=rptCtx;
       rdCtx={sk:sortKey,dayData:[],yoyActive:false};
       document.getElementById('reportDayTitle').textContent=`📅 ${label} — ${monthLabel}`;
-      document.getElementById('reportDayModal').style.display='flex';
+      document.getElementById('reportDayModal').classList.add('open');
+      document.getElementById('reportDayModal').scrollTop = 0;
       document.getElementById('reportDayKPIs').innerHTML='<div style="color:var(--text-muted);padding:12px">Loading daily data...</div>';
       document.getElementById('reportDayTable').querySelector('tbody').innerHTML='';
       document.getElementById('btnReportDayYoY').textContent='📊 Compare vs Last Year';
@@ -10692,7 +10704,7 @@ Loading items...
     // ============================================================
     let b2bChart = null;
     let b2bCtx = { sortKey:'', label:'', chartBucket:'day', from:'', to:'', dayData:[], yr:0, mo:0, yoyActive:false };
-    function closeB2BDetail() { document.getElementById('b2bDetailModal').style.display='none'; if(b2bChart){b2bChart.destroy();b2bChart=null;} }
+    function closeB2BDetail() { document.getElementById('b2bDetailModal').classList.remove('open'); if(b2bChart){b2bChart.destroy();b2bChart=null;} }
 
     async function openB2BDetail(sortKey, label) {
       const grouping = window._revenueGrouping || 'monthly';
@@ -10834,7 +10846,8 @@ Loading items...
 
       b2bCtx = { sortKey, label, chartBucket, from, to, dayData, yr: year, mo: month, yoyActive: false };
       document.getElementById('b2bDetailTitle').textContent = `🏢 B2B vs B2C — ${label} — ${subtitle}`;
-      document.getElementById('b2bDetailModal').style.display = 'flex';
+      document.getElementById('b2bDetailModal').classList.add('open');
+      document.getElementById('b2bDetailModal').scrollTop = 0;
       document.getElementById('b2bDetailKPIs').innerHTML = '<div style="color:var(--text-muted);padding:12px">Loading...</div>';
       document.getElementById('btnB2BYoY').textContent = '📊 Compare vs Same Period Last Year';
       document.getElementById('btnB2BYoY').style.background = '';
@@ -11191,7 +11204,8 @@ Loading items...
       if (cpLargest) cpLargest.textContent = '...';
       if (cpLastDate) cpLastDate.textContent = '...';
       document.getElementById('cpOrdersTable').innerHTML = '<tr><td colspan="6" class="loading-overlay"><span class="spinner"></span></td></tr>';
-      document.getElementById('customerProfileModal').style.display = 'flex';
+      document.getElementById('customerProfileModal').classList.add('open');
+      document.getElementById('customerProfileModal').scrollTop = 0;
       document.getElementById('customerProfileModal').style.zIndex = '200';
 
       try {
@@ -11538,7 +11552,8 @@ Loading items...
       const wrapper = document.getElementById('omItemsWrapper');
       wrapper.innerHTML = '<span class="spinner" style="display:inline-block;width:16px;height:16px;border-width:2px;border-top-color:var(--primary-color);"></span> Loading items...';
 
-      document.getElementById('orderModal').style.display = 'flex';
+      document.getElementById('orderModal').classList.add('open');
+      document.getElementById('orderModal').scrollTop = 0;
       document.getElementById('orderModal').style.zIndex = '200';
 
       try {
@@ -11566,13 +11581,12 @@ Loading items...
                 </thead>
                 <tbody>
                   ${items.map(i => {
-            const lookupSku = i.product_name || i.product_sku;
-            let realProductName = i.product_name;
+            let realProductName = i.product_name || 'Unknown';
             if (typeof allProducts !== 'undefined' && allProducts.length > 0) {
-              const matchedProduct = allProducts.find(p => p.sku === lookupSku || p.sku === i.product_sku);
-              if (matchedProduct && matchedProduct.name) {
-                realProductName = matchedProduct.name;
-              }
+              let matchedProduct = null;
+              if (i.product_id) matchedProduct = allProducts.find(p => p.id === i.product_id);
+              if (!matchedProduct && i.product_sku) matchedProduct = allProducts.find(p => p.sku === i.product_sku);
+              if (matchedProduct && matchedProduct.name) realProductName = matchedProduct.name;
             }
             return `
                     <tr style="border-bottom: 1px solid var(--border-color);">
@@ -11668,13 +11682,14 @@ Loading items...
       document.getElementById('moFulfillment').value = 'unfulfilled';
       ['moSubtotal', 'moDiscount', 'moShipping', 'moTax', 'moTotal'].forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; });
       const notesEl = document.getElementById('moNotes'); if (notesEl) notesEl.value = '';
-      modal.style.display = 'flex';
+      modal.classList.add('open');
+      modal.scrollTop = 0;
       modal.style.zIndex = '220';
     }
 
     function closeManualOrderModal() {
       const modal = document.getElementById('manualOrderModal');
-      if (modal) modal.style.display = 'none';
+      if (modal) modal.classList.remove('open');
     }
 
     function recalcManualOrderTotal() {
@@ -11906,11 +11921,11 @@ Loading items...
     }
 
     function closeOrderModal() {
-      document.getElementById('orderModal').style.display = 'none';
+      document.getElementById('orderModal').classList.remove('open');
     }
 
     function closeCustomerProfileModal() {
-      document.getElementById('customerProfileModal').style.display = 'none';
+      document.getElementById('customerProfileModal').classList.remove('open');
       if (window._cpChart) { window._cpChart.destroy(); window._cpChart = null; }
     }
 
@@ -11919,7 +11934,7 @@ Loading items...
     // ============================================================
     let cdChart = null;
     let cdCtx = { mk:'', label:'', yr:0, mo:0, custId:null, dayData:[], yoyActive:false };
-    function closeCustDay() { document.getElementById('custDayModal').style.display='none'; if(cdChart){cdChart.destroy();cdChart=null;} }
+    function closeCustDay() { document.getElementById('custDayModal').classList.remove('open'); if(cdChart){cdChart.destroy();cdChart=null;} }
 
     async function openCustDay(mk, label) {
       const [yr, mo] = mk.split('-').map(Number);
@@ -11928,7 +11943,8 @@ Loading items...
       const custName = cust ? ([cust.first_name, cust.last_name].filter(Boolean).join(' ') || cust.email || 'Customer') : 'Customer';
       cdCtx = { mk, label, yr, mo, custId, dayData:[], yoyActive:false };
       document.getElementById('custDayTitle').textContent = `📊 ${custName} — ${label}`;
-      document.getElementById('custDayModal').style.display = 'flex';
+      document.getElementById('custDayModal').classList.add('open');
+      document.getElementById('custDayModal').scrollTop = 0;
       document.getElementById('custDayKPIs').innerHTML = '<div style="color:var(--text-muted);padding:12px">Loading...</div>';
       document.getElementById('custDayTable').querySelector('tbody').innerHTML = '';
       document.getElementById('btnCustDayYoY').textContent = '📊 Compare vs Same Month Last Year';
@@ -12360,7 +12376,8 @@ Loading items...
       document.getElementById('couponActive').checked = true;
       document.getElementById('couponFirstOrder').checked = false;
       document.getElementById('couponPerCustomer').value = 1;
-      document.getElementById('couponModal').style.display = 'flex';
+      document.getElementById('couponModal').classList.add('open');
+      document.getElementById('couponModal').scrollTop = 0;
     }
     function openCouponEdit(id) {
       const c = allCoupons.find(x => x.id === id); if (!c) return;
@@ -12378,9 +12395,10 @@ Loading items...
       document.getElementById('couponExpiresAt').value = c.expires_at ? c.expires_at.slice(0, 16) : '';
       document.getElementById('couponFirstOrder').checked = c.first_order_only || false;
       document.getElementById('couponActive').checked = c.is_active !== false;
-      document.getElementById('couponModal').style.display = 'flex';
+      document.getElementById('couponModal').classList.add('open');
+      document.getElementById('couponModal').scrollTop = 0;
     }
-    function closeCouponModal() { document.getElementById('couponModal').style.display = 'none'; }
+    function closeCouponModal() { document.getElementById('couponModal').classList.remove('open'); }
 
     async function saveCoupon() {
       const code = document.getElementById('couponCode').value.trim().toUpperCase();
@@ -12500,7 +12518,8 @@ Loading items...
       document.getElementById('gcNote').value = '';
       document.getElementById('gcExpires').value = '';
       document.getElementById('gcActive').checked = true;
-      document.getElementById('giftCardModal').style.display = 'flex';
+      document.getElementById('giftCardModal').classList.add('open');
+      document.getElementById('giftCardModal').scrollTop = 0;
     }
     function openGiftCardEdit(id) {
       const g = allGiftCards.find(x => x.id === id); if (!g) return;
@@ -12512,9 +12531,10 @@ Loading items...
       document.getElementById('gcNote').value = g.note || '';
       document.getElementById('gcExpires').value = g.expires_at ? g.expires_at.slice(0, 16) : '';
       document.getElementById('gcActive').checked = g.is_active !== false;
-      document.getElementById('giftCardModal').style.display = 'flex';
+      document.getElementById('giftCardModal').classList.add('open');
+      document.getElementById('giftCardModal').scrollTop = 0;
     }
-    function closeGiftCardModal() { document.getElementById('giftCardModal').style.display = 'none'; }
+    function closeGiftCardModal() { document.getElementById('giftCardModal').classList.remove('open'); }
 
     async function saveGiftCard() {
       const initial = parseFloat(document.getElementById('gcInitial').value);
@@ -12582,7 +12602,8 @@ Loading items...
       document.getElementById('shipFreeAbove').value = '';
       document.getElementById('shipDays').value = '';
       document.getElementById('shipActive').checked = true;
-      document.getElementById('shippingModal').style.display = 'flex';
+      document.getElementById('shippingModal').classList.add('open');
+      document.getElementById('shippingModal').scrollTop = 0;
     }
     function openShippingEdit(id) {
       const z = allShippingZones.find(x => x.id === id); if (!z) return;
@@ -12595,9 +12616,10 @@ Loading items...
       document.getElementById('shipFreeAbove').value = z.free_shipping_threshold || '';
       document.getElementById('shipDays').value = z.estimated_days || '';
       document.getElementById('shipActive').checked = z.is_active !== false;
-      document.getElementById('shippingModal').style.display = 'flex';
+      document.getElementById('shippingModal').classList.add('open');
+      document.getElementById('shippingModal').scrollTop = 0;
     }
-    function closeShippingModal() { document.getElementById('shippingModal').style.display = 'none'; }
+    function closeShippingModal() { document.getElementById('shippingModal').classList.remove('open'); }
 
     async function saveShippingZone() {
       const name = document.getElementById('shipName').value.trim();
@@ -12668,28 +12690,35 @@ Loading items...
     async function renderAnalytics() {
       try {
         const [pv, sq, pe] = await Promise.all([
-          supaGet('page_views', '?order=created_at.desc&limit=1000').catch(() => []),
+          supaGetAll('page_views', '?order=created_at.desc').catch(() => []),
           supaGet('search_queries', '?order=created_at.desc&limit=100').catch(() => []),
           supaGet('product_events', '?limit=500').catch(() => [])
         ]);
 
-        const views = pv || [];
+        // Filter out dev/local paths and normalize URLs
+        const normUrl = (u) => {
+          if (!u) return '';
+          return u.replace(/^https?:\/\/[^/]+/, '').replace(/^\/?(Users|sports-foods-ireland)\/.*?\/([\w-]+\.html)/, '$2').replace(/^\//, '');
+        };
+        const isDevPath = (u) => !u || u.includes('/Users/') || u.includes('/sports-foods-ireland/') || u.includes('localhost');
+        const views = (pv || []).filter(v => !isDevPath(v.page_url));
         const searches = sq || [];
         const sessions = [...new Set(views.map(v => v.session_id))];
 
         // 1. Visibilidade & Tráfego
-        document.getElementById('analPageViews').textContent = views.length;
-        document.getElementById('analSessions').textContent = sessions.length;
+        document.getElementById('analPageViews').textContent = views.length.toLocaleString();
+        document.getElementById('analSessions').textContent = sessions.length.toLocaleString();
 
-        // Avg Session Time
+        // Avg Session Time (cap at 30 min per page to exclude outliers)
+        const MAX_PAGE_TIME = 1800;
         const sessionDurations = {};
         views.forEach(v => {
           if (!sessionDurations[v.session_id]) sessionDurations[v.session_id] = 0;
-          sessionDurations[v.session_id] += v.time_on_page_seconds || 0;
+          sessionDurations[v.session_id] += Math.min(v.time_on_page_seconds || 0, MAX_PAGE_TIME);
         });
         const durations = Object.values(sessionDurations);
         const avgDur = durations.length ? (durations.reduce((s, v) => s + v, 0) / durations.length) : 0;
-        document.getElementById('analAvgTime').textContent = `${(avgDur / 60).toFixed(1)}m`;
+        document.getElementById('analAvgTime').textContent = avgDur >= 60 ? `${(avgDur / 60).toFixed(1)}m` : `${avgDur.toFixed(0)}s`;
 
         // Bounce Rate
         const sessionPageCounts = {};
@@ -12700,12 +12729,13 @@ Loading items...
         const bounceRate = sessions.length ? ((bounces / sessions.length) * 100).toFixed(1) : 0;
         document.getElementById('analBounce').textContent = `${bounceRate}%`;
 
-        // 2. Engajamento & Comportamento (Top Pages)
+        // 2. Engajamento & Comportamento (Top Pages — normalized)
         const pageAgg = {};
         views.forEach(v => {
-          if (!pageAgg[v.page_url]) pageAgg[v.page_url] = { views: 0, time: 0 };
-          pageAgg[v.page_url].views++;
-          pageAgg[v.page_url].time += v.time_on_page_seconds || 0;
+          const key = normUrl(v.page_url) || 'home';
+          if (!pageAgg[key]) pageAgg[key] = { views: 0, time: 0 };
+          pageAgg[key].views++;
+          pageAgg[key].time += Math.min(v.time_on_page_seconds || 0, MAX_PAGE_TIME);
         });
         const sortedPages = Object.entries(pageAgg).sort((a, b) => b[1].views - a[1].views);
         const pvEl = document.getElementById('analPagesTable');
@@ -12725,12 +12755,18 @@ Loading items...
             <td>${s.results_count || 0}</td>
             <td>${new Date(s.created_at).toLocaleDateString()}</td></tr>`).join('');
 
-        // 3. Performance de Produtos
+        // 3. Performance de Produtos (merge page_views + product_events)
         const prodAgg = {};
         views.filter(v => v.product_id).forEach(v => {
-          if (!prodAgg[v.product_id]) prodAgg[v.product_id] = { views: 0, time: 0 };
-          prodAgg[v.product_id].views++;
-          prodAgg[v.product_id].time += v.time_on_page_seconds || 0;
+          const pid = v.product_id;
+          if (!prodAgg[pid]) prodAgg[pid] = { views: 0, time: 0 };
+          prodAgg[pid].views++;
+          prodAgg[pid].time += Math.min(v.time_on_page_seconds || 0, MAX_PAGE_TIME);
+        });
+        (pe || []).filter(e => e.event_type === 'view' && e.product_id).forEach(e => {
+          const pid = e.product_id;
+          if (!prodAgg[pid]) prodAgg[pid] = { views: 0, time: 0 };
+          prodAgg[pid].views++;
         });
         const sortedProds = Object.entries(prodAgg).sort((a, b) => b[1].views - a[1].views);
         const apEl = document.getElementById('analProductsTable');
@@ -12739,27 +12775,28 @@ Loading items...
           apEl.innerHTML = '<tr><td colspan="4" class="empty-state">No product interactions recorded</td></tr>';
         } else {
           apEl.innerHTML = sortedProds.slice(0, 10).map(([pid, stats]) => {
-            const p = allProducts.find(x => x.id === pid) || { name: 'Unknown', sku: pid };
+            const p = allProducts.find(x => String(x.id) === String(pid)) || { name: pid.substring(0, 12) + '...', sku: '—' };
             return `<tr>
               <td><strong>${esc(p.name)}</strong></td>
               <td><code>${esc(p.sku || '—')}</code></td>
               <td>${stats.views}</td>
-              <td>${(stats.time / stats.views).toFixed(0)}s avg</td></tr>`;
+              <td>${stats.time > 0 ? (stats.time / stats.views).toFixed(0) + 's avg' : '—'}</td></tr>`;
           }).join('');
         }
 
         // 4. Tecnologia & Origem
-        const getTop = (arr, key) => {
+        const getTop = (arr, key, fallback) => {
           const counts = {};
-          arr.forEach(x => { const v = x[key] || 'Unknown'; counts[v] = (counts[v] || 0) + 1; });
+          arr.forEach(x => { const v = x[key]; if (v && v !== 'Unknown' && v !== '') counts[v] = (counts[v] || 0) + 1; });
           const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-          return sorted[0]?.[0] || '-';
+          return sorted[0]?.[0] || fallback || '—';
         };
 
-        document.getElementById('analTopDevice').textContent = getTop(views, 'device_type');
-        document.getElementById('analTopSource').textContent = getTop(views, 'referrer').replace(/https?:\/\//, '').split('/')[0] || 'Direct';
-        document.getElementById('analTopLocation').textContent = getTop(views, 'country');
-        document.getElementById('analTopBrowser').textContent = getTop(views, 'browser');
+        document.getElementById('analTopDevice').textContent = getTop(views, 'device_type', 'Desktop');
+        const topRef = getTop(views, 'referrer', 'Direct');
+        document.getElementById('analTopSource').textContent = topRef.replace(/https?:\/\//, '').split('/')[0] || 'Direct';
+        document.getElementById('analTopLocation').textContent = getTop(views, 'country', 'Ireland');
+        document.getElementById('analTopBrowser').textContent = getTop(views, 'browser', 'Chrome');
 
       } catch (e) {
         console.error('Analytics load error:', e);
@@ -12919,7 +12956,8 @@ Loading items...
       _currentInvOrder = null;
       if (!inv) return;
       document.getElementById('invoiceViewTitle').textContent = 'Invoice ' + (inv.doc_number || inv.invoice_number || '');
-      document.getElementById('invoiceViewModal').style.display = 'flex';
+      document.getElementById('invoiceViewModal').classList.add('open');
+      document.getElementById('invoiceViewModal').scrollTop = 0;
       const printArea = document.getElementById('invoicePrintArea');
       printArea.innerHTML = '<div style="padding:20px;color:var(--text-muted)">Loading...</div>';
 
@@ -13039,7 +13077,7 @@ Loading items...
     }
 
     function closeInvoiceModal() {
-      document.getElementById('invoiceViewModal').style.display = 'none';
+      document.getElementById('invoiceViewModal').classList.remove('open');
     }
 
     function printInvoice() {
@@ -13452,10 +13490,11 @@ html += '<button class="btn btn-ghost" onclick="closeB2BEditModal()">Cancel</but
 html += '<button class="btn btn-primary" onclick="saveAllB2BEdits()">Save All Changes</button>';
 html += '</div>';
 document.getElementById('b2bModalBody').innerHTML = html;
-document.getElementById('b2bEditModal').style.display = 'flex';
+document.getElementById('b2bEditModal').classList.add('open');
+      document.getElementById('b2bEditModal').scrollTop = 0;
 }
 
-function closeB2BEditModal() { document.getElementById('b2bEditModal').style.display = 'none'; }
+function closeB2BEditModal() { document.getElementById('b2bEditModal').classList.remove('open'); }
 
 async function saveAllB2BEdits() {
 var inputs = document.querySelectorAll('#b2bModalBody [data-cid]');
@@ -13604,10 +13643,11 @@ html += '<div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick
 html += '<button class="btn btn-primary" onclick="saveB2CEdit()">Save Changes</button></div>';
 html += '</div>';
 document.getElementById('b2cModalBody').innerHTML = html;
-document.getElementById('b2cEditModal').style.display = 'flex';
+document.getElementById('b2cEditModal').classList.add('open');
+      document.getElementById('b2cEditModal').scrollTop = 0;
 }
 
-function closeB2CEditModal() { document.getElementById('b2cEditModal').style.display = 'none'; }
+function closeB2CEditModal() { document.getElementById('b2cEditModal').classList.remove('open'); }
 
 async function saveB2CEdit() {
 var inputs = document.querySelectorAll('#b2cModalBody [data-b2c-cid]');
@@ -13696,7 +13736,7 @@ document.getElementById('loginPass')?.addEventListener('keydown', e => { if (e.k
 // Close modals on overlay click
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
 overlay.addEventListener('click', e => {
-if (e.target === overlay && overlay.id !== 'productModal') overlay.style.display = 'none';
+if (e.target === overlay && overlay.id !== 'productModal') overlay.classList.remove('open');
 });
 });
 });
@@ -13744,7 +13784,8 @@ monthSel.innerHTML += `<option value="${val}">${label}</option>`;
 }
 document.getElementById('brandSalesPeriod').value = '30';
 monthSel.style.display = 'none';
-document.getElementById('brandDetailModal').style.display = 'flex';
+document.getElementById('brandDetailModal').classList.add('open');
+      document.getElementById('brandDetailModal').scrollTop = 0;
 loadBrandSales();
 loadBrandTopClients();
 }
@@ -13924,7 +13965,8 @@ monthSel.innerHTML += `<option value="${val}">${label}</option>`;
 }
 document.getElementById('catSalesPeriod').value = '30';
 monthSel.style.display = 'none';
-document.getElementById('catDetailModal').style.display = 'flex';
+document.getElementById('catDetailModal').classList.add('open');
+      document.getElementById('catDetailModal').scrollTop = 0;
 loadCategorySales();
 }
 
@@ -14484,7 +14526,7 @@ method: 'PATCH', headers: h, body: JSON.stringify({ backorder_notes: note })
 <div class="modal" style="max-width:900px">
 <div class="modal-header">
 <h3 id="monthDetailTitle">Monthly Sales</h3>
-<button class="modal-close" onclick="document.getElementById('monthDetailModal').style.display='none'">✕</button>
+<button class="modal-close" onclick="document.getElementById('monthDetailModal').classList.remove('open');">✕</button>
 </div>
 <div class="modal-body" style="padding:16px">
 <div class="stats-grid" id="monthDetailKPIs" style="margin-bottom:16px"></div>
