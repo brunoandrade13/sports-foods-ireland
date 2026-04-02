@@ -8260,10 +8260,10 @@ Loading items...
       const existing = productVariantsCache[productId] || [];
       if (!variants.length && !existing.length) return;
 
-      // Deactivate removed variants
+      // Delete removed variants (not just deactivate)
       const newExIds = variants.filter(v => v.existingId).map(v => v.existingId);
-      for (const id of existing.map(v => v.id).filter(id => !newExIds.includes(id))) {
-        try { await supaUpdate('product_variants', id, { is_active: false }); } catch (e) { }
+      for (const vid of existing.map(v => v.id).filter(vid => !newExIds.includes(vid))) {
+        try { await supaDelete('product_variants', vid); } catch (e) { console.warn('Could not delete variant', vid, e); }
       }
 
       // Save parents first to get their IDs
