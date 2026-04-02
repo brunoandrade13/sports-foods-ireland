@@ -414,11 +414,12 @@
             const data = await res.json();
 
             if (!res.ok || !data.url) {
-                throw new Error(data.error || 'Could not create checkout session');
+                console.error('[checkout] API response error:', res.status, JSON.stringify(data));
+                throw new Error(data.error || data.message || 'Could not create checkout session (status: ' + res.status + ')');
             }
 
             // Security: validate redirect URL before navigating
-            const allowedDomains = ['checkout.stripe.com', 'sportsfoodsireland.ie', 'www.sportsfoodsireland.ie', 'www.paypal.com', 'www.sandbox.paypal.com'];
+            const allowedDomains = ['checkout.stripe.com', 'sportsfoodsireland.ie', 'www.sportsfoodsireland.ie', 'www.paypal.com', 'www.sandbox.paypal.com', 'paypal.com'];
             try {
                 const redirectUrl = new URL(data.url);
                 if (!allowedDomains.some(d => redirectUrl.hostname === d || redirectUrl.hostname.endsWith('.' + d))) {
@@ -426,7 +427,8 @@
                 }
                 window.location.href = data.url;
             } catch (urlErr) {
-                throw new Error('Invalid checkout URL');
+                console.error('[checkout] URL validation failed:', urlErr.message, 'URL:', data.url, 'Response:', JSON.stringify(data));
+                throw new Error('Invalid checkout URL: ' + (urlErr.message || '') + ' (url: ' + (data.url || 'empty') + ')');
             }
 
         } catch (err) {
