@@ -17,7 +17,10 @@
 <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
 href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
-<link rel="stylesheet" href="css/sfi-styles.min.css?v=27">
+
+<link rel='preload' href='css/sfi-styles.min.css?v=27' as='style' onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel='stylesheet' href='css/sfi-styles.min.css?v=27'></noscript>
+<!-- Original blocking CSS removed for performance: <link rel="stylesheet" href="css/sfi-styles.min.css?v=27"> -->
 <style>
 .b2b-reg-wrap { max-width: 600px; margin: 40px auto; padding: 0 20px 60px; }
 .b2b-badge { display: inline-flex; align-items: center; gap: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #1B4332; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; margin-bottom: 24px; }
@@ -94,28 +97,28 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 <div class="form-row">
 <div class="form-group">
 <label for="b2bFirstName">First Name *</label>
-<input type="text" id="b2bFirstName" required placeholder="John">
+<input type="text" id="b2bFirstName" required aria-required="true" placeholder="John">
 </div>
 <div class="form-group">
 <label for="b2bLastName">Last Name *</label>
-<input type="text" id="b2bLastName" required placeholder="Doe">
+<input type="text" id="b2bLastName" required aria-required="true" placeholder="Doe">
 </div>
 </div>
 
 <div class="form-group">
 <label for="b2bEmail">Email Address *</label>
-<input type="email" id="b2bEmail" required placeholder="you@company.com">
+<input type="email" id="b2bEmail" required aria-required="true" placeholder="you@company.com">
 </div>
 
 <div class="form-row">
 <div class="form-group">
 <label for="b2bPassword">Password *</label>
-<input type="password" id="b2bPassword" required placeholder="Min. 8 characters">
+<input type="password" id="b2bPassword" required aria-required="true" placeholder="Min. 8 characters">
 <small>At least 8 characters with 1 number</small>
 </div>
 <div class="form-group">
 <label for="b2bConfirmPw">Confirm Password *</label>
-<input type="password" id="b2bConfirmPw" required placeholder="••••••••">
+<input type="password" id="b2bConfirmPw" required aria-required="true" placeholder="••••••••">
 </div>
 </div>
 
@@ -123,13 +126,13 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 
 <div class="form-group">
 <label for="b2bCompany">Company Name *</label>
-<input type="text" id="b2bCompany" required placeholder="Acme Fitness Ltd.">
+<input type="text" id="b2bCompany" required aria-required="true" placeholder="Acme Fitness Ltd.">
 </div>
 
 <div class="form-row">
 <div class="form-group">
 <label for="b2bVat">VAT Number *</label>
-<input type="text" id="b2bVat" required placeholder="IE1234567T">
+<input type="text" id="b2bVat" required aria-required="true" placeholder="IE1234567T">
 <small>Irish or EU VAT number</small>
 </div>
 <div class="form-group">
@@ -141,7 +144,7 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 <div class="form-row">
 <div class="form-group">
 <label for="b2bType">Business Type *</label>
-<select id="b2bType" required>
+<select id="b2bType" required aria-required="true">
 <option value="">Select...</option>
 <option>Gym / Fitness Centre</option>
 <option>Sports Club</option>
@@ -154,7 +157,7 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 </div>
 <div class="form-group">
 <label for="b2bVolume">Expected Monthly Volume *</label>
-<select id="b2bVolume" required>
+<select id="b2bVolume" required aria-required="true">
 <option value="">Select...</option>
 <option>Under €500</option>
 <option>€500 – €2,000</option>
@@ -181,7 +184,7 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 
 <div class="form-group">
 <label class="checkbox-label">
-<input type="checkbox" id="b2bTerms" required>
+<input type="checkbox" id="b2bTerms" required aria-required="true">
 <span>I agree to the <a href="terms.html" target="_blank" style="color:#2D6A4F;">Terms & Conditions</a> and <a href="privacy.html" target="_blank" style="color:#2D6A4F;">B2B Trade Conditions</a>.</span>
 </label>
 </div>
