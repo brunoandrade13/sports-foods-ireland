@@ -16,6 +16,20 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
+
+/**
+ * Sanitize a string for safe use in HTML context.
+ * Prevents XSS injection via user-supplied fields (name, company, email).
+ */
+function sanitizeHtml(str: unknown): string {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
 const ADMIN_EMAIL = "admin@sportsfoodsireland.ie";
 const FROM_EMAIL = "Sports Foods Ireland <noreply@sportsfoodsireland.ie>";
 const SITE_URL = "https://www.sportsfoodsireland.ie";
@@ -80,11 +94,12 @@ Deno.serve(async (req: Request) => {
 
     const newStatus = record.b2b_status;
     const oldStatus = oldRecord.b2b_status;
-    const email = record.email || "";
-    const company = record.b2b_company_name || "Unknown Company";
-    const name =
+    const email = sanitizeHtml(record.email || "");
+    const company = sanitizeHtml(record.b2b_company_name || "Unknown Company");
+    const name = sanitizeHtml(
       [record.first_name, record.last_name].filter(Boolean).join(" ") ||
-      "Customer";
+      "Customer",
+    );
 
     // Only act if status actually changed
     if (newStatus === oldStatus) {
@@ -124,7 +139,7 @@ Deno.serve(async (req: Request) => {
 
     // --- REJECTED ---
     if (newStatus === "rejected" && oldStatus === "pending") {
-      const notes = record.b2b_notes || "";
+      const notes = sanitizeHtml(record.b2b_notes || "");
       await sendEmail(
         email,
         "Your B2B Application Update — Sports Foods Ireland",

@@ -4,8 +4,11 @@
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
 if (!STRIPE_SECRET_KEY) {
   throw new Error(
@@ -56,6 +59,66 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    // SERVER-SIDE PRICE VALIDATION
+    // Fetch real prices from database to prevent client-side price manipulation
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const priceField = currency === "GBP" ? "price_gbp" : "price_eur";
+    const itemIds = items
+      .map((i: { id?: string | number }) => i.id)
+      .filter(Boolean);
+
+    const productPrices = new Map<string | number, number>();
+
+    if (itemIds.length > 0) {
+      const { data: products, error: dbError } = await supabase
+        .from("products")
+        .select(`id, ${priceField}`)
+        .in("id", itemIds);
+
+      if (dbError) {
+        console.error("[create-checkout] DB price lookup error:", dbError);
+        return new Response(
+          JSON.stringify({ error: "Failed to validate product prices" }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      for (const p of products || []) {
+        const price = Number(p[priceField as keyof typeof p]);
+        if (price > 0) productPrices.set(p.id, price);
+      }
+    }
+
+    // Replace client-sent prices with server-authoritative prices
+    const validatedItems = items.map(
+      (item: {
+        id?: string | number;
+        name: string;
+        price: number;
+        quantity: number;
+        image?: string;
+      }) => {
+        if (item.id !== undefined && productPrices.has(item.id)) {
+          const serverPrice = productPrices.get(item.id)!;
+          if (item.price !== serverPrice) {
+            console.warn(
+              `[create-checkout] Price mismatch for product ${item.id}: ` +
+                `client sent ${item.price}, using server price ${serverPrice}`,
+            );
+          }
+          return { ...item, price: serverPrice };
+        }
+        // No server price found — log and allow (e.g. shipping-only items)
+        console.warn(
+          `[create-checkout] No DB price for item id=${item.id} name=${item.name}, using client price`,
+        );
+        return item;
+      },
+    );
+
     const siteUrl =
       Deno.env.get("SITE_URL") || "https://sportsfoodsireland.com";
 
@@ -66,7 +129,7 @@ Deno.serve(async (req: Request) => {
       originUrl = siteUrl;
     }
 
-    const lineItems = items.map(
+    const lineItems = validatedItems.map(
       (item: {
         name: string;
         price: number;
@@ -95,7 +158,7 @@ Deno.serve(async (req: Request) => {
       },
     );
 
-    const subtotal = items.reduce(
+    const subtotal = validatedItems.reduce(
       (s: number, i: { price: number; quantity: number }) =>
         s + i.price * (i.quantity || 1),
       0,
@@ -158,7 +221,7 @@ Deno.serve(async (req: Request) => {
       cancel_url: `${originUrl}/checkout.html?canceled=true`,
       metadata: {
         items_json: JSON.stringify(
-          items.map(
+          validatedItems.map(
             (i: {
               id?: string | number;
               name: string;
