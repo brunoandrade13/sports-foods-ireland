@@ -101,6 +101,24 @@ function mapQbStatusToOrderStatus(invoice: any): {
 }
 
 Deno.serve(async (req: Request) => {
+  // Validate Authorization header with service role key
+  const authHeader = req.headers.get("Authorization");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+  if (
+    !authHeader ||
+    !serviceRoleKey ||
+    authHeader !== `Bearer ${serviceRoleKey}`
+  ) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized - Service role key required" }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
+
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   const { data: syncRecord } = await supabase
     .from("qb_sync_history")
