@@ -1,10 +1,10 @@
 /**
  * b2b-notify — Supabase Edge Function
  * Sends email notifications for B2B status changes.
- * 
+ *
  * Trigger via Supabase Database Webhook on profiles table
  * when b2b_status column changes.
- * 
+ *
  * Expected payload (from webhook or direct call):
  * {
  *   type: "UPDATE",
@@ -20,22 +20,38 @@ const ADMIN_EMAIL = "admin@sportsfoodsireland.ie";
 const FROM_EMAIL = "Sports Foods Ireland <noreply@sportsfoodsireland.ie>";
 const SITE_URL = "https://www.sportsfoodsireland.ie";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+const ALLOWED_ORIGINS = [
+  "https://sportsfoodsireland.ie",
+  "https://www.sportsfoodsireland.ie",
+];
+
+function getCorsHeaders(req: Request): HeadersInit {
+  const origin = req.headers.get("origin") || "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin)
+    ? origin
+    : ALLOWED_ORIGINS[0];
+
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    Vary: "Origin",
+  };
+}
 
 async function sendEmail(to: string, subject: string, html: string) {
   if (!RESEND_API_KEY) {
-    console.log(`[b2b-notify] RESEND_API_KEY not set. Would send to ${to}: ${subject}`);
+    console.log(
+      `[b2b-notify] RESEND_API_KEY not set. Would send to ${to}: ${subject}`,
+    );
     return { success: true, mock: true };
   }
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${RESEND_API_KEY}`,
+      Authorization: `Bearer ${RESEND_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ from: FROM_EMAIL, to: [to], subject, html }),
@@ -51,6 +67,8 @@ async function sendEmail(to: string, subject: string, html: string) {
 }
 
 Deno.serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -64,7 +82,9 @@ Deno.serve(async (req: Request) => {
     const oldStatus = oldRecord.b2b_status;
     const email = record.email || "";
     const company = record.b2b_company_name || "Unknown Company";
-    const name = [record.first_name, record.last_name].filter(Boolean).join(" ") || "Customer";
+    const name =
+      [record.first_name, record.last_name].filter(Boolean).join(" ") ||
+      "Customer";
 
     // Only act if status actually changed
     if (newStatus === oldStatus) {
@@ -77,7 +97,10 @@ Deno.serve(async (req: Request) => {
 
     // --- APPROVED ---
     if (newStatus === "approved") {
-      await sendEmail(email, "🎉 Your B2B Application Has Been Approved!", `
+      await sendEmail(
+        email,
+        "🎉 Your B2B Application Has Been Approved!",
+        `
         <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;">
           <div style="text-align:center;margin-bottom:30px;">
             <h1 style="color:#2D6A4F;font-size:24px;">Welcome to SFI Wholesale!</h1>
@@ -94,14 +117,18 @@ Deno.serve(async (req: Request) => {
           <hr style="border:none;border-top:1px solid #eee;margin:30px 0;">
           <p style="color:#999;font-size:12px;">Sports Foods Ireland — Premium Sports Nutrition & Triathlon Gear</p>
         </div>
-      `);
+      `,
+      );
       results.push("Sent approval email to " + email);
     }
 
     // --- REJECTED ---
     if (newStatus === "rejected" && oldStatus === "pending") {
       const notes = record.b2b_notes || "";
-      await sendEmail(email, "Your B2B Application Update — Sports Foods Ireland", `
+      await sendEmail(
+        email,
+        "Your B2B Application Update — Sports Foods Ireland",
+        `
         <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;">
           <h1 style="color:#333;font-size:22px;">B2B Application Update</h1>
           <p>Hi ${name},</p>
@@ -113,13 +140,17 @@ Deno.serve(async (req: Request) => {
           <hr style="border:none;border-top:1px solid #eee;margin:30px 0;">
           <p style="color:#999;font-size:12px;">Sports Foods Ireland — Premium Sports Nutrition & Triathlon Gear</p>
         </div>
-      `);
+      `,
+      );
       results.push("Sent rejection email to " + email);
     }
 
     // --- NEW PENDING APPLICATION → notify admin ---
     if (newStatus === "pending" && oldStatus !== "pending") {
-      await sendEmail(ADMIN_EMAIL, `🏢 New B2B Application: ${company}`, `
+      await sendEmail(
+        ADMIN_EMAIL,
+        `🏢 New B2B Application: ${company}`,
+        `
         <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;">
           <h1 style="color:#2D6A4F;font-size:22px;">New B2B Application</h1>
           <table style="width:100%;border-collapse:collapse;margin:20px 0;">
@@ -137,14 +168,14 @@ Deno.serve(async (req: Request) => {
             </a>
           </div>
         </div>
-      `);
+      `,
+      );
       results.push("Sent notification to admin for " + company);
     }
 
     return new Response(JSON.stringify({ success: true, actions: results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
   } catch (error) {
     console.error("[b2b-notify] Error:", error);
     return new Response(JSON.stringify({ error: error.message }), {

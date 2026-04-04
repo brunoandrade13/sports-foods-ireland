@@ -2,33 +2,43 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+const SUPABASE_SERVICE_ROLE_KEY =
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
-const WOO_URL = (Deno.env.get("WOOCOMMERCE_URL") || Deno.env.get("WOO_URL") || "").replace(/\/$/, "");
-const WOO_CK = Deno.env.get("WOOCOMMERCE_CONSUMER_KEY") || Deno.env.get("WOO_CK") || "";
-const WOO_CS = Deno.env.get("WOOCOMMERCE_CONSUMER_SECRET") || Deno.env.get("WOO_CS") || "";
+const WOO_URL = (
+  Deno.env.get("WOOCOMMERCE_URL") ||
+  Deno.env.get("WOO_URL") ||
+  ""
+).replace(/\/$/, "");
+const WOO_CK =
+  Deno.env.get("WOOCOMMERCE_CONSUMER_KEY") || Deno.env.get("WOO_CK") || "";
+const WOO_CS =
+  Deno.env.get("WOOCOMMERCE_CONSUMER_SECRET") || Deno.env.get("WOO_CS") || "";
 
 function normalizeName(name: string): string {
-  return name.toLowerCase().trim().replace(/[\s-_]+/g, " ");
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[\s-_]+/g, " ");
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      },
-    });
-  }
-
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-  const stats = { processed: 0, matched: 0, updated: 0, skipped: 0, failed: 0, errors: [] as any[], unmatched: [] as any[] };
+  const stats = {
+    processed: 0,
+    matched: 0,
+    updated: 0,
+    skipped: 0,
+    failed: 0,
+    errors: [] as any[],
+    unmatched: [] as any[],
+  };
 
   try {
     if (!WOO_URL || !WOO_CK || !WOO_CS) {
-      throw new Error("WooCommerce not configured. Set WOOCOMMERCE_URL + WOOCOMMERCE_CONSUMER_KEY + WOOCOMMERCE_CONSUMER_SECRET (or WOO_URL/WOO_CK/WOO_CS).");
+      throw new Error(
+        "WooCommerce not configured. Set WOOCOMMERCE_URL + WOOCOMMERCE_CONSUMER_KEY + WOOCOMMERCE_CONSUMER_SECRET (or WOO_URL/WOO_CK/WOO_CS).",
+      );
     }
 
     const { data: products, error } = await supabase
@@ -53,7 +63,9 @@ Deno.serve(async (req: Request) => {
 
     while (true) {
       const url = `${baseUrl}?per_page=${perPage}&page=${page}`;
-      const res = await fetch(url, { headers: { Authorization: `Basic ${auth}` } });
+      const res = await fetch(url, {
+        headers: { Authorization: `Basic ${auth}` },
+      });
       if (!res.ok) {
         throw new Error(`WooCommerce API ${res.status}: ${await res.text()}`);
       }
@@ -82,7 +94,12 @@ Deno.serve(async (req: Request) => {
           }
 
           if (!matched) {
-            stats.unmatched.push({ woo_id: prod.id, woo_name: wooName, woo_sku: wooSku || null, message: "No matching product found in Supabase" });
+            stats.unmatched.push({
+              woo_id: prod.id,
+              woo_name: wooName,
+              woo_sku: wooSku || null,
+              message: "No matching product found in Supabase",
+            });
             stats.skipped++;
             continue;
           }
@@ -130,7 +147,9 @@ Deno.serve(async (req: Request) => {
 
               // Buscar todas variações deste produto em uma chamada
               const varUrl = `${baseUrl}/${prod.id}/variations?per_page=100`;
-              const vRes = await fetch(varUrl, { headers: { Authorization: `Basic ${auth}` } });
+              const vRes = await fetch(varUrl, {
+                headers: { Authorization: `Basic ${auth}` },
+              });
               if (vRes.ok) {
                 const vList = await vRes.json();
                 if (Array.isArray(vList) && vList.length) {
@@ -144,12 +163,17 @@ Deno.serve(async (req: Request) => {
                     const matchVar = byLabel.get(key);
                     if (!matchVar) continue;
 
-                    const currentVarSku = matchVar.sku ? String(matchVar.sku).trim() : "";
+                    const currentVarSku = matchVar.sku
+                      ? String(matchVar.sku).trim()
+                      : "";
                     if (currentVarSku === vSku) continue;
 
                     await supabase
                       .from("product_variants")
-                      .update({ sku: vSku, updated_at: new Date().toISOString() })
+                      .update({
+                        sku: vSku,
+                        updated_at: new Date().toISOString(),
+                      })
                       .eq("id", matchVar.id);
                   }
                 }
@@ -167,13 +191,20 @@ Deno.serve(async (req: Request) => {
     }
 
     return new Response(JSON.stringify({ success: true, stats }, null, 2), {
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
   } catch (err: any) {
-    return new Response(JSON.stringify({ success: false, error: err.message, stats }, null, 2), {
-      status: 500,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-    });
+    return new Response(
+      JSON.stringify({ success: false, error: err.message, stats }, null, 2),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      },
+    );
   }
 });
-
