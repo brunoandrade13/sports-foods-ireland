@@ -67,36 +67,50 @@ serve(async (req) => {
 
     switch (action) {
       case "subscribe_newsletter": {
+        // BE-A4: validate required fields
+        if (!data.email || !data.listId) {
+          return new Response(
+            JSON.stringify({ success: false, message: "email and listId are required." }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
         const contactRes = await addContact(
           data.email,
           { FIRSTNAME: data.firstName || "" },
           [data.listId],
         );
         let msg = "Successfully subscribed!";
+        let isAlreadySubscribed = false;
         if (!contactRes.ok) {
           const err = await contactRes.json();
-          if (err.code === "duplicate_parameter")
+          if (err.code === "duplicate_parameter") {
             msg = "You are already subscribed!";
-          else
+            isAlreadySubscribed = true;
+          } else {
             return new Response(
-              JSON.stringify({
-                success: false,
-                message: "Subscription failed.",
-              }),
-              {
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
-              },
+              JSON.stringify({ success: false, message: "Subscription failed." }),
+              { headers: { ...corsHeaders, "Content-Type": "application/json" } },
             );
+          }
         }
-        await sendTemplate(data.email, data.templateId, {
-          FIRSTNAME: data.firstName || "there",
-        });
+        // BE-A7: only send welcome email on first subscription, not on duplicate
+        if (!isAlreadySubscribed && data.templateId) {
+          await sendTemplate(data.email, data.templateId, {
+            FIRSTNAME: data.firstName || "there",
+          });
+        }
         return new Response(JSON.stringify({ success: true, message: msg }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
       case "send_order_confirmation": {
+        if (!data.email || !data.templateId) {
+          return new Response(
+            JSON.stringify({ success: false, message: "email and templateId are required." }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
         if (data.attributes && data.listId) {
           await addContact(data.email, data.attributes, [data.listId]);
         }

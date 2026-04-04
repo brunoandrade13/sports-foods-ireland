@@ -103,10 +103,15 @@ Deno.serve(async (req: Request) => {
             continue;
           }
 
-          let matched: any = null;
-          if (wooSku) {
-            matched = bySku.get(wooSku.toLowerCase());
+          // BE-A5: skip early if there is no Woo SKU to update with
+          // (avoids inflating stats.matched for name-only matches that can't be updated)
+          if (!wooSku) {
+            stats.skipped++;
+            continue;
           }
+
+          let matched: any = null;
+          matched = bySku.get(wooSku.toLowerCase());
           if (!matched && wooName) {
             matched = byName.get(normalizeName(wooName));
           }
@@ -115,7 +120,7 @@ Deno.serve(async (req: Request) => {
             stats.unmatched.push({
               woo_id: prod.id,
               woo_name: wooName,
-              woo_sku: wooSku || null,
+              woo_sku: wooSku,
               message: "No matching product found in Supabase",
             });
             stats.skipped++;
@@ -125,10 +130,6 @@ Deno.serve(async (req: Request) => {
           stats.matched++;
 
           const currentSku = matched.sku ? String(matched.sku).trim() : "";
-          if (!wooSku) {
-            stats.skipped++;
-            continue;
-          }
 
           // Se o SKU já é igual ao do Woo, não precisa atualizar
           if (currentSku === wooSku) {

@@ -321,9 +321,10 @@ async function loadOrders() {
                 return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:0.85rem"><span style="color:#334155">' + name + ' <span style="color:#94a3b8">x' + qty + '</span></span><span style="font-weight:600;color:#1e293b">€' + price + '</span></div>';
             }).join('') : '<div style="padding:8px 0;color:#94a3b8;font-size:0.85rem">Order details not available</div>';
 
-            const itemsData = JSON.stringify(items.map(it => ({
+            // FE-A2: use data-* attribute to avoid JSON-in-onclick breakage with special chars
+            const itemsPayload = encodeURIComponent(JSON.stringify(items.map(it => ({
                 id: it.product_id, name: it.product_name || it.name, price: Number(it.unit_price || it.price || 0), qty: it.quantity || 1
-            }))).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            }))));
 
             return '<div class="order-card" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">' +
                 '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">' +
@@ -334,10 +335,15 @@ async function loadOrders() {
                 '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:2px solid #f1f5f9">' +
                     '<div><span style="color:#64748b;font-size:0.85rem">Payment: </span><span style="color:#334155;font-size:0.85rem;font-weight:500">' + (o.payment_method || '—') + '</span></div>' +
                     '<div style="display:flex;align-items:center;gap:12px"><span style="font-weight:700;font-size:1.1rem;color:#169B62">€' + (Number(o.total)||0).toFixed(2) + '</span>' +
-                    '<button onclick="reorderItems(\''+itemsData+'\')" style="background:#FF883E;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer">🔄 Reorder</button></div>' +
+                    '<button type="button" class="sfi-reorder-btn" data-items="' + itemsPayload + '" style="background:#FF883E;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-weight:600;font-size:0.8rem;cursor:pointer">🔄 Reorder</button></div>' +
                 '</div>' +
             '</div>';
         }).join('');
+        // Event delegation for reorder buttons (avoids inline onclick)
+        el.addEventListener('click', function(e) {
+            const btn = e.target.closest('.sfi-reorder-btn');
+            if (btn) window.reorderItems(btn.dataset.items);
+        }, { once: false });
     } catch (err) {
         console.error('loadOrders:', err);
         el.innerHTML = '<p class="empty-state">Unable to load orders.</p>';
@@ -347,7 +353,7 @@ async function loadOrders() {
 // ---- REORDER ----
 window.reorderItems = function(itemsJson) {
     try {
-        const items = JSON.parse(itemsJson.replace(/&quot;/g, '"'));
+        const items = JSON.parse(decodeURIComponent(itemsJson));
         if (!items || !items.length) { alert('No items to reorder'); return; }
         const cart = JSON.parse(localStorage.getItem('sfi_cart') || '[]');
         let added = 0;

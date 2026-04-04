@@ -8,6 +8,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
+const STANDARD_SHIPPING_CENTS = 499; // €4.99 / £4.99
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
 if (!STRIPE_SECRET_KEY) {
@@ -223,7 +224,7 @@ Deno.serve(async (req: Request) => {
             {
               shipping_rate_data: {
                 type: "fixed_amount",
-                fixed_amount: { amount: 499, currency: currency.toLowerCase() },
+                fixed_amount: { amount: STANDARD_SHIPPING_CENTS, currency: currency.toLowerCase() },
                 display_name: "Standard Shipping (3-5 days)",
               },
             },

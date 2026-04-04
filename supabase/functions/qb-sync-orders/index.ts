@@ -367,7 +367,7 @@ Deno.serve(async (req: Request) => {
         records_failed: stats.failed,
         errors: stats.errors,
         completed_at: new Date().toISOString(),
-        status: "completed",
+        status: stats.errors.length > 0 ? "completed_with_errors" : "completed",
       })
       .eq("id", syncRecord?.id);
 
