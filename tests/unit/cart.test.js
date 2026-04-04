@@ -26,30 +26,13 @@ global.console = {
     log: jest.fn()
 };
 
-// Mock window.PRODUTOS
-global.window = {
-    PRODUTOS: [
-        { id: 1, nome: 'Whey Protein', preco: 29.99, imagem: 'img/produto1.jpg', em_stock: true },
-        { id: 2, nome: 'Creatine Monohydrate', preco: 19.99, imagem: 'img/produto2.jpg', em_stock: true },
-        { id: 3, nome: 'BCAA Powder', preco: 24.99, imagem: 'img/produto3.jpg', em_stock: true }
-    ]
-};
-
-// Mock DOM elements
-global.document = {
-    querySelectorAll: jest.fn(() => []),
-    getElementById: jest.fn(() => null),
-    createElement: jest.fn(() => ({
-        className: '',
-        innerHTML: '',
-        classList: { add: jest.fn(), remove: jest.fn() },
-        appendChild: jest.fn(),
-        remove: jest.fn()
-    })),
-    body: {
-        appendChild: jest.fn()
-    }
-};
+// Mock window.PRODUTOS — in jsdom, window === global, so set directly on global
+const MOCK_PRODUTOS = [
+    { id: 1, nome: 'Whey Protein', preco: 29.99, imagem: 'img/produto1.jpg', em_stock: true },
+    { id: 2, nome: 'Creatine Monohydrate', preco: 19.99, imagem: 'img/produto2.jpg', em_stock: true },
+    { id: 3, nome: 'BCAA Powder', preco: 24.99, imagem: 'img/produto3.jpg', em_stock: true }
+];
+global.PRODUTOS = MOCK_PRODUTOS;
 
 // Import cart functions (simulated - since we can't directly import from cart.js)
 // We'll define them here based on the actual implementation
@@ -162,6 +145,7 @@ describe('Add to Cart', () => {
 
     beforeEach(() => {
         localStorage.clear();
+        global.PRODUTOS = MOCK_PRODUTOS;
     });
 
     test('addToCart adds item correctly with default quantity', () => {
