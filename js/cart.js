@@ -9,7 +9,7 @@
 
 function getCart() {
     try {
-        return JSON.parse(localStorage.getItem('cart')) || [];
+        return JSON.parse(localStorage.getItem('sfi_cart')) || [];
     } catch (e) {
         console.error('Error reading cart:', e);
         return [];
@@ -18,7 +18,7 @@ function getCart() {
 
 function saveCart(cart) {
     try {
-        localStorage.setItem('cart', JSON.stringify(cart));
+        localStorage.setItem('sfi_cart', JSON.stringify(cart));
         updateCartCount();
         updateCartModalContent();
     } catch (e) {

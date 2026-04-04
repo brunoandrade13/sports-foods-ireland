@@ -76,6 +76,20 @@ async function handleCheckoutComplete(
   session: StripeSession,
   supabase: ReturnType<typeof createClient>,
 ) {
+  // IDEMPOTENCY CHECK: prevent duplicate orders if Stripe retries the webhook
+  const { data: alreadyProcessed } = await supabase
+    .from("processed_webhook_events")
+    .select("event_id")
+    .eq("event_id", session.id)
+    .maybeSingle();
+
+  if (alreadyProcessed) {
+    console.log(
+      `[stripe-webhook] Session ${session.id} already processed — skipping duplicate`,
+    );
+    return;
+  }
+
   const metadata = session.metadata || {};
   const items = safeJson(metadata.items_json, []);
   const shipping = safeJson(metadata.shipping_json, {});
@@ -119,6 +133,12 @@ async function handleCheckoutComplete(
     throw new Error(`DB insert failed: ${error.message}`);
   }
 
+  // Mark session as processed to prevent duplicates on Stripe retries
+  await supabase.from("processed_webhook_events").insert({
+    event_id: session.id,
+    event_type: "checkout.session.completed",
+  });
+
   console.log(`[stripe-webhook] Order ${orderId} saved successfully`);
 
   // Optionally trigger QB sync (fire-and-forget, don't block webhook response)
@@ -137,7 +157,7 @@ async function handlePaymentFailed(
   await supabase
     .from("orders")
     .update({ status: "payment_failed" })
-    .eq("stripe_payment_intent", pi.id);
+    .eq("stripe_payment_intent_id", pi.id); // fix: coluna correcta é stripe_payment_intent_id
 }
 
 // ---- QuickBooks Sync Trigger ----
