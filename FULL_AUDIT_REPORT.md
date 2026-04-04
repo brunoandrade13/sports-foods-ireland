@@ -392,7 +392,50 @@ Páginas referenciadas em navegação que precisam de verificação:
 | BD-M3 | order_items.product_id FK: SET NULL → RESTRICT | ✅ Migração aplicada |
 | BD-M4 | CHECK constraints total/subtotal/tax/shipping >= 0 | ✅ Migração aplicada |
 
-> ⚠️ **Pendente de deploy**: Executar no terminal `supabase functions deploy brevo-proxy create-checkout qb-sync-orders woo-sync-skus --project-ref styynhgzrkyoioqjssuw`
+> ✅ **Deploy concluído via Supabase MCP** (2026-04-04): brevo-proxy v8 · create-checkout v24 · qb-sync-orders v23 · woo-sync-skus v11 — todos ACTIVE.
+
+### ✅ Verificação Triple-Layer — CONCLUÍDA (Commit `e0dbf59`)
+
+Verificação independente realizada após Fase 2 para confirmar integridade do código e infra em produção:
+
+| Camada | Testes | Resultado |
+|--------|--------|-----------|
+| **Front-End** (análise de código) | 5 | 5/5 PASS ✅ |
+| **Back-End** (curl ao vivo) | 6 | 6/6 PASS ✅ |
+| **Supabase DB** (SQL MCP) | 10 | 10/10 PASS ✅ |
+
+**Detalhe Front-End:**
+
+| Check | Resultado |
+|-------|-----------|
+| LY-A1 — 24 ficheiros `<button class="cart">` sem `<a href="#">` | ✅ PASS |
+| LY-A3 — Zero links duplos `#cat#sub`, 20 ficheiros com `?category=` | ✅ PASS |
+| FE-A1 — `cart.js` usa `sfi_cart` | ✅ PASS |
+| FE-A1 — `cart.min.js` regenerado com `sfi_cart` (fix adicional `e0dbf59`) | ✅ PASS |
+| FE-A2 — `data-items` + `encodeURIComponent` + event delegation | ✅ PASS |
+| LY-A2 — `contact.html` og:description limpo | ✅ PASS |
+
+**Detalhe Back-End (curl ao vivo):**
+
+| Check | Resultado |
+|-------|-----------|
+| brevo-proxy: validação campos obrigatórios → `400` | ✅ PASS |
+| create-checkout: cart vazio → `{"error":"Cart is empty"}` | ✅ PASS |
+| qb-sync-orders: sem auth → `401` | ✅ PASS |
+| woo-sync-skus: sem auth → `401` | ✅ PASS |
+| OPTIONS preflight: `Access-Control-Allow-Origin: https://sportsfoodsireland.ie` | ✅ PASS |
+
+**Detalhe Supabase DB:**
+
+| Check | Resultado |
+|-------|-----------|
+| BD-C3 enum `payment_failed`/`partially_refunded` | ✅ PASS |
+| BD-M3 FK RESTRICT em `order_items.product_id` | ✅ PASS |
+| BD-M4 CHECK total/subtotal/tax/shipping >= 0 | ✅ PASS |
+| BD-M2 trigger `trg_update_customer_stats` | ✅ PASS |
+| BD-M1 `product_images.product_id` NOT NULL | ✅ PASS |
+| BD-C5 RLS em `orders` | ✅ PASS |
+| BD-C4 índice em `event_id` | ✅ PASS |
 
 ### 🔵 Fase 3 — Pós-lançamento (Qualidade de Código)
 - FE-A3, FE-A4: Imagem lazy loading e otimizações de performance
@@ -410,4 +453,6 @@ Páginas referenciadas em navegação que precisam de verificação:
 **Relatório gerado:** 2026-04-04
 **Fase 1 concluída:** 2026-04-04 (commit `8307317`)
 **Fase 2 concluída:** 2026-04-04 (commit `a357138`)
+**Deploy Edge Functions:** 2026-04-04 (via Supabase MCP — v8/v24/v23/v11)
+**Verificação triple-layer:** 2026-04-04 — 21/21 PASS (commit `e0dbf59`)
 **Próxima revisão:** Pós-lançamento (Fase 3)
