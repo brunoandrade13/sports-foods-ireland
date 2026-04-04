@@ -359,29 +359,55 @@ Páginas referenciadas em navegação que precisam de verificação:
 
 ---
 
-## PLANO DE AÇÃO RECOMENDADO
+## PLANO DE AÇÃO — STATUS DE EXECUÇÃO
 
-### Fase 1 — Esta semana (Pré-lançamento)
-1. **BD-C1 a BD-C8**: Criar tabelas/colunas em falta, corrigir enum, adicionar RLS
-2. **BE-A1**: Corrigir nome de coluna no stripe-webhook (1 linha)
-3. **BE-A4**: Adicionar idempotência ao stripe-webhook
-4. **FE-A1**: Padronizar chave do localStorage do carrinho
-5. **LY-A2**: Corrigir og:description quebrado
-6. **LY-A4**: Verificar existência de todas as páginas referenciadas
+### ✅ Fase 1 — CONCLUÍDA (Commit `8307317`)
+| Item | Descrição | Status |
+|------|-----------|--------|
+| BD-C1 | Tabelas qb_integration + qb_sync_history | ✅ Já existiam |
+| BD-C2 | Colunas QB em products/orders/customers | ✅ Já existiam |
+| BD-C3 | Enum order_status (payment_failed, partially_refunded) | ✅ Migração aplicada |
+| BD-C4 | Idempotência no stripe-webhook (processed_webhook_events) | ✅ Tabela criada + código fix |
+| BD-C5 | RLS em orders e order_items | ✅ Já existia |
+| BD-C6 | Analytics anon insert restrita | ✅ Já existia |
+| BD-C7 | order_number UNIQUE + check constraints | ✅ Já existia |
+| BD-C8 | supplier_id NOT NULL em purchase_orders | ✅ Já existia |
+| BE-A1 | stripe-webhook coluna errada (stripe_payment_intent_id) | ✅ Corrigido |
+| FE-A1 | localStorage key 'cart' → 'sfi_cart' padronizado | ✅ Corrigido |
+| LY-A2 | og:description quebrado em contact.html | ✅ Corrigido |
 
-### Fase 2 — Semana seguinte (Estabilização)
-- BE-A2 a BE-A8 (lógica de Edge Functions)
-- FE-A2 a FE-A4 (bugs de UX)
-- LY-A1, LY-A3 (acessibilidade e links)
-- BD-M1 a BD-M4 (constraints e triggers)
+### ✅ Fase 2 — CONCLUÍDA (Commit `a357138`)
+| Item | Descrição | Status |
+|------|-----------|--------|
+| BE-A4 | brevo-proxy valida campos obrigatórios | ✅ Corrigido |
+| BE-A5 | woo-sync-skus: contador stats invertido | ✅ Corrigido |
+| BE-A6 | qb-sync-orders: status always 'completed' | ✅ Corrigido → 'completed_with_errors' |
+| BE-A7 | brevo-proxy envia welcome email em duplicados | ✅ Corrigido |
+| BE-A8 | create-checkout: 499 sem constante nomeada | ✅ STANDARD_SHIPPING_CENTS = 499 |
+| FE-A2 | reorder button: JSON inline em onclick | ✅ data-items + encodeURIComponent |
+| LY-A1 | cart icon links `<a href="#">` → `<button>` | ✅ 24 ficheiros corrigidos |
+| LY-A3 | links duplos `#cat#sub` → `?category=cat&sub=sub` | ✅ 21 ficheiros corrigidos |
+| BD-M1 | product_images.product_id NOT NULL | ✅ Já existia |
+| BD-M2 | trigger customer stats | ✅ Já existia (trg_update_customer_stats) |
+| BD-M3 | order_items.product_id FK: SET NULL → RESTRICT | ✅ Migração aplicada |
+| BD-M4 | CHECK constraints total/subtotal/tax/shipping >= 0 | ✅ Migração aplicada |
 
-### Fase 3 — Pós-lançamento (Qualidade)
-- Todos os itens MÉDIO restantes
-- Refactoring de imagem, constantes nomeadas, TypeScript interfaces
-- Audit log completo
-- Mecanismo de retry para QB sync
+> ⚠️ **Pendente de deploy**: Executar no terminal `supabase functions deploy brevo-proxy create-checkout qb-sync-orders woo-sync-skus --project-ref styynhgzrkyoioqjssuw`
+
+### 🔵 Fase 3 — Pós-lançamento (Qualidade de Código)
+- FE-A3, FE-A4: Imagem lazy loading e otimizações de performance
+- BE-A2: qb-sync-orders delete+reinsert sem rastrear IDs antigos (risco de duplicados)
+- BE-A3: Variante de WooCommerce — update não captura erro
+- Constantes mágicas sem nome (9.04 shipping, 1.23 VAT)
+- TypeScript interfaces formais para Coupon, Order, etc.
+- Audit log completo para operações admin
+- Mecanismo de retry com backoff para QB sync
+- hreflang en-GB vs en-IE (Schema markup)
+- Índices em falta: product_variants.product_id, payment_transactions.charge_id
 
 ---
 
 **Relatório gerado:** 2026-04-04
-**Próxima revisão:** Após Fase 1 concluída
+**Fase 1 concluída:** 2026-04-04 (commit `8307317`)
+**Fase 2 concluída:** 2026-04-04 (commit `a357138`)
+**Próxima revisão:** Pós-lançamento (Fase 3)
