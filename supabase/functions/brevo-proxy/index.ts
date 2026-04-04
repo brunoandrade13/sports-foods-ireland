@@ -137,8 +137,9 @@ serve(async (req) => {
         );
     }
   } catch (err) {
+    console.error("[brevo-proxy] Error:", err);
     return new Response(
-      JSON.stringify({ success: false, message: err.message }),
+      JSON.stringify({ success: false, message: "An internal error occurred. Please try again." }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

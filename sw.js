@@ -66,6 +66,17 @@ self.addEventListener('fetch', event => {
   if (url.hostname.includes('brevo')) return;
   if (url.hostname.includes('fonts.googleapis')) return;
 
+  // Security: Only cache same-origin responses with valid Content-Type
+  const MAX_CACHE_SIZE_IMAGES = 50 * 1024 * 1024; // 50MB image cache limit
+  function isSafeToCacheResponse(response) {
+    if (!response.ok) return false;
+    const ct = response.headers.get('content-type') || '';
+    // Only cache expected content types — prevent caching of unexpected responses
+    const allowedTypes = ['image/', 'text/css', 'text/javascript', 'application/javascript',
+      'text/html', 'application/json'];
+    return allowedTypes.some(t => ct.includes(t));
+  }
+
   // Imagens — Cache First (imagens mudam raramente)
   if (/\.(webp|png|jpg|jpeg|gif|svg|ico)(\?|$)/i.test(url.pathname)) {
     event.respondWith(
@@ -73,7 +84,7 @@ self.addEventListener('fetch', event => {
         cache.match(request).then(cached => {
           if (cached) return cached;
           return fetch(request).then(response => {
-            if (response.ok) cache.put(request, response.clone());
+            if (isSafeToCacheResponse(response)) cache.put(request, response.clone());
             return response;
           }).catch(() => cached);
         })
@@ -89,7 +100,7 @@ self.addEventListener('fetch', event => {
         cache.match(request).then(cached => {
           if (cached) return cached;
           return fetch(request).then(response => {
-            if (response.ok) cache.put(request, response.clone());
+            if (isSafeToCacheResponse(response)) cache.put(request, response.clone());
             return response;
           });
         })

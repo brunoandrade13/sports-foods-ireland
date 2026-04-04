@@ -52,7 +52,7 @@
 
 # === HSTS (after confirming HTTPS works) ===
 <IfModule mod_headers.c>
-    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
 </IfModule>
 
 # === GZIP COMPRESSION ===

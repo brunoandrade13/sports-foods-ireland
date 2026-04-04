@@ -12,8 +12,45 @@
     let checkoutData = { contact: {}, shipping: {}, payment: {} };
     let appliedCoupon = null;
 
+    // === PII localStorage TTL helpers (GDPR / security) ===
+    const PII_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+    function setPiiItem(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify({ value, expiry: Date.now() + PII_TTL_MS }));
+        } catch(e) { console.warn('[checkout] Could not save to localStorage:', e); }
+    }
+
+    function getPiiItem(key) {
+        try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return null;
+            const item = JSON.parse(raw);
+            if (item.expiry && Date.now() > item.expiry) {
+                localStorage.removeItem(key);
+                return null;
+            }
+            return item.value !== undefined ? item.value : item; // backwards compat
+        } catch(e) { return null; }
+    }
+
+    function cleanExpiredPiiItems() {
+        try {
+            const sfiKeys = Object.keys(localStorage).filter(k => k.startsWith('sfi_'));
+            for (const key of sfiKeys) {
+                const raw = localStorage.getItem(key);
+                if (!raw) continue;
+                try {
+                    const item = JSON.parse(raw);
+                    if (item.expiry && Date.now() > item.expiry) localStorage.removeItem(key);
+                } catch(e) {}
+            }
+        } catch(e) {}
+    }
+    cleanExpiredPiiItems(); // Run on every checkout page load
+
     const SUPABASE_COUPON_URL = 'https://styynhgzrkyoioqjssuw.supabase.co/rest/v1/discount_codes';
-    const SUPABASE_COUPON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
+    const SUPABASE_COUPON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH'; // Unified anon key (was old JWT format)
 
     async function fetchCouponFromDB(code) {
         try {
@@ -427,14 +464,12 @@
                 }
                 // Save checkout data for PayPal capture (lost after redirect)
                 if (paymentMethod === 'paypal') {
-                    try {
-                        localStorage.setItem('sfi_paypal_checkout', JSON.stringify({
-                            items, email: checkoutData.contact.email, contact: checkoutData.contact,
-                            shippingAddress: checkoutData.shipping, coupon: appliedCoupon || null,
-                            is_b2b: window._sfiCustomerIsB2B || false,
-                            attribution: typeof sfiGetAttribution === 'function' ? sfiGetAttribution() : {},
-                        }));
-                    } catch(e) { console.warn('[checkout] Could not save PayPal data:', e); }
+                    setPiiItem('sfi_paypal_checkout', {
+                        items, email: checkoutData.contact.email, contact: checkoutData.contact,
+                        shippingAddress: checkoutData.shipping, coupon: appliedCoupon || null,
+                        is_b2b: window._sfiCustomerIsB2B || false,
+                        attribution: typeof sfiGetAttribution === 'function' ? sfiGetAttribution() : {},
+                    });
                 }
                 window.location.href = data.url;
             } catch (urlErr) {
@@ -492,9 +527,8 @@
                 const SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
                 const SUPABASE_ANON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
 
-                // Retrieve saved checkout data from before PayPal redirect
-                let ppData = {};
-                try { ppData = JSON.parse(localStorage.getItem('sfi_paypal_checkout') || '{}'); } catch(e) {}
+                // Retrieve saved checkout data from before PayPal redirect (TTL-protected)
+                let ppData = getPiiItem('sfi_paypal_checkout') || {};
 
                 fetch(`${SUPABASE_URL}/functions/v1/paypal-capture`, {
                     method: 'POST',
