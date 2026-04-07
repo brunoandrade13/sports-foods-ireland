@@ -1680,7 +1680,7 @@ authorized staff</p>
 </div>
 
 <div class="dash-group">
-<div class="dash-group-title">🖱️ Engajamento & Comportamento</div>
+<div class="dash-group-title">🖱️ Engagement & Behaviour</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
 <div class="table-wrap">
 <div class="table-toolbar"><strong>📄 Top Pages by Volume</strong></div>
@@ -1742,7 +1742,7 @@ authorized staff</p>
 </div>
 
 <div class="dash-group">
-<div class="dash-group-title">📱 Tecnologia & Origem</div>
+<div class="dash-group-title">📱 Technology & Source</div>
 <div class="stats-grid">
 <div class="stat-card">
 <div class="label">Top Device</div>
@@ -2986,7 +2986,7 @@ Window: last 90 days · paid orders only
 <tr>
 <th>Product</th>
 <th>Brand</th>
-<th style="text-align:right">Stock atual</th>
+<th style="text-align:right">Current Stock</th>
 <th style="text-align:right">Vendido (90d)</th>
 <th style="text-align:right">Orders (90d)</th>
 <th style="text-align:right">Coverage (days)</th>
@@ -8795,7 +8795,7 @@ Loading items...
       tbody.innerHTML = byValue.map(p => {
         const val = (p.price_eur || 0) * (p.stock_quantity || 0);
         const cls = p.stock_quantity <= 0 ? 'out' : p.stock_quantity < 10 ? 'low' : 'in';
-        const lbl = p.stock_quantity <= 0 ? 'Sem stock' : p.stock_quantity < 10 ? 'Baixo' : 'Em stock';
+        const lbl = p.stock_quantity <= 0 ? 'Out of Stock' : p.stock_quantity < 10 ? 'Low' : 'In Stock';
         return `<tr>
           <td class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="View stock & sales"><strong>${esc(p.name)}</strong></td>
           <td>${esc(p.sku || '—')}</td>
@@ -8828,7 +8828,7 @@ Loading items...
       const valB2B = (p.wholesale_price_eur != null && p.wholesale_price_eur > 0 ? p.wholesale_price_eur : p.price_eur || 0) * (p.stock_quantity || 0);
       const valCost = (p.cost_price_eur || 0) * (p.stock_quantity || 0);
       const cls = p.stock_quantity <= 0 ? 'out' : p.stock_quantity < 10 ? 'low' : 'in';
-      const statusLbl = p.stock_quantity <= 0 ? 'Sem stock' : p.stock_quantity < 10 ? 'Baixo' : 'Em stock';
+      const statusLbl = p.stock_quantity <= 0 ? 'Out of Stock' : p.stock_quantity < 10 ? 'Low' : 'In Stock';
       kpiEl.innerHTML = `
         <div class="stat-card"><div class="label">SKU</div><div class="value" style="font-size:0.85rem">${esc(p.sku || '—')}</div></div>
         <div class="stat-card"><div class="label">Brand</div><div class="value" style="font-size:0.85rem">${esc(p.brands?.name || '—')}</div></div>
