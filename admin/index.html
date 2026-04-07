@@ -1578,7 +1578,7 @@ authorized staff</p>
 </div>
 
 <div class="dash-group">
-<div class="dash-group-title">📝 Resumo de Cadastros</div>
+<div class="dash-group-title">📝 Registration Summary</div>
 <div class="stats-grid">
 <div class="stat-card">
 <div class="label">Total Products</div>
@@ -1854,7 +1854,7 @@ oninput="filterProducts()">
 </div>
 <div class="stat-cards-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
 <div class="stat-card" style="border-left:3px solid var(--info)">
-<div class="label">Total de Brands</div>
+<div class="label">Total Brands</div>
 <div class="value" id="brandsStatTotal">—</div>
 </div>
 <div class="stat-card" style="border-left:3px solid var(--accent)">
@@ -1917,7 +1917,7 @@ oninput="filterProducts()">
 
 <div id="brandSalesDaily" style="max-height:400px;overflow-y:auto"></div>
 
-<div class="dash-group-title" style="margin-top:20px;margin-bottom:8px">👤 Top 15 clientes desta marca</div>
+<div class="dash-group-title" style="margin-top:20px;margin-bottom:8px">👤 Top 15 customers for this brand</div>
 <div style="overflow-x:auto;max-height:320px;overflow-y:auto">
 <table style="width:100%">
 <thead><tr><th>#</th><th>Customer</th><th>Email</th><th style="text-align:right">Units</th><th style="text-align:right">Revenue</th></tr></thead>
@@ -2647,7 +2647,7 @@ Select a financial report above to begin analysis.
 <button class="btn-sm btn-outline" onclick="clearCustomerDateRange()" title="Clear date filter">✕ Clear Dates</button>
 <span id="customerDateInfo" style="font-size:12px;color:var(--accent);display:none;"></span>
 </div>
-<p style="color:var(--text-muted);font-size:0.85rem;margin:0 0 8px 0;">Lista ordenada por total de compra (principais clientes primeiro). Clique no nome para abrir o perfil.</p>
+<p style="color:var(--text-muted);font-size:0.85rem;margin:0 0 8px 0;">Sorted by total purchases (top customers first). Click the name to open the profile.</p>
 <div style="overflow-x:auto">
 <table>
 <thead>
@@ -2967,7 +2967,7 @@ Select a financial report above to begin analysis.
 <div class="value" id="statOutStockCount">—</div>
 </div>
 <div class="stat-card" style="border-left:3px solid #0ea5e9;cursor:pointer" id="stkNoB2BCard" onclick="openNoB2BModal()" title="Clique para ver lista e documentação">
-<div class="label">Sem preço B2B</div>
+<div class="label">No B2B Price</div>
 <div class="value" id="stkNoB2BCount">—</div>
 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">clique para lista</div>
 </div>
@@ -2975,7 +2975,7 @@ Select a financial report above to begin analysis.
 
 <div class="table-wrap" style="margin-top:20px">
 <div class="table-toolbar">
-<strong>🔁 Reposição sugerida — produtos com vendas recorrentes e baixo estoque</strong>
+<strong>🔁 Suggested Restock — products with recurring sales and low stock</strong>
 <div style="font-size:0.8rem;color:var(--text-muted);margin-left:auto">
 Janela: últimos 90 dias · apenas pedidos pagos
 </div>
@@ -2990,7 +2990,7 @@ Janela: últimos 90 dias · apenas pedidos pagos
 <th style="text-align:right">Vendido (90d)</th>
 <th style="text-align:right">Orders (90d)</th>
 <th style="text-align:right">Cobertura (dias)</th>
-<th style="text-align:right">Sugestão de reposição</th>
+<th style="text-align:right">Restock Suggestion</th>
 </tr>
 </thead>
 <tbody id="stockReplenishTable">
@@ -3083,7 +3083,7 @@ Janela: últimos 90 dias · apenas pedidos pagos
 <tbody id="productStockSalesOrdersBody"></tbody>
 </table>
 </div>
-<div class="dash-group-title" style="margin-bottom:8px">👤 Top 10 clientes deste produto</div>
+<div class="dash-group-title" style="margin-bottom:8px">👤 Top 10 customers for this product</div>
 <div style="overflow-x:auto">
 <table style="width:100%">
 <thead><tr><th>#</th><th>Customer</th><th>Email</th><th style="text-align:right">Units</th><th style="text-align:right">Revenue</th></tr></thead>
@@ -3162,9 +3162,9 @@ style="font-size:0.8rem;padding:4px 8px">
 <button class="modal-close" onclick="closeNoB2BModal()">✕</button>
 </div>
 <div class="modal-body">
-<p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:12px">Estes produtos estão ativos mas não têm <strong>wholesale_price_eur</strong> definido (ou é zero). O preço B2B pode existir no WooCommerce (meta do plugin wholesale) ou no QuickBooks (UnitPrice). Veja <strong>docs/B2B-PRECOS-WOO-QB.md</strong> para onde buscar e como sincronizar.</p>
+<p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:12px">These products are active but have no <strong>wholesale_price_eur</strong> set (or it is zero). The B2B price may exist in WooCommerce (wholesale plugin meta) or in QuickBooks (UnitPrice). See <strong>docs/B2B-PRECOS-WOO-QB.md</strong> for where to find and how to sync.</p>
 <div style="margin-bottom:12px">
-<button type="button" class="btn btn-outline btn-sm" onclick="exportNoB2BCSV()">📥 Exportar CSV</button>
+<button type="button" class="btn btn-outline btn-sm" onclick="exportNoB2BCSV()">📥 Export CSV</button>
 </div>
 <div style="max-height:60vh;overflow:auto">
 <table>
@@ -3185,7 +3185,7 @@ style="font-size:0.8rem;padding:4px 8px">
 <button class="modal-close" onclick="closeB2BReportModal()">✕</button>
 </div>
 <div class="modal-body" id="b2bReportBody" style="overflow:auto;flex:1">
-<p style="color:var(--text-muted)">A carregar…</p>
+<p style="color:var(--text-muted)">Loading…</p>
 </div>
 </div>
 </div>
@@ -4101,7 +4101,7 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 
 <div class="stats-grid" style="margin-bottom:16px;grid-template-columns:1fr 1fr 1fr">
 <div class="stat-card">
-<div class="label">Total de compra</div>
+<div class="label">Total purchases</div>
 <div class="value" id="cpStatsSpent">€0.00</div>
 </div>
 <div class="stat-card">
@@ -4849,7 +4849,7 @@ Loading items...
       const list = getFinanceProductList();
       dropdown.innerHTML = list.length === 0
         ? '<div style="padding:12px;color:var(--text-muted);font-size:0.9rem;">No products.</div>'
-        : '<div style="padding:8px 12px;font-size:0.8rem;color:var(--text-muted);border-bottom:1px solid var(--border);">Todos os ' + list.length + ' produtos (por receita)</div>' + list.map((p, i) => {
+        : '<div style="padding:8px 12px;font-size:0.8rem;color:var(--text-muted);border-bottom:1px solid var(--border);">All ' + list.length + ' products (by revenue)</div>' + list.map((p, i) => {
             const attrVal = p.name.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             const displayName = p.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
             return `<div class="fin-product-item" role="button" tabindex="0" data-product="${attrVal}" style="padding:10px 12px;cursor:pointer;font-size:0.9rem;border-bottom:1px solid var(--border);" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); setFinanceProductFromEl(this); }" onclick="setFinanceProductFromEl(this)"><span style="font-weight:500">${i + 1}.</span> ${displayName} <span style="color:var(--accent);margin-left:6px">€${p.rev.toFixed(2)}</span></div>`;
@@ -5520,7 +5520,7 @@ Loading items...
         <div style="background:var(--card-bg);border-radius:8px;padding:16px;border:1px solid var(--border);margin-bottom:16px">
           <canvas id="finMainChart" height="320"></canvas>
         </div>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:8px;">Lista completa: ${sorted.length} produtos (ordenados por receita)</p>
+        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:8px;">Full list: ${sorted.length} products (sorted by revenue)</p>
         <div style="overflow-x:auto;max-height:70vh;overflow-y:auto">
           <table><thead><tr><th>#</th><th>Product</th><th>Brand</th><th>Category</th><th style="text-align:right">Qty</th><th style="text-align:right">Revenue</th><th style="text-align:right">%</th></tr></thead>
           <tbody>${sorted.map(([name,d],i) => {
@@ -8451,7 +8451,7 @@ Loading items...
         const healthPct = d.products.length > 0 ? Math.round(((d.products.length - d.out) / d.products.length) * 100) : 0;
         const hCls = healthPct >= 80 ? 'in' : healthPct >= 50 ? 'low' : 'out';
         const safeName = (name || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-        return `<tr><td class="stock-detail-link" data-stock-type="category" data-stock-key="${safeName}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="Ver detalhe de estoque"><strong>${esc(name)}</strong></td>
+        return `<tr><td class="stock-detail-link" data-stock-type="category" data-stock-key="${safeName}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="View stock details"><strong>${esc(name)}</strong></td>
       <td style="text-align:right">${d.products.length}</td>
       <td style="text-align:right;font-weight:600">${d.units.toLocaleString()}</td>
       <td style="text-align:right">€${d.value.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
@@ -8482,7 +8482,7 @@ Loading items...
         const healthPct = d.products.length > 0 ? Math.round(((d.products.length - d.out) / d.products.length) * 100) : 0;
         const hCls = healthPct >= 80 ? 'in' : healthPct >= 50 ? 'low' : 'out';
         const safeName = (name || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-        return `<tr><td class="stock-detail-link" data-stock-type="brand" data-stock-key="${safeName}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="Ver detalhe de estoque"><strong>${esc(name)}</strong></td>
+        return `<tr><td class="stock-detail-link" data-stock-type="brand" data-stock-key="${safeName}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="View stock details"><strong>${esc(name)}</strong></td>
       <td style="text-align:right">${d.products.length}</td>
       <td style="text-align:right;font-weight:600">${d.units.toLocaleString()}</td>
       <td style="text-align:right">€${d.value.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
@@ -8499,14 +8499,14 @@ Loading items...
       const topValue = [...active].filter(p => p.stock_quantity > 0).sort((a, b) => ((b.price_eur || 0) * (b.stock_quantity || 0)) - ((a.price_eur || 0) * (a.stock_quantity || 0))).slice(0, 20);
       document.getElementById('stockTopValueTable').innerHTML = topValue.map(p => {
         const val = (p.price_eur || 0) * (p.stock_quantity || 0);
-        return `<tr><td class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="Ver estoque e vendas"><span class="product-name">${esc(p.name)}</span></td>
+        return `<tr><td class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="View stock & sales"><span class="product-name">${esc(p.name)}</span></td>
       <td>${p.brands?.name || '—'}</td><td>${p.categories?.name || '—'}</td>
       <td style="text-align:right">€${(p.price_eur || 0).toFixed(2)}</td>
       <td style="text-align:right;font-weight:600">${p.stock_quantity}</td>
       <td style="text-align:right;font-weight:700;color:var(--accent)">€${val.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>`;
       }).join('');
 
-      // --- Reposição sugerida (produtos com vendas recorrentes e baixo estoque) ---
+      // --- Suggested Restock (products with recurring sales and low stock) ---
       renderStockReplenishment(active);
 
       // --- Populate filters ---
@@ -8521,14 +8521,14 @@ Loading items...
 
       renderStockFullTable();
 
-      // Modal "Produtos sem preço B2B" — preencher tabela ao abrir
+      // Modal "Products without B2B price" — populate table on open
       window.openNoB2BModal = function openNoB2BModal() {
         const list = window._noB2BProducts || [];
         const tbody = document.getElementById('noB2BTableBody');
         const modal = document.getElementById('noB2BModal');
         if (!tbody || !modal) return;
         tbody.innerHTML = list.length === 0
-          ? '<tr><td colspan="6" class="empty-state">Nenhum produto ativo sem preço B2B.</td></tr>'
+          ? '<tr><td colspan="6" class="empty-state">No active products without B2B price.</td></tr>'
           : list.map(p => '<tr><td>' + esc(p.name || '—') + '</td><td>' + esc(p.sku || '—') + '</td><td>' + esc((p.brands && p.brands.name) || '—') + '</td><td>' + esc((p.categories && p.categories.name) || '—') + '</td><td class="price">€' + (p.price_eur != null ? Number(p.price_eur).toFixed(2) : '0.00') + '</td><td><button type="button" class="btn-sm btn-outline" onclick="closeNoB2BModal(); editProduct(\'' + p.id + '\')">Editar</button></td></tr>').join('');
         modal.classList.add('open');
       modal.scrollTop = 0;
@@ -8554,7 +8554,7 @@ Loading items...
         const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'produtos-sem-preco-b2b-' + new Date().toISOString().slice(0, 10) + '.csv';
+        a.download = 'products-without-b2b-price-' + new Date().toISOString().slice(0, 10) + '.csv';
         a.click();
         URL.revokeObjectURL(a.href);
       };
@@ -8567,7 +8567,7 @@ Loading items...
         modal.classList.add('open');
       modal.scrollTop = 0;
         body.innerHTML = '<p style="color:var(--text-muted)"><span class="spinner"></span> A consultar QuickBooks e WooCommerce…</p>';
-        if (btn) { btn.disabled = true; btn.textContent = 'A carregar…'; }
+        if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
         try {
           const url = (typeof SUPA_URL !== 'undefined' ? SUPA_URL : '') + '/functions/v1/b2b-price-report';
           const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (await getValidBearerToken()) } });
@@ -8581,9 +8581,9 @@ Loading items...
           const wc = r.woocommerce || {};
           let html = '<p style="margin-bottom:16px;color:var(--text-muted)">Gerado em: ' + (r.generated_at ? new Date(r.generated_at).toLocaleString() : '—') + '</p>';
           html += '<div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:20px">';
-          html += '<div class="stat-card"><div class="label">Supabase: total produtos</div><div class="value">' + (sup.total != null ? sup.total : '—') + '</div></div>';
-          html += '<div class="stat-card"><div class="label">Supabase: com preço B2B</div><div class="value">' + (sup.with_wholesale != null ? sup.with_wholesale : '—') + '</div></div>';
-          html += '<div class="stat-card"><div class="label">Supabase: sem preço B2B</div><div class="value">' + (sup.without_wholesale != null ? sup.without_wholesale : '—') + '</div></div>';
+          html += '<div class="stat-card"><div class="label">Supabase: total products</div><div class="value">' + (sup.total != null ? sup.total : '—') + '</div></div>';
+          html += '<div class="stat-card"><div class="label">Supabase: with B2B price</div><div class="value">' + (sup.with_wholesale != null ? sup.with_wholesale : '—') + '</div></div>';
+          html += '<div class="stat-card"><div class="label">Supabase: without B2B price</div><div class="value">' + (sup.without_wholesale != null ? sup.without_wholesale : '—') + '</div></div>';
           html += '</div>';
 
           html += '<h4 style="margin:16px 0 8px 0;color:var(--accent)">📋 Prices listed in QuickBooks</h4>';
@@ -8591,7 +8591,7 @@ Loading items...
             html += '<p style="color:var(--danger)">Erro QB: ' + (qb.error || '') + '</p>';
           } else {
             let qbPrices = qb.prices_found || [];
-            html += '<p>Total de itens lidos do QB: <strong>' + qbPrices.length + '</strong>. Itens com preço de venda &gt; 0: <strong>' + (qb.items_with_unit_price != null ? qb.items_with_unit_price : 0) + '</strong>.</p>';
+            html += '<p>Total items read from QB: <strong>' + qbPrices.length + '</strong>. Items with unit price &gt; 0: <strong>' + (qb.items_with_unit_price != null ? qb.items_with_unit_price : 0) + '</strong>.</p>';
             if (qbPrices.length > 0) {
               html += '<div style="max-height:320px;overflow:auto;margin-top:8px;border:1px solid var(--border);border-radius:8px;padding:8px"><table style="width:100%;font-size:0.85rem"><thead><tr><th>ID</th><th>Name</th><th>SKU</th><th>Price (€)</th><th>Cost (€)</th></tr></thead><tbody>';
               qbPrices.forEach(function(row) {
@@ -8599,9 +8599,9 @@ Loading items...
               });
               html += '</tbody></table></div>';
             } else {
-              html += '<p style="color:var(--text-muted)">Nenhum item retornado do QuickBooks (ou conexão não disponível).</p>';
+              html += '<p style="color:var(--text-muted)">No items returned from QuickBooks (or connection unavailable).</p>';
             }
-            html += '<p style="margin-top:12px;font-size:0.9rem">Destes, <strong>' + (qb.matched != null ? qb.matched : 0) + '</strong> têm correspondência no Supabase; <strong>' + (qb.missing_in_supabase != null ? qb.missing_in_supabase : 0) + '</strong> têm preço no QB mas sem wholesale no Supabase.</p>';
+            html += '<p style="margin-top:12px;font-size:0.9rem">Of these, <strong>' + (qb.matched != null ? qb.matched : 0) + '</strong> match in Supabase; <strong>' + (qb.missing_in_supabase != null ? qb.missing_in_supabase : 0) + '</strong> have a QB price but no wholesale in Supabase.</p>';
             if (qb.rows && qb.rows.length > 0) {
               html += '<details style="margin-top:8px"><summary>Ver lista dos que faltam no Supabase</summary><div style="max-height:200px;overflow:auto;margin-top:6px"><table><thead><tr><th>QB Name/SKU</th><th>UnitPrice (€)</th><th>Supabase</th></tr></thead><tbody>';
               qb.rows.forEach(function(row) {
@@ -8613,12 +8613,12 @@ Loading items...
 
           html += '<h4 style="margin:24px 0 8px 0;color:var(--accent)">🛒 B2B Prices listed in WooCommerce</h4>';
           if (!wc.configured) {
-            html += '<p style="color:var(--text-muted)">WooCommerce não configurado. Defina WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY e WOOCOMMERCE_CONSUMER_SECRET (ou WOO_URL, WOO_CK, WOO_CS) nas variáveis da Edge Function.</p>';
+            html += '<p style="color:var(--text-muted)">WooCommerce not configured. Set WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY and WOOCOMMERCE_CONSUMER_SECRET (or WOO_URL, WOO_CK, WOO_CS) in the Edge Function secrets.</p>';
           } else if (wc.error) {
             html += '<p style="color:var(--danger)">Erro WC: ' + (wc.error || '') + '</p>';
           } else {
             let wcPrices = wc.prices_found || [];
-            html += '<p>Total de produtos com preço wholesale na meta: <strong>' + wcPrices.length + '</strong>.</p>';
+            html += '<p>Total products with wholesale price in meta: <strong>' + wcPrices.length + '</strong>.</p>';
             if (wcPrices.length > 0) {
               html += '<div style="max-height:320px;overflow:auto;margin-top:8px;border:1px solid var(--border);border-radius:8px;padding:8px"><table style="width:100%;font-size:0.85rem"><thead><tr><th>ID</th><th>Name</th><th>SKU</th><th>B2B Price (€)</th></tr></thead><tbody>';
               wcPrices.forEach(function(row) {
@@ -8626,9 +8626,9 @@ Loading items...
               });
               html += '</tbody></table></div>';
             } else {
-              html += '<p style="color:var(--text-muted)">Nenhum produto com preço wholesale encontrado (meta keys: wholesale_price, _wholesale_price, wwp_wholesale_price, etc.).</p>';
+              html += '<p style="color:var(--text-muted)">No products with wholesale price found (meta keys: wholesale_price, _wholesale_price, wwp_wholesale_price, etc.).</p>';
             }
-            html += '<p style="margin-top:12px;font-size:0.9rem">Destes, <strong>' + (wc.matched != null ? wc.matched : 0) + '</strong> têm correspondência no Supabase; <strong>' + (wc.missing_in_supabase != null ? wc.missing_in_supabase : 0) + '</strong> têm preço B2B no WC mas sem wholesale no Supabase.</p>';
+            html += '<p style="margin-top:12px;font-size:0.9rem">Of these, <strong>' + (wc.matched != null ? wc.matched : 0) + '</strong> match in Supabase; <strong>' + (wc.missing_in_supabase != null ? wc.missing_in_supabase : 0) + '</strong> have a B2B price in WC but no wholesale in Supabase.</p>';
             if (wc.rows && wc.rows.length > 0) {
               html += '<details style="margin-top:8px"><summary>Ver lista dos que faltam no Supabase</summary><div style="max-height:200px;overflow:auto;margin-top:6px"><table><thead><tr><th>Woo name/sku</th><th>Wholesale (€)</th><th>Supabase</th></tr></thead><tbody>';
               wc.rows.forEach(function(row) {
@@ -8640,7 +8640,7 @@ Loading items...
           html += '<p style="margin-top:20px;font-size:0.9rem;color:var(--text-muted)">Este relatório não altera dados. Após validar, pode executar a sincronização para preencher wholesale_price_eur no Supabase a partir do QB e do WC.</p>';
           body.innerHTML = html;
         } catch (e) {
-          body.innerHTML = '<p style="color:var(--danger)">Erro: ' + (e && e.message ? e.message : String(e)) + '</p><p style="color:var(--text-muted);font-size:0.9rem">Confirme que a Edge Function b2b-price-report está publicada e que QuickBooks (qb_integration) está configurado.</p>';
+          body.innerHTML = '<p style="color:var(--danger)">Error: ' + (e && e.message ? e.message : String(e)) + '</p><p style="color:var(--text-muted);font-size:0.9rem">Confirm that the Edge Function b2b-price-report is deployed and that QuickBooks (qb_integration) is configured.</p>';
         }
         if (btn) { btn.disabled = false; btn.textContent = '📋 B2B Price Report (QB + WC)'; }
       };
@@ -8649,7 +8649,7 @@ Loading items...
         if (modal) modal.classList.remove('open');
       };
 
-      // Delegated click: abrir modal ao clicar no nome da categoria ou da marca
+      // Delegated click: open modal when clicking on category or brand name
       const catTbody = document.getElementById('stockByCategoryTable');
       const brandTbody = document.getElementById('stockByBrandTable');
       if (catTbody && !catTbody._stockDetailBound) {
@@ -8732,7 +8732,7 @@ Loading items...
         });
 
         if (candidates.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--text-dim)">Nenhum produto com vendas recorrentes e baixo estoque encontrado nos últimos 90 dias.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--text-dim)">No products with recurring sales and low stock found in the last 90 days.</td></tr>';
           return;
         }
 
@@ -8748,7 +8748,7 @@ Loading items...
           const br = p.brands?.name || '—';
           const coverTxt = row.daysCover == null ? '—' : row.daysCover.toFixed(1);
           return `<tr>
-            <td><span class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="Ver estoque e vendas deste produto">${esc(p.name || '—')}</span></td>
+            <td><span class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="View stock & sales deste produto">${esc(p.name || '—')}</span></td>
             <td>${esc(br)}</td>
             <td style="text-align:right;font-weight:600">${row.currentStock}</td>
             <td style="text-align:right">${row.unitsSold}</td>
@@ -8759,7 +8759,7 @@ Loading items...
         }).join('');
       } catch (e) {
         console.error('renderStockReplenishment:', e);
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--danger)">Erro ao calcular reposição sugerida.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--danger)">Error calculating suggested restock.</td></tr>';
       }
     }
 
@@ -8797,7 +8797,7 @@ Loading items...
         const cls = p.stock_quantity <= 0 ? 'out' : p.stock_quantity < 10 ? 'low' : 'in';
         const lbl = p.stock_quantity <= 0 ? 'Sem stock' : p.stock_quantity < 10 ? 'Baixo' : 'Em stock';
         return `<tr>
-          <td class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="Ver estoque e vendas"><strong>${esc(p.name)}</strong></td>
+          <td class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="View stock & sales"><strong>${esc(p.name)}</strong></td>
           <td>${esc(p.sku || '—')}</td>
           <td style="text-align:right">€${(p.price_eur || 0).toFixed(2)}</td>
           <td style="text-align:right;font-weight:600">${p.stock_quantity || 0}</td>
@@ -8837,14 +8837,14 @@ Loading items...
         <div class="stat-card"><div class="label">B2B Price</div><div class="value">€${(p.wholesale_price_eur || p.price_eur || 0).toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">Custo</div><div class="value">€${(p.cost_price_eur || 0).toFixed(2)}</div></div>
         <div class="stat-card" style="border-left:3px solid #4ade80"><div class="label">Stock</div><div class="value">${p.stock_quantity || 0}</div></div>
-        <div class="stat-card"><div class="label">Valor estoque (venda)</div><div class="value">€${val.toFixed(2)}</div></div>
-        <div class="stat-card"><div class="label">Valor estoque B2B</div><div class="value">€${valB2B.toFixed(2)}</div></div>
-        <div class="stat-card"><div class="label">Valor estoque (custo)</div><div class="value">€${valCost.toFixed(2)}</div></div>
+        <div class="stat-card"><div class="label">Stock Value (retail)</div><div class="value">€${val.toFixed(2)}</div></div>
+        <div class="stat-card"><div class="label">Stock Value B2B</div><div class="value">€${valB2B.toFixed(2)}</div></div>
+        <div class="stat-card"><div class="label">Stock Value (cost)</div><div class="value">€${valCost.toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">Estado</div><div class="value"><span class="stock-badge ${cls}">${statusLbl}</span></div></div>
       `;
-      flowEl.innerHTML = '<div style="grid-column:1/-1;color:var(--text-muted)">A carregar...</div>';
-      ordersBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">A carregar...</td></tr>';
-      if (topClientsBody) topClientsBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">A carregar...</td></tr>';
+      flowEl.innerHTML = '<div style="grid-column:1/-1;color:var(--text-muted)">Loading...</div>';
+      ordersBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">Loading...</td></tr>';
+      if (topClientsBody) topClientsBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">Loading...</td></tr>';
       document.getElementById('productStockSalesModal').classList.add('open');
       document.getElementById('productStockSalesModal').scrollTop = 0;
 
@@ -8881,7 +8881,7 @@ Loading items...
 
         const sorted = items.slice().sort((a, b) => new Date(b.orders?.created_at || 0) - new Date(a.orders?.created_at || 0));
         ordersBody.innerHTML = sorted.length === 0
-          ? '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">Nenhuma encomenda com este produto.</td></tr>'
+          ? '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">No orders found for this product.</td></tr>'
           : sorted.slice(0, 30).map(item => {
               const order = item.orders || {};
               const date = order.created_at ? new Date(order.created_at).toLocaleDateString('pt-PT') : '—';
@@ -8897,10 +8897,10 @@ Loading items...
               </tr>`;
               }).join('');
 
-        // Top 10 clientes (agregado por grupo/empresa)
+        // Top 10 customers (aggregated by group/company)
         if (topClientsBody) {
           if (items.length === 0) {
-            topClientsBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">Nenhum cliente encontrado para este produto.</td></tr>';
+            topClientsBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">No customers found for this product.</td></tr>';
           } else {
             const byGroup = {};
             const getGroupKey = window.getCustomerGroupKey || function(cid, email) { return cid || (email || '').trim().toLowerCase() || 'unknown'; };
@@ -8922,8 +8922,8 @@ Loading items...
           }
         }
       } catch (e) {
-        flowEl.innerHTML = '<div style="grid-column:1/-1;color:var(--danger)">Erro ao carregar vendas.</div>';
-        ordersBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--danger)">Erro ao carregar ordens.</td></tr>';
+        flowEl.innerHTML = '<div style="grid-column:1/-1;color:var(--danger)">Error loading sales.</div>';
+        ordersBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--danger)">Error loading orders.</td></tr>';
       }
     }
 
@@ -8962,7 +8962,7 @@ Loading items...
           const cls = p.stock_quantity <= 0 ? 'out' : p.stock_quantity < 10 ? 'low' : 'in';
           const lbl = p.stock_quantity <= 0 ? 'Out of Stock' : p.stock_quantity < 10 ? 'Low Stock' : 'In Stock';
           const val = (p.price_eur || 0) * (p.stock_quantity || 0);
-          return `<tr><td class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="Ver estoque e vendas"><span class="product-name">${esc(p.name)}</span></td>
+          return `<tr><td class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="View stock & sales"><span class="product-name">${esc(p.name)}</span></td>
       <td><span class="product-sku">${esc(p.sku || '—')}</span></td>
       <td>${p.brands?.name || '—'}</td><td>${p.categories?.name || '—'}</td>
       <td style="text-align:right">€${(p.price_eur || 0).toFixed(2)}</td>
@@ -10505,7 +10505,7 @@ Loading items...
           let tbodyClients = document.getElementById('reportDetailTopClientsBody');
           let wrapClients = document.getElementById('reportDetailTopClientsWrap');
           if (tbodyClients) {
-            tbodyClients.innerHTML = sortedClients.length === 0 ? '<tr><td colspan="6" style="color:var(--text-muted);padding:12px">Nenhum cliente encontrado neste período.</td></tr>' : sortedClients.map(function(row, idx) {
+            tbodyClients.innerHTML = sortedClients.length === 0 ? '<tr><td colspan="6" style="color:var(--text-muted);padding:12px">No customers found in this period.</td></tr>' : sortedClients.map(function(row, idx) {
               let name = getGroupName(row.groupKey);
               let groupId = (typeof row.groupKey === 'string' && row.groupKey.indexOf('@') === -1 && row.groupKey !== 'unknown') ? row.groupKey : '';
               let btn = groupId ? '<button type="button" class="btn-sm btn-outline" onclick="closeReportDetail(); viewCustomerProfile(\'' + groupId + '\')">Ver</button>' : '';
@@ -11644,7 +11644,7 @@ Loading items...
     }
 
     function getB2BPriceForCustomer(product, customerId) {
-      // 1) Special price por cliente+produto, se existir
+      // 1) Special price per customer+product, if exists
       const byProd = window.customerProductPricesCache && window.customerProductPricesCache[product.id];
       if (byProd && customerId) {
         const row = byProd.find(function (r) { return r.customer_id === customerId && r.is_active !== false; });
@@ -12769,7 +12769,7 @@ Loading items...
             <td>${s.results_count || 0}</td>
             <td>${new Date(s.created_at).toLocaleDateString()}</td></tr>`).join('');
 
-        // 3. Performance de Produtos (merge page_views + product_events)
+        // 3. Product Performance (merge page_views + product_events)
         const prodAgg = {};
         views.filter(v => v.product_id).forEach(v => {
           const pid = v.product_id;
@@ -13889,10 +13889,10 @@ loadBrandTopClients();
 async function loadBrandTopClients() {
 const tbody = document.getElementById('brandTopClientsBody');
 if (!tbody) return;
-tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">A carregar...</td></tr>';
+tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">Loading...</td></tr>';
 if (!currentBrandId) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">—</td></tr>'; return; }
 const prodIds = (allProducts || []).filter(p => p.brand_id === currentBrandId).map(p => p.id);
-if (prodIds.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">Nenhum produto nesta marca.</td></tr>'; return; }
+if (prodIds.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">No products in this brand.</td></tr>'; return; }
 try {
 let allItems = [];
 for (let i = 0; i < prodIds.length; i += 20) {
@@ -13916,14 +13916,14 @@ byGroup[key].revenue += parseFloat(item.total_price || item.total || 0) || 0;
 });
 const arr = Object.keys(byGroup).map(k => byGroup[k]).sort((a, b) => b.revenue - a.revenue).slice(0, 15);
 tbody.innerHTML = arr.length === 0
-? '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">Nenhum cliente encontrado para esta marca.</td></tr>'
+? '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">No customers found for this brand.</td></tr>'
 : arr.map((row, idx) => {
 const name = getGroupName(row.groupKey);
 return '<tr><td>' + (idx + 1) + '</td><td>' + esc(name) + '</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</td><td style="text-align:right">' + row.qty + '</td><td style="text-align:right;font-weight:600">€' + row.revenue.toFixed(2) + '</td></tr>';
 }).join('');
 } catch (e) {
 console.error('loadBrandTopClients:', e);
-tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--danger)">Erro ao carregar clientes.</td></tr>';
+tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--danger)">Error loading customers.</td></tr>';
 }
 }
 
@@ -14657,7 +14657,7 @@ method: 'PATCH', headers: h, body: JSON.stringify({ backorder_notes: note })
 <table id="reportDetailTable"><thead><tr><th>Month</th><th>Orders/Qty</th><th>Revenue</th><th>Avg</th></tr></thead><tbody></tbody></table>
 </div>
 <div id="reportDetailTopClientsWrap" style="display:none;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)">
-<h4 style="margin:0 0 10px 0;color:var(--text-color)">👤 Top 20 clientes deste produto</h4>
+<h4 style="margin:0 0 10px 0;color:var(--text-color)">👤 Top 20 customers for this product</h4>
 <div style="max-height:320px;overflow:auto">
 <table style="width:100%;font-size:0.9rem">
 <thead><tr><th>#</th><th>Customer</th><th>Email</th><th style="text-align:right">Units</th><th style="text-align:right">Revenue</th><th></th></tr></thead>
