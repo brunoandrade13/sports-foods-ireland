@@ -4257,6 +4257,7 @@ Loading items...
 <button class="btn btn-outline" style="border-color:var(--border)" id="btnGlsShip" onclick="shipViaGLS()">📦 Ship via GLS</button>
 <button class="btn btn-outline" style="border-color:var(--border);display:none" id="btnGlsLabel" onclick="downloadGLSLabel()">🏷️ Print Label</button>
 <button class="btn btn-primary" onclick="generateInvoicePDFFromModal().catch(e => alert('ERROR: ' + e.message))">Generate Invoice</button>
+<button class="btn btn-outline" style="border-color:#2D6A4F;color:#2D6A4F" onclick="sendInvoiceByEmail().catch(e => alert('ERROR: ' + e.message))">📧 Send Invoice</button>
 </div>
 </div>
 </div>
@@ -13231,7 +13232,7 @@ window._sfiLogoB64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAM
       URL.revokeObjectURL(url);
     }
 
-async function generateInvoicePDFFromModal() {
+async function generateInvoicePDFFromModal(options) {
 try {
 const titleEl = document.getElementById('omTitle');
 if (!titleEl) return alert('No order open');
@@ -13413,8 +13414,73 @@ doc.text('VAT @ 23%', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(vatTotal)
 
 // ---- Footer on last page ----
 addFooter();
-doc.save('Invoice_' + invNum + '_SFI.pdf');
+const pdfFileName = 'Invoice_' + invNum + '_SFI.pdf';
+if (options && options.returnBase64) {
+  const raw = doc.output('arraybuffer');
+  const bytes = new Uint8Array(raw);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return { base64: btoa(binary), fileName: pdfFileName, invNum: invNum, order: order };
+}
+doc.save(pdfFileName);
 } catch(err) { console.error('Invoice generation error:', err); alert('Error generating invoice: ' + err.message); }
+}
+
+async function sendInvoiceByEmail() {
+  const result = await generateInvoicePDFFromModal({ returnBase64: true });
+  if (!result) return;
+  const { base64, fileName, invNum, order } = result;
+  // Find customer email
+  const bill = order.billing_address || {};
+  let email = order.email || bill.email || '';
+  if (!email && order.customer_id) {
+    const cust = (allCustomers || []).find(c => c.id === order.customer_id);
+    if (cust) email = cust.email || '';
+  }
+  if (!email) { email = prompt('Customer email not found. Enter email:'); if (!email) return; }
+  const confirmed = confirm('Send Invoice ' + invNum + ' to ' + email + '?');
+  if (!confirmed) return;
+  const btn = document.querySelector('[onclick*="sendInvoiceByEmail"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+  try {
+    const customerName = [bill.first_name, bill.last_name].filter(Boolean).join(' ') || '';
+    const htmlContent = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">' +
+      '<div style="background:#1B4332;padding:20px;text-align:center"><img src="https://sportsfoodsireland.ie/wp-content/uploads/2021/09/logo.png" alt="SFI" style="height:60px"></div>' +
+      '<div style="padding:30px 20px">' +
+      '<h2 style="color:#1B4332;margin:0 0 16px">Invoice ' + invNum + '</h2>' +
+      '<p>Dear ' + (customerName || 'Customer') + ',</p>' +
+      '<p>Please find attached your invoice <strong>' + invNum + '</strong> from Sports Foods Ireland.</p>' +
+      '<p>Payment is due within 30 days of the invoice date.</p>' +
+      '<p style="margin-top:24px"><strong>Bank Details:</strong><br>IBAN: IE48BOFI90458753923845<br>BIC: BOFIIE2D</p>' +
+      '<p style="margin-top:24px">If you have any questions, please contact us at <a href="mailto:info@sportsfoodsireland.ie">info@sportsfoodsireland.ie</a></p>' +
+      '<p>Thank you for your business!</p>' +
+      '<p style="color:#666;margin-top:24px">Sports Foods Ireland Ltd<br>Unit 12, Northwest Business Park, Blanchardstown<br>Dublin D15 YC53</p>' +
+      '</div></div>';
+    const res = await fetch(SUPABASE_URL + '/functions/v1/brevo-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON },
+      body: JSON.stringify({
+        action: 'send_invoice',
+        email: email,
+        customerName: customerName,
+        subject: 'Invoice ' + invNum + ' — Sports Foods Ireland',
+        htmlContent: htmlContent,
+        pdfBase64: base64,
+        fileName: fileName
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast('Invoice ' + invNum + ' sent to ' + email);
+    } else {
+      alert('Failed to send: ' + (data.message || 'Unknown error'));
+    }
+  } catch (err) {
+    console.error('Send invoice error:', err);
+    alert('Error sending invoice: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '📧 Send Invoice'; }
+  }
 }
 
 async function downloadInvoicePDFFromView() {
