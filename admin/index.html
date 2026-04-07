@@ -3074,7 +3074,7 @@ Janela: últimos 90 dias · apenas pedidos pagos
 <div class="modal-body" style="padding:16px;overflow:auto;flex:1">
 <div class="dash-group-title" style="margin-bottom:8px">📦 Stock</div>
 <div id="productStockSalesKpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px"></div>
-<div class="dash-group-title" style="margin-bottom:8px">📈 Fluxo de venda</div>
+<div class="dash-group-title" style="margin-bottom:8px">📈 Sales Flow</div>
 <div id="productStockSalesFlow" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:16px"></div>
 <div class="dash-group-title" style="margin-bottom:8px">🛒 Últimas ordens</div>
 <div style="overflow-x:auto;margin-bottom:16px">
@@ -4115,7 +4115,7 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 </div>
 <div class="stats-grid" style="margin-bottom:20px;grid-template-columns:1fr 1fr 1fr 1fr">
 <div class="stat-card" style="border-left:3px solid var(--accent)">
-<div class="label">Último ano</div>
+<div class="label">Last Year</div>
 <div class="value" id="cpStatsLastYear">0 ped · €0</div>
 </div>
 <div class="stat-card" style="border-left:3px solid #60a5fa">
@@ -4123,11 +4123,11 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 <div class="value" id="cpStatsLast6Months">0 ped · €0</div>
 </div>
 <div class="stat-card" style="border-left:3px solid #a78bfa">
-<div class="label">Maior pedido</div>
+<div class="label">Largest Order</div>
 <div class="value" id="cpStatsLargestOrder">€0.00</div>
 </div>
 <div class="stat-card" style="border-left:3px solid #34d399">
-<div class="label">Último pedido</div>
+<div class="label">Last Order</div>
 <div class="value" id="cpStatsLastOrderDate">—</div>
 </div>
 </div>
@@ -7713,7 +7713,7 @@ Loading items...
         const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(img.url);
         const mediaEl = isVideo
           ? `<video src="${resolveImageSrc(img.url)}" style="width:100%;height:100%;object-fit:cover" muted ></video> <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;color:#fff;text-shadow:0 0 6px rgba(0,0,0,0.8)">▶</span>`
-          : `<img src="${resolveImageSrc(img.url)}" alt="Product gallery image" style="width:100%;height:100%;object-fit:cover" onerror="this.src='../img/produto1.jpg'" > `;
+          : `<img src="${resolveImageSrc(img.url)}" alt="Product gallery image" style="width:100%;height:100%;object-fit:cover" onerror="this.src='../img/placeholder.jpg'" > `;
         return `
           <div class="pi-card" data-idx="${i}" draggable="true" style="position:relative;width:100px;height:100px;border:2px solid ${i === 0 ? 'var(--accent)' : 'var(--border)'};border-radius:8px;overflow:hidden;cursor:grab;flex-shrink:0">
             ${mediaEl}
@@ -8573,7 +8573,7 @@ Loading items...
           const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (await getValidBearerToken()) } });
           let data;
           try { data = await resp.json(); } catch (_) { data = { success: false, error: resp.status + ' ' + resp.statusText + ' (resposta não JSON)' }; }
-          if (!resp.ok) throw new Error(data.error || 'Erro ' + resp.status);
+          if (!resp.ok) throw new Error(data.error || 'Error ' + resp.status);
           if (!data.success) throw new Error(data.error || 'Report failed');
           const r = data.report || {};
           const sup = r.supabase || {};
@@ -8588,7 +8588,7 @@ Loading items...
 
           html += '<h4 style="margin:16px 0 8px 0;color:var(--accent)">📋 Prices listed in QuickBooks</h4>';
           if (qb.error) {
-            html += '<p style="color:var(--danger)">Erro QB: ' + (qb.error || '') + '</p>';
+            html += '<p style="color:var(--danger)">QB Error: ' + (qb.error || '') + '</p>';
           } else {
             let qbPrices = qb.prices_found || [];
             html += '<p>Total items read from QB: <strong>' + qbPrices.length + '</strong>. Items with unit price &gt; 0: <strong>' + (qb.items_with_unit_price != null ? qb.items_with_unit_price : 0) + '</strong>.</p>';
@@ -8615,7 +8615,7 @@ Loading items...
           if (!wc.configured) {
             html += '<p style="color:var(--text-muted)">WooCommerce not configured. Set WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY and WOOCOMMERCE_CONSUMER_SECRET (or WOO_URL, WOO_CK, WOO_CS) in the Edge Function secrets.</p>';
           } else if (wc.error) {
-            html += '<p style="color:var(--danger)">Erro WC: ' + (wc.error || '') + '</p>';
+            html += '<p style="color:var(--danger)">WC Error: ' + (wc.error || '') + '</p>';
           } else {
             let wcPrices = wc.prices_found || [];
             html += '<p>Total products with wholesale price in meta: <strong>' + wcPrices.length + '</strong>.</p>';
@@ -8637,7 +8637,7 @@ Loading items...
               html += '</tbody></table></div></details>';
             }
           }
-          html += '<p style="margin-top:20px;font-size:0.9rem;color:var(--text-muted)">Este relatório não altera dados. Após validar, pode executar a sincronização para preencher wholesale_price_eur no Supabase a partir do QB e do WC.</p>';
+          html += '<p style="margin-top:20px;font-size:0.9rem;color:var(--text-muted)">This report does not modify data. After validating, you can run the sync to populate wholesale_price_eur in Supabase from QB and WC.</p>';
           body.innerHTML = html;
         } catch (e) {
           body.innerHTML = '<p style="color:var(--danger)">Error: ' + (e && e.message ? e.message : String(e)) + '</p><p style="color:var(--text-muted);font-size:0.9rem">Confirm that the Edge Function b2b-price-report is deployed and that QuickBooks (qb_integration) is configured.</p>';
@@ -8748,7 +8748,7 @@ Loading items...
           const br = p.brands?.name || '—';
           const coverTxt = row.daysCover == null ? '—' : row.daysCover.toFixed(1);
           return `<tr>
-            <td><span class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="View stock & sales deste produto">${esc(p.name || '—')}</span></td>
+            <td><span class="product-stock-link" data-product-id="${esc(p.id)}" style="cursor:pointer;text-decoration:underline;color:var(--accent)" title="View stock & sales for this product">${esc(p.name || '—')}</span></td>
             <td>${esc(br)}</td>
             <td style="text-align:right;font-weight:600">${row.currentStock}</td>
             <td style="text-align:right">${row.unitsSold}</td>
@@ -8835,7 +8835,7 @@ Loading items...
         <div class="stat-card"><div class="label">Category</div><div class="value" style="font-size:0.85rem">${esc(p.categories?.name || '—')}</div></div>
         <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Price (EUR)</div><div class="value">€${(p.price_eur || 0).toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">B2B Price</div><div class="value">€${(p.wholesale_price_eur || p.price_eur || 0).toFixed(2)}</div></div>
-        <div class="stat-card"><div class="label">Custo</div><div class="value">€${(p.cost_price_eur || 0).toFixed(2)}</div></div>
+        <div class="stat-card"><div class="label">Cost</div><div class="value">€${(p.cost_price_eur || 0).toFixed(2)}</div></div>
         <div class="stat-card" style="border-left:3px solid #4ade80"><div class="label">Stock</div><div class="value">${p.stock_quantity || 0}</div></div>
         <div class="stat-card"><div class="label">Stock Value (retail)</div><div class="value">€${val.toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">Stock Value B2B</div><div class="value">€${valB2B.toFixed(2)}</div></div>
@@ -12909,7 +12909,7 @@ Loading items...
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (await getValidBearerToken()) }
         });
         let result;
-        try { result = await resp.json(); } catch (_) { throw new Error('Resposta inválida (' + resp.status + '). Verifique se a Edge Function qb-sync-purchase-orders está publicada no Supabase.'); }
+        try { result = await resp.json(); } catch (_) { throw new Error('Invalid response (' + resp.status + '). Check if the Edge Function qb-sync-purchase-orders is deployed on Supabase.'); }
         if (!resp.ok || !result.success) throw new Error(result.error || result.message || 'QB Purchase Orders sync failed');
         const s = result.stats || {};
         if (statusEl) statusEl.textContent = '✅ Synced: ' + (s.created || 0) + ' new, ' + (s.updated || 0) + ' updated, ' + (s.failed || 0) + ' failed';
