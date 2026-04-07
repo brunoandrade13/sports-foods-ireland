@@ -13046,7 +13046,7 @@ Loading items...
       tbody.innerHTML = filteredInvoices.slice(0, 100).map((inv, idx) => {
         const docNum = esc(inv.doc_number || '—');
         const custName = esc(inv.customer_name || '—');
-        return `<tr><td><code class="invoice-doc-link" title="View invoice">${docNum}</code></td>
+        return `<tr><td><code class="invoice-doc-link" style="cursor:pointer" onclick="openInvoiceModal(filteredInvoices[${idx}])">${docNum}</code></td>
           <td>${custName}</td>
           <td><span class="stock-badge info">${esc(inv.source || 'QuickBooks')}</span></td>
           <td><span class="stock-badge in">${esc(inv.status || '—')}</span></td>
@@ -13054,10 +13054,6 @@ Loading items...
           <td>${new Date(inv.txn_date).toLocaleDateString()}</td>
         </tr>`;
       }).join('');
-      tbody.querySelectorAll('.invoice-doc-link').forEach((el, i) => {
-        const inv = filteredInvoices[i];
-        if (inv) el.addEventListener('click', () => openInvoiceModal(inv));
-      });
       document.getElementById('invoicesInfo').textContent = `Showing ${Math.min(filteredInvoices.length, 100)} of ${filteredInvoices.length} invoices`;
     }
 
@@ -13074,33 +13070,26 @@ Loading items...
 
     const invFmt = v => '€' + Number(v || 0).toLocaleString('en-IE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    let _currentInvOrder = null; // store for PDF download
+    let _currentInvOrder = null;
     async function openInvoiceModal(inv) {
       _currentInvOrder = null;
       if (!inv) return;
-      
-      // Find the matching order to open its modal (which has Generate Invoice button)
       const docNum = inv.doc_number || inv.invoice_number || '';
-      // Try to find order by order_number matching doc_number
-      let order = allOrders.find(o => 
-        o.order_number === docNum || 
-        'WOO-' + o.order_number === docNum || 
-        o.order_number === docNum.replace('WOO-', '')
-      );
-      
-      // If not found by order_number, try by order_id from invoices table
-      if (!order && inv.order_id) {
-        order = allOrders.find(o => String(o.id) === String(inv.order_id));
+      let order = allOrders.find(o => o.order_number === docNum);
+      if (!order) {
+        try {
+          const rows = await supaGet('orders', '?order_number=eq.' + encodeURIComponent(docNum) + '&limit=1');
+          if (rows && rows.length) {
+            order = rows[0];
+            allOrders.push(order);
+          }
+        } catch (e) {}
       }
-      
       if (order) {
-        // Open the order modal which has the proper Generate Invoice + Send Invoice buttons
-        openOrderModal(order);
-        return;
+        openOrderModal(order.id);
+      } else {
+        toast('Order not found: ' + docNum, 'error');
       }
-      
-      // Fallback: if order not found in loaded data, show alert
-      toast('Order not found in loaded data. Try searching in Orders page: ' + docNum, 'info');
     }
 
 async function downloadInvoicePDFFromView() {
