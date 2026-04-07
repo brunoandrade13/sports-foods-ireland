@@ -8529,7 +8529,7 @@ Loading items...
         if (!tbody || !modal) return;
         tbody.innerHTML = list.length === 0
           ? '<tr><td colspan="6" class="empty-state">No active products without B2B price.</td></tr>'
-          : list.map(p => '<tr><td>' + esc(p.name || '—') + '</td><td>' + esc(p.sku || '—') + '</td><td>' + esc((p.brands && p.brands.name) || '—') + '</td><td>' + esc((p.categories && p.categories.name) || '—') + '</td><td class="price">€' + (p.price_eur != null ? Number(p.price_eur).toFixed(2) : '0.00') + '</td><td><button type="button" class="btn-sm btn-outline" onclick="closeNoB2BModal(); editProduct(\'' + p.id + '\')">Editar</button></td></tr>').join('');
+          : list.map(p => '<tr><td>' + esc(p.name || '—') + '</td><td>' + esc(p.sku || '—') + '</td><td>' + esc((p.brands && p.brands.name) || '—') + '</td><td>' + esc((p.categories && p.categories.name) || '—') + '</td><td class="price">€' + (p.price_eur != null ? Number(p.price_eur).toFixed(2) : '0.00') + '</td><td><button type="button" class="btn-sm btn-outline" onclick="closeNoB2BModal(); editProduct(\'' + p.id + '\')">Edit</button></td></tr>').join('');
         modal.classList.add('open');
       modal.scrollTop = 0;
       };
@@ -10508,7 +10508,7 @@ Loading items...
             tbodyClients.innerHTML = sortedClients.length === 0 ? '<tr><td colspan="6" style="color:var(--text-muted);padding:12px">No customers found in this period.</td></tr>' : sortedClients.map(function(row, idx) {
               let name = getGroupName(row.groupKey);
               let groupId = (typeof row.groupKey === 'string' && row.groupKey.indexOf('@') === -1 && row.groupKey !== 'unknown') ? row.groupKey : '';
-              let btn = groupId ? '<button type="button" class="btn-sm btn-outline" onclick="closeReportDetail(); viewCustomerProfile(\'' + groupId + '\')">Ver</button>' : '';
+              let btn = groupId ? '<button type="button" class="btn-sm btn-outline" onclick="closeReportDetail(); viewCustomerProfile(\'' + groupId + '\')">View</button>' : '';
               return '<tr><td>' + (idx + 1) + '</td><td>' + esc(name) + '</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</td><td style="text-align:right">' + row.qty + '</td><td class="price" style="text-align:right">€' + row.revenue.toFixed(2) + '</td><td>' + btn + '</td></tr>';
             }).join('');
           }
