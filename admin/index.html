@@ -1451,6 +1451,9 @@ authorized staff</p>
 <div class="nav-item" data-page="backorders" onclick="showPage('backorders')">
 <span class="icon">📦</span> Backorders
 </div>
+<div class="nav-item" data-page="monthly-closing" onclick="showPage('monthly-closing')">
+<span class="icon">📊</span> Monthly Closing
+</div>
 </div>
 <div class="nav-section">
 <div class="nav-section-title">Marketing</div>
@@ -2752,6 +2755,46 @@ Select a financial report above to begin analysis.
 </tr></thead>
 <tbody id="boBody"></tbody>
 </table>
+</div>
+</div>
+
+<!-- MONTHLY CLOSING PAGE -->
+<div class="page" id="page-monthly-closing">
+<div class="page-header">
+<h2>📊 Monthly Closing — B2B Statements</h2>
+<div style="display:flex;gap:10px;align-items:center">
+<select id="mcMonth" class="form-control" style="width:140px">
+<option value="0">January</option><option value="1">February</option><option value="2">March</option>
+<option value="3">April</option><option value="4">May</option><option value="5">June</option>
+<option value="6">July</option><option value="7">August</option><option value="8">September</option>
+<option value="9">October</option><option value="10">November</option><option value="11">December</option>
+</select>
+<select id="mcYear" class="form-control" style="width:100px"></select>
+<button class="btn btn-primary" onclick="loadMonthlyClosing()">Load</button>
+</div>
+</div>
+<div id="mcSummary" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px"></div>
+<div class="table-responsive">
+<table class="data-table">
+<thead>
+<tr>
+<th><input type="checkbox" id="mcSelectAll" onchange="document.querySelectorAll('.mc-cb').forEach(c=>c.checked=this.checked)"></th>
+<th>Customer</th>
+<th>Company</th>
+<th>Orders</th>
+<th>Products</th>
+<th style="text-align:right">Total (ex-VAT)</th>
+<th style="text-align:right">VAT</th>
+<th style="text-align:right">Total (inc-VAT)</th>
+<th>Payment Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="mcTable"><tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted)">Select a month and click Load</td></tr></tbody>
+</table>
+</div>
+<div style="margin-top:16px;display:flex;gap:10px">
+<button class="btn btn-primary" onclick="sendSelectedStatements()" id="mcSendSelected" disabled>📧 Send Selected Statements</button>
 </div>
 </div>
 
@@ -6758,7 +6801,7 @@ Loading items...
       const titles = {
         dashboard: 'Dashboard', analytics: 'Analytics', products: 'Products', brands: 'Brands', categories: 'Categories',
         reviews: 'Reviews', orders: 'Orders', customers: 'Customers', abandoned: 'Abandoned Carts', discounts: 'Discount Codes',
-        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', settings: 'Settings'
+        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'monthly-closing': 'Monthly Closing', settings: 'Settings'
       };
       document.getElementById('pageTitle').textContent = titles[page] || page;
 
@@ -6772,6 +6815,7 @@ Loading items...
       if (page === 'site-analytics') loadSAReport(saCurrentReport);
       if (page === 'receivables') loadReceivables();
       if (page === 'backorders') loadBackorders();
+      if (page === 'monthly-closing') initMonthlyClosing();
     }
 
     // ============================================================
@@ -14680,6 +14724,247 @@ await fetch(SUPA_URL + '/rest/v1/order_items?id=eq.' + itemId, {
 method: 'PATCH', headers: h, body: JSON.stringify({ backorder_notes: note })
 });
 } catch (e) { toast('Error saving note', 'error'); }
+}
+
+// ============================================
+// MONTHLY CLOSING — B2B STATEMENTS
+// ============================================
+let mcData = [];
+
+function initMonthlyClosing() {
+  const now = new Date();
+  const monthSel = document.getElementById('mcMonth');
+  const yearSel = document.getElementById('mcYear');
+  if (monthSel) monthSel.value = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+  if (yearSel) {
+    yearSel.innerHTML = '';
+    for (let y = now.getFullYear(); y >= 2024; y--) yearSel.innerHTML += '<option value="' + y + '">' + y + '</option>';
+    if (now.getMonth() === 0) yearSel.value = now.getFullYear() - 1;
+  }
+  loadMonthlyClosing();
+}
+
+async function loadMonthlyClosing() {
+  const month = parseInt(document.getElementById('mcMonth').value);
+  const year = parseInt(document.getElementById('mcYear').value);
+  const startDate = new Date(year, month, 1).toISOString();
+  const endDate = new Date(year, month + 1, 1).toISOString();
+  const tbody = document.getElementById('mcTable');
+  tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px"><span class="spinner"></span> Loading...</td></tr>';
+  try {
+    const orders = await supaGet('orders', '?created_at=gte.' + startDate + '&created_at=lt.' + endDate + '&select=*,customers!inner(id,first_name,last_name,email,b2b_company_name,customer_type)&customers.customer_type=eq.b2b&order=created_at.desc');
+    if (!orders || !orders.length) {
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted)">No B2B orders found for this month</td></tr>';
+      document.getElementById('mcSummary').innerHTML = '';
+      document.getElementById('mcSendSelected').disabled = true;
+      mcData = [];
+      return;
+    }
+    const customerMap = {};
+    for (const o of orders) {
+      const c = o.customers;
+      if (!c) continue;
+      const cid = c.id;
+      if (!customerMap[cid]) {
+        customerMap[cid] = { customer: c, orders: [], totalExVat: 0, totalVat: 0, totalIncVat: 0, paidCount: 0, pendingCount: 0, items: [] };
+      }
+      const entry = customerMap[cid];
+      entry.orders.push(o);
+      const total = parseFloat(o.total) || 0;
+      const exVat = Math.round(total / 1.23 * 100) / 100;
+      const vat = Math.round((total - exVat) * 100) / 100;
+      entry.totalIncVat += total;
+      entry.totalExVat += exVat;
+      entry.totalVat += vat;
+      if (o.financial_status === 'paid') entry.paidCount++; else entry.pendingCount++;
+    }
+    // Fetch items for each order
+    const orderIds = orders.map(o => o.id);
+    let allItems = [];
+    try {
+      allItems = await supaGet('order_items', '?order_id=in.(' + orderIds.join(',') + ')&select=order_id,product_name,quantity,unit_price,total_price');
+    } catch (e) {}
+    for (const item of allItems) {
+      for (const cid in customerMap) {
+        if (customerMap[cid].orders.some(o => o.id === item.order_id)) {
+          customerMap[cid].items.push(item);
+          break;
+        }
+      }
+    }
+    mcData = Object.values(customerMap);
+    renderMCTable();
+    // Summary cards
+    const totalRev = mcData.reduce((s, d) => s + d.totalIncVat, 0);
+    const totalOrders = mcData.reduce((s, d) => s + d.orders.length, 0);
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('mcSummary').innerHTML =
+      '<div class="stat-card"><div class="label">Period</div><div class="value">' + monthNames[month] + ' ' + year + '</div></div>' +
+      '<div class="stat-card"><div class="label">B2B Customers</div><div class="value">' + mcData.length + '</div></div>' +
+      '<div class="stat-card"><div class="label">Total Orders</div><div class="value">' + totalOrders + '</div></div>' +
+      '<div class="stat-card"><div class="label">Total Revenue</div><div class="value">€' + totalRev.toFixed(2) + '</div></div>';
+    document.getElementById('mcSendSelected').disabled = false;
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#ef4444">Error: ' + e.message + '</td></tr>';
+  }
+}
+
+function renderMCTable() {
+  const tbody = document.getElementById('mcTable');
+  const fmt = v => '€' + Number(v || 0).toFixed(2);
+  tbody.innerHTML = mcData.map((d, idx) => {
+    const c = d.customer;
+    const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
+    const company = c.b2b_company_name || '—';
+    const productCount = d.items.reduce((s, i) => s + (parseInt(i.quantity) || 1), 0);
+    const paidBadge = d.pendingCount > 0
+      ? '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">' + d.pendingCount + ' PENDING</span>'
+      : '<span style="background:#d1fae5;color:#059669;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">ALL PAID</span>';
+    if (d.paidCount > 0 && d.pendingCount > 0) {
+      var paidBadge2 = '<span style="background:#d1fae5;color:#059669;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">' + d.paidCount + ' PAID</span> ' + paidBadge;
+    } else { var paidBadge2 = paidBadge; }
+    return '<tr>' +
+      '<td><input type="checkbox" class="mc-cb" data-idx="' + idx + '" checked></td>' +
+      '<td>' + esc(name) + '</td>' +
+      '<td><strong>' + esc(company) + '</strong></td>' +
+      '<td>' + d.orders.length + '</td>' +
+      '<td>' + productCount + '</td>' +
+      '<td style="text-align:right">' + fmt(d.totalExVat) + '</td>' +
+      '<td style="text-align:right">' + fmt(d.totalVat) + '</td>' +
+      '<td style="text-align:right;font-weight:700">' + fmt(d.totalIncVat) + '</td>' +
+      '<td>' + paidBadge2 + '</td>' +
+      '<td><button class="btn-sm btn-outline" onclick="viewMCDetail(' + idx + ')">View</button> <button class="btn-sm btn-primary" onclick="sendSingleStatement(' + idx + ')">📧 Send</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function viewMCDetail(idx) {
+  const d = mcData[idx];
+  const c = d.customer;
+  const name = [c.first_name, c.last_name].filter(Boolean).join(' ');
+  const month = document.getElementById('mcMonth');
+  const monthName = month.options[month.selectedIndex].text;
+  const year = document.getElementById('mcYear').value;
+  const fmt = v => '€' + Number(v || 0).toFixed(2);
+  let html = '<h3>' + esc(c.b2b_company_name || name) + ' — ' + monthName + ' ' + year + '</h3>';
+  html += '<p style="margin:8px 0"><strong>Email:</strong> ' + esc(c.email || '—') + ' | <strong>Orders:</strong> ' + d.orders.length + ' | <strong>Total:</strong> ' + fmt(d.totalIncVat) + '</p>';
+  html += '<table class="data-table" style="margin-top:12px"><thead><tr><th>Order</th><th>Date</th><th>Product</th><th style="text-align:right">Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Total</th><th>Payment</th></tr></thead><tbody>';
+  for (const o of d.orders) {
+    const orderItems = d.items.filter(i => i.order_id === o.id);
+    const fStatus = o.financial_status === 'paid' ? '<span style="color:#059669">Paid</span>' : '<span style="color:#d97706">Pending</span>';
+    if (orderItems.length === 0) {
+      html += '<tr><td>' + esc(o.order_number || '—') + '</td><td>' + new Date(o.created_at).toLocaleDateString('en-IE') + '</td><td colspan="3">—</td><td style="text-align:right;font-weight:600">' + fmt(o.total) + '</td><td>' + fStatus + '</td></tr>';
+    } else {
+      orderItems.forEach((item, i) => {
+        html += '<tr><td>' + (i === 0 ? esc(o.order_number || '—') : '') + '</td><td>' + (i === 0 ? new Date(o.created_at).toLocaleDateString('en-IE') : '') + '</td>';
+        html += '<td>' + esc(item.product_name) + '</td><td style="text-align:right">' + (item.quantity || 1) + '</td>';
+        html += '<td style="text-align:right">' + fmt(item.unit_price) + '</td><td style="text-align:right">' + fmt(item.total_price || (item.unit_price * (item.quantity || 1))) + '</td>';
+        html += '<td>' + (i === 0 ? fStatus : '') + '</td></tr>';
+      });
+    }
+  }
+  html += '</tbody></table>';
+  showDetailModal(html);
+}
+
+function showDetailModal(html) {
+  let modal = document.getElementById('mcDetailModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'mcDetailModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div style="background:var(--card-bg,#1e293b);border-radius:16px;padding:24px;max-width:900px;width:100%;max-height:90vh;overflow-y:auto;position:relative"><button onclick="document.getElementById(\'mcDetailModal\').style.display=\'none\'" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer">×</button><div id="mcDetailContent"></div></div>';
+    document.body.appendChild(modal);
+  }
+  document.getElementById('mcDetailContent').innerHTML = html;
+  modal.style.display = 'flex';
+}
+
+function buildStatementHTML(d) {
+  const c = d.customer;
+  const name = [c.first_name, c.last_name].filter(Boolean).join(' ');
+  const company = c.b2b_company_name || name;
+  const month = document.getElementById('mcMonth');
+  const monthName = month.options[month.selectedIndex].text;
+  const year = document.getElementById('mcYear').value;
+  const fmt = v => '€' + Number(v || 0).toFixed(2);
+  let rows = '';
+  for (const o of d.orders) {
+    const orderItems = d.items.filter(i => i.order_id === o.id);
+    const fStatus = o.financial_status === 'paid' ? '✅ Paid' : '⏳ Pending';
+    for (const item of orderItems) {
+      rows += '<tr><td>' + (o.order_number || '') + '</td><td>' + new Date(o.created_at).toLocaleDateString('en-IE') + '</td><td>' + (item.product_name || '') + '</td><td style="text-align:right">' + (item.quantity || 1) + '</td><td style="text-align:right">' + fmt(item.unit_price) + '</td><td style="text-align:right">' + fmt(item.total_price || (item.unit_price * (item.quantity || 1))) + '</td><td>' + fStatus + '</td></tr>';
+    }
+  }
+  return '<div style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto">' +
+    '<div style="background:#1B4332;padding:20px;text-align:center"><img src="https://sportsfoodsireland.ie/wp-content/uploads/2021/09/logo.png" alt="SFI" style="height:60px"></div>' +
+    '<div style="padding:30px 20px">' +
+    '<h2 style="color:#1B4332;margin:0 0 8px">Monthly Statement — ' + monthName + ' ' + year + '</h2>' +
+    '<p>Dear ' + esc(name || 'Partner') + ',</p>' +
+    '<p>Below is a summary of your account activity with Sports Foods Ireland for <strong>' + monthName + ' ' + year + '</strong>.</p>' +
+    '<table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:13px">' +
+    '<thead><tr style="background:#f1f5f9"><th style="padding:8px;text-align:left;border:1px solid #e2e8f0">Order</th><th style="padding:8px;border:1px solid #e2e8f0">Date</th><th style="padding:8px;border:1px solid #e2e8f0">Product</th><th style="padding:8px;text-align:right;border:1px solid #e2e8f0">Qty</th><th style="padding:8px;text-align:right;border:1px solid #e2e8f0">Unit Price</th><th style="padding:8px;text-align:right;border:1px solid #e2e8f0">Total</th><th style="padding:8px;border:1px solid #e2e8f0">Status</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+    '<tfoot><tr style="font-weight:700;background:#f8fafc"><td colspan="5" style="padding:8px;border:1px solid #e2e8f0;text-align:right">Subtotal (ex-VAT)</td><td style="padding:8px;text-align:right;border:1px solid #e2e8f0">' + fmt(d.totalExVat) + '</td><td></td></tr>' +
+    '<tr style="background:#f8fafc"><td colspan="5" style="padding:8px;border:1px solid #e2e8f0;text-align:right">VAT (23%)</td><td style="padding:8px;text-align:right;border:1px solid #e2e8f0">' + fmt(d.totalVat) + '</td><td></td></tr>' +
+    '<tr style="font-weight:700;font-size:15px;background:#e8f5e9"><td colspan="5" style="padding:10px;border:1px solid #e2e8f0;text-align:right">Total</td><td style="padding:10px;text-align:right;border:1px solid #e2e8f0">' + fmt(d.totalIncVat) + '</td><td></td></tr></tfoot></table>' +
+    (d.pendingCount > 0 ? '<p style="color:#d97706;font-weight:600">⚠️ You have ' + d.pendingCount + ' order(s) with pending payment.</p>' : '<p style="color:#059669;font-weight:600">✅ All orders are paid. Thank you!</p>') +
+    '<p style="margin-top:20px"><strong>Bank Details:</strong><br>IBAN: IE48BOFI90458753923845<br>BIC: BOFIIE2D</p>' +
+    '<p>Questions? Contact us at <a href="mailto:info@sportsfoodsireland.ie">info@sportsfoodsireland.ie</a></p>' +
+    '<p style="color:#666;margin-top:20px;font-size:12px">Sports Foods Ireland Ltd · Unit 12, Northwest Business Park, Blanchardstown, Dublin D15 YC53</p>' +
+    '</div></div>';
+}
+
+async function sendSingleStatement(idx) {
+  const d = mcData[idx];
+  const email = d.customer.email;
+  if (!email) return alert('No email for this customer');
+  const month = document.getElementById('mcMonth');
+  const monthName = month.options[month.selectedIndex].text;
+  const year = document.getElementById('mcYear').value;
+  if (!confirm('Send ' + monthName + ' ' + year + ' statement to ' + email + '?')) return;
+  const btn = event.target; btn.disabled = true; btn.textContent = '...';
+  try {
+    const htmlContent = buildStatementHTML(d);
+    const res = await fetch(SUPABASE_URL + '/functions/v1/brevo-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON },
+      body: JSON.stringify({ action: 'send_statement', email: email, customerName: [d.customer.first_name, d.customer.last_name].filter(Boolean).join(' '), subject: 'Monthly Statement — ' + monthName + ' ' + year + ' — Sports Foods Ireland', htmlContent: htmlContent })
+    });
+    const data = await res.json();
+    if (data.success) toast('Statement sent to ' + email);
+    else alert('Failed: ' + (data.message || 'Unknown error'));
+  } catch (e) { alert('Error: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = '📧 Send'; }
+}
+
+async function sendSelectedStatements() {
+  const checked = Array.from(document.querySelectorAll('.mc-cb:checked')).map(cb => parseInt(cb.dataset.idx));
+  if (!checked.length) return alert('No customers selected');
+  const month = document.getElementById('mcMonth');
+  const monthName = month.options[month.selectedIndex].text;
+  const year = document.getElementById('mcYear').value;
+  if (!confirm('Send ' + monthName + ' ' + year + ' statement to ' + checked.length + ' customer(s)?')) return;
+  const btn = document.getElementById('mcSendSelected');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  let sent = 0, failed = 0;
+  for (const idx of checked) {
+    const d = mcData[idx];
+    if (!d.customer.email) { failed++; continue; }
+    try {
+      const htmlContent = buildStatementHTML(d);
+      const res = await fetch(SUPABASE_URL + '/functions/v1/brevo-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON },
+        body: JSON.stringify({ action: 'send_statement', email: d.customer.email, customerName: [d.customer.first_name, d.customer.last_name].filter(Boolean).join(' '), subject: 'Monthly Statement — ' + monthName + ' ' + year + ' — Sports Foods Ireland', htmlContent: htmlContent })
+      });
+      const data = await res.json();
+      if (data.success) sent++; else failed++;
+    } catch (e) { failed++; }
+    btn.textContent = 'Sending... (' + sent + '/' + checked.length + ')';
+  }
+  toast(sent + ' statement(s) sent' + (failed > 0 ? ', ' + failed + ' failed' : ''));
+  btn.disabled = false; btn.textContent = '📧 Send Selected Statements';
 }
 
 </script>
