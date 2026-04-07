@@ -1658,7 +1658,7 @@ authorized staff</p>
 </div>
 
 <div class="dash-group">
-<div class="dash-group-title">📊 Visibilidade & Tráfego</div>
+<div class="dash-group-title">📊 Visibility & Traffic</div>
 <div class="stats-grid">
 <div class="stat-card">
 <div class="label">Total Page Views</div>
@@ -1858,7 +1858,7 @@ oninput="filterProducts()">
 <div class="value" id="brandsStatTotal">—</div>
 </div>
 <div class="stat-card" style="border-left:3px solid var(--accent)">
-<div class="label">Brands ativas</div>
+<div class="label">Active Brands</div>
 <div class="value" id="brandsStatActive">—</div>
 </div>
 <div class="stat-card" style="border-left:3px solid var(--text-muted)">
@@ -2966,7 +2966,7 @@ Select a financial report above to begin analysis.
 <div class="label">Out of Stock</div>
 <div class="value" id="statOutStockCount">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid #0ea5e9;cursor:pointer" id="stkNoB2BCard" onclick="openNoB2BModal()" title="Clique para ver lista e documentação">
+<div class="stat-card" style="border-left:3px solid #0ea5e9;cursor:pointer" id="stkNoB2BCard" onclick="openNoB2BModal()" title="Click to view list and documentation">
 <div class="label">No B2B Price</div>
 <div class="value" id="stkNoB2BCount">—</div>
 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">clique para lista</div>
@@ -3056,7 +3056,7 @@ Window: last 90 days · paid orders only
 <th style="text-align:right">Price</th>
 <th style="text-align:right">Stock</th>
 <th style="text-align:right">Value</th>
-<th>Estado</th>
+<th>Status</th>
 </tr>
 </thead>
 <tbody id="stockDetailTableBody"></tbody>
@@ -3076,7 +3076,7 @@ Window: last 90 days · paid orders only
 <div id="productStockSalesKpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px"></div>
 <div class="dash-group-title" style="margin-bottom:8px">📈 Sales Flow</div>
 <div id="productStockSalesFlow" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:16px"></div>
-<div class="dash-group-title" style="margin-bottom:8px">🛒 Últimas ordens</div>
+<div class="dash-group-title" style="margin-bottom:8px">🛒 Latest Orders</div>
 <div style="overflow-x:auto;margin-bottom:16px">
 <table style="width:100%">
 <thead><tr><th>PO #</th><th>Date</th><th style="text-align:right">Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Total</th></tr></thead>
@@ -4109,7 +4109,7 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 <div class="value" id="cpStatsOrders">0</div>
 </div>
 <div class="stat-card">
-<div class="label">Ticket médio</div>
+<div class="label">Avg. Order Value</div>
 <div class="value" id="cpStatsAvg">€0.00</div>
 </div>
 </div>
@@ -4119,7 +4119,7 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 <div class="value" id="cpStatsLastYear">0 ped · €0</div>
 </div>
 <div class="stat-card" style="border-left:3px solid #60a5fa">
-<div class="label">Últimos 6 meses</div>
+<div class="label">Last 6 Months</div>
 <div class="value" id="cpStatsLast6Months">0 ped · €0</div>
 </div>
 <div class="stat-card" style="border-left:3px solid #a78bfa">
@@ -6889,7 +6889,7 @@ Loading items...
           filteredCustomers = [...allCustomers];
         } catch (e) { console.warn('Group aggregation skipped:', e); }
 
-        // Helpers para agregação por grupo
+        // Helpers for group aggregation
         window.getCustomerGroupKey = function(customerId, email) {
           const e = (email || '').trim().toLowerCase();
           if (customerId && window.customerIdToGroupId && window.customerIdToGroupId[customerId] !== undefined) return window.customerIdToGroupId[customerId];
@@ -8840,7 +8840,7 @@ Loading items...
         <div class="stat-card"><div class="label">Stock Value (retail)</div><div class="value">€${val.toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">Stock Value B2B</div><div class="value">€${valB2B.toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">Stock Value (cost)</div><div class="value">€${valCost.toFixed(2)}</div></div>
-        <div class="stat-card"><div class="label">Estado</div><div class="value"><span class="stock-badge ${cls}">${statusLbl}</span></div></div>
+        <div class="stat-card"><div class="label">Status</div><div class="value"><span class="stock-badge ${cls}">${statusLbl}</span></div></div>
       `;
       flowEl.innerHTML = '<div style="grid-column:1/-1;color:var(--text-muted)">Loading...</div>';
       ordersBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--text-dim)">Loading...</td></tr>';
@@ -12719,7 +12719,7 @@ Loading items...
         const searches = sq || [];
         const sessions = [...new Set(views.map(v => v.session_id))];
 
-        // 1. Visibilidade & Tráfego
+        // 1. Visibility & Traffic
         document.getElementById('analPageViews').textContent = views.length.toLocaleString();
         document.getElementById('analSessions').textContent = sessions.length.toLocaleString();
 
