@@ -2977,7 +2977,7 @@ Select a financial report above to begin analysis.
 <div class="table-toolbar">
 <strong>🔁 Suggested Restock — products with recurring sales and low stock</strong>
 <div style="font-size:0.8rem;color:var(--text-muted);margin-left:auto">
-Janela: últimos 90 dias · apenas pedidos pagos
+Window: last 90 days · paid orders only
 </div>
 </div>
 <div style="max-height:360px;overflow-y:auto">
@@ -2989,7 +2989,7 @@ Janela: últimos 90 dias · apenas pedidos pagos
 <th style="text-align:right">Stock atual</th>
 <th style="text-align:right">Vendido (90d)</th>
 <th style="text-align:right">Orders (90d)</th>
-<th style="text-align:right">Cobertura (dias)</th>
+<th style="text-align:right">Coverage (days)</th>
 <th style="text-align:right">Restock Suggestion</th>
 </tr>
 </thead>
@@ -4105,7 +4105,7 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 <div class="value" id="cpStatsSpent">€0.00</div>
 </div>
 <div class="stat-card">
-<div class="label">Nº de pedidos</div>
+<div class="label">No. of Orders</div>
 <div class="value" id="cpStatsOrders">0</div>
 </div>
 <div class="stat-card">
@@ -6077,7 +6077,7 @@ Loading items...
         return brandStats[name];
       }
 
-      // Eventos de produto por brand
+      // Product events by brand
       pe.forEach(r => {
         const p = productById.get(String(r.product_id || ''));
         if (!p) return;
@@ -6089,7 +6089,7 @@ Loading items...
         if (p.id) b.products.add(String(p.id));
       });
 
-      // Tempo em páginas de produto, por brand
+      // Time on product pages, by brand
       pv.filter(r => r.page_type === 'product' && r.product_id).forEach(r => {
         const p = productById.get(String(r.product_id));
         if (!p) return;
@@ -7071,7 +7071,7 @@ Loading items...
       const editBrand = document.getElementById('editBrand');
       const editCat = document.getElementById('editCategory');
       // Preserve current selections while rebuilding option lists, to avoid
-      // fields "apagarem" quando o modal é aberto pela primeira vez.
+      // fields clearing when modal is opened for the firsta vez.
       const currentCatFilter = catFilter?.value || '';
       const currentBrandFilter = brandFilter?.value || '';
       const currentEditBrand = editBrand?.value || '';
@@ -8157,9 +8157,9 @@ Loading items...
       updateVariantCountLabel();
     }
 
-    // ---- Variant Image Picker — criado dinamicamente no body ----
+    // ---- Variant Image Picker — created dynamically on body ----
     function openVariantImagePicker(idx) {
-      // Remover modal anterior se existir
+      // Remove previous modal if exists
       const prev = document.getElementById('_vimgPicker');
       if (prev) prev.remove();
 
@@ -8572,7 +8572,7 @@ Loading items...
           const url = (typeof SUPA_URL !== 'undefined' ? SUPA_URL : '') + '/functions/v1/b2b-price-report';
           const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (await getValidBearerToken()) } });
           let data;
-          try { data = await resp.json(); } catch (_) { data = { success: false, error: resp.status + ' ' + resp.statusText + ' (resposta não JSON)' }; }
+          try { data = await resp.json(); } catch (_) { data = { success: false, error: resp.status + ' ' + resp.statusText + ' (non-JSON response)' }; }
           if (!resp.ok) throw new Error(data.error || 'Error ' + resp.status);
           if (!data.success) throw new Error(data.error || 'Report failed');
           const r = data.report || {};
@@ -8781,9 +8781,9 @@ Loading items...
       kpiEl.innerHTML = `
         <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Products</div><div class="value">${products.length}</div></div>
         <div class="stat-card"><div class="label">Unidades</div><div class="value">${totalUnits.toLocaleString()}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Valor (EUR)</div><div class="value">€${totalValue.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
-        <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="label">Valor B2B</div><div class="value">€${totalValueB2B.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
-        <div class="stat-card" style="border-left:3px solid #f59e0b"><div class="label">Valor Custo</div><div class="value">€${totalValueCost.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
+        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Value (EUR)</div><div class="value">€${totalValue.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
+        <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="label">Value B2B</div><div class="value">€${totalValueB2B.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
+        <div class="stat-card" style="border-left:3px solid #f59e0b"><div class="label">Value Cost</div><div class="value">€${totalValueCost.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
         <div class="stat-card" style="border-left:3px solid var(--warn)"><div class="label">Low Stock</div><div class="value">${data.low || 0}</div></div>
         <div class="stat-card" style="border-left:3px solid var(--danger)"><div class="label">Out of Stock</div><div class="value">${data.out || 0}</div></div>
       `;
@@ -8872,10 +8872,10 @@ Loading items...
         });
 
         flowEl.innerHTML = `
-          <div class="stat-card"><div class="label">7 dias</div><div class="value">${q7} un. · €${v7.toFixed(2)}</div></div>
-          <div class="stat-card"><div class="label">30 dias</div><div class="value">${q30} un. · €${v30.toFixed(2)}</div></div>
-          <div class="stat-card"><div class="label">90 dias</div><div class="value">${q90} un. · €${v90.toFixed(2)}</div></div>
-          <div class="stat-card"><div class="label">180 dias</div><div class="value">${q180} un. · €${v180.toFixed(2)}</div></div>
+          <div class="stat-card"><div class="label">7 days</div><div class="value">${q7} un. · €${v7.toFixed(2)}</div></div>
+          <div class="stat-card"><div class="label">30 days</div><div class="value">${q30} un. · €${v30.toFixed(2)}</div></div>
+          <div class="stat-card"><div class="label">90 days</div><div class="value">${q90} un. · €${v90.toFixed(2)}</div></div>
+          <div class="stat-card"><div class="label">180 days</div><div class="value">${q180} un. · €${v180.toFixed(2)}</div></div>
           <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Total</div><div class="value">${qL} un. · €${vL.toFixed(2)}</div></div>
         `;
 
@@ -9504,7 +9504,7 @@ Loading items...
 
       try {
         if (type === 'monthly') {
-          // Monthly Revenue: usar TODAS as ordens pagas e agrupar por trimestre / semestral / anual
+          // Monthly Revenue: use ALL paid orders and group by trimestre / semestral / anual
           paidOrders = allOrders.filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status));
           const groups = {};
           const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -11062,13 +11062,13 @@ Loading items...
     function renderCustomers() {
       if (document.getElementById('custTotal')) document.getElementById('custTotal').textContent = allCustomers.length;
 
-      // Total Revenue = mesma fonte do dashboard (soma de ordens pagas) para não divergir
+      // Total Revenue = mesma fonte do dashboard (sum of paid orders) to avoid divergence
       const paidStatuses = ['paid', 'partially_refunded', 'partially_paid'];
       const paidOrdersForRev = (allOrders || []).filter(o => paidStatuses.includes(o.financial_status));
       const totalRevenueConsistent = paidOrdersForRev.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
       if (document.getElementById('custTotalRev')) document.getElementById('custTotalRev').textContent = '€' + totalRevenueConsistent.toLocaleString('en', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-      // Calculate Stats (por cliente, para médias e totais de pedidos)
+      // Calculate Stats (per customer, for averages and order totalsdos)
       if (allCustomers.length > 0) {
         let totalOrders = 0;
         let totalSpent = 0;
@@ -11650,7 +11650,7 @@ Loading items...
         const row = byProd.find(function (r) { return r.customer_id === customerId && r.is_active !== false; });
         if (row && row.price_eur != null) return parseFloat(row.price_eur) || 0;
       }
-      // 2) wholesale_price_eur se definido, senão price_eur
+      // 2) wholesale_price_eur if defined, otherwise price_eur
       if (product.wholesale_price_eur != null && Number(product.wholesale_price_eur) > 0) {
         return parseFloat(product.wholesale_price_eur) || 0;
       }
