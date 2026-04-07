@@ -2360,7 +2360,7 @@ Only B2B customers
 </div>
 <div class="table-wrap">
 <div class="table-toolbar">
-<input type="text" class="search-input" id="invoiceSearch" placeholder="Search invoices..."
+<input type="text" class="search-input" id="invoiceSearch" placeholder="Search by order number or customer name..."
 oninput="filterInvoices()">
 </div>
 <div style="overflow-x:auto">
@@ -2368,6 +2368,7 @@ oninput="filterInvoices()">
 <thead>
 <tr>
 <th>Doc #</th>
+<th>Customer</th>
 <th>Source</th>
 <th>Status</th>
 <th>Total</th>
@@ -13039,12 +13040,14 @@ Loading items...
     function renderInvoices() {
       const tbody = document.getElementById('invoicesTable');
       if (!filteredInvoices || filteredInvoices.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No invoices found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No invoices found</td></tr>';
         return;
       }
       tbody.innerHTML = filteredInvoices.slice(0, 100).map((inv, idx) => {
         const docNum = esc(inv.doc_number || '—');
+        const custName = esc(inv.customer_name || '—');
         return `<tr><td><code class="invoice-doc-link" title="View invoice">${docNum}</code></td>
+          <td>${custName}</td>
           <td><span class="stock-badge info">${esc(inv.source || 'QuickBooks')}</span></td>
           <td><span class="stock-badge in">${esc(inv.status || '—')}</span></td>
           <td class="price">€${(inv.total || 0).toFixed(2)}</td>
@@ -13062,6 +13065,7 @@ Loading items...
       const q = document.getElementById('invoiceSearch').value.toLowerCase();
       filteredInvoices = allInvoices.filter(i =>
         (i.doc_number && i.doc_number.toLowerCase().includes(q)) ||
+        (i.customer_name && i.customer_name.toLowerCase().includes(q)) ||
         (i.source && i.source.toLowerCase().includes(q)) ||
         (i.status && i.status.toLowerCase().includes(q))
       );
