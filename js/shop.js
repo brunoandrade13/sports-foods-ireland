@@ -2,7 +2,7 @@
 let allProducts = [];
 let filteredProducts = [];
 let currentPage = 1;
-const productsPerPage = 12;
+const productsPerPage = 20;
 let currentView = 'grid';
 let currentSort = 'relevance';
 
