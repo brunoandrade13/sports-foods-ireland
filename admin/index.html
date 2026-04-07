@@ -1862,7 +1862,7 @@ oninput="filterProducts()">
 <div class="value" id="brandsStatActive">—</div>
 </div>
 <div class="stat-card" style="border-left:3px solid var(--text-muted)">
-<div class="label">Brands inativas</div>
+<div class="label">Inactive Brands</div>
 <div class="value" id="brandsStatInactive">—</div>
 </div>
 </div>
@@ -2411,11 +2411,11 @@ style="padding:10px 18px;font-size:0.95rem;">💳 Payment Status</button>
 <span style="color:var(--text-muted); font-size:0.9rem;">📆 Group by:</span>
 <button class="btn-sm btn-outline rptRevenueGroupBtn" onclick="setRevenueGroup('monthly')" id="rptGroup-monthly"
 style="padding:6px 14px;">Monthly</button>
-<button class="btn-sm btn-outline rptRevenueGroupBtn" onclick="setRevenueGroup('trimestre')" id="rptGroup-trimestre"
+<button class="btn-sm btn-outline rptRevenueGroupBtn" onclick="setRevenueGroup('quarterly')" id="rptGroup-quarterly"
 style="padding:6px 14px;">Quarter (Q1–Q4)</button>
-<button class="btn-sm btn-outline rptRevenueGroupBtn" onclick="setRevenueGroup('semestral')" id="rptGroup-semestral"
+<button class="btn-sm btn-outline rptRevenueGroupBtn" onclick="setRevenueGroup('semester')" id="rptGroup-semester"
 style="padding:6px 14px;">Semester (H1–H2)</button>
-<button class="btn-sm btn-outline rptRevenueGroupBtn" onclick="setRevenueGroup('anual')" id="rptGroup-anual"
+<button class="btn-sm btn-outline rptRevenueGroupBtn" onclick="setRevenueGroup('annual')" id="rptGroup-annual"
 style="padding:6px 14px;">Annual</button>
 </div>
 </div>
@@ -2553,9 +2553,9 @@ Select product...
 <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
 <span style="color:var(--text-muted); font-size:0.9rem;">📆 Group by:</span>
 <button class="btn-sm btn-outline finGroupBtn" onclick="setFinanceReportGrouping('monthly')" id="finGroup-monthly" style="padding:6px 14px;">Monthly</button>
-<button class="btn-sm btn-outline finGroupBtn" onclick="setFinanceReportGrouping('trimestre')" id="finGroup-trimestre" style="padding:6px 14px;">Quarter (Q1–Q4)</button>
-<button class="btn-sm btn-outline finGroupBtn" onclick="setFinanceReportGrouping('semestral')" id="finGroup-semestral" style="padding:6px 14px;">Semester (H1–H2)</button>
-<button class="btn-sm btn-outline finGroupBtn" onclick="setFinanceReportGrouping('anual')" id="finGroup-anual" style="padding:6px 14px;">Annual</button>
+<button class="btn-sm btn-outline finGroupBtn" onclick="setFinanceReportGrouping('quarterly')" id="finGroup-quarterly" style="padding:6px 14px;">Quarter (Q1–Q4)</button>
+<button class="btn-sm btn-outline finGroupBtn" onclick="setFinanceReportGrouping('semester')" id="finGroup-semester" style="padding:6px 14px;">Semester (H1–H2)</button>
+<button class="btn-sm btn-outline finGroupBtn" onclick="setFinanceReportGrouping('annual')" id="finGroup-annual" style="padding:6px 14px;">Annual</button>
 </div>
 </div>
 
@@ -4515,7 +4515,7 @@ Loading items...
     // ============================================================
     let currentReportPeriod = 'all';
     let currentReportType = null;
-    let currentRevenueGrouping = 'monthly'; // monthly | trimestre | semestral | anual (for Monthly Revenue report)
+    let currentRevenueGrouping = 'monthly'; // monthly | quarterly | semester | annual (for Monthly Revenue report)
 
     function getReportDateRange() {
       const now = new Date();
@@ -4600,7 +4600,7 @@ Loading items...
     // ============================================================
     let currentFinancePeriod = 'all';
     let currentFinanceType = null;
-    let currentFinanceReportGrouping = 'monthly'; // for Revenue by Brand, by Category, Top Products: monthly | trimestre | semestral | anual
+    let currentFinanceReportGrouping = 'monthly'; // for Revenue by Brand, by Category, Top Products: monthly | quarterly | semester | annual
     let currentFinanceBrand = null; // selected brand for Revenue by Brand
     let currentFinanceCategory = null; // selected category for Revenue by Category
     let currentFinanceProduct = null; // selected product for Top Products
@@ -5127,15 +5127,15 @@ Loading items...
     function getFinancePeriodKey(monthStr, grouping) {
       const [y, m] = monthStr.split('-').map(Number);
       if (grouping === 'monthly') return { key: monthStr, label: `${MONTH_NAMES[m - 1]} ${y}` };
-      if (grouping === 'trimestre') {
+      if (grouping === 'quarterly') {
         const q = Math.ceil(m / 3);
         return { key: `${y}-${q}`, label: `Q${q} ${y}` };
       }
-      if (grouping === 'semestral') {
+      if (grouping === 'semester') {
         const h = m <= 6 ? 1 : 2;
         return { key: `${y}-${h}`, label: `H${h} ${y}` };
       }
-      if (grouping === 'anual') return { key: String(y), label: String(y) };
+      if (grouping === 'annual') return { key: String(y), label: String(y) };
       return { key: monthStr, label: `${MONTH_NAMES[m - 1]} ${y}` };
     }
 
@@ -5146,21 +5146,21 @@ Loading items...
         const to = new Date(y, m, 0, 23, 59, 59);
         return { from: from.toISOString(), to: to.toISOString() };
       }
-      if (grouping === 'trimestre') {
+      if (grouping === 'quarterly') {
         const [y, q] = key.split('-').map(Number);
         const startMonth = (q - 1) * 3;
         const from = new Date(y, startMonth, 1);
         const to = new Date(y, startMonth + 3, 0, 23, 59, 59);
         return { from: from.toISOString(), to: to.toISOString() };
       }
-      if (grouping === 'semestral') {
+      if (grouping === 'semester') {
         const [y, h] = key.split('-').map(Number);
         const startMonth = (h - 1) * 6;
         const from = new Date(y, startMonth, 1);
         const to = new Date(y, startMonth + 6, 0, 23, 59, 59);
         return { from: from.toISOString(), to: to.toISOString() };
       }
-      if (grouping === 'anual') {
+      if (grouping === 'annual') {
         const y = parseInt(key, 10);
         const from = new Date(y, 0, 1);
         const to = new Date(y, 11, 31, 23, 59, 59);
@@ -9504,7 +9504,7 @@ Loading items...
 
       try {
         if (type === 'monthly') {
-          // Monthly Revenue: use ALL paid orders and group by trimestre / semestral / anual
+          // Monthly Revenue: use ALL paid orders and group by quarterly / semester / annual
           paidOrders = allOrders.filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status));
           const groups = {};
           const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -9515,11 +9515,11 @@ Loading items...
               const sortKey = `${y}-${String(m + 1).padStart(2, '0')}`;
               return { sortKey, label: `${monthNames[m]} ${y}` };
             }
-            if (currentRevenueGrouping === 'trimestre') {
+            if (currentRevenueGrouping === 'quarterly') {
               const q = Math.floor(m / 3) + 1;
               return { sortKey: `${y}-${q}`, label: `Q${q} ${y}` };
             }
-            if (currentRevenueGrouping === 'semestral') {
+            if (currentRevenueGrouping === 'semester') {
               const h = m < 6 ? 1 : 2;
               return { sortKey: `${y}-${h}`, label: `H${h} ${y}` };
             }
@@ -9541,7 +9541,7 @@ Loading items...
           const totalRev = sorted.reduce((s, [, d]) => s + d.revenue, 0);
           const totalOrd = sorted.reduce((s, [, d]) => s + d.orders, 0);
           window._revenueGrouping = currentRevenueGrouping;
-          const colLabel = currentRevenueGrouping === 'monthly' ? 'Month' : currentRevenueGrouping === 'trimestre' ? 'Quarter' : currentRevenueGrouping === 'semestral' ? 'Semester' : 'Year';
+          const colLabel = currentRevenueGrouping === 'monthly' ? 'Month' : currentRevenueGrouping === 'quarterly' ? 'Quarter' : currentRevenueGrouping === 'semester' ? 'Semester' : 'Year';
           out.innerHTML = `
             <h3 style="margin:0 0 15px 0;">📅 Revenue by period (paid orders only)</h3>
               <div style="overflow-x:auto"><table>
@@ -9821,11 +9821,11 @@ Loading items...
             if (currentRevenueGrouping === 'monthly') {
               return { sortKey: `${y}-${String(m + 1).padStart(2, '0')}`, label: `${monthNames[m]} ${y}` };
             }
-            if (currentRevenueGrouping === 'trimestre') {
+            if (currentRevenueGrouping === 'quarterly') {
               const q = Math.floor(m / 3) + 1;
               return { sortKey: `${y}-${q}`, label: `Q${q} ${y}` };
             }
-            if (currentRevenueGrouping === 'semestral') {
+            if (currentRevenueGrouping === 'semester') {
               const h = m < 6 ? 1 : 2;
               return { sortKey: `${y}-${h}`, label: `H${h} ${y}` };
             }
@@ -9860,7 +9860,7 @@ Loading items...
           const totalRev = b2bRev + b2cRev;
           const b2bCust = b2bCustSet.size;
           const b2cCust = b2cCustSet.size;
-          const colLabel = currentRevenueGrouping === 'monthly' ? 'Month' : currentRevenueGrouping === 'trimestre' ? 'Quarter' : currentRevenueGrouping === 'semestral' ? 'Semester' : 'Year';
+          const colLabel = currentRevenueGrouping === 'monthly' ? 'Month' : currentRevenueGrouping === 'quarterly' ? 'Quarter' : currentRevenueGrouping === 'semester' ? 'Semester' : 'Year';
 
           out.innerHTML = `
             <h3 style="margin:0 0 15px 0;">🏢 B2B vs B2C Analysis</h3>
@@ -9984,21 +9984,21 @@ Loading items...
       const parts = sortKey.split('-').map(Number);
       const year = parts[0];
       const month = parts[1] != null ? parts[1] : 0;
-      if (grouping === 'trimestre' && parts.length >= 2) {
+      if (grouping === 'quarterly' && parts.length >= 2) {
         const q = parts[1];
         const startMonth = (q - 1) * 3;
         const endMonth = startMonth + 3;
         from = `${year}-${String(startMonth + 1).padStart(2, '0')}-01T00:00:00`;
         const lastDay = new Date(year, endMonth, 0).getDate();
         to = `${year}-${String(endMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}T23:59:59`;
-      } else if (grouping === 'semestral' && parts.length >= 2) {
+      } else if (grouping === 'semester' && parts.length >= 2) {
         const h = parts[1];
         const startMonth = (h - 1) * 6;
         const endMonth = startMonth + 6;
         from = `${year}-${String(startMonth + 1).padStart(2, '0')}-01T00:00:00`;
         const lastDay = new Date(year, endMonth, 0).getDate();
         to = `${year}-${String(endMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}T23:59:59`;
-      } else if (grouping === 'anual' && parts.length === 1) {
+      } else if (grouping === 'annual' && parts.length === 1) {
         from = `${year}-01-01T00:00:00`;
         to = `${year}-12-31T23:59:59`;
       } else {
@@ -10017,7 +10017,7 @@ Loading items...
       const totalDays = Math.ceil((toDate - fromDate) / msPerDay) + 1;
 
       let chartData, chartBucket, subtitle;
-      if (grouping === 'trimestre') {
+      if (grouping === 'quarterly') {
         // Quarter: bucket by week (7 days)
         const numWeeks = Math.ceil(totalDays / 7);
         chartData = [];
@@ -10038,7 +10038,7 @@ Loading items...
           const idx = Math.floor((orderTime - fromDate.getTime()) / (7 * msPerDay));
           if (idx >= 0 && idx < chartData.length) { chartData[idx].orders++; chartData[idx].revenue += val; }
         });
-      } else if (grouping === 'semestral') {
+      } else if (grouping === 'semester') {
         // Semester: two bars per month — 1st half (1–15) and 2nd half (16–end). Use semester number (h) to define range so Dec is never lost to timezone (e.g. "2025-12-31T23:59:59" parsed as UTC → Jan in UTC+1).
         const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         chartData = [];
@@ -10070,7 +10070,7 @@ Loading items...
           const idx = monthIndex * 2 + half;
           if (idx >= 0 && idx < chartData.length) { chartData[idx].orders++; chartData[idx].revenue += val; }
         });
-      } else if (grouping === 'anual') {
+      } else if (grouping === 'annual') {
         // Year: bucket by month
         const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         chartData = [];
@@ -10713,21 +10713,21 @@ Loading items...
       const year = parts[0];
       const month = parts[1] != null ? parts[1] : 0;
       let from, to;
-      if (grouping === 'trimestre' && parts.length >= 2) {
+      if (grouping === 'quarterly' && parts.length >= 2) {
         const q = parts[1];
         const startMonth = (q - 1) * 3;
         const endMonth = startMonth + 3;
         from = `${year}-${String(startMonth + 1).padStart(2, '0')}-01T00:00:00`;
         const lastDay = new Date(year, endMonth, 0).getDate();
         to = `${year}-${String(endMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}T23:59:59`;
-      } else if (grouping === 'semestral' && parts.length >= 2) {
+      } else if (grouping === 'semester' && parts.length >= 2) {
         const h = parts[1];
         const startMonth = (h - 1) * 6;
         const endMonth = startMonth + 6;
         from = `${year}-${String(startMonth + 1).padStart(2, '0')}-01T00:00:00`;
         const lastDay = new Date(year, endMonth, 0).getDate();
         to = `${year}-${String(endMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}T23:59:59`;
-      } else if (grouping === 'anual' && parts.length === 1) {
+      } else if (grouping === 'annual' && parts.length === 1) {
         from = `${year}-01-01T00:00:00`;
         to = `${year}-12-31T23:59:59`;
       } else {
@@ -10753,7 +10753,7 @@ Loading items...
       let chartBucket = 'day';
       let subtitle = 'Daily Sales';
 
-      if (grouping === 'trimestre') {
+      if (grouping === 'quarterly') {
         chartBucket = 'week';
         subtitle = 'Weekly Sales';
         const numWeeks = Math.ceil(totalDays / 7);
@@ -10776,7 +10776,7 @@ Loading items...
             if (isB2B) { dayData[idx].b2b_o++; dayData[idx].b2b_r += val; } else { dayData[idx].b2c_o++; dayData[idx].b2c_r += val; }
           }
         });
-      } else if (grouping === 'semestral') {
+      } else if (grouping === 'semester') {
         chartBucket = 'fortnight';
         subtitle = 'Fortnightly Sales';
         const startYear = fromDate.getFullYear();
@@ -10809,7 +10809,7 @@ Loading items...
             if (isB2B) { dayData[idx].b2b_o++; dayData[idx].b2b_r += val; } else { dayData[idx].b2c_o++; dayData[idx].b2c_r += val; }
           }
         });
-      } else if (grouping === 'anual') {
+      } else if (grouping === 'annual') {
         chartBucket = 'month';
         subtitle = 'Monthly Sales';
         for (let m = 0; m < 12; m++) {
@@ -12743,7 +12743,7 @@ Loading items...
         const bounceRate = sessions.length ? ((bounces / sessions.length) * 100).toFixed(1) : 0;
         document.getElementById('analBounce').textContent = `${bounceRate}%`;
 
-        // 2. Engajamento & Comportamento (Top Pages — normalized)
+        // 2. Engagement & Behaviour (Top Pages — normalized)
         const pageAgg = {};
         views.forEach(v => {
           const key = normUrl(v.page_url) || 'home';
