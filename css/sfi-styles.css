@@ -14584,25 +14584,7 @@ body .cart-modal-overlay.active {
     border: 1px solid #e5e1da;
 }
 
-.cart-modal-item-image {
-    width: 90px;
-    height: 90px;
-    flex-shrink: 0;
-    border-radius: 6px;
-    overflow: hidden;
-    background: #f5f3ee;
-}
-
-.cart-modal-item-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.cart-modal-item-info {
-    flex: 1;
-    min-width: 0;
-}
+/* cart-modal-item image and info - see main definition above line ~952 */
 
 .cart-modal-item-name {
     font-weight: 600;
@@ -14768,43 +14750,7 @@ header,
    ============================================ */
 
 /* Imagens do cart - ambas classes */
-.cart-item-img,
-.cart-modal-item img,
-.cart-modal-item-image,
-.cart-modal-item-image img {
-    width: 90px;
-    height: 90px;
-    min-width: 90px;
-    min-height: 90px;
-    flex-shrink: 0;
-    border-radius: 6px;
-    object-fit: cover;
-    background: #f5f3ee;
-    display: block;
-    visibility: visible;
-    opacity: 1;
-}
-
-/* Garantir que img dentro do item seja visível */
-.cart-modal-item > img {
-    width: 90px;
-    height: 90px;
-    min-width: 90px;
-    min-height: 90px;
-    flex-shrink: 0;
-    border-radius: 6px;
-    object-fit: cover;
-    background: #f5f3ee;
-    display: block;
-    visibility: visible;
-    opacity: 1;
-    border: 1px solid #e5e1da;
-}
-
-/* Fallback image styling */
-.cart-modal-item img[src*="produto"] {
-    background: linear-gradient(135deg, #f5f3ee 0%, #e5e1da 100%);
-}
+/* cart modal image overrides removed - consolidated at line ~952 */
 
 /* ====== 7/9: correcoes-cores.css ====== */
 /* ===========================================
@@ -16578,19 +16524,7 @@ img.header-svg-icon {
     overflow: visible;
 }
 
-/* Override: imagens de produto no cart modal NÃO devem ter 24px */
-.cart-modal-item img.cart-item-img,
-.cart-modal-item > img,
-.cart-modal-item-image img {
-    width: 90px;
-    height: 90px;
-    min-width: 90px;
-    min-height: 90px;
-    max-width: 90px;
-    max-height: 90px;
-    border-radius: 8px;
-    object-fit: cover;
-    display: block;
+/* cart modal image override removed - consolidated */
     background: #f5f3ee;
 }
 
