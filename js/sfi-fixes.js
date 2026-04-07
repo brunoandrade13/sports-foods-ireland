@@ -281,10 +281,13 @@
     // Always override any previous definition to ensure our version is used
     window.closeCartModal = function() {
         const overlay = document.getElementById('cartModalOverlay');
+        const modal = document.getElementById('cartModal');
         if (!overlay) return;
         
-        // Remove active class
+        // Remove active class and clear ALL inline styles forced by openCartModal
         overlay.classList.remove('active');
+        overlay.removeAttribute('style');
+        if (modal) modal.removeAttribute('style');
         
         // Remove scroll lock
         document.body.classList.remove('cart-modal-open');
