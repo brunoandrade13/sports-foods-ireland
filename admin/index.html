@@ -2774,6 +2774,7 @@ Select a financial report above to begin analysis.
 </div>
 </div>
 <div id="mcSummary" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px"></div>
+<div style="margin-bottom:14px"><input type="text" id="mcSearch" class="search-input" placeholder="Search customer or company name..." oninput="filterMCTable()" style="max-width:400px"></div>
 <div class="table-responsive">
 <table class="data-table">
 <thead>
@@ -14809,13 +14810,15 @@ async function loadMonthlyClosing() {
   }
 }
 
-function renderMCTable() {
+function renderMCTable(filterText) {
   const tbody = document.getElementById('mcTable');
   const fmt = v => '€' + Number(v || 0).toFixed(2);
+  const term = (filterText || '').toLowerCase();
   tbody.innerHTML = mcData.map((d, idx) => {
     const c = d.customer;
     const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
     const company = c.b2b_company_name || '—';
+    if (term && !name.toLowerCase().includes(term) && !company.toLowerCase().includes(term) && !(c.email || '').toLowerCase().includes(term)) return '';
     const productCount = d.items.reduce((s, i) => s + (parseInt(i.quantity) || 1), 0);
     const paidBadge = d.pendingCount > 0
       ? '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">' + d.pendingCount + ' PENDING</span>'
@@ -14825,7 +14828,7 @@ function renderMCTable() {
     } else { var paidBadge2 = paidBadge; }
     return '<tr>' +
       '<td><input type="checkbox" class="mc-cb" data-idx="' + idx + '" checked></td>' +
-      '<td>' + esc(name) + '</td>' +
+      '<td><a href="#" onclick="event.preventDefault();viewMCDetail(' + idx + ')" style="color:var(--accent);font-weight:600;text-decoration:none">' + esc(name) + '</a></td>' +
       '<td><strong>' + esc(company) + '</strong></td>' +
       '<td>' + d.orders.length + '</td>' +
       '<td>' + productCount + '</td>' +
@@ -14838,6 +14841,11 @@ function renderMCTable() {
   }).join('');
 }
 
+function filterMCTable() {
+  const term = (document.getElementById('mcSearch')?.value || '').trim();
+  renderMCTable(term);
+}
+
 function viewMCDetail(idx) {
   const d = mcData[idx];
   const c = d.customer;
@@ -14846,17 +14854,29 @@ function viewMCDetail(idx) {
   const monthName = month.options[month.selectedIndex].text;
   const year = document.getElementById('mcYear').value;
   const fmt = v => '€' + Number(v || 0).toFixed(2);
-  let html = '<h3>' + esc(c.b2b_company_name || name) + ' — ' + monthName + ' ' + year + '</h3>';
-  html += '<p style="margin:8px 0"><strong>Email:</strong> ' + esc(c.email || '—') + ' | <strong>Orders:</strong> ' + d.orders.length + ' | <strong>Total:</strong> ' + fmt(d.totalIncVat) + '</p>';
-  html += '<table class="data-table" style="margin-top:12px"><thead><tr><th>Order</th><th>Date</th><th>Product</th><th style="text-align:right">Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Total</th><th>Payment</th></tr></thead><tbody>';
+  const productCount = d.items.reduce((s, i) => s + (parseInt(i.quantity) || 1), 0);
+  let html = '<h3 style="margin:0 0 4px">' + esc(c.b2b_company_name || name) + '</h3>';
+  html += '<p style="color:var(--text-muted);margin:0 0 16px;font-size:0.85rem">' + esc(c.email || '') + ' · ' + monthName + ' ' + year + '</p>';
+  // Summary cards
+  html += '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">';
+  html += '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 18px;flex:1;min-width:100px"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px">Orders</div><div style="font-size:1.4rem;font-weight:700">' + d.orders.length + '</div></div>';
+  html += '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 18px;flex:1;min-width:100px"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px">Products</div><div style="font-size:1.4rem;font-weight:700">' + productCount + '</div></div>';
+  html += '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 18px;flex:1;min-width:100px"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px">Total (ex-VAT)</div><div style="font-size:1.4rem;font-weight:700">' + fmt(d.totalExVat) + '</div></div>';
+  html += '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 18px;flex:1;min-width:100px"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px">Total (inc-VAT)</div><div style="font-size:1.4rem;font-weight:700;color:var(--accent)">' + fmt(d.totalIncVat) + '</div></div>';
+  html += '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 18px;flex:1;min-width:100px"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px">Status</div><div style="font-size:1.1rem;font-weight:700">' + (d.pendingCount > 0 ? '<span style="color:#d97706">' + d.pendingCount + ' Pending</span>' : '<span style="color:#059669">All Paid</span>') + '</div></div>';
+  html += '</div>';
+  // Orders table
+  html += '<table class="data-table" style="margin-top:4px"><thead><tr><th>Order</th><th>Date</th><th>Product</th><th style="text-align:right">Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Total</th><th>Payment</th></tr></thead><tbody>';
   for (const o of d.orders) {
     const orderItems = d.items.filter(i => i.order_id === o.id);
-    const fStatus = o.financial_status === 'paid' ? '<span style="color:#059669">Paid</span>' : '<span style="color:#d97706">Pending</span>';
+    const fStatus = o.financial_status === 'paid' ? '<span style="color:#059669;font-weight:600">✅ Paid</span>' : '<span style="color:#d97706;font-weight:600">⏳ Pending</span>';
     if (orderItems.length === 0) {
-      html += '<tr><td>' + esc(o.order_number || '—') + '</td><td>' + new Date(o.created_at).toLocaleDateString('en-IE') + '</td><td colspan="3">—</td><td style="text-align:right;font-weight:600">' + fmt(o.total) + '</td><td>' + fStatus + '</td></tr>';
+      html += '<tr><td><strong>' + esc(o.order_number || '—') + '</strong></td><td>' + new Date(o.created_at).toLocaleDateString('en-IE') + '</td><td colspan="3" style="color:var(--text-muted)">No items data</td><td style="text-align:right;font-weight:600">' + fmt(o.total) + '</td><td>' + fStatus + '</td></tr>';
     } else {
       orderItems.forEach((item, i) => {
-        html += '<tr><td>' + (i === 0 ? esc(o.order_number || '—') : '') + '</td><td>' + (i === 0 ? new Date(o.created_at).toLocaleDateString('en-IE') : '') + '</td>';
+        html += '<tr' + (i === 0 ? ' style="border-top:2px solid var(--border)"' : '') + '>';
+        html += '<td>' + (i === 0 ? '<strong>' + esc(o.order_number || '—') + '</strong>' : '') + '</td>';
+        html += '<td>' + (i === 0 ? new Date(o.created_at).toLocaleDateString('en-IE') : '') + '</td>';
         html += '<td>' + esc(item.product_name) + '</td><td style="text-align:right">' + (item.quantity || 1) + '</td>';
         html += '<td style="text-align:right">' + fmt(item.unit_price) + '</td><td style="text-align:right">' + fmt(item.total_price || (item.unit_price * (item.quantity || 1))) + '</td>';
         html += '<td>' + (i === 0 ? fStatus : '') + '</td></tr>';
@@ -14864,6 +14884,7 @@ function viewMCDetail(idx) {
     }
   }
   html += '</tbody></table>';
+  html += '<div style="margin-top:16px;text-align:right"><button class="btn btn-primary" onclick="sendSingleStatement(' + idx + ')">📧 Send Statement to ' + esc(c.email || 'Customer') + '</button></div>';
   showDetailModal(html);
 }
 
