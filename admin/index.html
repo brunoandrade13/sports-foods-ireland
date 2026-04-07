@@ -13092,6 +13092,291 @@ Loading items...
       }
     }
 
+async function generateInvoicePDFFromModal(options) {
+try {
+const titleEl = document.getElementById('omTitle');
+if (!titleEl) return alert('No order open');
+const orderRef = (titleEl.textContent || '').replace('Order ', '').trim();
+const order = allOrders.find(o => String(o.order_number) === orderRef || String(o.order_number) === 'WOO-' + orderRef || String(o.id).startsWith(orderRef));
+if (!order) return alert('Order not found: ' + orderRef);
+let allItems = [];
+try { allItems = await supaGet('order_items', `?order_id=eq.${order.id}&select=product_name,product_sku,sku,quantity,unit_price,total_price,variant_label`); } catch(e) { console.error(e); }
+if (!allItems || !allItems.length) return alert('No items found for this order');
+
+// Filter to only checked items (if checkboxes exist in the order modal)
+var checkedIndexes = [];
+var checkboxes = document.querySelectorAll('.om-item-cb');
+if (checkboxes.length > 0) {
+checkboxes.forEach(function(cb) { if (cb.checked) checkedIndexes.push(parseInt(cb.dataset.idx)); });
+if (checkedIndexes.length === 0) return alert('No items selected for invoice. Please check at least one item.');
+}
+var items = checkedIndexes.length > 0 ? allItems.filter(function(_, idx) { return checkedIndexes.includes(idx); }) : allItems;
+const bill = order.billing_address || {}, ship = order.shipping_address || {};
+let company = '';
+if (order.customer_id) { const cust = (allCustomers || []).find(c => c.id === order.customer_id); if (cust) company = cust.b2b_company_name || cust.company || ''; }
+const invNum = (order.order_number || '').replace('WOO-', '');
+const invDate = new Date(order.created_at);
+const dueDate = new Date(invDate); dueDate.setDate(dueDate.getDate() + 30);
+const fmtD = d => d ? `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` : '';
+const fmtM = v => Number(v||0).toFixed(2);
+if (!window.jspdf) return alert('PDF library not loaded. Please refresh the page.');
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+const PW = 595.28, PH = 841.89, ML = 40, MR = 40, MT = 40, MB = 80, CW = PW - ML - MR;
+const PAGE_BOTTOM = PH - MB;
+let y = MT, xp, pageNum = 1;
+
+// ---- Helper: add footer to current page ----
+function addFooter() {
+doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(85,85,85);
+doc.text(SFI_COMPANY.name, PW/2, PH - 52, {align:'center'});
+doc.text('IBAN: ' + SFI_COMPANY.iban, PW/2, PH - 40, {align:'center'});
+doc.text('BIC: ' + SFI_COMPANY.bic, PW/2, PH - 28, {align:'center'});
+}
+
+// ---- Helper: check if we need a new page ----
+function checkPage(needed) {
+if (y + needed > PAGE_BOTTOM) {
+addFooter();
+doc.addPage();
+pageNum++;
+y = MT;
+return true;
+}
+return false;
+}
+
+// ---- Helper: draw item table headers ----
+function drawItemHeaders() {
+doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F');
+doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
+doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(0,0,0);
+var xh = ML;
+['QTY','ACTIVITY','DESCRIPTION','VAT','RATE','AMOUNT'].forEach(function(h, i) {
+if ([0,3,4,5].indexOf(i) >= 0) doc.text(h, xh + icW[i] - 4, y + 10, {align:'right'});
+else doc.text(h, xh + 4, y + 10);
+xh += icW[i];
+});
+y += 16;
+}
+
+// ---- HEADER with logo ----
+if (window._sfiLogoB64) {
+try { doc.addImage(window._sfiLogoB64, 'JPEG', ML, y - 2, 57, 66); } catch(e) {}
+}
+var infoX = ML + 88;
+doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(0,0,0);
+doc.text(SFI_COMPANY.name, infoX, y + 12);
+doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(85,85,85);
+[SFI_COMPANY.addr1, SFI_COMPANY.addr2, SFI_COMPANY.eircode, SFI_COMPANY.phone, SFI_COMPANY.email, SFI_COMPANY.website, 'VAT Registration No.: ' + SFI_COMPANY.vat].forEach(function(ln, i) { doc.text(ln, infoX, y + 24 + i * 10); });
+doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(0,0,0);
+doc.text('Invoice', PW - MR, y + 22, {align:'right'});
+y += 100;
+
+// ---- INVOICE TO / SHIP TO ----
+var boxW = (CW - 20) / 2;
+var formatAddr = function(a, comp) { var l = []; var nm = [a.first_name, a.last_name].filter(Boolean).join(' '); if (nm) l.push(nm); if (comp) l.push(comp); if (a.address_1) l.push(a.address_1); if (a.address_2) l.push(a.address_2); var ct = a.city || '', st = a.state || a.county || ''; if (ct && st) l.push(ct + ', ' + st); else if (ct) l.push(ct); var pc = a.postcode || a.postal_code || '', co = a.country === 'IE' ? 'Ireland' : (a.country === 'GB' ? 'United Kingdom' : (a.country || '')); if (pc && co) l.push(pc + ' ' + co); else if (pc) l.push(pc); else if (co) l.push(co); return l; };
+[[ML, 'INVOICE TO', bill], [ML + boxW + 20, 'SHIP TO', ship]].forEach(function(cfg) {
+var bx = cfg[0], label = cfg[1], addr = cfg[2];
+doc.setFillColor(224,224,224); doc.rect(bx, y, boxW, 14, 'F');
+doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(0,0,0);
+doc.text(label, bx + 4, y + 10);
+doc.setFont('helvetica','normal'); doc.setFontSize(8);
+formatAddr(addr, company).forEach(function(ln, i) { doc.text(ln, bx + 4, y + 26 + i * 11); });
+});
+y += 16 + Math.max(formatAddr(bill, company).length, formatAddr(ship, company).length) * 11 + 8;
+
+// ---- INVOICE DETAILS ROW ----
+var preSubtotal = items.reduce(function(s, i) { return s + (parseInt(i.quantity) || 1) * (parseFloat(i.unit_price) || 0); }, 0);
+var preVat = Math.round(preSubtotal * 23) / 100;
+var preTotal = preSubtotal + preVat;
+var detF = [['INVOICE NO.', invNum], ['DATE', fmtD(invDate)], ['TOTAL DUE', 'EUR ' + fmtM(preTotal)], ['DUE DATE', fmtD(dueDate)], ['TERMS', 'Net 30'], ['ENCLOSED', '']];
+var dCW = [CW*0.22, CW*0.13, CW*0.17, CW*0.15, CW*0.13, CW*0.20];
+doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
+doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(0,0,0);
+xp = ML; detF.forEach(function(f, i) { doc.text(f[0], xp + 4, y + 10); xp += dCW[i]; }); y += 14;
+doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 20, 'S');
+doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+xp = ML; detF.forEach(function(f, i) { doc.text(f[1], xp + 4, y + 13); xp += dCW[i]; }); y += 26;
+
+// ---- SHIP DATE ROW ----
+var invoiceTracking = (document.getElementById('omTrackingNumber') ? document.getElementById('omTrackingNumber').value.trim() : '') || order.tracking_number || '';
+var sF = [['SHIP DATE', fmtD(invDate)], ['SHIP VIA', order.shipping_method || 'gls'], ['TRACKING NO.', invoiceTracking]];
+var sCW = [CW*0.33, CW*0.33, CW*0.34];
+doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
+doc.setFont('helvetica','bold'); doc.setFontSize(7); xp = ML; sF.forEach(function(f, i) { doc.text(f[0], xp + 4, y + 10); xp += sCW[i]; }); y += 14;
+doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 20, 'S');
+xp = ML; sF.forEach(function(f, i) { doc.setFont('helvetica', i === 0 ? 'bold' : 'normal'); doc.setFontSize(8.5); doc.text(f[1] || '', xp + 4, y + 13); xp += sCW[i]; }); y += 30;
+
+// ---- ITEMS TABLE ----
+var icW = [35, 80, 210, 35, 60, 70].map(function(w) { return w * CW / 490; });
+drawItemHeaders();
+
+var subtotal = 0, FS = 7.5, LS = 9.5, RPT = 3, RPB = 2;
+items.forEach(function(item) {
+var qty = parseInt(item.quantity) || 1, sku = item.sku || item.product_sku || '', desc = item.product_name || '', rate = parseFloat(item.unit_price) || 0, amount = qty * rate;
+subtotal += amount;
+
+// Word wrap description
+var dL = [];
+if (desc.length <= 38) { dL.push(desc); } else {
+var ws = desc.split(' '); var c = '';
+ws.forEach(function(w) { var t = (c + ' ' + w).trim(); if (t.length <= 38) c = t; else { if (c) dL.push(c); c = w; } });
+if (c) dL.push(c);
+}
+if (!dL.length) dL.push('');
+
+var rH = RPT + dL.length * LS + RPB;
+
+// Check if this item fits on current page
+if (y + rH > PAGE_BOTTOM) {
+addFooter();
+doc.addPage();
+pageNum++;
+y = MT;
+drawItemHeaders();
+}
+
+doc.setDrawColor(204,204,204); doc.line(ML, y, ML + CW, y);
+var tY = y + RPT + LS - 2;
+xp = ML;
+doc.setFont('helvetica','normal'); doc.setFontSize(FS); doc.text(String(qty), xp + icW[0] - 4, tY, {align:'right'}); xp += icW[0];
+doc.setFont('helvetica','bold'); doc.setFontSize(FS); doc.text(sku, xp + 4, tY); xp += icW[1];
+doc.setFont('helvetica','normal'); doc.setFontSize(FS); dL.forEach(function(dl, li) { doc.text(dl, xp + 4, tY + li * LS); }); xp += icW[2];
+doc.text('S', xp + icW[3] - 4, tY, {align:'right'}); xp += icW[3];
+doc.text(fmtM(rate), xp + icW[4] - 4, tY, {align:'right'}); xp += icW[4];
+doc.text(fmtM(amount), xp + icW[5] - 4, tY, {align:'right'});
+y += rH;
+});
+
+doc.setDrawColor(204,204,204); doc.line(ML, y, ML + CW, y); y += 12;
+
+// ---- TOTALS ----
+var vatTotal = Math.round(subtotal * 23) / 100, total = subtotal + vatTotal;
+checkPage(80);
+var tx = ML + CW - 200;
+[['SUBTOTAL', fmtM(subtotal)], ['VAT TOTAL', fmtM(vatTotal)], ['TOTAL', fmtM(total)]].forEach(function(r) {
+doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(0,0,0);
+doc.text(r[0], tx + 100, y, {align:'right'}); doc.text(r[1], tx + 180, y, {align:'right'}); y += 13;
+}); y += 6;
+doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('BALANCE DUE', tx + 40, y, {align:'right'});
+doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text('EUR ' + fmtM(total), tx + 185, y, {align:'right'}); y += 30;
+
+// ---- TAX SUMMARY ----
+checkPage(50);
+doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(0,0,0); doc.text('TAX SUMMARY', ML, y); y += 14;
+var taxCW = [150, 100, 100], taxTW = 350;
+doc.setFillColor(224,224,224); doc.rect(ML, y, taxTW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, taxTW, 14, 'S');
+doc.setFont('helvetica','bold'); doc.setFontSize(7); var txp = ML; ['RATE', 'TAX', 'NET'].forEach(function(h, i) { doc.text(h, txp + 4, y + 10); txp += taxCW[i]; }); y += 14;
+doc.setDrawColor(204,204,204); doc.rect(ML, y, taxTW, 14, 'S');
+doc.setFont('helvetica','normal'); doc.setFontSize(8); txp = ML;
+doc.text('VAT @ 23%', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(vatTotal), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(subtotal), txp + 4, y + 10);
+
+// ---- Footer on last page ----
+addFooter();
+const pdfFileName = 'Invoice_' + invNum + '_SFI.pdf';
+if (options && options.returnBase64) {
+  const raw = doc.output('arraybuffer');
+  const bytes = new Uint8Array(raw);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return { base64: btoa(binary), fileName: pdfFileName, invNum: invNum, order: order };
+}
+// Open PDF in modal instead of downloading
+const pdfBlob = doc.output('blob');
+const pdfUrl = URL.createObjectURL(pdfBlob);
+showInvoicePDFModal(pdfUrl, pdfFileName);
+} catch(err) { console.error('Invoice generation error:', err); alert('Error generating invoice: ' + err.message); }
+}
+
+async function sendInvoiceByEmail() {
+  const result = await generateInvoicePDFFromModal({ returnBase64: true });
+  if (!result) return;
+  const { base64, fileName, invNum, order } = result;
+  // Find customer email
+  const bill = order.billing_address || {};
+  let email = order.email || bill.email || '';
+  if (!email && order.customer_id) {
+    const cust = (allCustomers || []).find(c => c.id === order.customer_id);
+    if (cust) email = cust.email || '';
+  }
+  if (!email) { email = prompt('Customer email not found. Enter email:'); if (!email) return; }
+  const confirmed = confirm('Send Invoice ' + invNum + ' to ' + email + '?');
+  if (!confirmed) return;
+  const btn = document.querySelector('[onclick*="sendInvoiceByEmail"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+  try {
+    const customerName = [bill.first_name, bill.last_name].filter(Boolean).join(' ') || '';
+    const htmlContent = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">' +
+      '<div style="background:#1B4332;padding:20px;text-align:center"><img src="https://sportsfoodsireland.ie/wp-content/uploads/2021/09/logo.png" alt="SFI" style="height:60px"></div>' +
+      '<div style="padding:30px 20px">' +
+      '<h2 style="color:#1B4332;margin:0 0 16px">Invoice ' + invNum + '</h2>' +
+      '<p>Dear ' + (customerName || 'Customer') + ',</p>' +
+      '<p>Please find attached your invoice <strong>' + invNum + '</strong> from Sports Foods Ireland.</p>' +
+      '<p>Payment is due within 30 days of the invoice date.</p>' +
+      '<p style="margin-top:24px"><strong>Bank Details:</strong><br>IBAN: IE48BOFI90458753923845<br>BIC: BOFIIE2D</p>' +
+      '<p style="margin-top:24px">If you have any questions, please contact us at <a href="mailto:info@sportsfoodsireland.ie">info@sportsfoodsireland.ie</a></p>' +
+      '<p>Thank you for your business!</p>' +
+      '<p style="color:#666;margin-top:24px">Sports Foods Ireland Ltd<br>Unit 12, Northwest Business Park, Blanchardstown<br>Dublin D15 YC53</p>' +
+      '</div></div>';
+    const res = await fetch(SUPABASE_URL + '/functions/v1/brevo-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON },
+      body: JSON.stringify({
+        action: 'send_invoice',
+        email: email,
+        customerName: customerName,
+        subject: 'Invoice ' + invNum + ' — Sports Foods Ireland',
+        htmlContent: htmlContent,
+        pdfBase64: base64,
+        fileName: fileName
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast('Invoice ' + invNum + ' sent to ' + email);
+    } else {
+      alert('Failed to send: ' + (data.message || 'Unknown error'));
+    }
+  } catch (err) {
+    console.error('Send invoice error:', err);
+    alert('Error sending invoice: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '📧 Send Invoice'; }
+  }
+}
+
+
+function showInvoicePDFModal(pdfUrl, fileName) {
+  let modal = document.getElementById('invoicePDFModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'invoicePDFModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div style="background:var(--card-bg,#1e293b);border-radius:16px;width:95%;max-width:800px;height:90vh;display:flex;flex-direction:column;position:relative">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--border)">' +
+        '<h3 id="invPDFTitle" style="margin:0;font-size:1rem"></h3>' +
+        '<div style="display:flex;gap:8px">' +
+          '<button id="invPDFDownload" class="btn btn-primary" style="font-size:0.8rem">⬇ Download</button>' +
+          '<button onclick="document.getElementById(\'invoicePDFModal\').style.display=\'none\'" style="background:none;border:none;color:var(--text);font-size:24px;cursor:pointer">×</button>' +
+        '</div>' +
+      '</div>' +
+      '<iframe id="invPDFFrame" style="flex:1;border:none;border-radius:0 0 16px 16px;background:#fff"></iframe>' +
+    '</div>';
+    document.body.appendChild(modal);
+  }
+  document.getElementById('invPDFTitle').textContent = fileName;
+  document.getElementById('invPDFFrame').src = pdfUrl;
+  document.getElementById('invPDFDownload').onclick = function() {
+    var a = document.createElement('a');
+    a.href = pdfUrl;
+    a.download = fileName;
+    a.click();
+  };
+  modal.style.display = 'flex';
+}
+
+
 async function downloadInvoicePDFFromView() {
 const order = _currentInvOrder;
 if (!order) return alert('No order data available for this invoice');
