@@ -1,21 +1,21 @@
-// SFI Service Worker v2.0 — Cache estratégico para performance
-const CACHE_NAME = 'sfi-v2';
-const CACHE_STATIC = 'sfi-static-v2';
-const CACHE_IMAGES = 'sfi-images-v2';
+// SFI Service Worker v3.0 — Cache with correct versioning
+const CACHE_NAME = 'sfi-v3';
+const CACHE_STATIC = 'sfi-static-v3';
+const CACHE_IMAGES = 'sfi-images-v3';
 
-// Recursos críticos a pré-cachear no install
+// Critical resources to precache on install
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/shop.html',
   '/cart.html',
-  '/css/sfi-styles.min.css?v=25',
-  '/js/main.min.js',
-  '/js/cart.min.js',
+  '/css/sfi-styles.min.css?v=31',
+  '/js/main.min.js?v=16',
+  '/js/cart.min.js?v=10',
   '/js/sfi-api.min.js',
-  '/js/sfi-data-loader.min.js',
-  '/js/product-card.min.js',
-  '/js/sfi-fixes.min.js',
+  '/js/sfi-data-loader.min.js?v=8',
+  '/js/product-card.min.js?v=10',
+  '/js/sfi-fixes.min.js?v=8',
   '/js/sfi-enhancements.min.js',
   '/img/logo.webp',
   '/img/placeholder.webp',
