@@ -406,73 +406,7 @@
                             document.documentElement.classList.remove('cart-modal-open');
                         }
                         
-                        // CRITICAL: Force restore body and html styles to ensure header is visible
-                        // Remove ALL possible styles that could hide the header
-                        const bodyStylesToRemove = ['position', 'overflow', 'width', 'height', 'top', 'left', 'right', 'bottom', 'touch-action', '-webkit-overflow-scrolling', 'margin', 'padding'];
-                        bodyStylesToRemove.forEach(prop => {
-                            document.body.style.removeProperty(prop);
-                            document.body.style.removeProperty(prop.replace(/([A-Z])/g, '-$1').toLowerCase());
-                        });
-                        
-                        // Force body to static position
-                        document.body.style.setProperty('position', 'static', 'important');
-                        document.body.style.setProperty('overflow', '', 'important');
-                        document.body.style.setProperty('width', '', 'important');
-                        document.body.style.setProperty('height', '', 'important');
-                        
-                        if (document.documentElement) {
-                            document.documentElement.style.removeProperty('overflow');
-                            document.documentElement.style.removeProperty('height');
-                            document.documentElement.style.setProperty('overflow', '', 'important');
-                            document.documentElement.style.setProperty('height', '', 'important');
-                        }
-                        
-                        // Force a reflow to ensure styles are applied
-                        void document.body.offsetHeight;
-                        
-                        // Additional check: ensure body is not stuck in fixed position
-                        const bodyComputed = window.getComputedStyle(document.body);
-                        if (bodyComputed.position === 'fixed' || bodyComputed.position === 'absolute') {
-                            debugWarn('⚠️ Body still has position:', bodyComputed.position, '- forcing static...');
-                            document.body.style.setProperty('position', 'static', 'important');
-                            setTimeout(() => {
-                                document.body.style.removeProperty('position');
-                            }, 50);
-                        }
-                        
-                        // Ensure header is visible - force it to appear with multiple selectors
-                        const headerSelectors = ['header', '.header', '#header', 'header.main-header', '.main-header'];
-                        let headerFound = false;
-                        headerSelectors.forEach(selector => {
-                            const header = document.querySelector(selector);
-                            if (header && !headerFound) {
-                                headerFound = true;
-                                // Force visibility - KEEP these styles, don't remove them
-                                header.style.setProperty('display', 'block', 'important');
-                                header.style.setProperty('visibility', 'visible', 'important');
-                                header.style.setProperty('opacity', '1', 'important');
-                                header.style.setProperty('z-index', '10004', 'important'); // Higher than overlay (10000)
-                                header.style.setProperty('position', 'relative', 'important');
-                                
-                                // Verify after a delay and re-apply if needed
-                                setTimeout(() => {
-                                    const computed = window.getComputedStyle(header);
-                                    if (computed.display === 'none' || computed.visibility === 'hidden' || computed.opacity === '0') {
-                                        debugWarn('⚠️ Header became hidden again, re-forcing visibility...');
-                                        header.style.setProperty('display', 'block', 'important');
-                                        header.style.setProperty('visibility', 'visible', 'important');
-                                        header.style.setProperty('opacity', '1', 'important');
-                                    }
-                                }, 100);
-                                debugLog('Header styles restored', {
-                                    selector: selector,
-                                    display: window.getComputedStyle(header).display,
-                                    visibility: window.getComputedStyle(header).visibility,
-                                    opacity: window.getComputedStyle(header).opacity,
-                                    zIndex: window.getComputedStyle(header).zIndex
-                                });
-                            }
-                        });
+                        debugLog('Cart modal closed cleanly');
                         
                         // Ensure cart icon is visible - force it to appear - KEEP these styles
                         const cartIcon = document.getElementById('cartIcon');

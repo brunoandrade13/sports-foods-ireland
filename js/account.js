@@ -355,7 +355,7 @@ window.reorderItems = function(itemsJson) {
     try {
         const items = JSON.parse(decodeURIComponent(itemsJson));
         if (!items || !items.length) { alert('No items to reorder'); return; }
-        const cart = JSON.parse(localStorage.getItem('sfi_cart') || '[]');
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         let added = 0;
         items.forEach(item => {
             if (!item.name) return;
@@ -367,7 +367,7 @@ window.reorderItems = function(itemsJson) {
             }
             added++;
         });
-        localStorage.setItem('sfi_cart', JSON.stringify(cart));
+        localStorage.setItem('cart', JSON.stringify(cart));
         if (typeof window.updateCartCount === 'function') window.updateCartCount();
         alert(added + ' item(s) added to your cart!');
     } catch (e) {

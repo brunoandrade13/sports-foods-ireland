@@ -631,7 +631,7 @@
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.error || 'Order creation failed');
 
-        localStorage.removeItem('sfi_cart');
+        localStorage.removeItem('cart');
         if (typeof window.updateCartCount === 'function') window.updateCartCount();
 
         const methodLabel = data.payment_method || (method === 'net30' ? 'Net 30 (Invoice)' : 'Cash on Delivery');
