@@ -1192,8 +1192,8 @@
             align-items: flex-start;
         }
         .cart-modal-item-image {
-            width: 72px;
-            height: 72px;
+            width: 84px;
+            height: 84px;
             object-fit: contain;
             border-radius: 8px;
             flex-shrink: 0;

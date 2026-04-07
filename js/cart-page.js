@@ -22,7 +22,7 @@ function renderCartPage() {
     }
 
     const subtotal = cart.reduce((s, i) => s + i.preco * (i.quantidade || 1), 0);
-    const shipping = subtotal >= 50 ? 0 : 4.99;
+    const shipping = subtotal >= 60 ? 0 : 9.04;
     const total = subtotal + shipping;
 
     container.innerHTML = `

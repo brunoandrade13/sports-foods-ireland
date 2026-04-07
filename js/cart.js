@@ -391,7 +391,7 @@ function updateCartModalContent() {
     const subtotal = getCartTotal();
     const isB2B = window._sfiCustomerIsB2B || false;
     const freeShipMin = isB2B ? 150 : 60;
-    const delivery = subtotal >= freeShipMin ? 0 : 9.04;
+    const delivery = (subtotal > 0 && subtotal >= freeShipMin) ? 0 : 9.04;
     const total = subtotal + delivery;
     
     const subtotalEl = document.getElementById('cartModalSubtotal');
