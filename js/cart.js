@@ -369,29 +369,29 @@ function updateCartModalContent() {
             const itemImgSrc = itemImg.startsWith('http') ? itemImg : imgPrefix + itemImg;
             const itemImgFallback = imgPrefix + 'img/produto1.jpg';
         return `
-        <div class="cart-modal-item" data-id="${item.id}">
-            <img src="${itemImgSrc}" alt="${item.nome}" class="cart-modal-item-image" onerror="this.src='${itemImgFallback}'">
-            <div class="cart-modal-item-info">
-                <div class="cart-modal-item-name">${item.nome}</div>
+        <div class="cart-modal-item" data-id="${item.id}" style="display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(0,31,63,0.1);align-items:flex-start;background:#fff">
+            <img src="${itemImgSrc}" alt="${item.nome}" style="width:84px;height:84px;object-fit:contain;border-radius:8px;flex-shrink:0;background:#f9fafb;border:1px solid #e5e7eb;display:block" onerror="this.src='${itemImgFallback}'">
+            <div style="flex:1;min-width:0">
+                <div style="font-size:14px;font-weight:600;color:#001f3f;margin-bottom:6px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${item.nome}</div>
                 ${subBadge}
-                <div class="cart-modal-item-details">
-                    <div class="cart-modal-item-quantity">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+                    <div style="display:flex;align-items:center;gap:8px;color:#001f3f">
                         <button class="qty-btn" onclick="updateCartQuantity(${item.id}, ${(item.quantidade || 1) - 1})">−</button>
                         <span>${item.quantidade || 1}</span>
                         <button class="qty-btn" onclick="updateCartQuantity(${item.id}, ${(item.quantidade || 1) + 1})">+</button>
                     </div>
-                    <div class="cart-modal-item-price">${priceDisplay}</div>
+                    <div style="font-weight:700;color:#001f3f;font-size:15px">${priceDisplay}</div>
                 </div>
             </div>
-            <button class="cart-modal-item-remove" onclick="removeFromCart(${item.id})">×</button>
+            <button onclick="removeFromCart(${item.id})" style="background:none;border:none;font-size:20px;color:#001f3f;cursor:pointer;flex-shrink:0;padding:0 4px">×</button>
         </div>
     `}).join('');
     
     // Atualizar totais
-    const subtotal = getCartTotal();
+    const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.preco) || 0) * (parseInt(item.quantidade) || 1), 0);
     const isB2B = window._sfiCustomerIsB2B || false;
     const freeShipMin = isB2B ? 150 : 60;
-    const delivery = (subtotal > 0 && subtotal >= freeShipMin) ? 0 : 9.04;
+    const delivery = subtotal >= freeShipMin ? 0 : 9.04;
     const total = subtotal + delivery;
     
     const subtotalEl = document.getElementById('cartModalSubtotal');
