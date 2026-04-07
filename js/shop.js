@@ -323,6 +323,60 @@ function initCustomSortSelect() {
     if (initialOption) initialOption.classList.add('selected');
 }
 
+// Build subcategory list for a brand from loaded product data
+function toggleBrandSubcategories(checkbox) {
+    const brandName = checkbox.value;
+    const wrapper = checkbox.closest('.filter-checkbox');
+    let subList = wrapper.nextElementSibling;
+    
+    // If already has a sub-list, toggle it
+    if (subList && subList.classList.contains('brand-sub-list')) {
+        if (checkbox.checked) {
+            subList.classList.add('active');
+        } else {
+            subList.classList.remove('active');
+            // Uncheck all sub-filters when brand is unchecked
+            subList.querySelectorAll('.brand-sub-filter').forEach(cb => cb.checked = false);
+        }
+        return;
+    }
+    
+    // Create new sub-list if brand is checked
+    if (!checkbox.checked) return;
+    
+    // Get unique subcategories for this brand from product data
+    const brandProducts = allProducts.filter(p => p.marca === brandName);
+    const subcatMap = {};
+    brandProducts.forEach(p => {
+        const sub = p.subcategoria || p.sub_subcategoria;
+        if (sub && sub !== '' && sub !== 'undefined') {
+            subcatMap[sub] = (subcatMap[sub] || 0) + 1;
+        }
+    });
+    
+    // Sort by count descending
+    const subcats = Object.entries(subcatMap).sort((a, b) => b[1] - a[1]);
+    if (subcats.length === 0) return;
+    
+    // Create the subcategory list
+    subList = document.createElement('div');
+    subList.className = 'brand-sub-list active';
+    const slug = brandName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    
+    subcats.forEach(([name, count]) => {
+        const subSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const id = 'bsub-' + slug + '-' + subSlug;
+        const div = document.createElement('div');
+        div.className = 'filter-checkbox';
+        div.innerHTML = '<input type="checkbox" id="' + id + '" value="' + name + '" class="brand-sub-filter" data-brand="' + brandName + '">' +
+            '<label for="' + id + '">' + name + ' <span style="opacity:0.5;font-size:0.75rem">(' + count + ')</span></label>';
+        subList.appendChild(div);
+    });
+    
+    // Insert after the brand checkbox wrapper
+    wrapper.after(subList);
+}
+
 // Apply filters
 function applyFilters() {
     filteredProducts = [...allProducts];
@@ -418,7 +472,18 @@ function applyFilters() {
                 if (!catsForProduct.some(c => activeCategories.includes(c))) return false;
                 // Apply general brand filter if set
                 if (generalBrandFilters.length > 0) {
-                    return generalBrandFilters.includes(p.marca);
+                    if (!generalBrandFilters.includes(p.marca)) return false;
+                    // Apply brand-subcategory filters
+                    const brandSubFilters = {};
+                    document.querySelectorAll('.brand-sub-filter:checked').forEach(cb => {
+                        const brand = cb.getAttribute('data-brand');
+                        if (!brandSubFilters[brand]) brandSubFilters[brand] = [];
+                        brandSubFilters[brand].push(cb.value);
+                    });
+                    const subs = brandSubFilters[p.marca];
+                    if (subs && subs.length > 0) {
+                        return subs.includes(p.subcategoria) || subs.includes(p.sub_subcategoria);
+                    }
                 }
                 return true;
             });
@@ -426,9 +491,23 @@ function applyFilters() {
     } else {
         // No categories expanded, apply general brand filter if set
         if (generalBrandFilters.length > 0) {
-            filteredProducts = filteredProducts.filter(p => 
-                generalBrandFilters.includes(p.marca)
-            );
+            // Get brand-subcategory filters (nested under brands)
+            const brandSubFilters = {};
+            document.querySelectorAll('.brand-sub-filter:checked').forEach(cb => {
+                const brand = cb.getAttribute('data-brand');
+                if (!brandSubFilters[brand]) brandSubFilters[brand] = [];
+                brandSubFilters[brand].push(cb.value);
+            });
+            
+            filteredProducts = filteredProducts.filter(p => {
+                if (!generalBrandFilters.includes(p.marca)) return false;
+                // If this brand has subcategory filters, apply them
+                const subs = brandSubFilters[p.marca];
+                if (subs && subs.length > 0) {
+                    return subs.includes(p.subcategoria) || subs.includes(p.sub_subcategoria);
+                }
+                return true;
+            });
         }
     }
     
@@ -792,7 +871,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Filter event listeners (use event delegation for dynamically loaded content)
     document.addEventListener('change', (e) => {
-        if (e.target.matches('.brand-filter, .brand-filter-all, .subcategory-filter, .dietary-filter')) {
+        if (e.target.matches('.brand-filter-all')) {
+            toggleBrandSubcategories(e.target);
+            currentPage = 1;
+            applyFilters();
+        } else if (e.target.matches('.brand-filter, .subcategory-filter, .dietary-filter, .brand-sub-filter')) {
             currentPage = 1;
             applyFilters();
         }

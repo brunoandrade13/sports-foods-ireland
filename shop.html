@@ -169,6 +169,27 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
             font-size: 14px;
             color: var(--color-text);
         }
+
+        /* Brand expandable subcategories */
+        .brand-sub-list {
+            display: none;
+            padding: 4px 0 6px 24px;
+            border-left: 2px solid var(--primary);
+            margin: 2px 0 6px 10px;
+        }
+        .brand-sub-list.active {
+            display: block;
+        }
+        .brand-sub-list .filter-checkbox {
+            padding: 2px 0;
+        }
+        .brand-sub-list .filter-checkbox label {
+            font-size: 0.82rem;
+            opacity: 0.85;
+        }
+        .brand-sub-list .filter-checkbox label:hover {
+            opacity: 1;
+        }
         
         .price-range {
             display: flex;
