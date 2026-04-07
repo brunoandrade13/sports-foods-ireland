@@ -8603,7 +8603,7 @@ Loading items...
             }
             html += '<p style="margin-top:12px;font-size:0.9rem">Of these, <strong>' + (qb.matched != null ? qb.matched : 0) + '</strong> match in Supabase; <strong>' + (qb.missing_in_supabase != null ? qb.missing_in_supabase : 0) + '</strong> have a QB price but no wholesale in Supabase.</p>';
             if (qb.rows && qb.rows.length > 0) {
-              html += '<details style="margin-top:8px"><summary>Ver lista dos que faltam no Supabase</summary><div style="max-height:200px;overflow:auto;margin-top:6px"><table><thead><tr><th>QB Name/SKU</th><th>UnitPrice (€)</th><th>Supabase</th></tr></thead><tbody>';
+              html += '<details style="margin-top:8px"><summary>View list of missing items in Supabase</summary><div style="max-height:200px;overflow:auto;margin-top:6px"><table><thead><tr><th>QB Name/SKU</th><th>UnitPrice (€)</th><th>Supabase</th></tr></thead><tbody>';
               qb.rows.forEach(function(row) {
                 html += '<tr><td>' + esc(row.qb_name || '') + ' / ' + esc(row.qb_sku || '') + '</td><td class="price">€' + (row.unit_price != null ? Number(row.unit_price).toFixed(2) : '') + '</td><td>' + esc(row.supabase_name || '') + ' / ' + esc(row.supabase_sku || '') + '</td></tr>';
               });
@@ -8630,9 +8630,9 @@ Loading items...
             }
             html += '<p style="margin-top:12px;font-size:0.9rem">Of these, <strong>' + (wc.matched != null ? wc.matched : 0) + '</strong> match in Supabase; <strong>' + (wc.missing_in_supabase != null ? wc.missing_in_supabase : 0) + '</strong> have a B2B price in WC but no wholesale in Supabase.</p>';
             if (wc.rows && wc.rows.length > 0) {
-              html += '<details style="margin-top:8px"><summary>Ver lista dos que faltam no Supabase</summary><div style="max-height:200px;overflow:auto;margin-top:6px"><table><thead><tr><th>Woo name/sku</th><th>Wholesale (€)</th><th>Supabase</th></tr></thead><tbody>';
+              html += '<details style="margin-top:8px"><summary>View list of missing items in Supabase</summary><div style="max-height:200px;overflow:auto;margin-top:6px"><table><thead><tr><th>Woo name/sku</th><th>Wholesale (€)</th><th>Supabase</th></tr></thead><tbody>';
               wc.rows.forEach(function(row) {
-                html += '<tr><td>' + esc(row.woo_name || '') + ' / ' + esc(row.woo_sku || '') + '</td><td class="price">€' + (row.wholesale_price != null ? Number(row.wholesale_price).toFixed(2) : '') + '</td><td>' + (row.supabase_id ? esc(row.supabase_name || '') + ' / ' + esc(row.supabase_sku || '') : '<span style="color:var(--text-muted)">sem match</span>') + '</td></tr>';
+                html += '<tr><td>' + esc(row.woo_name || '') + ' / ' + esc(row.woo_sku || '') + '</td><td class="price">€' + (row.wholesale_price != null ? Number(row.wholesale_price).toFixed(2) : '') + '</td><td>' + (row.supabase_id ? esc(row.supabase_name || '') + ' / ' + esc(row.supabase_sku || '') : '<span style="color:var(--text-muted)">no match</span>') + '</td></tr>';
               });
               html += '</tbody></table></div></details>';
             }
@@ -12798,7 +12798,7 @@ Loading items...
           }).join('');
         }
 
-        // 4. Tecnologia & Origem
+        // 4. Technology & Source
         const getTop = (arr, key, fallback) => {
           const counts = {};
           arr.forEach(x => { const v = x[key]; if (v && v !== 'Unknown' && v !== '') counts[v] = (counts[v] || 0) + 1; });
