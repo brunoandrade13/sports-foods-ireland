@@ -368,7 +368,7 @@ function initSocialProof() {
         { name: 'Sarah', location: 'Cork', product: 'High5 Energy Gel Pack', time: '5 minutes ago', img: 'img/produto2.jpg' },
         { name: 'Mike', location: 'Galway', product: 'Zone3 Wetsuit', time: '8 minutes ago', img: 'img/produto3.jpg' },
         { name: 'Emma', location: 'Limerick', product: 'PowerBar Recovery', time: '12 minutes ago', img: 'img/produto4.jpg' },
-        { name: 'David', location: 'Waterford', product: 'SiS Hydration Tabs', time: '15 minutes ago', img: 'img/produto5.jpg' }
+        { name: 'David', location: 'Waterford', product: 'Nuun Sport Hydration Tabs', time: '15 minutes ago', img: 'img/produto5.jpg' }
     ];
     
     let currentIndex = 0;
@@ -1003,71 +1003,91 @@ class SportsFoodsChatbot {
         
         // Order tracking
         if (lower.includes('track') || lower.includes('order') || lower.includes('where is my')) {
-            return "📦 To track your order, please provide your order number (e.g., SFI-12345) or check your email for tracking updates. Orders usually arrive within 2-3 business days.";
+            return "📦 To track your order, please provide your order number (e.g., SFI-25001) or check your confirmation email for tracking updates. Orders are shipped via GLS and usually arrive within 2-3 business days across Ireland.";
         }
         
-        // Protein recommendations
-        if (lower.includes('protein') || lower.includes('muscle') || lower.includes('whey')) {
-            return "💪 For muscle building, I recommend our Whey Protein Isolate (€49.99) - 25g protein per serving with minimal carbs. For plant-based, try our Vegan Protein Blend (€44.99). Want me to add either to your cart?";
+        // Nutrition / energy / fuel
+        if (lower.includes('protein') || lower.includes('muscle') || lower.includes('recovery')) {
+            return "💪 For recovery, we recommend PowerBar Recovery Drink or Tailwind Recovery Mix. For endurance fuel, check out Tailwind Endurance Fuel (available in 8 flavours!), High5 Energy Gels, or Clif Bars. Browse all in our Nutrition section!";
         }
         
-        // Weight loss
-        if (lower.includes('weight loss') || lower.includes('fat') || lower.includes('diet')) {
-            return "🔥 For weight loss support, check out our Fat Burner Complex (€34.99) and Lean Protein (€42.99). Combine with our FREE meal plan for best results! Should I show you our weight management bundle?";
+        // Energy / endurance
+        if (lower.includes('energy') || lower.includes('gel') || lower.includes('fuel') || lower.includes('pre-workout') || lower.includes('pre workout')) {
+            return "⚡ Our best-selling energy products: Tailwind Endurance Fuel (from €35.99), High5 Energy Gels, PowerBar Gels & Drinks, and Clif Energy Bars. We also stock Beet It nitrate shots for natural performance boost! Check our Nutrition section.";
         }
         
-        // Pre-workout
-        if (lower.includes('pre-workout') || lower.includes('energy') || lower.includes('pre workout')) {
-            return "⚡ Our Pre-Workout Extreme (€39.99) is a best-seller! It provides clean energy, focus, and pump for your training. Caffeine-free option also available. Want more details?";
+        // Hydration / electrolytes
+        if (lower.includes('hydration') || lower.includes('electrolyte') || lower.includes('drink') || lower.includes('salt')) {
+            return "💧 For hydration, try Nuun Sport Hydration Tablets, High5 Zero Electrolyte Tabs, SaltStick Capsules, or PowerBar Electrolyte Drinks. Perfect for running, cycling, and triathlon. Free shipping on orders over €60!";
+        }
+        
+        // Cycling
+        if (lower.includes('cycling') || lower.includes('bike') || lower.includes('cycle')) {
+            return "🚴 We stock premium cycling gear: Spatzwear (overshoes, gloves, baselayers, warmers), iGPSPORT bike computers & sensors, and Chamois Butt'r anti-chafing cream. Browse our Cycling section for the full range!";
+        }
+        
+        // Swimming / wetsuit
+        if (lower.includes('swim') || lower.includes('wetsuit') || lower.includes('triathlon') || lower.includes('tri ')) {
+            return "🏊 We're official Zone3 stockists — wetsuits, swimwear, goggles, trisuits, and accessories. Also check Swim Secure safety buoys and neoprene accessories. Browse our Swimming section!";
+        }
+        
+        // Running
+        if (lower.includes('running') || lower.includes('run') || lower.includes('marathon')) {
+            return "🏃 For runners, we have Fitletic hydration belts, Lock Laces elastic laces, SaltStick electrolyte capsules, and Trainer Armour shoe protectors. Plus, all our energy gels and endurance fuel! Check our Running section.";
         }
         
         // Shipping
         if (lower.includes('shipping') || lower.includes('delivery') || lower.includes('how long')) {
-            return "🚚 We offer FREE shipping on orders over €50! Standard delivery: 2-3 business days. Express (next-day): €5.99. We ship across Ireland and UK. Need help with anything else?";
+            return "🚚 FREE shipping on orders over €60! Standard delivery via GLS: 2-3 business days (€9.04 for orders under €60). We ship across Ireland. Need help with anything else?";
         }
         
         // Returns
         if (lower.includes('return') || lower.includes('refund') || lower.includes('exchange')) {
-            return "↩️ We offer a 30-day satisfaction guarantee! If you're not happy with your purchase, contact us for a full refund or exchange. Unopened products can be returned hassle-free.";
+            return "↩️ If you're not happy with your purchase, contact us within 14 days for a refund or exchange. Products must be unopened and in original condition. Email us at info@sportsfoodsireland.ie to arrange a return.";
         }
         
-        // Human agent
-        if (lower.includes('human') || lower.includes('agent') || lower.includes('person') || lower.includes('speak to')) {
-            return "👤 I'll connect you with a human agent. Our team is available Mon-Fri 9am-6pm. Leave your email and we'll get back to you within 24 hours, or call us at +353 1 234 5678.";
+        // Human agent / contact
+        if (lower.includes('human') || lower.includes('agent') || lower.includes('person') || lower.includes('speak to') || lower.includes('contact') || lower.includes('phone')) {
+            return "👤 You can reach our team at:\n📧 info@sportsfoodsireland.ie\n📞 +353 1 840 0403\n📍 Unit 12, Northwest Business Park, Blanchardstown, Dublin D15 YC53\nWe're happy to help with any questions!";
         }
         
-        // Subscription
-        if (lower.includes('subscription') || lower.includes('subscribe') || lower.includes('auto')) {
-            return "🔄 Subscribe & Save 15% on your favourite supplements! Choose delivery every 4, 6, or 8 weeks. Cancel anytime, no commitment. Perfect for protein, creatine, and daily vitamins!";
+        // B2B / wholesale
+        if (lower.includes('wholesale') || lower.includes('b2b') || lower.includes('trade') || lower.includes('bulk') || lower.includes('shop owner') || lower.includes('resell')) {
+            return "🏢 We offer wholesale/B2B pricing for sports shops, gyms, and event organisers. Free delivery on B2B orders over €150. Apply for a trade account at sportsfoodsireland.ie/b2b/ or email info@sportsfoodsireland.ie.";
         }
         
         // Payment
-        if (lower.includes('payment') || lower.includes('pay') || lower.includes('klarna') || lower.includes('installment')) {
-            return "💳 We accept cards, Apple Pay, Google Pay, PayPal, and Revolut. Plus, pay in 4 interest-free instalments with Klarna or Clearpay! No extra fees. What would you like to know?";
+        if (lower.includes('payment') || lower.includes('pay') || lower.includes('card') || lower.includes('visa')) {
+            return "💳 We accept Visa, Mastercard, American Express, Apple Pay, Google Pay (via Stripe), and PayPal. All payments are securely processed. What would you like to know?";
         }
         
         // Discount/coupon
-        if (lower.includes('discount') || lower.includes('coupon') || lower.includes('code') || lower.includes('offer')) {
-            return "🎁 Sign up for our newsletter to be the first to know about new product launches and exclusive deals! Also check our Offers page for current promotions.";
+        if (lower.includes('discount') || lower.includes('coupon') || lower.includes('code') || lower.includes('offer') || lower.includes('sale')) {
+            return "🎁 Check our Offers page for current promotions and bundle deals! Sign up for our newsletter to get exclusive discount codes and be the first to know about new product launches.";
         }
         
         // Stock
-        if (lower.includes('stock') || lower.includes('available') || lower.includes('when')) {
-            return "📋 Most items are in stock and ship within 24 hours. If a product is out of stock, you can place a backorder and receive it as soon as it is restocked. Which product are you interested in?";
+        if (lower.includes('stock') || lower.includes('available') || lower.includes('out of stock')) {
+            return "📋 Most items are in stock and ship within 24 hours. If a product is temporarily out of stock, you can place a backorder and we'll ship it as soon as it's restocked. Which product are you interested in?";
+        }
+        
+        // Brands
+        if (lower.includes('brand') || lower.includes('what do you sell') || lower.includes('products')) {
+            return "🏷️ We stock premium sports nutrition and equipment brands: Tailwind Nutrition, Clif Bar, PowerBar, High5, Nuun, SaltStick, Beet It, Zone3, Spatzwear, iGPSPORT, Chamois Butt'r, Swim Secure, Lock Laces, and more!";
         }
         
         // Greeting
         if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey') || lower === 'yo') {
-            return "👋 Hello! Welcome to Sports Foods Ireland. I'm here to help with product recommendations, order tracking, and any questions. What can I help you with today?";
+            return "👋 Hello! Welcome to Sports Foods Ireland. I can help you find the right nutrition and gear for running, cycling, swimming, and triathlon. What are you looking for today?";
         }
         
         // Thanks
         if (lower.includes('thank') || lower.includes('cheers') || lower.includes('appreciate')) {
-            return "😊 You're welcome! Happy to help. Feel free to ask if you need anything else. Have a great workout! 💪";
+            return "😊 You're welcome! Feel free to ask if you need anything else. Enjoy your training! 💪";
         }
         
         // Default response
-        return "Thanks for your message! I'm here to help with product recommendations, order tracking, shipping info, and general questions. You can also try our Supplement Quiz to find your perfect stack! What would you like to know?";
+        return "Thanks for your message! I can help with product recommendations, order tracking, shipping info, and more. We specialise in sports nutrition (Tailwind, Clif, PowerBar, High5) and equipment (Zone3, Spatzwear, iGPSPORT). What can I help you with?";
     }
 
     handleKeypress(event) {
@@ -1111,15 +1131,15 @@ class SupplementQuiz {
         this.answers = {};
         this.products = {
             // Product database for recommendations
-            'whey-isolate': { name: 'Whey Protein Isolate', price: '€49.99', emoji: '💪' },
-            'vegan-protein': { name: 'Vegan Protein Blend', price: '€44.99', emoji: '🌱' },
-            'gold-standard': { name: 'Gold Standard Whey', price: '€54.99', emoji: '🏆' },
-            'creatine': { name: 'Creatine Monohydrate', price: '€29.99', emoji: '⚡' },
-            'fat-burner': { name: 'Fat Burner Complex', price: '€34.99', emoji: '🔥' },
-            'pre-workout': { name: 'Pre-Workout Extreme', price: '€39.99', emoji: '🚀' },
-            'bcaa': { name: 'BCAA Recovery', price: '€32.99', emoji: '💊' },
-            'omega3': { name: 'Omega-3 Fish Oil', price: '€24.99', emoji: '🧬' },
-            'multivitamin': { name: 'Daily Multivitamin', price: '€19.99', emoji: '🌈' }
+            'tailwind-endurance': { name: 'Tailwind Endurance Fuel', price: 'from €35.99', emoji: '⚡' },
+            'tailwind-recovery': { name: 'Tailwind Recovery Mix', price: 'from €35.99', emoji: '💪' },
+            'clif-bar': { name: 'Clif Bar Energy Box (12 pack)', price: '€24.99', emoji: '🍫' },
+            'high5-gel': { name: 'High5 Energy Gel Pack', price: 'from €1.80', emoji: '🔋' },
+            'powerbar-drink': { name: 'PowerBar Isoactive Sports Drink', price: '€29.99', emoji: '💧' },
+            'nuun-hydration': { name: 'Nuun Sport Hydration Tablets', price: '€9.99', emoji: '💊' },
+            'saltstick': { name: 'SaltStick Capsules', price: 'from €12.99', emoji: '🧂' },
+            'beetit-shots': { name: 'Beet It Sport Nitrate Shots (15 pack)', price: '€42.99', emoji: '🏃' },
+            'high5-zero': { name: 'High5 Zero Electrolyte Tabs', price: '€7.99', emoji: '🌊' }
         };
     }
 
@@ -1260,55 +1280,50 @@ class SupplementQuiz {
         const { q1: goal, q2: frequency, q3: diet, q4: budget } = this.answers;
         const recommendations = [];
         
-        // Protein based on diet
+        // Endurance fuel based on diet
         if (diet === 'vegan') {
             recommendations.push({
-                ...this.products['vegan-protein'],
-                reason: 'Plant-based protein for your vegan lifestyle'
-            });
-        } else if (diet === 'lactose') {
-            recommendations.push({
-                ...this.products['whey-isolate'],
-                reason: 'Low lactose, high protein (25g per serving)'
+                ...this.products['tailwind-endurance'],
+                reason: 'Vegan-friendly endurance fuel — all natural ingredients'
             });
         } else {
             recommendations.push({
-                ...this.products['gold-standard'],
-                reason: 'Best-seller for muscle building'
+                ...this.products['clif-bar'],
+                reason: 'Organic energy bars — perfect pre and during workout fuel'
             });
         }
         
         // Goal-specific
-        if (goal === 'muscle') {
+        if (goal === 'muscle' || goal === 'recovery') {
             recommendations.push({
-                ...this.products['creatine'],
-                reason: 'Proven to increase strength and muscle'
+                ...this.products['tailwind-recovery'],
+                reason: 'Complete recovery with protein, carbs and electrolytes'
             });
-        } else if (goal === 'weight-loss') {
+        } else if (goal === 'weight-loss' || goal === 'endurance') {
             recommendations.push({
-                ...this.products['fat-burner'],
-                reason: 'Boost metabolism and burn fat faster'
+                ...this.products['high5-gel'],
+                reason: 'Fast-acting energy gels for endurance performance'
             });
         } else if (goal === 'performance') {
             recommendations.push({
-                ...this.products['pre-workout'],
-                reason: 'Maximum energy and focus for training'
+                ...this.products['beetit-shots'],
+                reason: 'Nitrate shots — scientifically proven to boost performance'
             });
         }
         
-        // High frequency training
-        if (frequency === '5+') {
+        // Hydration for frequent trainers
+        if (frequency === '5+' || frequency === '3-4') {
             recommendations.push({
-                ...this.products['bcaa'],
-                reason: 'Essential for intense training recovery'
+                ...this.products['nuun-hydration'],
+                reason: 'Essential electrolyte replacement for regular training'
             });
         }
         
         // Budget allows extras
         if (budget !== 'budget' && recommendations.length < 4) {
             recommendations.push({
-                ...this.products['omega3'],
-                reason: 'Joint health and overall wellness'
+                ...this.products['saltstick'],
+                reason: 'Electrolyte capsules for cramp prevention and hydration'
             });
         }
         
