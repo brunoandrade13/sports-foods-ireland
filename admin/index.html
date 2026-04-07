@@ -11854,8 +11854,15 @@ Loading items...
       const prod = (allProducts || []).find(function (p) { return p.id === prodId; });
       const custId = document.getElementById('moCustomer').value || null;
       if (!prod || !custId) return;
+      // Check for active variants
+      const variants = (productVariantsCache[prodId] || []).filter(function (v) { return v.is_active !== false; });
+      if (variants.length > 0) {
+        showVariantPickerForOrder(prod, variants, custId, qty);
+        return;
+      }
+      // No variants — add directly
       const unit = getB2BPriceForProduct(prod, custId);
-      const existing = manualOrderItems.find(function (i) { return i.product_id === prodId; });
+      const existing = manualOrderItems.find(function (i) { return i.product_id === prodId && !i.variant_id; });
       if (existing) {
         existing.qty += qty;
       } else {
@@ -11867,6 +11874,56 @@ Loading items...
           qty: qty
         });
       }
+      renderManualOrderItems();
+    }
+
+    function showVariantPickerForOrder(prod, variants, custId, qty) {
+      let modal = document.getElementById('moVariantModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'moVariantModal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px';
+        modal.innerHTML = '<div style="background:var(--card-bg,#1e293b);border-radius:16px;padding:24px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;position:relative"><button onclick="document.getElementById(\'moVariantModal\').style.display=\'none\'" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer">×</button><div id="moVariantContent"></div></div>';
+        document.body.appendChild(modal);
+      }
+      const unit = getB2BPriceForProduct(prod, custId);
+      let html = '<h3 style="margin:0 0 4px">' + esc(prod.name) + '</h3>';
+      html += '<p style="color:var(--text-muted);margin:0 0 16px;font-size:0.85rem">Select a variant:</p>';
+      html += '<table class="data-table"><thead><tr><th>Variant</th><th>SKU</th><th style="text-align:right">Price</th><th style="text-align:right">Stock</th><th></th></tr></thead><tbody>';
+      variants.forEach(function (v) {
+        const typeName = (v.variant_types && v.variant_types.name) || '';
+        const label = v.label || '—';
+        const vPrice = parseFloat(v.wholesale_price) || parseFloat(v.price) || unit;
+        const stock = v.stock != null ? v.stock : '—';
+        const stockColor = v.stock != null && v.stock <= 0 ? 'color:#ef4444' : '';
+        html += '<tr>';
+        html += '<td><strong>' + esc(label) + '</strong>' + (typeName ? '<div style="font-size:0.7rem;color:var(--text-muted)">' + esc(typeName) + '</div>' : '') + '</td>';
+        html += '<td style="font-size:0.8rem">' + esc(v.sku || '') + '</td>';
+        html += '<td style="text-align:right;font-weight:600">€' + vPrice.toFixed(2) + '</td>';
+        html += '<td style="text-align:right;' + stockColor + '">' + stock + '</td>';
+        html += '<td style="text-align:right"><button class="btn-sm btn-primary" onclick="addVariantToManualOrder(\'' + prod.id + '\',\'' + v.id + '\',' + qty + ',' + vPrice + ',\'' + esc((prod.name || '').replace(/'/g, "\\'")) + '\',\'' + esc((label || '').replace(/'/g, "\\'")) + '\',\'' + esc((v.sku || '').replace(/'/g, "\\'")) + '\')">Add</button></td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      document.getElementById('moVariantContent').innerHTML = html;
+      modal.style.display = 'flex';
+    }
+
+    function addVariantToManualOrder(prodId, variantId, qty, price, prodName, variantLabel, variantSku) {
+      const existing = manualOrderItems.find(function (i) { return i.product_id === prodId && i.variant_id === variantId; });
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        manualOrderItems.push({
+          product_id: prodId,
+          variant_id: variantId,
+          name: prodName + ' — ' + variantLabel,
+          sku: variantSku || '',
+          unit_price: price,
+          qty: qty
+        });
+      }
+      document.getElementById('moVariantModal').style.display = 'none';
       renderManualOrderItems();
     }
 
@@ -11959,12 +12016,14 @@ Loading items...
             await supaInsert('order_items', {
               order_id: ord.id,
               product_id: i.product_id,
+              variant_id: i.variant_id || null,
+              variant_label: i.variant_id ? i.name.split(' — ').slice(1).join(' — ') : null,
               quantity: i.qty,
               unit_price: i.unit_price,
               total: lineTotal,
               total_price: lineTotal,
               sku: i.sku || null,
-              product_name: p.name || i.name || null,
+              product_name: i.name || p.name || null,
               product_image_url: p.image_url || null,
               requires_shipping: true
             });
