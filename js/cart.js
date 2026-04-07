@@ -370,7 +370,7 @@ function updateCartModalContent() {
             const itemImgFallback = imgPrefix + 'img/produto1.jpg';
         return `
         <div class="cart-modal-item" data-id="${item.id}" style="display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(0,31,63,0.1);align-items:flex-start;background:#fff">
-            <img src="${itemImgSrc}" alt="${item.nome}" style="width:84px;height:84px;object-fit:contain;border-radius:8px;flex-shrink:0;background:#f9fafb;border:1px solid #e5e7eb;display:block" onerror="this.src='${itemImgFallback}'">
+            <img src="${itemImgSrc}" alt="${item.nome}" style="width:84px !important;height:84px !important;min-width:84px !important;min-height:84px !important;max-width:84px !important;max-height:84px !important;object-fit:contain;border-radius:8px;flex-shrink:0;background:#f9fafb;border:1px solid #e5e7eb;display:block" onerror="this.src='${itemImgFallback}'">
             <div style="flex:1;min-width:0">
                 <div style="font-size:14px;font-weight:600;color:#001f3f;margin-bottom:6px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${item.nome}</div>
                 ${subBadge}
