@@ -370,18 +370,20 @@ function updateCartModalContent() {
             const itemImgFallback = imgPrefix + 'img/produto1.jpg';
         return `
         <div class="cart-modal-item" data-id="${item.id}">
-            <img src="${itemImgSrc}" alt="${item.nome}" class="cart-item-img" onerror="this.src='${itemImgFallback}'">
-            <div class="cart-item-details" style="color:#001f3f!important">
-                <h4 class="cart-item-name" style="color:#001f3f!important">${item.nome}</h4>
+            <img src="${itemImgSrc}" alt="${item.nome}" class="cart-modal-item-image" onerror="this.src='${itemImgFallback}'">
+            <div class="cart-modal-item-info">
+                <div class="cart-modal-item-name">${item.nome}</div>
                 ${subBadge}
-                <div class="cart-item-price" style="color:#001f3f!important">${priceDisplay}</div>
-                <div class="cart-item-quantity" style="color:#001f3f!important">
-                    <button class="qty-btn" onclick="updateCartQuantity(${item.id}, ${(item.quantidade || 1) - 1})">−</button>
-                    <span style="color:#001f3f!important">${item.quantidade || 1}</span>
-                    <button class="qty-btn" onclick="updateCartQuantity(${item.id}, ${(item.quantidade || 1) + 1})">+</button>
+                <div class="cart-modal-item-details">
+                    <div class="cart-modal-item-quantity">
+                        <button class="qty-btn" onclick="updateCartQuantity(${item.id}, ${(item.quantidade || 1) - 1})">−</button>
+                        <span>${item.quantidade || 1}</span>
+                        <button class="qty-btn" onclick="updateCartQuantity(${item.id}, ${(item.quantidade || 1) + 1})">+</button>
+                    </div>
+                    <div class="cart-modal-item-price">${priceDisplay}</div>
                 </div>
             </div>
-            <button class="cart-item-remove" onclick="removeFromCart(${item.id})" style="color:#001f3f!important">×</button>
+            <button class="cart-modal-item-remove" onclick="removeFromCart(${item.id})">×</button>
         </div>
     `}).join('');
     
