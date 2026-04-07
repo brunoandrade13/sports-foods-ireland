@@ -13846,7 +13846,9 @@ html[data-theme="dark"] .cart-wrapper .cart {
     background: #fff;
 }
 
-.quick-action-btn {
+.chatbot-quick-actions .quick-action-btn {
+    width: auto;
+    height: auto;
     padding: 8px 14px;
     background: var(--color-bg-alt, #F5F3EE);
     border: 1px solid var(--color-border, #E5E1DA);
@@ -13857,9 +13859,13 @@ html[data-theme="dark"] .cart-wrapper .cart {
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    box-shadow: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.quick-action-btn:hover {
+.chatbot-quick-actions .quick-action-btn:hover {
     background: var(--color-primary-50, #F0FDF4);
     border-color: var(--color-primary, #2D6A4F);
     color: var(--color-primary, #2D6A4F);
