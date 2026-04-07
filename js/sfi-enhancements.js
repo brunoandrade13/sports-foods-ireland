@@ -1131,15 +1131,15 @@ class SupplementQuiz {
         this.answers = {};
         this.products = {
             // Product database for recommendations
-            'tailwind-endurance': { name: 'Tailwind Endurance Fuel', price: 'from €35.99', emoji: '⚡' },
-            'tailwind-recovery': { name: 'Tailwind Recovery Mix', price: 'from €35.99', emoji: '💪' },
-            'clif-bar': { name: 'Clif Bar Energy Box (12 pack)', price: '€24.99', emoji: '🍫' },
-            'high5-gel': { name: 'High5 Energy Gel Pack', price: 'from €1.80', emoji: '🔋' },
-            'powerbar-drink': { name: 'PowerBar Isoactive Sports Drink', price: '€29.99', emoji: '💧' },
-            'nuun-hydration': { name: 'Nuun Sport Hydration Tablets', price: '€9.99', emoji: '💊' },
-            'saltstick': { name: 'SaltStick Capsules', price: 'from €12.99', emoji: '🧂' },
-            'beetit-shots': { name: 'Beet It Sport Nitrate Shots (15 pack)', price: '€42.99', emoji: '🏃' },
-            'high5-zero': { name: 'High5 Zero Electrolyte Tabs', price: '€7.99', emoji: '🌊' }
+            'tailwind-endurance': { name: 'Tailwind Endurance Fuel', price: 'from €35.99', emoji: '⚡', img: 'img/produtos-279/046-tailwind-endurance-fuel-berry-flavour.webp' },
+            'tailwind-recovery': { name: 'Tailwind Recovery Mix', price: 'from €35.99', emoji: '💪', img: 'img/produtos-279/057-tailwind-recovery-mix-vanilla.webp' },
+            'clif-bar': { name: 'Clif Bar Energy Box (12 pack)', price: '€24.99', emoji: '🍫', img: 'img/produtos-279/013-clif-bar-12-x-65g.webp' },
+            'high5-gel': { name: 'High5 Zero Electrolyte Tabs', price: 'from €7.99', emoji: '🔋', img: 'img/produtos-279/025-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs.webp' },
+            'powerbar-drink': { name: 'PowerBar Isoactive Sports Drink', price: '€29.99', emoji: '💧', img: 'img/produtos-279/034-powerbar-isoactive-drink-mix-132kg.webp' },
+            'nuun-hydration': { name: 'Nuun Sport Hydration Tablets', price: '€9.99', emoji: '💊', img: 'img/produtos-279/029-nuun-sport-electrolyte-drink-8-x-10-tablet-tubes.webp' },
+            'saltstick': { name: 'SaltStick Capsules', price: 'from €12.99', emoji: '🧂', img: 'img/produtos-279/042-saltstick-capsules.webp' },
+            'beetit-shots': { name: 'Beet It Sport Nitrate Shots (15 pack)', price: '€42.99', emoji: '🏃', img: 'img/produtos-279/002-beet-it-sport-nitrate-400-70ml-shots-x-15.webp' },
+            'high5-zero': { name: 'High5 Zero Electrolyte Tabs', price: '€7.99', emoji: '🌊', img: 'img/produtos-279/025-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs.webp' }
         };
     }
 
@@ -1336,7 +1336,7 @@ class SupplementQuiz {
         
         let html = recommendations.map(rec => `
             <div class="quiz-product-card">
-                <div class="quiz-product-image">${rec.emoji}</div>
+                <div class="quiz-product-image"><img src="${rec.img || 'img/placeholder.jpg'}" alt="${rec.name}" style="width:56px;height:56px;object-fit:contain;border-radius:8px"></div>
                 <div class="quiz-product-info">
                     <div class="quiz-product-name">${rec.name}</div>
                     <div class="quiz-product-reason">${rec.reason}</div>
@@ -1360,7 +1360,7 @@ class SupplementQuiz {
                 margin-top: 16px;
                 transition: all 0.2s ease;
             ">
-                🛒 Add All to Cart - Save 10%
+                🛒 Add All to Cart
             </button>
             <button onclick="quiz.close()" style="
                 width: 100%;
@@ -1381,7 +1381,7 @@ class SupplementQuiz {
 
     addAllToCart() {
         // Here you would integrate with your cart system
-        alert('🛒 All recommended products added to cart!\n\n10% bundle discount applied!');
+        alert('🛒 All recommended products added to cart!');
         this.close();
         
         // Optional: Trigger cart modal
