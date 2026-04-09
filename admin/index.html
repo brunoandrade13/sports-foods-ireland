@@ -13839,6 +13839,7 @@ window.rejectB2BApplication = async function(id, email) {
     toast('Error: ' + e.message, 'error');
   }
 };
+function renderB2BList() {
 var el = document.getElementById('b2bActiveList');
 var search = (document.getElementById('b2bSearch')?.value || '').toLowerCase();
 var filtered = b2bGroups;
