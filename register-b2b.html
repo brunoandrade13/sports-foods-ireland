@@ -302,15 +302,19 @@ window.submitB2BForm = async function() {
 
     if (!resp.ok || !result.success) {
       var msg = result.message || result.error || 'Something went wrong. Please try again.';
-      if (result.error === 'email_exists' || msg.toLowerCase().includes('already registered')) {
-        msg = 'This email already has an account. If you registered via Google, sign in with Google and apply for B2B access from your account settings.';
-      }
       b2bShowError(msg);
       if (btn) { btn.disabled = false; btn.textContent = 'Submit Application'; }
       return;
     }
 
-    // Success
+    // Already registered — show specific message, do NOT show success card
+    if (result.status === 'already_registered') {
+      b2bShowError('This email already has an account with us. If you need to update your B2B application, please contact us at info@sportsfoodsireland.ie.');
+      if (btn) { btn.disabled = false; btn.textContent = 'Submit Application'; }
+      return;
+    }
+
+    // Success — new application created
     document.getElementById('formCard').style.display = 'none';
     document.getElementById('successEmail').textContent = data.email;
     document.getElementById('successCard').style.display = 'block';
