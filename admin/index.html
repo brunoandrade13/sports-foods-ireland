@@ -13772,67 +13772,65 @@ function renderB2BPending() {
 
 // ── Approve ───────────────────────────────────────────────────
 window.approveB2BApplication = async function(id, firstName, email) {
-  if (!confirm('Approve B2B application for ' + email + '?\n\nThis will set their account to B2B (Wholesale) and send them an approval email.')) return;
+  if (!confirm('Approve B2B application for ' + email + '?\n\nThis will activate their B2B account and send them an approval email.')) return;
   try {
-    await supaUpdate('customers', id, {
-      b2b_status: 'approved',
-      customer_type: 'b2b',
-      is_b2b: true,
+    // 1. Update customer record
+    const updated = await supaUpdate('customers', id, {
+      b2b_status:     'approved',
+      customer_type:  'b2b',
+      is_b2b:         true,
       b2b_approved_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at:      new Date().toISOString()
     });
-    // Send approval email via Brevo
-    try {
-      await fetch(SUPA_URL + '/functions/v1/brevo-proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'send_template',
-          email: email,
-          templateId: 0,   // fallback to htmlContent below if template not set
-          params: {}
-        })
-      }).catch(()=>{});
-      // Direct HTML email as fallback (always works)
-      const brevoUrl = 'https://api.brevo.com/v3/smtp/email';
-      await fetch(brevoUrl, {
-        method: 'POST',
-        headers: { 'api-key': window.BREVO_KEY || '', 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sender: { name: 'Sports Foods Ireland', email: 'brunoandrade13@yahoo.com.br' },
-          to: [{ email: email, name: firstName }],
-          subject: '🎉 Your B2B Account is Approved — Sports Foods Ireland',
-          htmlContent: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-<div style="background:#1B4332;padding:24px 32px"><img src="https://sportsfoodsireland.ie/wp-content/uploads/2021/09/logo.png" alt="Sports Foods Ireland" height="48" style="display:block"></div>
-<div style="padding:32px">
-<h2 style="color:#169B62;margin:0 0 16px">Your Wholesale Account is Approved! 🎉</h2>
-<p>Hi <strong>${firstName}</strong>,</p>
-<p>Great news — your B2B wholesale account with Sports Foods Ireland has been <strong>approved</strong>!</p>
-<p>You can now log in to our <a href="https://sportsfoodsireland.ie/b2b/landing.html" style="color:#169B62;font-weight:600">B2B Portal</a> to access exclusive wholesale pricing on all our products.</p>
-<div style="margin:24px 0;text-align:center"><a href="https://sportsfoodsireland.ie/b2b/landing.html" style="background:#169B62;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:700;font-size:1rem">Access B2B Portal →</a></div>
-<p>If you have any questions, reply to this email or contact us at <a href="mailto:info@sportsfoodsireland.ie" style="color:#169B62">info@sportsfoodsireland.ie</a>.</p>
-<p>Welcome aboard!</p>
-</div></div>`
-        })
-      }).catch(()=>{});
-    } catch(_) {}
-    toast('✅ Approved! Email sent to ' + email, 'success');
+
+    // 2. Get company name for the email
+    const rec = b2bPendingData.find(function(p) { return p.id === id; });
+    const companyName = rec ? (rec.b2b_company_name || '') : '';
+
+    // 3. Send approval email via dedicated Edge Function (CORS *)
+    const emailResp = await fetch(SUPA_URL + '/functions/v1/send-approval-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + (await getValidBearerToken())
+      },
+      body: JSON.stringify({ type: 'b2b_approved', email: email, firstName: firstName, companyName: companyName })
+    });
+    const emailResult = await emailResp.json();
+    if (!emailResp.ok || !emailResult.success) {
+      console.error('[approveB2B] Email error:', emailResult);
+      toast('✅ Approved! (email send failed: ' + (emailResult.error || emailResp.status) + ')', 'warning');
+    } else {
+      toast('✅ Approved! Confirmation email sent to ' + email, 'success');
+    }
+
     b2bPendingData = b2bPendingData.filter(function(p) { return p.id !== id; });
     renderB2BPending();
   } catch(e) {
-    toast('Error: ' + e.message, 'error');
+    toast('Error approving: ' + e.message, 'error');
   }
 };
 
 // ── Reject ────────────────────────────────────────────────────
 window.rejectB2BApplication = async function(id, email) {
-  if (!confirm('Reject B2B application for ' + email + '?')) return;
+  if (!confirm('Reject B2B application for ' + email + '?\nAn email will be sent notifying them.')) return;
   try {
     await supaUpdate('customers', id, {
       b2b_status: 'rejected',
       updated_at: new Date().toISOString()
     });
-    toast('Application rejected for ' + email, 'info');
+    const rec = b2bPendingData.find(function(p) { return p.id === id; });
+    const firstName = rec ? (rec.first_name || '') : '';
+    // Send rejection email
+    await fetch(SUPA_URL + '/functions/v1/send-approval-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + (await getValidBearerToken())
+      },
+      body: JSON.stringify({ type: 'b2b_rejected', email: email, firstName: firstName })
+    }).catch(function(){});
+    toast('Application rejected — ' + email, 'info');
     b2bPendingData = b2bPendingData.filter(function(p) { return p.id !== id; });
     renderB2BPending();
   } catch(e) {
