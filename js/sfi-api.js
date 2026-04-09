@@ -258,6 +258,20 @@ const sfi = {
         body: JSON.stringify({ email, password, data: { first_name: firstName, last_name: lastName } })
       });
       const data = await res.json();
+      // Throw on any auth error so callers can catch it properly
+      if (!res.ok || data.error_code || data.error) {
+        const raw = data.msg || data.message || data.error_description || data.error || 'Registration failed';
+        // Map Supabase error codes to friendly messages
+        let friendly = raw;
+        if (data.error_code === 'weak_password' || (raw || '').toLowerCase().includes('password')) {
+          friendly = 'Password is too weak. It must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character (e.g. !@#$%).';
+        } else if (data.error_code === 'email_exists' || (raw || '').toLowerCase().includes('already registered')) {
+          friendly = 'This email is already registered. Try signing in instead.';
+        } else if (data.error_code === 'invalid_email') {
+          friendly = 'Please enter a valid email address.';
+        }
+        throw new Error(friendly);
+      }
       if (data.access_token) {
         db.token = data.access_token;
         localStorage.setItem('sfi_token', data.access_token);
