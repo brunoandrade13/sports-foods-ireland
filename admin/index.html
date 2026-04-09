@@ -4177,6 +4177,29 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 </div>
 </div>
 
+<div id="cpOrderHistorySection" style="margin-bottom:20px;">
+<h4 style="margin: 0 0 10px 0; color: var(--text-color);">Order History</h4>
+<div class="table-wrap">
+<div style="overflow-x:auto; max-height: 400px;">
+<table>
+<thead>
+<tr>
+<th>Order #</th>
+<th>Date</th>
+<th>Status</th>
+<th>Total</th>
+<th>Source</th>
+<th>Email</th>
+<th style="width: 50px;"></th>
+</tr>
+</thead>
+<tbody id="cpOrdersTable">
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
 <div style="margin-bottom:20px;">
 <h4 style="margin:0 0 10px 0;color:var(--text-color);">📊 Monthly Purchase History</h4>
 <div style="background:var(--card-bg);border-radius:8px;padding:16px;border:1px solid var(--border)">
@@ -4200,29 +4223,6 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 </tr>
 </thead>
 <tbody id="cpTopProducts">
-</tbody>
-</table>
-</div>
-</div>
-</div>
-
-<div id="cpOrderHistorySection" style="margin-bottom:20px;">
-<h4 style="margin: 0 0 10px 0; color: var(--text-color);">Order History</h4>
-<div class="table-wrap">
-<div style="overflow-x:auto; max-height: 400px;">
-<table>
-<thead>
-<tr>
-<th>Order #</th>
-<th>Date</th>
-<th>Status</th>
-<th>Total</th>
-<th>Source</th>
-<th>Email</th>
-<th style="width: 50px;"></th>
-</tr>
-</thead>
-<tbody id="cpOrdersTable">
 </tbody>
 </table>
 </div>
@@ -11258,12 +11258,6 @@ Loading items...
       document.getElementById('customerProfileModal').classList.add('open');
       document.getElementById('customerProfileModal').scrollTop = 0;
       document.getElementById('customerProfileModal').style.zIndex = '200';
-      // Move Order History section to top of modal body (first content block)
-      const modalBody = document.querySelector('#customerProfileModal .modal-body');
-      const orderSection = document.getElementById('cpOrderHistorySection');
-      if (modalBody && orderSection && modalBody.firstElementChild !== orderSection) {
-        modalBody.insertBefore(orderSection, modalBody.firstElementChild);
-      }
 
       try {
         // Query orders — for group parents, include all subsidiary account orders and all linked emails
