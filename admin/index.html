@@ -4206,6 +4206,7 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 </div>
 </div>
 
+<div id="cpOrderHistorySection" style="margin-bottom:20px;">
 <h4 style="margin: 0 0 10px 0; color: var(--text-color);">Order History</h4>
 <div class="table-wrap">
 <div style="overflow-x:auto; max-height: 400px;">
@@ -4217,12 +4218,14 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 <th>Status</th>
 <th>Total</th>
 <th>Source</th>
+<th>Email</th>
 <th style="width: 50px;"></th>
 </tr>
 </thead>
 <tbody id="cpOrdersTable">
 </tbody>
 </table>
+</div>
 </div>
 </div>
 
@@ -11251,10 +11254,16 @@ Loading items...
       if (cpL6) cpL6.textContent = '...';
       if (cpLargest) cpLargest.textContent = '...';
       if (cpLastDate) cpLastDate.textContent = '...';
-      document.getElementById('cpOrdersTable').innerHTML = '<tr><td colspan="6" class="loading-overlay"><span class="spinner"></span></td></tr>';
+      document.getElementById('cpOrdersTable').innerHTML = '<tr><td colspan="7" class="loading-overlay"><span class="spinner"></span></td></tr>';
       document.getElementById('customerProfileModal').classList.add('open');
       document.getElementById('customerProfileModal').scrollTop = 0;
       document.getElementById('customerProfileModal').style.zIndex = '200';
+      // Move Order History section to top of modal body (first content block)
+      const modalBody = document.querySelector('#customerProfileModal .modal-body');
+      const orderSection = document.getElementById('cpOrderHistorySection');
+      if (modalBody && orderSection && modalBody.firstElementChild !== orderSection) {
+        modalBody.insertBefore(orderSection, modalBody.firstElementChild);
+      }
 
       try {
         // Query orders — for group parents, include all subsidiary account orders and all linked emails
@@ -11386,9 +11395,10 @@ Loading items...
         }
 
         document.getElementById('cpOrdersTable').innerHTML = custOrders.length === 0
-          ? '<tr><td colspan="6" class="empty-state">No orders found for this customer email</td></tr>'
+          ? '<tr><td colspan="7" class="empty-state">No orders found for this customer email</td></tr>'
           : custOrders.map(o => {
             const cls = ['paid','partially_refunded','partially_paid'].includes(o.financial_status) ? 'in' : 'low';
+            const orderEmail = esc(o.customer_email || '');
             return `
         <tr style="background:var(--surface-1);">
           <td><code>${esc(o.order_number || o.id?.slice(0, 8))}</code></td>
@@ -11396,6 +11406,7 @@ Loading items...
           <td><span class="stock-badge ${cls}">${o.financial_status || 'pending'}</span></td>
           <td class="price">€${(o.total || 0).toFixed(2)}</td>
           <td><span class="stock-badge purple">${o.order_source || 'system'}</span></td>
+          <td style="font-size:0.8rem;color:var(--text-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${orderEmail}">${orderEmail || '—'}</td>
           <td style="text-align: right;">
             <button class="btn-sm btn-outline" onclick="closeCustomerProfileModal(); openOrderModal('${o.id}')">View</button>
           </td>
@@ -11452,7 +11463,7 @@ Loading items...
         } catch(subErr) { /* subsidiary load error - silent */ }
 
       } catch (e) {
-        document.getElementById('cpOrdersTable').innerHTML = `<tr><td colspan="6" class="empty-state">Error loading orders</td></tr>`;
+        document.getElementById('cpOrdersTable').innerHTML = `<tr><td colspan="7" class="empty-state">Error loading orders</td></tr>`;
       }
     }
 
