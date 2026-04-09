@@ -12953,49 +12953,63 @@ Loading items...
     // PURCHASE ORDERS
     // ============================================================
     function renderPurchaseOrders() {
-      const statusFilter = document.getElementById('poStatusFilter')?.value || '';
+      const statusFilter   = document.getElementById('poStatusFilter')?.value  || '';
       const supplierFilter = document.getElementById('poSupplierFilter')?.value || '';
+      // FIX: use correct QB field names for filtering
       filteredPurchaseOrders = (allPurchaseOrders || []).filter(po => {
-        if (statusFilter && (po.status || '') !== statusFilter) return false;
-        if (supplierFilter && (po.supplier_id || '') !== supplierFilter) return false;
+        if (statusFilter && (po.status || '').toLowerCase() !== statusFilter.toLowerCase()) return false;
+        if (supplierFilter && (po.vendor_qb_id || po.vendor_name || '') !== supplierFilter) return false;
         return true;
       });
       const list = filteredPurchaseOrders || [];
+      // FIX: populate from allVendors (allSuppliers was always empty)
       const supplierSelect = document.getElementById('poSupplierFilter');
-      if (supplierSelect && (allSuppliers || []).length >= 0) {
-        const opts = ['<option value="">All Suppliers</option>'].concat((allSuppliers || []).map(s => `<option value="${s.id}">${esc(s.name || '')}</option>`));
-        supplierSelect.innerHTML = opts.join('');
+      if (supplierSelect) {
+        const vendors = (allVendors || []).filter(v => v.is_active !== false);
+        supplierSelect.innerHTML = '<option value="">All Suppliers</option>' +
+          vendors.map(v => `<option value="${v.qb_id || v.id}">${esc(v.name || '')}</option>`).join('');
         if (supplierFilter) supplierSelect.value = supplierFilter;
       }
-      const totalVal = (allPurchaseOrders || []).reduce((s, po) => s + (parseFloat(po.total) || 0), 0);
-      const byStatus = (arr) => (st) => arr.filter(po => (po.status || '') === st).length;
+      // FIX: use total_amount (not po.total)
+      const totalVal = (allPurchaseOrders || []).reduce((s, po) => s + (parseFloat(po.total_amount) || 0), 0);
+      const byStatus = (arr, st) => arr.filter(po => (po.status || '').toLowerCase() === st).length;
       const all = allPurchaseOrders || [];
-      if (document.getElementById('poStatTotal')) document.getElementById('poStatTotal').textContent = all.length;
-      if (document.getElementById('poStatDraft')) document.getElementById('poStatDraft').textContent = byStatus(all)('draft');
-      if (document.getElementById('poStatOrdered')) document.getElementById('poStatOrdered').textContent = byStatus(all)('ordered');
-      if (document.getElementById('poStatPartial')) document.getElementById('poStatPartial').textContent = byStatus(all)('partial');
-      if (document.getElementById('poStatReceived')) document.getElementById('poStatReceived').textContent = byStatus(all)('received');
-      if (document.getElementById('poStatValue')) document.getElementById('poStatValue').textContent = '€' + totalVal.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (document.getElementById('poStatTotal'))    document.getElementById('poStatTotal').textContent    = all.length;
+      if (document.getElementById('poStatDraft'))    document.getElementById('poStatDraft').textContent    = byStatus(all, 'draft');
+      if (document.getElementById('poStatOrdered'))  document.getElementById('poStatOrdered').textContent  = byStatus(all, 'ordered') + byStatus(all, 'open');
+      if (document.getElementById('poStatPartial'))  document.getElementById('poStatPartial').textContent  = byStatus(all, 'partial');
+      if (document.getElementById('poStatReceived')) document.getElementById('poStatReceived').textContent = byStatus(all, 'received') + byStatus(all, 'paid') + byStatus(all, 'closed');
+      if (document.getElementById('poStatValue'))    document.getElementById('poStatValue').textContent    = '€' + totalVal.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const tbody = document.getElementById('poTable');
       if (!tbody) return;
-      const supplierMap = new Map((allSuppliers || []).map(s => [s.id, s]));
+      // FIX: build vendor lookup from allVendors keyed by qb_id
+      const vendorMap = new Map((allVendors || []).map(v => [String(v.qb_id || ''), v]));
       if (list.length === 0) {
         tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No purchase orders found. Sync from QuickBooks or create a new one.</td></tr>';
         return;
       }
       tbody.innerHTML = list.map(po => {
-        const sup = po.supplier_id ? supplierMap.get(po.supplier_id) : null;
-        const supName = sup ? sup.name : (po.vendor_qb_id ? 'QB Vendor' : '—');
-        const orderDate = po.order_date ? new Date(po.order_date).toLocaleDateString() : '—';
-        const expected = po.expected_date ? new Date(po.expected_date).toLocaleDateString() : '—';
-        const paySt = (po.payment_status || 'unpaid');
+        // FIX: resolve vendor from vendor_name field or lookup by vendor_qb_id
+        const vendor    = po.vendor_qb_id ? vendorMap.get(String(po.vendor_qb_id)) : null;
+        const supName   = po.vendor_name   || (vendor ? vendor.name : '—');
+        // FIX: use txn_date / due_date (not order_date / expected_date)
+        const orderDate = po.txn_date ? new Date(po.txn_date).toLocaleDateString('en-IE') : '—';
+        const expected  = po.due_date  ? new Date(po.due_date).toLocaleDateString('en-IE') : '—';
+        // FIX: use doc_number or qb_purchase_id for PO number; total_amount for total
+        const poNum     = po.doc_number || po.qb_purchase_id || po.qb_id || '—';
+        const total     = parseFloat(po.total_amount) || 0;
+        const status    = (po.status || 'open').toLowerCase();
+        const badge     = ['paid','received','closed'].includes(status) ? 'in'
+                        : ['voided','cancelled'].includes(status)       ? 'out' : 'low';
+        const isQB      = !!po.qb_id;
+        const items     = Array.isArray(po.line_items) ? po.line_items.length : '—';
         return `<tr>
-          <td><code>${esc(po.po_number || '—')}</code></td>
+          <td><code style="cursor:pointer" onclick="openPOModal('${po.id}')">${esc(poNum)}</code></td>
           <td>${esc(supName)}</td>
-          <td><span class="stock-badge ${(po.status || 'draft') === 'received' ? 'in' : (po.status || '') === 'cancelled' ? 'out' : 'low'}">${po.status || 'draft'}</span></td>
-          <td>—</td>
-          <td class="price" style="text-align:right">€${(parseFloat(po.total) || 0).toFixed(2)}</td>
-          <td>${paySt}</td>
+          <td><span class="stock-badge ${badge}">${esc(status)}</span>${isQB ? ' <span title="Synced from QuickBooks" style="font-size:0.7rem;opacity:.6">QB</span>' : ''}</td>
+          <td>${items}</td>
+          <td class="price" style="text-align:right">€${total.toFixed(2)}</td>
+          <td>${po.currency || 'EUR'}</td>
           <td>${orderDate}</td>
           <td>${expected}</td>
           <td><button class="btn-sm btn-outline" onclick="openPOModal('${po.id}')">View</button></td>
@@ -13003,24 +13017,205 @@ Loading items...
       }).join('');
     }
 
+    // ============================================================
+    // PO MODAL — openPOModal / closePOModal
+    // ============================================================
+    window.openPOModal = async function openPOModal(poId) {
+      const modal = document.getElementById('poModal');
+      if (!modal) return;
+      // Populate supplier dropdown from allVendors
+      const supSel = document.getElementById('poSupplier');
+      if (supSel) {
+        const vendors = (allVendors || []).filter(v => v.is_active !== false).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+        supSel.innerHTML = '<option value="">Select supplier...</option>' +
+          vendors.map(v => `<option value="${v.qb_id||v.id}" data-name="${esc(v.name||'')}">${esc(v.name||'')}</option>`).join('');
+      }
+      const today = new Date().toISOString().split('T')[0];
+      const clear = (id, val='') => { const el=document.getElementById(id); if(el) el.value=val; };
+      if (!poId) {
+        // NEW PO
+        clear('poId'); clear('poNumber');
+        const titleEl = document.getElementById('poModalTitle');
+        if (titleEl) titleEl.textContent = 'New Purchase Order';
+        clear('poSupplier'); clear('poStatus','draft');
+        clear('poOrderDate', today); clear('poExpectedDate');
+        clear('poShipping'); clear('poTracking');
+        clear('poDestination','Main Warehouse');
+        clear('poPayMethod'); clear('poPayStatus','unpaid'); clear('poPayDate');
+        clear('poTaxRate','0'); clear('poShipCost','0'); clear('poDiscountAmt','0');
+        clear('poNotes'); clear('poInternalNotes');
+        const rows = document.getElementById('poItemRows');
+        if (rows) rows.innerHTML = '';
+        recalcPO(); addPOItem();
+      } else {
+        // EXISTING PO
+        const po = (allPurchaseOrders||[]).find(p=>p.id===poId);
+        if (!po) { toast('Purchase order not found','error'); return; }
+        const titleEl = document.getElementById('poModalTitle');
+        if (titleEl) titleEl.textContent = 'PO: ' + (po.doc_number||po.qb_purchase_id||po.id.slice(0,8));
+        clear('poId', po.id);
+        clear('poNumber', po.doc_number||po.qb_purchase_id||'');
+        if (supSel && po.vendor_qb_id) supSel.value = String(po.vendor_qb_id);
+        clear('poStatus', po.status||'open');
+        clear('poOrderDate', po.txn_date||today);
+        clear('poExpectedDate', po.due_date||'');
+        clear('poShipping',''); clear('poTracking','');
+        clear('poDestination','Main Warehouse');
+        clear('poPayMethod',''); clear('poPayStatus','unpaid'); clear('poPayDate','');
+        clear('poTaxRate','0'); clear('poShipCost','0'); clear('poDiscountAmt','0');
+        clear('poNotes', po.memo||'');
+        clear('poInternalNotes', po.private_note||'');
+        const rows = document.getElementById('poItemRows');
+        if (rows) {
+          rows.innerHTML = '';
+          const items = Array.isArray(po.line_items) ? po.line_items : [];
+          if (items.length === 0) { addPOItem(); } else { items.forEach(it => addPOItem(it)); }
+        }
+        recalcPO();
+      }
+      modal.style.display = 'flex';
+    };
+
+    window.closePOModal = function closePOModal() {
+      const modal = document.getElementById('poModal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    // ============================================================
+    // PO LINE ITEMS — addPOItem / recalcPO
+    // ============================================================
+    window.addPOItem = function addPOItem(item) {
+      const rows = document.getElementById('poItemRows');
+      if (!rows) return;
+      const qty  = item ? (item.quantity||item.qty||1)          : 1;
+      const qtyR = item ? (item.qty_received||0)                 : 0;
+      const cost = item ? (item.unit_price||item.unit_cost||0)  : 0;
+      const name = item ? (item.product_name||item.description||item.detail_type||'') : '';
+      const sku  = item ? (item.sku||item.product_code||'')      : '';
+      const line = qty * cost;
+      const inp  = 'padding:4px 6px;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;color:var(--text);width:100%';
+      const div  = document.createElement('div');
+      div.className = 'po-item-row';
+      div.style.cssText = 'display:grid;grid-template-columns:2fr 1fr 80px 80px 80px 100px 30px;gap:6px;padding:6px 0;border-bottom:1px solid var(--border);align-items:center;font-size:0.82rem';
+      div.innerHTML = `
+        <input type="text"   class="po-item-name"  value="${esc(name)}"  placeholder="Product / description" style="${inp}">
+        <input type="text"   class="po-item-sku"   value="${esc(sku)}"   placeholder="SKU"                   style="${inp}">
+        <input type="number" class="po-item-qty"   value="${qty}"  min="0" step="1"    style="${inp};text-align:right" oninput="recalcPO()">
+        <input type="number" class="po-item-qtyR"  value="${qtyR}" min="0" step="1"    style="${inp};text-align:right">
+        <input type="number" class="po-item-cost"  value="${cost}" min="0" step="0.01" style="${inp};text-align:right" oninput="recalcPO()">
+        <span  class="po-item-line" style="text-align:right;font-weight:600">€${line.toFixed(2)}</span>
+        <button type="button" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:1rem;padding:0" onclick="this.closest('.po-item-row').remove();recalcPO()">✕</button>`;
+      rows.appendChild(div);
+    };
+
+    window.recalcPO = function recalcPO() {
+      let subtotal = 0;
+      document.querySelectorAll('#poItemRows .po-item-row').forEach(row => {
+        const qty  = parseFloat(row.querySelector('.po-item-qty')?.value  || 0);
+        const cost = parseFloat(row.querySelector('.po-item-cost')?.value || 0);
+        const line = qty * cost;
+        const lineEl = row.querySelector('.po-item-line');
+        if (lineEl) lineEl.textContent = '€' + line.toFixed(2);
+        subtotal += line;
+      });
+      const taxRate = parseFloat(document.getElementById('poTaxRate')?.value    || 0) / 100;
+      const ship    = parseFloat(document.getElementById('poShipCost')?.value   || 0);
+      const disc    = parseFloat(document.getElementById('poDiscountAmt')?.value || 0);
+      const tax     = subtotal * taxRate;
+      const total   = subtotal + tax + ship - disc;
+      const fmt = v => '€' + v.toFixed(2);
+      if (document.getElementById('poSubtotal'))  document.getElementById('poSubtotal').textContent  = fmt(subtotal);
+      if (document.getElementById('poTaxAmount')) document.getElementById('poTaxAmount').textContent = fmt(tax);
+      if (document.getElementById('poTotal'))     document.getElementById('poTotal').textContent     = fmt(total);
+    };
+
+    // ============================================================
+    // PO SAVE — savePO (create or update in Supabase)
+    // ============================================================
+    window.savePO = async function savePO(mode) {
+      const vendorEl   = document.getElementById('poSupplier');
+      const vendorVal  = vendorEl?.value || '';
+      const vendorName = vendorEl?.options[vendorEl.selectedIndex]?.dataset?.name
+                      || vendorEl?.options[vendorEl.selectedIndex]?.text || '';
+      if (!vendorVal) { toast('Please select a supplier', 'error'); return; }
+
+      const lineItems = [];
+      document.querySelectorAll('#poItemRows .po-item-row').forEach(row => {
+        const name = row.querySelector('.po-item-name')?.value?.trim() || '';
+        const sku  = row.querySelector('.po-item-sku')?.value?.trim()  || '';
+        const qty  = parseFloat(row.querySelector('.po-item-qty')?.value  || 0);
+        const qtyR = parseFloat(row.querySelector('.po-item-qtyR')?.value || 0);
+        const cost = parseFloat(row.querySelector('.po-item-cost')?.value || 0);
+        if (name || qty) lineItems.push({ product_name:name, sku, quantity:qty, qty_received:qtyR, unit_price:cost, total:qty*cost });
+      });
+
+      const taxRate  = parseFloat(document.getElementById('poTaxRate')?.value    || 0) / 100;
+      const shipCost = parseFloat(document.getElementById('poShipCost')?.value   || 0);
+      const discAmt  = parseFloat(document.getElementById('poDiscountAmt')?.value || 0);
+      const subtotal = lineItems.reduce((s,i) => s + (i.total||0), 0);
+      const total    = subtotal + subtotal * taxRate + shipCost - discAmt;
+      const statusVal = mode === 'draft' ? 'draft' : (document.getElementById('poStatus')?.value || 'draft');
+      const docNum    = document.getElementById('poNumber')?.value?.trim() || null;
+
+      const payload = {
+        vendor_name:    vendorName,
+        vendor_qb_id:   vendorVal,
+        doc_number:     docNum,
+        txn_date:       document.getElementById('poOrderDate')?.value   || null,
+        due_date:       document.getElementById('poExpectedDate')?.value || null,
+        status:         statusVal,
+        total_amount:   total,
+        currency:       'EUR',
+        line_items:     lineItems,
+        memo:           document.getElementById('poNotes')?.value?.trim()         || null,
+        private_note:   document.getElementById('poInternalNotes')?.value?.trim() || null,
+        qb_purchase_id: docNum || ('LOCAL-' + Date.now()),
+        updated_at:     new Date().toISOString()
+      };
+
+      const existingId = document.getElementById('poId')?.value;
+      try {
+        if (existingId) {
+          const result = await supaUpdate('purchase_orders', existingId, payload);
+          const updated = Array.isArray(result) ? result[0] : result;
+          const idx = allPurchaseOrders.findIndex(p => p.id === existingId);
+          if (idx >= 0) allPurchaseOrders[idx] = { ...allPurchaseOrders[idx], ...updated };
+          toast('Purchase order updated', 'success');
+        } else {
+          const result = await supaInsert('purchase_orders', payload);
+          const created = Array.isArray(result) ? result[0] : result;
+          allPurchaseOrders.unshift(created);
+          if (document.getElementById('poId')) document.getElementById('poId').value = created.id;
+          toast('Purchase order created', 'success');
+        }
+        filteredPurchaseOrders = allPurchaseOrders.slice();
+        renderPurchaseOrders();
+        closePOModal();
+      } catch (err) {
+        console.error('savePO error:', err);
+        toast('Error saving PO: ' + (err.message || err), 'error');
+      }
+    };
+
     window.syncQBPurchaseOrders = async function syncQBPurchaseOrders() {
       const btn = document.getElementById('btnSyncQBPO');
       const statusEl = document.getElementById('poSyncStatus');
       if (btn) { btn.disabled = true; btn.textContent = '⏳ Syncing...'; }
       if (statusEl) statusEl.textContent = 'Calling QuickBooks sync...';
       try {
-        const url = (typeof SUPA_URL !== 'undefined' ? SUPA_URL : '') + '/functions/v1/qb-sync-purchase-orders';
+        const url = (typeof SUPA_URL !== 'undefined' ? SUPA_URL : '') + '/functions/v1/qb-sync-purchases';
         const resp = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (await getValidBearerToken()) }
         });
         let result;
-        try { result = await resp.json(); } catch (_) { throw new Error('Invalid response (' + resp.status + '). Check if the Edge Function qb-sync-purchase-orders is deployed on Supabase.'); }
+        try { result = await resp.json(); } catch (_) { throw new Error('Invalid response (' + resp.status + '). Check if the Edge Function qb-sync-purchases is deployed on Supabase.'); }
         if (!resp.ok || !result.success) throw new Error(result.error || result.message || 'QB Purchase Orders sync failed');
         const s = result.stats || {};
         if (statusEl) statusEl.textContent = '✅ Synced: ' + (s.created || 0) + ' new, ' + (s.updated || 0) + ' updated, ' + (s.failed || 0) + ' failed';
         toast('QuickBooks POs synced: ' + (s.created || 0) + ' new, ' + (s.updated || 0) + ' updated', 'success');
-        const pos = await supaGetAll('purchase_orders', '?order=order_date.desc').catch(function() { return []; });
+        // FIX: reload using correct field name txn_date
+        const pos = await supaGetAll('purchase_orders', '?order=txn_date.desc').catch(function() { return []; });
         allPurchaseOrders = pos || [];
         filteredPurchaseOrders = allPurchaseOrders.slice();
         renderPurchaseOrders();
