@@ -3378,13 +3378,39 @@ style="font-size:0.8rem;padding:4px 8px">
 <h1>🏢 B2B Management</h1>
 </div>
 
-<div class="detail-panel">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-<h3 style="margin:0">B2B Customers <span id="b2bCount" style="font-size:0.85rem;color:var(--text-muted);font-weight:400"></span></h3>
-<input type="text" id="b2bSearch" placeholder="Search by name, company, email..." oninput="renderB2BList()"
-style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem;width:300px;max-width:100%">
+<!-- Tab bar -->
+<div style="display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--border)">
+  <button id="b2bTabApproved" onclick="switchB2BTab('approved')"
+    style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;color:var(--accent);border-bottom:3px solid var(--accent);margin-bottom:-2px">
+    ✅ Approved Customers
+  </button>
+  <button id="b2bTabPending" onclick="switchB2BTab('pending')"
+    style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">
+    ⏳ Pending Applications <span id="b2bPendingTabCount" style="background:#ef4444;color:#fff;border-radius:999px;padding:1px 7px;font-size:0.75rem;margin-left:4px;display:none">0</span>
+  </button>
 </div>
-<div id="b2bActiveList" style="color:var(--muted);">Loading...</div>
+
+<!-- APPROVED tab -->
+<div id="b2bTabContentApproved">
+  <div class="detail-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <h3 style="margin:0">B2B Customers <span id="b2bCount" style="font-size:0.85rem;color:var(--text-muted);font-weight:400"></span></h3>
+      <input type="text" id="b2bSearch" placeholder="Search by name, company, email..." oninput="renderB2BList()"
+        style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem;width:300px;max-width:100%">
+    </div>
+    <div id="b2bActiveList" style="color:var(--muted);">Loading...</div>
+  </div>
+</div>
+
+<!-- PENDING tab -->
+<div id="b2bTabContentPending" style="display:none">
+  <div class="detail-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <h3 style="margin:0">Pending B2B Applications <span id="b2bPendingCount2" style="font-size:0.85rem;color:var(--text-muted);font-weight:400"></span></h3>
+      <button class="btn-sm btn-outline" onclick="loadB2BPending()">🔄 Refresh</button>
+    </div>
+    <div id="b2bPendingList">Loading...</div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="b2bEditModal" onclick="if(event.target===this)closeB2BEditModal()">
@@ -13662,6 +13688,8 @@ b2bGroups = Object.values(parentMap).filter(function(g) { return g.parent; });
 b2bGroups.forEach(function(g) { g.children.sort(function(a, b) { return Number(b.total_revenue) - Number(a.total_revenue); }); });
 b2bGroups.sort(function(a, b) { return b.groupRevenue - a.groupRevenue; });
 renderB2BList();
+// Also load pending count for nav badge
+loadB2BPending().catch(function(){});
 } catch (e) {
 console.error('B2B load error:', e);
 document.getElementById('b2bActiveList').innerHTML = '<div style="color:var(--danger)">Failed to load: ' + e.message + '</div>';
@@ -13670,7 +13698,147 @@ document.getElementById('b2bActiveList').innerHTML = '<div style="color:var(--da
 
 function b2bFmt(v) { return '\u20ac' + Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
-function renderB2BList() {
+// ── Tab switching ──────────────────────────────────────────────
+function switchB2BTab(tab) {
+  document.getElementById('b2bTabContentApproved').style.display = tab === 'approved' ? '' : 'none';
+  document.getElementById('b2bTabContentPending').style.display  = tab === 'pending'  ? '' : 'none';
+  const active   = 'color:var(--accent);border-bottom:3px solid var(--accent);margin-bottom:-2px';
+  const inactive = 'color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px';
+  document.getElementById('b2bTabApproved').style.cssText = 'padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;' + (tab==='approved'?active:inactive);
+  document.getElementById('b2bTabPending').style.cssText  = 'padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;' + (tab==='pending' ?active:inactive);
+  if (tab === 'pending') loadB2BPending();
+}
+
+// ── Load & render pending applications ────────────────────────
+let b2bPendingData = [];
+async function loadB2BPending() {
+  const el = document.getElementById('b2bPendingList');
+  if (el) el.innerHTML = '<span class="spinner"></span> Loading...';
+  try {
+    const rows = await supaGet('customers',
+      '?b2b_status=eq.pending&order=b2b_applied_at.desc&select=id,email,first_name,last_name,b2b_company_name,b2b_vat_number,b2b_website,b2b_business_type,b2b_expected_volume,b2b_notes,b2b_applied_at'
+    );
+    b2bPendingData = rows || [];
+    renderB2BPending();
+  } catch(e) {
+    if (el) el.innerHTML = '<div style="color:var(--danger)">Error: ' + e.message + '</div>';
+  }
+}
+
+function renderB2BPending() {
+  const el = document.getElementById('b2bPendingList');
+  if (!el) return;
+  const count = b2bPendingData.length;
+  // Update badges
+  const badge = document.getElementById('b2bPendingTabCount');
+  if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'inline' : 'none'; }
+  const navBadge = document.getElementById('b2bPendingCount');
+  if (navBadge) { navBadge.textContent = count; navBadge.style.display = count > 0 ? 'inline' : 'none'; }
+  const cnt2 = document.getElementById('b2bPendingCount2');
+  if (cnt2) cnt2.textContent = count + ' application' + (count !== 1 ? 's' : '');
+
+  if (count === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text-muted)">✅ No pending applications</div>';
+    return;
+  }
+  el.innerHTML = '<div style="overflow-x:auto"><table class="data-table"><thead><tr>' +
+    '<th>#</th><th>Name</th><th>Company</th><th>Email</th><th>VAT</th>' +
+    '<th>Business Type</th><th>Expected Volume</th><th>Applied</th><th style="width:150px">Actions</th>' +
+    '</tr></thead><tbody>' +
+    b2bPendingData.map(function(p, i) {
+      const name    = esc((p.first_name||'') + ' ' + (p.last_name||''));
+      const company = esc(p.b2b_company_name || '—');
+      const applied = p.b2b_applied_at ? new Date(p.b2b_applied_at).toLocaleDateString('en-IE') : '—';
+      const notes   = p.b2b_notes ? ' title="' + esc(p.b2b_notes) + '"' : '';
+      return '<tr>' +
+        '<td>' + (i+1) + '</td>' +
+        '<td><strong>' + name + '</strong>' + (p.b2b_website ? ' <a href="' + esc(p.b2b_website) + '" target="_blank" style="font-size:0.75rem;color:var(--accent)">🔗</a>' : '') + '</td>' +
+        '<td' + notes + '>' + company + (p.b2b_notes ? ' <span style="font-size:0.7rem;color:var(--text-muted)">(note)</span>' : '') + '</td>' +
+        '<td style="font-size:0.85rem">' + esc(p.email||'') + '</td>' +
+        '<td style="font-size:0.85rem">' + esc(p.b2b_vat_number||'—') + '</td>' +
+        '<td style="font-size:0.85rem">' + esc(p.b2b_business_type||'—') + '</td>' +
+        '<td style="font-size:0.85rem">' + esc(p.b2b_expected_volume||'—') + '</td>' +
+        '<td style="font-size:0.8rem;color:var(--text-muted)">' + applied + '</td>' +
+        '<td><div style="display:flex;gap:6px">' +
+          '<button class="btn-sm" style="background:#16a34a;color:#fff;border:none;padding:5px 12px;border-radius:5px;cursor:pointer;font-size:0.8rem"' +
+            ' onclick="approveB2BApplication(\'' + p.id + '\',\'' + esc(p.first_name||'') + '\',\'' + esc(p.email||'') + '\')">✅ Approve</button>' +
+          '<button class="btn-sm" style="background:#ef4444;color:#fff;border:none;padding:5px 12px;border-radius:5px;cursor:pointer;font-size:0.8rem"' +
+            ' onclick="rejectB2BApplication(\'' + p.id + '\',\'' + esc(p.email||'') + '\')">✕ Reject</button>' +
+        '</div></td>' +
+        '</tr>';
+    }).join('') +
+    '</tbody></table></div>';
+}
+
+// ── Approve ───────────────────────────────────────────────────
+window.approveB2BApplication = async function(id, firstName, email) {
+  if (!confirm('Approve B2B application for ' + email + '?\n\nThis will set their account to B2B (Wholesale) and send them an approval email.')) return;
+  try {
+    await supaUpdate('customers', id, {
+      b2b_status: 'approved',
+      customer_type: 'b2b',
+      is_b2b: true,
+      b2b_approved_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
+    // Send approval email via Brevo
+    try {
+      await fetch(SUPA_URL + '/functions/v1/brevo-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'send_template',
+          email: email,
+          templateId: 0,   // fallback to htmlContent below if template not set
+          params: {}
+        })
+      }).catch(()=>{});
+      // Direct HTML email as fallback (always works)
+      const brevoUrl = 'https://api.brevo.com/v3/smtp/email';
+      await fetch(brevoUrl, {
+        method: 'POST',
+        headers: { 'api-key': window.BREVO_KEY || '', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender: { name: 'Sports Foods Ireland', email: 'brunoandrade13@yahoo.com.br' },
+          to: [{ email: email, name: firstName }],
+          subject: '🎉 Your B2B Account is Approved — Sports Foods Ireland',
+          htmlContent: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
+<div style="background:#1B4332;padding:24px 32px"><img src="https://sportsfoodsireland.ie/wp-content/uploads/2021/09/logo.png" alt="Sports Foods Ireland" height="48" style="display:block"></div>
+<div style="padding:32px">
+<h2 style="color:#169B62;margin:0 0 16px">Your Wholesale Account is Approved! 🎉</h2>
+<p>Hi <strong>${firstName}</strong>,</p>
+<p>Great news — your B2B wholesale account with Sports Foods Ireland has been <strong>approved</strong>!</p>
+<p>You can now log in to our <a href="https://sportsfoodsireland.ie/b2b/landing.html" style="color:#169B62;font-weight:600">B2B Portal</a> to access exclusive wholesale pricing on all our products.</p>
+<div style="margin:24px 0;text-align:center"><a href="https://sportsfoodsireland.ie/b2b/landing.html" style="background:#169B62;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:700;font-size:1rem">Access B2B Portal →</a></div>
+<p>If you have any questions, reply to this email or contact us at <a href="mailto:info@sportsfoodsireland.ie" style="color:#169B62">info@sportsfoodsireland.ie</a>.</p>
+<p>Welcome aboard!</p>
+</div></div>`
+        })
+      }).catch(()=>{});
+    } catch(_) {}
+    toast('✅ Approved! Email sent to ' + email, 'success');
+    b2bPendingData = b2bPendingData.filter(function(p) { return p.id !== id; });
+    renderB2BPending();
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+};
+
+// ── Reject ────────────────────────────────────────────────────
+window.rejectB2BApplication = async function(id, email) {
+  if (!confirm('Reject B2B application for ' + email + '?')) return;
+  try {
+    await supaUpdate('customers', id, {
+      b2b_status: 'rejected',
+      updated_at: new Date().toISOString()
+    });
+    toast('Application rejected for ' + email, 'info');
+    b2bPendingData = b2bPendingData.filter(function(p) { return p.id !== id; });
+    renderB2BPending();
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+};
 var el = document.getElementById('b2bActiveList');
 var search = (document.getElementById('b2bSearch')?.value || '').toLowerCase();
 var filtered = b2bGroups;
