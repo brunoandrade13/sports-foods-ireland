@@ -191,7 +191,7 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 
 <div class="wizard-actions">
 <button type="button" class="btn-b2b btn-outline-b2b" onclick="goToStep(1)">← Back</button>
-<button type="submit" class="btn-b2b" id="submitBtn">Submit Application</button>
+<button type="button" class="btn-b2b" id="submitBtn" onclick="submitB2BForm()">Submit Application</button>
 </div>
 </div>
 </form>
@@ -216,133 +216,113 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 <script src="js/sfi-api.min.js?v=13" defer></script>
 <script src="js/main.min.js?v=16" defer></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('b2bForm');
-  const errorEl = document.getElementById('formError');
+// ── Global constants ──────────────────────────────────────────
+var B2B_EDGE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co/functions/v1/b2b-register';
 
-  function showError(msg) {
-    errorEl.textContent = msg;
-    errorEl.style.display = 'block';
-    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-  function hideError() { errorEl.style.display = 'none'; }
-
-  // --- Wizard navigation ---
-  window.goToStep = function(step) {
-    hideError();
-    if (step === 2) {
-      // Validate step 1
-      const fields = ['b2bFirstName','b2bLastName','b2bEmail','b2bPassword','b2bConfirmPw','b2bCompany','b2bVat','b2bType','b2bVolume'];
-      for (const id of fields) {
-        const el = document.getElementById(id);
-        if (!el.value.trim()) { el.focus(); showError('Please fill in all required fields.'); return; }
-      }
-      const pw = document.getElementById('b2bPassword').value;
-      const cpw = document.getElementById('b2bConfirmPw').value;
-      if (pw.length < 8) { showError('Password must be at least 8 characters.'); return; }
-      if (!/[A-Z]/.test(pw)) { showError('Password must contain at least one uppercase letter.'); return; }
-      if (!/[a-z]/.test(pw)) { showError('Password must contain at least one lowercase letter.'); return; }
-      if (!/\d/.test(pw)) { showError('Password must contain at least one number.'); return; }
-      if (!/[^A-Za-z0-9]/.test(pw)) { showError('Password must contain at least one special character (e.g. !@#$%).'); return; }
-      if (pw !== cpw) { showError('Passwords do not match.'); return; }
-
-      // Build review summary
-      const data = getFormData();
-      document.getElementById('reviewSummary').innerHTML =
-        '<strong>Name:</strong> ' + data.firstName + ' ' + data.lastName + '<br>' +
-        '<strong>Email:</strong> ' + data.email + '<br>' +
-        '<strong>Company:</strong> ' + data.companyName + '<br>' +
-        '<strong>VAT:</strong> ' + data.vatNumber + '<br>' +
-        (data.website ? '<strong>Website:</strong> ' + data.website + '<br>' : '') +
-        '<strong>Business Type:</strong> ' + data.businessType + '<br>' +
-        '<strong>Expected Volume:</strong> ' + data.expectedVolume;
-    }
-    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('step' + step).classList.add('active');
-    document.getElementById('stepBar1').className = 'wizard-step ' + (step >= 1 ? 'done' : '');
-    document.getElementById('stepBar2').className = 'wizard-step ' + (step === 2 ? 'active' : '');
+// ── Helpers ───────────────────────────────────────────────────
+function b2bShowError(msg) {
+  var el = document.getElementById('formError');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function b2bHideError() {
+  var el = document.getElementById('formError');
+  if (el) el.style.display = 'none';
+}
+function b2bGetFormData() {
+  return {
+    firstName:      (document.getElementById('b2bFirstName')?.value  || '').trim(),
+    lastName:       (document.getElementById('b2bLastName')?.value   || '').trim(),
+    email:          (document.getElementById('b2bEmail')?.value      || '').trim(),
+    password:       (document.getElementById('b2bPassword')?.value   || ''),
+    companyName:    (document.getElementById('b2bCompany')?.value    || '').trim(),
+    vatNumber:      (document.getElementById('b2bVat')?.value        || '').trim(),
+    website:        (document.getElementById('b2bWebsite')?.value    || '').trim(),
+    businessType:   (document.getElementById('b2bType')?.value       || ''),
+    expectedVolume: (document.getElementById('b2bVolume')?.value     || ''),
+    about:          (document.getElementById('b2bAbout')?.value      || '').trim()
   };
+}
 
-  function getFormData() {
-    return {
-      firstName: document.getElementById('b2bFirstName').value.trim(),
-      lastName: document.getElementById('b2bLastName').value.trim(),
-      email: document.getElementById('b2bEmail').value.trim(),
-      password: document.getElementById('b2bPassword').value,
-      companyName: document.getElementById('b2bCompany').value.trim(),
-      vatNumber: document.getElementById('b2bVat').value.trim(),
-      website: document.getElementById('b2bWebsite').value.trim(),
-      businessType: document.getElementById('b2bType').value,
-      expectedVolume: document.getElementById('b2bVolume').value,
-      about: document.getElementById('b2bAbout').value.trim()
-    };
+// ── Wizard navigation ────────────────────────────────────────
+window.goToStep = function(step) {
+  b2bHideError();
+  if (step === 2) {
+    var required = ['b2bFirstName','b2bLastName','b2bEmail','b2bPassword','b2bConfirmPw','b2bCompany','b2bVat','b2bType','b2bVolume'];
+    for (var i = 0; i < required.length; i++) {
+      var el = document.getElementById(required[i]);
+      if (!el || !el.value.trim()) {
+        if (el) el.focus();
+        b2bShowError('Please fill in all required fields.'); return;
+      }
+    }
+    var pw  = document.getElementById('b2bPassword').value;
+    var cpw = document.getElementById('b2bConfirmPw').value;
+    if (pw.length < 8)                   { b2bShowError('Password must be at least 8 characters.');                              return; }
+    if (!/[A-Z]/.test(pw))               { b2bShowError('Password must contain at least one uppercase letter.');                 return; }
+    if (!/[a-z]/.test(pw))               { b2bShowError('Password must contain at least one lowercase letter.');                 return; }
+    if (!/\d/.test(pw))                  { b2bShowError('Password must contain at least one number.');                           return; }
+    if (!/[^A-Za-z0-9]/.test(pw))        { b2bShowError('Password must contain at least one special character (e.g. !@#$%).'); return; }
+    if (pw !== cpw)                      { b2bShowError('Passwords do not match.');                                               return; }
+    var d = b2bGetFormData();
+    document.getElementById('reviewSummary').innerHTML =
+      '<strong>Name:</strong> '            + d.firstName + ' ' + d.lastName + '<br>' +
+      '<strong>Email:</strong> '           + d.email + '<br>' +
+      '<strong>Company:</strong> '         + d.companyName + '<br>' +
+      '<strong>VAT:</strong> '             + d.vatNumber + '<br>' +
+      (d.website ? '<strong>Website:</strong> ' + d.website + '<br>' : '') +
+      '<strong>Business Type:</strong> '   + d.businessType + '<br>' +
+      '<strong>Expected Volume:</strong> ' + d.expectedVolume;
   }
+  document.querySelectorAll('.step-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('step' + step).classList.add('active');
+  document.getElementById('stepBar1').className = 'wizard-step ' + (step >= 1 ? 'done'   : '');
+  document.getElementById('stepBar2').className = 'wizard-step ' + (step === 2 ? 'active' : '');
+};
 
-  // --- Form submit --- calls Edge Function directly (no sfi lib dependency)
-  const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
+// ── Submit (called from onclick — no form submit event needed) ─
+window.submitB2BForm = async function() {
+  b2bHideError();
+  if (!document.getElementById('b2bTerms')?.checked) {
+    b2bShowError('Please agree to the Terms & Conditions.'); return;
+  }
+  var btn = document.getElementById('submitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
 
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    hideError();
-    if (!document.getElementById('b2bTerms').checked) {
-      showError('Please agree to the Terms & Conditions.'); return;
-    }
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Submitting...';
+  var data = b2bGetFormData();
+  try {
+    var resp = await fetch(B2B_EDGE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    var result = await resp.json();
 
-    const data = getFormData();
-    try {
-      const resp = await fetch(SUPA_URL + '/functions/v1/b2b-register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email:          data.email,
-          password:       data.password,
-          firstName:      data.firstName,
-          lastName:       data.lastName,
-          companyName:    data.companyName,
-          vatNumber:      data.vatNumber,
-          website:        data.website,
-          businessType:   data.businessType,
-          expectedVolume: data.expectedVolume,
-          about:          data.about
-        })
-      });
-
-      const result = await resp.json();
-
-      if (!resp.ok || !result.success) {
-        // email_exists → friendly message
-        if (result.error === 'email_exists' || (result.message || '').toLowerCase().includes('already registered')) {
-          showError('This email already has an account. If you have a Google account with this email, please sign in via Google and apply for B2B access from your account settings.');
-        } else {
-          showError(result.message || result.error || 'Something went wrong. Please try again.');
-        }
-        btn.disabled = false;
-        btn.textContent = 'Submit Application';
-        return;
+    if (!resp.ok || !result.success) {
+      var msg = result.message || result.error || 'Something went wrong. Please try again.';
+      if (result.error === 'email_exists' || msg.toLowerCase().includes('already registered')) {
+        msg = 'This email already has an account. If you registered via Google, sign in with Google and apply for B2B access from your account settings.';
       }
-
-      // Success (including already_registered case — application saved)
-      document.getElementById('formCard').style.display = 'none';
-      document.getElementById('successEmail').textContent = data.email;
-      document.getElementById('successCard').style.display = 'block';
-      document.getElementById('successCard').scrollIntoView({ behavior: 'smooth' });
-
-    } catch (err) {
-      btn.disabled = false;
-      btn.textContent = 'Submit Application';
-      const msg = (err.message || '').toLowerCase();
-      if (msg.includes('already registered') || msg.includes('already been registered')) {
-        showError('This email is already registered. Try signing in instead.');
-      } else {
-        showError(err.message || 'Something went wrong. Please try again.');
-      }
+      b2bShowError(msg);
+      if (btn) { btn.disabled = false; btn.textContent = 'Submit Application'; }
+      return;
     }
-  });
-});
+
+    // Success
+    document.getElementById('formCard').style.display = 'none';
+    document.getElementById('successEmail').textContent = data.email;
+    document.getElementById('successCard').style.display = 'block';
+    document.getElementById('successCard').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    b2bShowError((err && err.message) ? err.message : 'Network error. Please check your connection and try again.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit Application'; }
+  }
+};
 </script>
+
 <script src="js/brevo-integration.min.js" defer></script>
 <script>
 if('serviceWorker' in navigator){
