@@ -131,9 +131,9 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 
 <div class="form-row">
 <div class="form-group">
-<label for="b2bVat">VAT Number *</label>
-<input type="text" id="b2bVat" required aria-required="true" placeholder="IE1234567T">
-<small>Irish or EU VAT number</small>
+<label for="b2bVat">VAT Number</label>
+<input type="text" id="b2bVat" placeholder="IE1234567T">
+<small>Irish or EU VAT number (optional)</small>
 </div>
 <div class="form-group">
 <label for="b2bWebsite">Business Website</label>
@@ -250,7 +250,7 @@ function b2bGetFormData() {
 window.goToStep = function(step) {
   b2bHideError();
   if (step === 2) {
-    var required = ['b2bFirstName','b2bLastName','b2bEmail','b2bPassword','b2bConfirmPw','b2bCompany','b2bVat','b2bType','b2bVolume'];
+    var required = ['b2bFirstName','b2bLastName','b2bEmail','b2bPassword','b2bConfirmPw','b2bCompany','b2bType','b2bVolume'];
     for (var i = 0; i < required.length; i++) {
       var el = document.getElementById(required[i]);
       if (!el || !el.value.trim()) {
