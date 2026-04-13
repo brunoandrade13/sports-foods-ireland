@@ -81,3 +81,6 @@ relatorio_roi_consolidado.html
 # === Ficheiros sensíveis a excluir do deploy ===
 deploy.sh
 .env.example
+coverage/
+*.bak-*
+node_modules/
