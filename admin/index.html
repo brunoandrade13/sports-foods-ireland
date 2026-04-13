@@ -13895,12 +13895,32 @@ async function sendInvoiceByEmail() {
   // Find customer email
   const bill = order.billing_address || {};
   let email = order.email || bill.email || '';
-  if (!email && order.customer_id) {
+  let ccEmails = [];
+  if (order.customer_id) {
     const cust = (allCustomers || []).find(c => c.id === order.customer_id);
-    if (cust) email = cust.email || '';
+    if (cust) {
+      if (!email) email = cust.email || '';
+      // If this parent has CC emails, use them
+      if (cust.invoice_cc_emails) {
+        ccEmails = cust.invoice_cc_emails.split(',').map(e => e.trim()).filter(e => e && e !== email);
+      }
+    }
+    // If customer is a child (order linked to branch), find parent's CC emails
+    var parentId = window.customerIdToGroupId ? window.customerIdToGroupId[order.customer_id] : null;
+    if (parentId && parentId !== order.customer_id) {
+      var parent = (allCustomers || []).find(c => c.id === parentId);
+      if (parent) {
+        if (!email) email = order.customer_email || (bill || {}).email || '';
+        if (parent.invoice_cc_emails) {
+          ccEmails = parent.invoice_cc_emails.split(',').map(e => e.trim()).filter(e => e && e !== email);
+        }
+      }
+    }
   }
   if (!email) { email = prompt('Customer email not found. Enter email:'); if (!email) return; }
-  const confirmed = confirm('Send Invoice ' + invNum + ' to ' + email + '?');
+  var confirmMsg = 'Send Invoice ' + invNum + ' to ' + email;
+  if (ccEmails.length > 0) confirmMsg += '\nCC: ' + ccEmails.join(', ');
+  const confirmed = confirm(confirmMsg + '?');
   if (!confirmed) return;
   const btn = document.querySelector('[onclick*="sendInvoiceByEmail"]');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
@@ -13924,6 +13944,7 @@ async function sendInvoiceByEmail() {
       body: JSON.stringify({
         action: 'send_invoice',
         email: email,
+        ccEmails: ccEmails.length > 0 ? ccEmails : undefined,
         customerName: customerName,
         subject: 'Invoice ' + invNum + ' — Sports Foods Ireland',
         htmlContent: htmlContent,
@@ -13933,7 +13954,7 @@ async function sendInvoiceByEmail() {
     });
     const data = await res.json();
     if (data.success) {
-      toast('Invoice ' + invNum + ' sent to ' + email);
+      toast('Invoice ' + invNum + ' sent to ' + email + (ccEmails.length > 0 ? ' (CC: ' + ccEmails.join(', ') + ')' : ''));
     } else {
       alert('Failed to send: ' + (data.message || 'Unknown error'));
     }
