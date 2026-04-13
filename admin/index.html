@@ -13918,9 +13918,9 @@ async function sendInvoiceByEmail() {
       '<p>Thank you for your business!</p>' +
       '<p style="color:#666;margin-top:24px">Sports Foods Ireland Ltd<br>Unit 12, Northwest Business Park, Blanchardstown<br>Dublin D15 YC53</p>' +
       '</div></div>';
-    const res = await fetch(SUPABASE_URL + '/functions/v1/brevo-proxy', {
+    const res = await fetch(SUPA_URL + '/functions/v1/brevo-proxy', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPA_KEY },
       body: JSON.stringify({
         action: 'send_invoice',
         email: email,
@@ -15727,9 +15727,9 @@ async function sendSingleStatement(idx) {
   const btn = event.target; btn.disabled = true; btn.textContent = '...';
   try {
     const htmlContent = buildStatementHTML(d);
-    const res = await fetch(SUPABASE_URL + '/functions/v1/brevo-proxy', {
+    const res = await fetch(SUPA_URL + '/functions/v1/brevo-proxy', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPA_KEY },
       body: JSON.stringify({ action: 'send_statement', email: email, customerName: [d.customer.first_name, d.customer.last_name].filter(Boolean).join(' '), subject: 'Monthly Statement — ' + monthName + ' ' + year + ' — Sports Foods Ireland', htmlContent: htmlContent })
     });
     const data = await res.json();
@@ -15754,9 +15754,9 @@ async function sendSelectedStatements() {
     if (!d.customer.email) { failed++; continue; }
     try {
       const htmlContent = buildStatementHTML(d);
-      const res = await fetch(SUPABASE_URL + '/functions/v1/brevo-proxy', {
+      const res = await fetch(SUPA_URL + '/functions/v1/brevo-proxy', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPA_KEY },
         body: JSON.stringify({ action: 'send_statement', email: d.customer.email, customerName: [d.customer.first_name, d.customer.last_name].filter(Boolean).join(' '), subject: 'Monthly Statement — ' + monthName + ' ' + year + ' — Sports Foods Ireland', htmlContent: htmlContent })
       });
       const data = await res.json();
