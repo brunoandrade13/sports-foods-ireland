@@ -11756,14 +11756,14 @@ Loading items...
       if (order.tracking_number) {
         glsBtn.textContent = '✅ Shipped: ' + order.tracking_number;
         glsBtn.disabled = true;
+        // Always show Print Label for shipped orders
+        lblBtn.style.display = 'inline-block';
         // Fetch label on-demand if not cached
         if (!_glsLabelBase64) {
           supaGet('orders', '?id=eq.' + order.id + '&select=gls_label_base64').then(function(rows) {
             if (rows && rows[0] && rows[0].gls_label_base64) {
               _glsLabelBase64 = rows[0].gls_label_base64;
               order.gls_label_base64 = _glsLabelBase64;
-              var lb = document.getElementById('btnGlsLabel');
-              if (lb) lb.style.display = 'inline-block';
             }
           }).catch(function(){});
         }
@@ -11771,7 +11771,8 @@ Loading items...
         glsBtn.textContent = '📦 Ship via GLS';
         glsBtn.disabled = false;
       }
-      lblBtn.style.display = _glsLabelBase64 ? 'inline-block' : 'none';
+      // For unshipped orders, hide label button; for shipped orders it's already visible
+      if (!order.tracking_number) lblBtn.style.display = 'none';
 
       try {
         const items = await supaGet('order_items', `?order_id=eq.${order.id}`);
@@ -13598,8 +13599,21 @@ window.shipViaGLS = async function shipViaGLS() {
   }
 };
 
-window.downloadGLSLabel = function downloadGLSLabel() {
-  if (!_glsLabelBase64) { toast('No label available', 'error'); return; }
+window.downloadGLSLabel = async function downloadGLSLabel() {
+  // Fetch from DB if not in memory
+  if (!_glsLabelBase64) {
+    var order = window._currentModalOrder;
+    if (order && order.id) {
+      try {
+        var rows = await supaGet('orders', '?id=eq.' + order.id + '&select=gls_label_base64');
+        if (rows && rows[0] && rows[0].gls_label_base64) {
+          _glsLabelBase64 = rows[0].gls_label_base64;
+          order.gls_label_base64 = _glsLabelBase64;
+        }
+      } catch(e) { console.error('[GLS] Failed to fetch label:', e); }
+    }
+  }
+  if (!_glsLabelBase64) { toast('No label available for this order. It may have been created before label storage was enabled.', 'error'); return; }
   try {
     const binary = atob(_glsLabelBase64);
     const bytes  = new Uint8Array(binary.length);
