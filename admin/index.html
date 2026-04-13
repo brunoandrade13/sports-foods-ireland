@@ -4259,6 +4259,7 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 <div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">VAT Number</label><input type="text" id="cpVatNumber" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
 <div style="grid-column:1/-1"><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Address</label><input type="text" id="cpAddress" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
 <div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">City</label><input type="text" id="cpCity" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Postcode / Eircode</label><input type="text" id="cpPostcode" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
 <div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Country</label><input type="text" id="cpCountry" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
 <div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Invoice CC Emails</label><input type="text" id="cpCcEmails" placeholder="email1@..., email2@..." style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
 <div style="grid-column:1/-1"><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Notes</label><textarea id="cpNotes" rows="2" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color);resize:vertical"></textarea></div>
@@ -11361,6 +11362,7 @@ Loading items...
       document.getElementById('cpVatNumber').value = cust.b2b_vat_number || '';
       document.getElementById('cpAddress').value = cust.address || '';
       document.getElementById('cpCity').value = cust.city || '';
+      document.getElementById('cpPostcode').value = cust.postcode || '';
       document.getElementById('cpCountry').value = cust.country || '';
       document.getElementById('cpCcEmails').value = cust.invoice_cc_emails || '';
       document.getElementById('cpNotes').value = cust.notes || '';
@@ -12441,6 +12443,7 @@ Loading items...
       const vatNumber = document.getElementById('cpVatNumber').value.trim();
       const address = document.getElementById('cpAddress').value.trim();
       const city = document.getElementById('cpCity').value.trim();
+      const postcode = document.getElementById('cpPostcode').value.trim();
       const country = document.getElementById('cpCountry').value.trim();
       const ccEmails = document.getElementById('cpCcEmails').value.trim();
       const notes = document.getElementById('cpNotes').value.trim();
@@ -12457,12 +12460,13 @@ Loading items...
           b2b_vat_number: vatNumber || null,
           address: address || null,
           city: city || null,
+          postcode: postcode || null,
           country: country || null,
           invoice_cc_emails: ccEmails || null,
           notes: notes || null,
           updated_at: new Date().toISOString()
         });
-        Object.assign(cust, { first_name: firstName, last_name: lastName, display_name: displayName, b2b_company_name: companyName, company: companyName || cust.company, email: email, phone: phone, b2b_vat_number: vatNumber, address: address, city: city, country: country, invoice_cc_emails: ccEmails, notes: notes });
+        Object.assign(cust, { first_name: firstName, last_name: lastName, display_name: displayName, b2b_company_name: companyName, company: companyName || cust.company, email: email, phone: phone, b2b_vat_number: vatNumber, address: address, city: city, postcode: postcode, country: country, invoice_cc_emails: ccEmails, notes: notes });
         document.getElementById('cpTitle').textContent = 'Profile: ' + displayName;
         toast('Customer saved', 'success');
         renderCustomers();
