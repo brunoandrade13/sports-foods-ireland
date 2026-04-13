@@ -13585,8 +13585,13 @@ window.shipViaGLS = async function shipViaGLS() {
   const city     = addr.city || '';
   const zipCode  = addr.postcode || addr.postal_code || addr.zip || '';
   const country  = addr.country_code || addr.country || 'IE';
-  const phone    = addr.phone || order.customer_phone || '';
-  const email    = order.customer_email || addr.email || '';
+  const phone    = addr.phone || bill.phone || order.customer_phone || '';
+  let email      = order.customer_email || bill.email || ship.email || addr.email || '';
+  // Fallback: get email from customer record if still empty
+  if (!email && order.customer_id) {
+    const cust = (allCustomers || []).find(c => c.id === order.customer_id);
+    if (cust && cust.email) email = cust.email;
+  }
 
   if (!street || !city || !zipCode) {
     if (btn) { btn.disabled = false; btn.textContent = '📦 Ship via GLS'; }
