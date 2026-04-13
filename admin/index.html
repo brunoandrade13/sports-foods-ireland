@@ -11750,17 +11750,28 @@ Loading items...
       document.getElementById('orderModal').style.zIndex = '200';
       // Populate tracking and reset GLS button state
       document.getElementById('omTrackingNumber').value = order.tracking_number || '';
-      _glsLabelBase64 = null;
+      _glsLabelBase64 = order.gls_label_base64 || null;
       var glsBtn = document.getElementById('btnGlsShip');
       var lblBtn = document.getElementById('btnGlsLabel');
       if (order.tracking_number) {
         glsBtn.textContent = '✅ Shipped: ' + order.tracking_number;
         glsBtn.disabled = true;
+        // Fetch label on-demand if not cached
+        if (!_glsLabelBase64) {
+          supaGet('orders', '?id=eq.' + order.id + '&select=gls_label_base64').then(function(rows) {
+            if (rows && rows[0] && rows[0].gls_label_base64) {
+              _glsLabelBase64 = rows[0].gls_label_base64;
+              order.gls_label_base64 = _glsLabelBase64;
+              var lb = document.getElementById('btnGlsLabel');
+              if (lb) lb.style.display = 'inline-block';
+            }
+          }).catch(function(){});
+        }
       } else {
         glsBtn.textContent = '📦 Ship via GLS';
         glsBtn.disabled = false;
       }
-      lblBtn.style.display = 'none';
+      lblBtn.style.display = _glsLabelBase64 ? 'inline-block' : 'none';
 
       try {
         const items = await supaGet('order_items', `?order_id=eq.${order.id}`);
@@ -13543,18 +13554,22 @@ window.shipViaGLS = async function shipViaGLS() {
     // Save tracking number to order
     if (trackId) {
       try {
-        await supaUpdate('orders', order.id, {
+        var updateData = {
           tracking_number: trackId,
           fulfillment_status: 'fulfilled',
           updated_at: new Date().toISOString()
-        });
+        };
+        if (result.label_pdf_base64) updateData.gls_label_base64 = result.label_pdf_base64;
+        await supaUpdate('orders', order.id, updateData);
         // Update in-memory cache
         const idx = allOrders.findIndex(function(o) { return o.id === order.id; });
         if (idx >= 0) {
           allOrders[idx].tracking_number = trackId;
           allOrders[idx].fulfillment_status = 'fulfilled';
+          if (result.label_pdf_base64) allOrders[idx].gls_label_base64 = result.label_pdf_base64;
         }
         window._currentModalOrder.tracking_number = trackId;
+        if (result.label_pdf_base64) window._currentModalOrder.gls_label_base64 = result.label_pdf_base64;
         // Update tracking input in modal
         const trackInput = document.getElementById('omTrackingNumber');
         if (trackInput) trackInput.value = trackId;
