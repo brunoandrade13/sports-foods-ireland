@@ -13545,14 +13545,14 @@ window.shipViaGLS = async function shipViaGLS() {
       try {
         await supaUpdate('orders', order.id, {
           tracking_number: trackId,
-          shipping_status: 'shipped',
+          fulfillment_status: 'fulfilled',
           updated_at: new Date().toISOString()
         });
         // Update in-memory cache
         const idx = allOrders.findIndex(function(o) { return o.id === order.id; });
         if (idx >= 0) {
           allOrders[idx].tracking_number = trackId;
-          allOrders[idx].shipping_status = 'shipped';
+          allOrders[idx].fulfillment_status = 'fulfilled';
         }
         window._currentModalOrder.tracking_number = trackId;
         // Update tracking input in modal
