@@ -13749,8 +13749,9 @@ var preDiscountVal = parseFloat((document.getElementById('omDiscountValue') || {
 var preDiscountType = (document.getElementById('omDiscountType') || {}).value || 'percent';
 var preDiscountAmt = preDiscountVal > 0 ? (preDiscountType === 'percent' ? preSubtotal * preDiscountVal / 100 : preDiscountVal) : 0;
 preDiscountAmt = Math.min(preDiscountAmt, preSubtotal);
-var preVat = Math.round((preSubtotal - preDiscountAmt) * 23) / 100;
-var preTotal = (preSubtotal - preDiscountAmt) + preVat;
+var preShipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
+var preVat = Math.round((preSubtotal - preDiscountAmt + preShipping) * 23) / 100;
+var preTotal = (preSubtotal - preDiscountAmt) + preShipping + preVat;
 var detF = [['INVOICE NO.', invNum], ['DATE', fmtD(invDate)], ['TOTAL DUE', 'EUR ' + fmtM(preTotal)], ['DUE DATE', fmtD(dueDate)], ['TERMS', 'Net 30'], ['ENCLOSED', '']];
 var dCW = [CW*0.22, CW*0.13, CW*0.17, CW*0.15, CW*0.13, CW*0.20];
 doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
@@ -13823,7 +13824,8 @@ if (discountVal > 0) {
 var discountedSubtotal = subtotal - discountAmount;
 
 // ---- TOTALS ----
-var vatTotal = Math.round(discountedSubtotal * 23) / 100, total = discountedSubtotal + vatTotal;
+var shipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
+var vatTotal = Math.round((discountedSubtotal + shipping) * 23) / 100, total = discountedSubtotal + shipping + vatTotal;
 checkPage(100);
 var tx = ML + CW - 200;
 var totalsRows = [['SUBTOTAL', fmtM(subtotal)]];
@@ -13832,6 +13834,7 @@ if (discountAmount > 0) {
   totalsRows.push([discLabel, '-' + fmtM(discountAmount)]);
   totalsRows.push(['NET TOTAL', fmtM(discountedSubtotal)]);
 }
+if (shipping > 0) totalsRows.push(['SHIPPING', fmtM(shipping)]);
 totalsRows.push(['VAT @ 23%', fmtM(vatTotal)]);
 totalsRows.push(['TOTAL', fmtM(total)]);
 totalsRows.forEach(function(r) {
@@ -13852,7 +13855,7 @@ doc.setFillColor(224,224,224); doc.rect(ML, y, taxTW, 14, 'F'); doc.setDrawColor
 doc.setFont('helvetica','bold'); doc.setFontSize(7); var txp = ML; ['RATE', 'TAX', 'NET'].forEach(function(h, i) { doc.text(h, txp + 4, y + 10); txp += taxCW[i]; }); y += 14;
 doc.setDrawColor(204,204,204); doc.rect(ML, y, taxTW, 14, 'S');
 doc.setFont('helvetica','normal'); doc.setFontSize(8); txp = ML;
-doc.text('VAT @ 23%', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(vatTotal), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(subtotal), txp + 4, y + 10);
+doc.text('VAT @ 23%', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(vatTotal), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(discountedSubtotal + shipping), txp + 4, y + 10);
 
 // ---- Footer on last page ----
 addFooter();
