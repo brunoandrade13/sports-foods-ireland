@@ -7004,7 +7004,7 @@ Loading items...
           supaGet('discount_codes', '?order=created_at.desc'),
           supaGet('variant_types', '?order=sort_order').catch(() => []),
           supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => []),
-          supaGetAll('customers', '?parent_customer_id=is.null&order=created_at.desc').catch(() => []),
+          supaGetAll('customers', '?order=created_at.desc').catch(() => []),
           loadOrdersSmart(),
           supaGet('zone3_customer_discounts', '?is_active=eq.true&select=*').catch(() => [])
         ]);
@@ -7044,8 +7044,7 @@ Loading items...
 
         // Customer group aggregation (essential for dashboard revenue)
         try {
-          const childRows = await supaGetAll('customers', '?parent_customer_id=not.is.null&select=id,parent_customer_id,email').catch(() => []);
-          const childList = Array.isArray(childRows) ? childRows : [];
+          const childList = allCustomers.filter(c => c.parent_customer_id);
           const parentIds = new Set(childList.map(r => r.parent_customer_id).filter(Boolean));
           const parentToChildren = {};
           childList.forEach(ch => {
@@ -7058,12 +7057,9 @@ Loading items...
           window.customerIdToGroupId = {};
           window.emailToGroupId = {};
           allCustomers.forEach(c => {
-            window.customerIdToGroupId[c.id] = c.id;
-            if (c.email) window.emailToGroupId[(c.email || '').trim().toLowerCase()] = c.id;
-          });
-          childList.forEach(ch => {
-            window.customerIdToGroupId[ch.id] = ch.parent_customer_id;
-            if (ch.email) window.emailToGroupId[(ch.email || '').trim().toLowerCase()] = ch.parent_customer_id;
+            const groupId = c.parent_customer_id || c.id;
+            window.customerIdToGroupId[c.id] = groupId;
+            if (c.email) window.emailToGroupId[(c.email || '').trim().toLowerCase()] = groupId;
           });
 
           const ordersList = Array.isArray(ords) ? ords : [];
@@ -11259,7 +11255,7 @@ Loading items...
     // CUSTOMERS
     // ============================================================
     function renderCustomers() {
-      if (document.getElementById('custTotal')) document.getElementById('custTotal').textContent = allCustomers.length;
+      if (document.getElementById('custTotal')) document.getElementById('custTotal').textContent = allCustomers.filter(c => !c.parent_customer_id).length;
 
       // Total Revenue = mesma fonte do dashboard (sum of paid orders) to avoid divergence
       const paidStatuses = ['paid', 'partially_refunded', 'partially_paid'];
@@ -11320,10 +11316,11 @@ Loading items...
           const isB2B = c.customer_type === 'b2b';
           const typeBadge = isB2B ? '<span class="stock-badge in" style="background:#4b0082;color:white;">B2B</span>' : '<span class="stock-badge out">B2C</span>';
           const groupBadge = c._isGroupParent ? '<span class="stock-badge in" style="background:#0e7490;color:white;" title="Group account with subsidiary accounts">👥 Group</span>' : '';
+          const branchBadge = c.parent_customer_id ? '<span class="stock-badge in" style="background:#6d28d9;color:white;" title="Branch/subsidiary account">🏪 Branch</span>' : '';
           const created = c.created_at ? new Date(c.created_at).toLocaleDateString() : '—';
           const lastBuy = c.last_order_at ? new Date(c.last_order_at).toLocaleDateString() : '—';
           return `<tr>
-              <td style="min-width:260px"><strong style="cursor:pointer;color:var(--primary-color);text-decoration:underline;display:block;margin-bottom:3px" onclick="viewCustomerProfile('${c.id}')">${esc(name)}</strong><div style="display:flex;gap:4px;flex-wrap:wrap">${typeBadge}${groupBadge}</div></td>
+              <td style="min-width:260px"><strong style="cursor:pointer;color:var(--primary-color);text-decoration:underline;display:block;margin-bottom:3px" onclick="viewCustomerProfile('${c.id}')">${esc(name)}</strong><div style="display:flex;gap:4px;flex-wrap:wrap">${typeBadge}${groupBadge}${branchBadge}</div></td>
               <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(c.email || '')}">${esc(c.email || '—')}</td>
               <td>${c._display_orders || c.total_orders || 0}</td>
               <td class="price">€${(c._display_spent || c.total_spent_eur || 0).toFixed(2)}</td>
@@ -12638,6 +12635,9 @@ Loading items...
         if (typeFilter === 'b2b' && !isB2B) return false;
         if (typeFilter === 'b2c' && isB2B) return false;
 
+        // Hide child/branch customers when NOT searching (show grouped view)
+        if (!search && c.parent_customer_id) return false;
+
         // Name / Email search
         if (search) {
           const name = [c.first_name, c.last_name].filter(Boolean).join(' ').toLowerCase();
@@ -12645,14 +12645,7 @@ Loading items...
           const company = (c.b2b_company_name || c.company || '').toLowerCase();
           const email = (c.email || '').toLowerCase();
           const phone = (c.phone || '').toLowerCase();
-          // Also check child/group emails
-          let childMatch = false;
-          if (c._isGroupParent && window.emailToGroupId) {
-            for (const [em, pid] of Object.entries(window.emailToGroupId)) {
-              if (pid === c.id && em.includes(search)) { childMatch = true; break; }
-            }
-          }
-          if (!name.includes(search) && !dname.includes(search) && !company.includes(search) && !email.includes(search) && !phone.includes(search) && !childMatch) return false;
+          if (!name.includes(search) && !dname.includes(search) && !company.includes(search) && !email.includes(search) && !phone.includes(search)) return false;
         }
 
         // Value / Orders search
