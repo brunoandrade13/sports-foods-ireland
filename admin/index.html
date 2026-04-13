@@ -13538,7 +13538,7 @@ window.shipViaGLS = async function shipViaGLS() {
       throw new Error(result.error || ('GLS error ' + resp.status));
     }
 
-    const trackId = result.track_id || result.parcel_number || '';
+    const trackId = result.parcel_number || result.track_id || '';
 
     // Save tracking number to order
     if (trackId) {
