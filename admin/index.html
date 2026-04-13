@@ -3388,6 +3388,10 @@ style="font-size:0.8rem;padding:4px 8px">
     style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">
     ⏳ Pending Applications <span id="b2bPendingTabCount" style="background:#ef4444;color:#fff;border-radius:999px;padding:1px 7px;font-size:0.75rem;margin-left:4px;display:none">0</span>
   </button>
+  <button id="b2bTabZone3" onclick="switchB2BTab('zone3')"
+    style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">
+    🏷️ Zone3 Discounts
+  </button>
 </div>
 
 <!-- APPROVED tab -->
@@ -3410,6 +3414,84 @@ style="font-size:0.8rem;padding:4px 8px">
       <button class="btn-sm btn-outline" onclick="loadB2BPending()">🔄 Refresh</button>
     </div>
     <div id="b2bPendingList">Loading...</div>
+  </div>
+</div>
+
+<!-- ZONE3 DISCOUNTS tab -->
+<div id="b2bTabContentZone3" style="display:none">
+  <div class="detail-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <h3 style="margin:0">Zone3 Customer Discounts</h3>
+        <p style="margin:4px 0 0;font-size:0.85rem;color:var(--text-muted)">Descontos automáticos aplicados em facturas com produtos Zone3, para clientes B2B específicos.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openZone3Modal()">+ Add Discount</button>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:var(--surface-2);font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
+          <th style="padding:10px 12px;text-align:left">Customer</th>
+          <th style="padding:10px 12px;text-align:left">Email</th>
+          <th style="padding:10px 12px;text-align:center">Discount</th>
+          <th style="padding:10px 12px;text-align:center">Status</th>
+          <th style="padding:10px 12px;text-align:left">Notes</th>
+          <th style="padding:10px 12px;text-align:center">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="zone3DiscountsTable">
+        <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ZONE3 DISCOUNT MODAL -->
+<div class="modal-overlay" id="zone3DiscountModal" onclick="if(event.target===this)closeZone3Modal()">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h3 id="zone3ModalTitle">Add Zone3 Discount</h3>
+      <button class="modal-close" onclick="closeZone3Modal()">&times;</button>
+    </div>
+    <div class="modal-body" style="padding:24px;display:flex;flex-direction:column;gap:16px">
+      <input type="hidden" id="zone3DiscId">
+      <div class="form-group">
+        <label style="font-size:0.85rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Customer B2B *</label>
+        <select id="zone3CustomerId"
+          style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem">
+          <option value="">— Select customer —</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px">
+        <div class="form-group" style="flex:1">
+          <label style="font-size:0.85rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Type *</label>
+          <select id="zone3DiscType" onchange="zone3PreviewDisc()"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem">
+            <option value="percent">% Percentage</option>
+            <option value="value">€ Fixed value</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label style="font-size:0.85rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Value *</label>
+          <input type="number" id="zone3DiscValue" min="0.01" step="0.01" placeholder="e.g. 10"
+            oninput="zone3PreviewDisc()"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem">
+        </div>
+      </div>
+      <div id="zone3DiscPreview" style="font-size:0.85rem;color:#4ade80;font-weight:600;min-height:18px"></div>
+      <div class="form-group">
+        <label style="font-size:0.85rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Notes (optional)</label>
+        <input type="text" id="zone3DiscNotes" placeholder="e.g. Agreed with customer on 12/2025"
+          style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="zone3DiscActive" checked style="width:16px;height:16px;accent-color:var(--accent)">
+        <label for="zone3DiscActive" style="font-size:0.9rem">Active</label>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end;gap:8px">
+      <button class="btn btn-outline" onclick="closeZone3Modal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveZone3Discount()">Save</button>
+    </div>
   </div>
 </div>
 
@@ -4327,6 +4409,20 @@ Loading items...
 <input type="text" id="omTrackingNumber" placeholder="e.g. GLS-123456789" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem">
 </div>
 <div style="font-size:0.8rem;color:var(--text-muted)">☑ Check the items above to include in the invoice. Unchecked items will remain as back order.</div>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px">
+  <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);white-space:nowrap">🏷️ Invoice Discount</span>
+  <input type="number" id="omDiscountValue" placeholder="0" min="0" step="0.01"
+    style="width:90px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:0.9rem"
+    oninput="updateDiscountPreview()">
+  <select id="omDiscountType" onchange="updateDiscountPreview()"
+    style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:0.9rem">
+    <option value="percent">%</option>
+    <option value="value">€ (value)</option>
+  </select>
+  <span id="omDiscountPreview" style="font-size:0.82rem;color:#4ade80;font-weight:600;min-width:120px"></span>
+  <button class="btn" onclick="document.getElementById('omDiscountValue').value='';updateDiscountPreview()"
+    style="padding:5px 10px;font-size:0.78rem;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;border-radius:6px">Clear</button>
+</div>
 <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
 <button class="btn btn-outline" style="border-color:var(--border)" id="btnGlsShip" onclick="shipViaGLS()">📦 Ship via GLS</button>
 <button class="btn btn-outline" style="border-color:var(--border);display:none" id="btnGlsLabel" onclick="downloadGLSLabel()">🏷️ Print Label</button>
@@ -4404,6 +4500,7 @@ Loading items...
     let allSuppliers = [];
     let allInvoices = [], filteredInvoices = [];
     let brands = [], categories = [], subcategories = [], discountCodes = [];
+    let allZone3Discounts = [];
     let allCustomers = [], filteredCustomers = [];
     let allOrders = [], filteredOrders = [];
     let allReviews = [], filteredReviews = [];
@@ -6875,7 +6972,7 @@ Loading items...
     async function loadAllData() {
       try {
         // ── PHASE 1: Essential data (products + catalog + orders + customers) ──
-        const [prods, br, cats, subcats, dc, vt, pv, custs, ords] = await Promise.all([
+        const [prods, br, cats, subcats, dc, vt, pv, custs, ords, z3disc] = await Promise.all([
           supaGet('products', '?select=*,brands(name),categories(name)&is_active=eq.true&order=name'),
           supaGet('brands', '?order=name'),
           supaGet('categories', '?order=name'),
@@ -6884,7 +6981,8 @@ Loading items...
           supaGet('variant_types', '?order=sort_order').catch(() => []),
           supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => []),
           supaGetAll('customers', '?parent_customer_id=is.null&order=created_at.desc').catch(() => []),
-          loadOrdersSmart()
+          loadOrdersSmart(),
+          supaGet('zone3_customer_discounts', '?is_active=eq.true&select=*').catch(() => [])
         ]);
 
         allProducts = (prods || []).filter(p => p.is_active !== false);
@@ -6893,6 +6991,7 @@ Loading items...
         categories = cats || [];
         subcategories = subcats || [];
         discountCodes = dc || [];
+        allZone3Discounts = z3disc || [];
         variantTypes = (vt && vt.length) ? vt : DEFAULT_VARIANT_TYPES;
 
         // Build variant cache
@@ -11719,6 +11818,42 @@ Loading items...
       } catch (e) {
         wrapper.innerHTML = '<div style="color:#d32f2f">Failed to load order items.</div>';
       }
+
+      // ---- AUTO-APPLY Zone3 customer discount ----
+      try {
+        // Reset discount fields first
+        const dvEl = document.getElementById('omDiscountValue');
+        const dtEl = document.getElementById('omDiscountType');
+        if (dvEl) dvEl.value = '';
+        if (dtEl) dtEl.value = 'percent';
+        if (typeof updateDiscountPreview === 'function') updateDiscountPreview();
+
+        // Only apply for B2B customers
+        const custForDisc = matchedCust || null;
+        if (custForDisc && custForDisc.customer_type === 'b2b' && allZone3Discounts.length > 0) {
+          const z3rule = allZone3Discounts.find(r => r.customer_id === custForDisc.id && r.is_active !== false);
+          if (z3rule) {
+            // Check if order has any Zone3 products
+            const orderItems = window._currentOrderItemsForInvoice || [];
+            const hasZone3 = orderItems.some(function(it) {
+              const name = (it.product_name || '').toLowerCase();
+              const sku  = (it.product_sku || it.sku || '').toLowerCase();
+              return name.includes('zone3') || name.includes('zone 3') || sku.startsWith('z3') || sku.includes('zone3');
+            });
+            if (hasZone3) {
+              if (dvEl) dvEl.value = z3rule.discount_value;
+              if (dtEl) dtEl.value = z3rule.discount_type;
+              if (typeof updateDiscountPreview === 'function') updateDiscountPreview();
+              // Show a small notification
+              const prevEl = document.getElementById('omDiscountPreview');
+              if (prevEl) {
+                const custName = [custForDisc.first_name, custForDisc.last_name].filter(Boolean).join(' ') || custForDisc.email || '';
+                prevEl.innerHTML = (prevEl.textContent || '') + ' <span style="color:#fbbf24;font-size:0.75rem">⚡ Zone3 auto</span>';
+              }
+            }
+          }
+        }
+      } catch(e) { /* silent */ }
     }
 
     function getB2BPriceForCustomer(product, customerId) {
@@ -13453,6 +13588,37 @@ window.downloadGLSLabel = function downloadGLSLabel() {
   }
 };
 
+// ---- Invoice Discount Preview ----
+function updateDiscountPreview() {
+  const valEl = document.getElementById('omDiscountValue');
+  const typeEl = document.getElementById('omDiscountType');
+  const previewEl = document.getElementById('omDiscountPreview');
+  if (!valEl || !typeEl || !previewEl) return;
+  const val = parseFloat(valEl.value) || 0;
+  const type = typeEl.value || 'percent';
+  if (val <= 0) { previewEl.textContent = ''; return; }
+  let subtotal = 0;
+  const cbs = document.querySelectorAll('.om-item-cb');
+  if (cbs.length > 0) {
+    cbs.forEach(function(cb) {
+      if (!cb.checked) return;
+      const item = (window._currentOrderItemsForInvoice || [])[parseInt(cb.dataset.idx)];
+      if (item) subtotal += (parseInt(item.quantity) || 1) * (parseFloat(item.unit_price) || 0);
+    });
+  } else {
+    (window._currentOrderItemsForInvoice || []).forEach(function(it) {
+      subtotal += (parseInt(it.quantity) || 1) * (parseFloat(it.unit_price) || 0);
+    });
+  }
+  if (subtotal <= 0 && window._currentOrderForInvoice)
+    subtotal = parseFloat(window._currentOrderForInvoice.total) || 0;
+  const discAmt = type === 'percent' ? subtotal * val / 100 : Math.min(val, subtotal);
+  previewEl.textContent = type === 'percent'
+    ? '−€' + discAmt.toFixed(2) + ' (' + val + '% off)'
+    : '−€' + discAmt.toFixed(2) + ' off';
+  previewEl.style.color = '#4ade80';
+}
+
 async function generateInvoicePDFFromModal(options) {
 try {
 const titleEl = document.getElementById('omTitle');
@@ -13549,8 +13715,12 @@ y += 16 + Math.max(formatAddr(bill, company).length, formatAddr(ship, company).l
 
 // ---- INVOICE DETAILS ROW ----
 var preSubtotal = items.reduce(function(s, i) { return s + (parseInt(i.quantity) || 1) * (parseFloat(i.unit_price) || 0); }, 0);
-var preVat = Math.round(preSubtotal * 23) / 100;
-var preTotal = preSubtotal + preVat;
+var preDiscountVal = parseFloat((document.getElementById('omDiscountValue') || {}).value) || 0;
+var preDiscountType = (document.getElementById('omDiscountType') || {}).value || 'percent';
+var preDiscountAmt = preDiscountVal > 0 ? (preDiscountType === 'percent' ? preSubtotal * preDiscountVal / 100 : preDiscountVal) : 0;
+preDiscountAmt = Math.min(preDiscountAmt, preSubtotal);
+var preVat = Math.round((preSubtotal - preDiscountAmt) * 23) / 100;
+var preTotal = (preSubtotal - preDiscountAmt) + preVat;
 var detF = [['INVOICE NO.', invNum], ['DATE', fmtD(invDate)], ['TOTAL DUE', 'EUR ' + fmtM(preTotal)], ['DUE DATE', fmtD(dueDate)], ['TERMS', 'Net 30'], ['ENCLOSED', '']];
 var dCW = [CW*0.22, CW*0.13, CW*0.17, CW*0.15, CW*0.13, CW*0.20];
 doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
@@ -13612,15 +13782,36 @@ y += rH;
 
 doc.setDrawColor(204,204,204); doc.line(ML, y, ML + CW, y); y += 12;
 
+// ---- DISCOUNT ----
+var discountVal = parseFloat((document.getElementById('omDiscountValue') || {}).value) || 0;
+var discountType = (document.getElementById('omDiscountType') || {}).value || 'percent';
+var discountAmount = 0;
+if (discountVal > 0) {
+  discountAmount = discountType === 'percent' ? subtotal * discountVal / 100 : discountVal;
+  discountAmount = Math.min(discountAmount, subtotal);
+}
+var discountedSubtotal = subtotal - discountAmount;
+
 // ---- TOTALS ----
-var vatTotal = Math.round(subtotal * 23) / 100, total = subtotal + vatTotal;
-checkPage(80);
+var vatTotal = Math.round(discountedSubtotal * 23) / 100, total = discountedSubtotal + vatTotal;
+checkPage(100);
 var tx = ML + CW - 200;
-[['SUBTOTAL', fmtM(subtotal)], ['VAT TOTAL', fmtM(vatTotal)], ['TOTAL', fmtM(total)]].forEach(function(r) {
-doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(0,0,0);
-doc.text(r[0], tx + 100, y, {align:'right'}); doc.text(r[1], tx + 180, y, {align:'right'}); y += 13;
+var totalsRows = [['SUBTOTAL', fmtM(subtotal)]];
+if (discountAmount > 0) {
+  var discLabel = discountType === 'percent' ? 'DISCOUNT (' + discountVal + '%)' : 'DISCOUNT';
+  totalsRows.push([discLabel, '-' + fmtM(discountAmount)]);
+  totalsRows.push(['NET TOTAL', fmtM(discountedSubtotal)]);
+}
+totalsRows.push(['VAT @ 23%', fmtM(vatTotal)]);
+totalsRows.push(['TOTAL', fmtM(total)]);
+totalsRows.forEach(function(r) {
+  var isDiscount = r[0].startsWith('DISCOUNT');
+  doc.setFont('helvetica', isDiscount ? 'italic' : 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(isDiscount ? 180 : 0, isDiscount ? 0 : 0, 0);
+  doc.text(r[0], tx + 100, y, {align:'right'}); doc.text(r[1], tx + 180, y, {align:'right'}); y += 13;
 }); y += 6;
-doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('BALANCE DUE', tx + 40, y, {align:'right'});
+doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(0,0,0); doc.text('BALANCE DUE', tx + 40, y, {align:'right'});
 doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text('EUR ' + fmtM(total), tx + 185, y, {align:'right'}); y += 30;
 
 // ---- TAX SUMMARY ----
@@ -13823,11 +14014,151 @@ function b2bFmt(v) { return '\u20ac' + Number(v).toFixed(2).replace(/\B(?=(\d{3}
 function switchB2BTab(tab) {
   document.getElementById('b2bTabContentApproved').style.display = tab === 'approved' ? '' : 'none';
   document.getElementById('b2bTabContentPending').style.display  = tab === 'pending'  ? '' : 'none';
+  document.getElementById('b2bTabContentZone3').style.display    = tab === 'zone3'    ? '' : 'none';
   const active   = 'color:var(--accent);border-bottom:3px solid var(--accent);margin-bottom:-2px';
   const inactive = 'color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px';
-  document.getElementById('b2bTabApproved').style.cssText = 'padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;' + (tab==='approved'?active:inactive);
-  document.getElementById('b2bTabPending').style.cssText  = 'padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;' + (tab==='pending' ?active:inactive);
+  const base = 'padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;';
+  document.getElementById('b2bTabApproved').style.cssText = base + (tab==='approved'?active:inactive);
+  document.getElementById('b2bTabPending').style.cssText  = base + (tab==='pending' ?active:inactive);
+  document.getElementById('b2bTabZone3').style.cssText    = base + (tab==='zone3'   ?active:inactive);
   if (tab === 'pending') loadB2BPending();
+  if (tab === 'zone3')   renderZone3Discounts();
+}
+
+// ── ZONE3 CUSTOMER DISCOUNTS ──────────────────────────────────
+function renderZone3Discounts() {
+  const tbody = document.getElementById('zone3DiscountsTable');
+  if (!tbody) return;
+  if (!allZone3Discounts || allZone3Discounts.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">No Zone3 discounts configured yet. Click "+ Add Discount" to create one.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allZone3Discounts.map(function(r) {
+    const cust = (allCustomers || []).find(function(c) { return c.id === r.customer_id; }) || {};
+    const custName = [cust.first_name, cust.last_name].filter(Boolean).join(' ') || cust.b2b_company_name || cust.email || r.customer_id.slice(0,8);
+    const discLabel = r.discount_type === 'percent'
+      ? '<strong>' + r.discount_value + '%</strong> <span style="color:var(--text-muted);font-size:0.8rem">off</span>'
+      : '<strong>€' + parseFloat(r.discount_value).toFixed(2) + '</strong> <span style="color:var(--text-muted);font-size:0.8rem">fixed</span>';
+    const badge = r.is_active
+      ? '<span class="stock-badge in" style="font-size:0.75rem">Active</span>'
+      : '<span class="stock-badge out" style="font-size:0.75rem">Inactive</span>';
+    return '<tr style="border-bottom:1px solid var(--border)">'
+      + '<td style="padding:10px 12px;font-weight:600">' + esc(custName) + '</td>'
+      + '<td style="padding:10px 12px;color:var(--text-muted);font-size:0.85rem">' + esc(cust.email || '') + '</td>'
+      + '<td style="padding:10px 12px;text-align:center">' + discLabel + '</td>'
+      + '<td style="padding:10px 12px;text-align:center">' + badge + '</td>'
+      + '<td style="padding:10px 12px;font-size:0.82rem;color:var(--text-muted)">' + esc(r.notes || '—') + '</td>'
+      + '<td style="padding:10px 12px;text-align:center;white-space:nowrap">'
+      +   '<button class="btn-sm" onclick="openZone3Modal(\'' + r.id + '\')" style="font-size:0.78rem;padding:4px 10px;margin-right:4px">✏️ Edit</button>'
+      +   '<button class="btn-sm" onclick="deleteZone3Discount(\'' + r.id + '\')" style="font-size:0.78rem;padding:4px 10px;background:var(--danger);color:#fff;border:none;border-radius:4px;cursor:pointer">🗑️</button>'
+      + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function openZone3Modal(id) {
+  // Populate customer select with B2B customers
+  const sel = document.getElementById('zone3CustomerId');
+  if (sel) {
+    const b2bCusts = (allCustomers || []).filter(function(c) { return c.customer_type === 'b2b'; });
+    sel.innerHTML = '<option value="">— Select B2B customer —</option>'
+      + b2bCusts.map(function(c) {
+          const nm = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.b2b_company_name || c.email || '';
+          return '<option value="' + c.id + '">' + esc(nm) + ' (' + esc(c.email || '') + ')</option>';
+        }).join('');
+  }
+  // Reset form
+  document.getElementById('zone3DiscId').value = '';
+  document.getElementById('zone3DiscType').value = 'percent';
+  document.getElementById('zone3DiscValue').value = '';
+  document.getElementById('zone3DiscNotes').value = '';
+  document.getElementById('zone3DiscActive').checked = true;
+  document.getElementById('zone3DiscPreview').textContent = '';
+  document.getElementById('zone3ModalTitle').textContent = 'Add Zone3 Discount';
+
+  if (id) {
+    const r = allZone3Discounts.find(function(x) { return x.id === id; });
+    if (r) {
+      document.getElementById('zone3DiscId').value = r.id;
+      document.getElementById('zone3CustomerId').value = r.customer_id;
+      document.getElementById('zone3DiscType').value = r.discount_type;
+      document.getElementById('zone3DiscValue').value = r.discount_value;
+      document.getElementById('zone3DiscNotes').value = r.notes || '';
+      document.getElementById('zone3DiscActive').checked = r.is_active !== false;
+      document.getElementById('zone3ModalTitle').textContent = 'Edit Zone3 Discount';
+      zone3PreviewDisc();
+    }
+  }
+  document.getElementById('zone3DiscountModal').classList.add('open');
+}
+
+function closeZone3Modal() {
+  document.getElementById('zone3DiscountModal').classList.remove('open');
+}
+
+function zone3PreviewDisc() {
+  const val = parseFloat(document.getElementById('zone3DiscValue').value) || 0;
+  const type = document.getElementById('zone3DiscType').value;
+  const el = document.getElementById('zone3DiscPreview');
+  if (!el) return;
+  if (val <= 0) { el.textContent = ''; return; }
+  el.textContent = type === 'percent'
+    ? '→ ' + val + '% de desconto em produtos Zone3'
+    : '→ €' + val.toFixed(2) + ' de desconto em produtos Zone3';
+}
+
+async function saveZone3Discount() {
+  const id = document.getElementById('zone3DiscId').value;
+  const customerId = document.getElementById('zone3CustomerId').value;
+  const discType = document.getElementById('zone3DiscType').value;
+  const discValue = parseFloat(document.getElementById('zone3DiscValue').value);
+  const notes = document.getElementById('zone3DiscNotes').value.trim();
+  const isActive = document.getElementById('zone3DiscActive').checked;
+
+  if (!customerId) return alert('Please select a customer.');
+  if (!discValue || discValue <= 0) return alert('Please enter a valid discount value.');
+
+  const payload = {
+    customer_id: customerId,
+    discount_type: discType,
+    discount_value: discValue,
+    notes: notes || null,
+    is_active: isActive,
+    updated_at: new Date().toISOString()
+  };
+
+  try {
+    if (id) {
+      await supaUpdate('zone3_customer_discounts', id, payload);
+      const idx = allZone3Discounts.findIndex(function(r) { return r.id === id; });
+      if (idx >= 0) allZone3Discounts[idx] = Object.assign({}, allZone3Discounts[idx], payload);
+    } else {
+      const result = await supaInsert('zone3_customer_discounts', payload);
+      if (result && result[0]) allZone3Discounts.push(result[0]);
+      else {
+        // Reload from DB
+        const fresh = await supaGet('zone3_customer_discounts', '?is_active=eq.true&select=*').catch(() => []);
+        allZone3Discounts = fresh || [];
+      }
+    }
+    closeZone3Modal();
+    renderZone3Discounts();
+    toast(id ? 'Zone3 discount updated.' : 'Zone3 discount created.', 'success');
+  } catch(e) {
+    alert('Error saving: ' + e.message);
+  }
+}
+
+async function deleteZone3Discount(id) {
+  if (!confirm('Delete this Zone3 discount? This cannot be undone.')) return;
+  try {
+    await supaDelete('zone3_customer_discounts', id);
+    allZone3Discounts = allZone3Discounts.filter(function(r) { return r.id !== id; });
+    renderZone3Discounts();
+    toast('Zone3 discount deleted.', 'success');
+  } catch(e) {
+    alert('Error deleting: ' + e.message);
+  }
 }
 
 // ── Load & render pending applications ────────────────────────
