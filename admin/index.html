@@ -4242,23 +4242,31 @@ Draft</button>
 <div class="modal-body">
 
 <div
-style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 20px;">
-<div style="flex: 1; min-width: 200px;">
-<p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Name</p>
-<strong id="cpName" style="font-size: 1.1rem;">Customer Name</strong>
-<div id="cpCompany" style="margin-top:4px;color:var(--text-muted);font-size:0.9rem;"></div>
-<div id="cpTypeBadge" style="margin-top:5px;"></div>
+style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h4 style="margin:0;color:var(--text-color);">Customer Details</h4>
+<div style="display:flex;gap:8px;align-items:center">
+<div id="cpTypeBadge"></div>
+<button class="btn btn-primary" style="font-size:0.8rem;padding:6px 16px" onclick="saveCustomerProfile()">💾 Save</button>
 </div>
-<div style="flex: 1; min-width: 200px;">
-<p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Contact</p>
-<div id="cpEmail" style="margin-bottom: 3px;"></div>
-<div id="cpPhone"></div>
 </div>
-<div style="flex: 1; min-width: 200px;">
-<p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Account Info</p>
-<div id="cpFirstContact" style="margin-bottom: 3px;">First Contact: —</div>
-<div id="cpLastPurchase" style="margin-bottom: 5px;">Last Purchase: —</div>
-<div id="cpStatusToggle"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">First Name</label><input type="text" id="cpFirstName" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Last Name</label><input type="text" id="cpLastName" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Company / B2B Name</label><input type="text" id="cpCompanyName" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Email</label><input type="email" id="cpEditEmail" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Phone</label><input type="text" id="cpEditPhone" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">VAT Number</label><input type="text" id="cpVatNumber" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div style="grid-column:1/-1"><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Address</label><input type="text" id="cpAddress" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">City</label><input type="text" id="cpCity" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Country</label><input type="text" id="cpCountry" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Invoice CC Emails</label><input type="text" id="cpCcEmails" placeholder="email1@..., email2@..." style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color)"></div>
+<div style="grid-column:1/-1"><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Notes</label><textarea id="cpNotes" rows="2" style="width:100%;padding:7px 10px;font-size:0.9rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--text-color);resize:vertical"></textarea></div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-size:0.85rem;color:var(--text-muted)">
+<span id="cpFirstContact">First Contact: —</span>
+<span id="cpLastPurchase">Last Purchase: —</span>
+<div id="cpStatusToggle" style="margin-left:auto"></div>
 </div>
 </div>
 
@@ -11342,11 +11350,20 @@ Loading items...
       if (!cust) return;
 
       const name = cust.display_name || [cust.first_name, cust.last_name].filter(Boolean).join(' ') || cust.company || cust.name || cust.email || 'Customer';
-      document.getElementById('cpName').textContent = name;
       document.getElementById('cpTitle').textContent = `Profile: ${name}`;
 
-      document.getElementById('cpEmail').innerHTML = cust.email ? `<a href="mailto:${esc(cust.email)}" style="color:var(--primary-color);text-decoration:none;">${esc(cust.email)}</a>` : 'No email';
-      document.getElementById('cpPhone').textContent = cust.phone ? esc(cust.phone) : 'No phone';
+      // Populate editable fields
+      document.getElementById('cpFirstName').value = cust.first_name || '';
+      document.getElementById('cpLastName').value = cust.last_name || '';
+      document.getElementById('cpCompanyName').value = cust.b2b_company_name || cust.company || '';
+      document.getElementById('cpEditEmail').value = cust.email || '';
+      document.getElementById('cpEditPhone').value = cust.phone || '';
+      document.getElementById('cpVatNumber').value = cust.b2b_vat_number || '';
+      document.getElementById('cpAddress').value = cust.address || '';
+      document.getElementById('cpCity').value = cust.city || '';
+      document.getElementById('cpCountry').value = cust.country || '';
+      document.getElementById('cpCcEmails').value = cust.invoice_cc_emails || '';
+      document.getElementById('cpNotes').value = cust.notes || '';
 
       const isB2B = cust.customer_type === 'b2b';
       document.getElementById('cpTypeBadge').innerHTML = isB2B
@@ -12411,6 +12428,49 @@ Loading items...
     }
 
     let currentProfileCustomerId = null;
+
+    async function saveCustomerProfile() {
+      if (!currentProfileCustomerId) return;
+      const cust = allCustomers.find(c => c.id === currentProfileCustomerId);
+      if (!cust) { toast('Customer not found', 'error'); return; }
+      const firstName = document.getElementById('cpFirstName').value.trim();
+      const lastName = document.getElementById('cpLastName').value.trim();
+      const companyName = document.getElementById('cpCompanyName').value.trim();
+      const email = document.getElementById('cpEditEmail').value.trim();
+      const phone = document.getElementById('cpEditPhone').value.trim();
+      const vatNumber = document.getElementById('cpVatNumber').value.trim();
+      const address = document.getElementById('cpAddress').value.trim();
+      const city = document.getElementById('cpCity').value.trim();
+      const country = document.getElementById('cpCountry').value.trim();
+      const ccEmails = document.getElementById('cpCcEmails').value.trim();
+      const notes = document.getElementById('cpNotes').value.trim();
+      const displayName = companyName || [firstName, lastName].filter(Boolean).join(' ') || email || cust.display_name;
+      try {
+        await supaUpdate('customers', currentProfileCustomerId, {
+          first_name: firstName || null,
+          last_name: lastName || null,
+          display_name: displayName,
+          b2b_company_name: companyName || null,
+          company: companyName || cust.company || null,
+          email: email || null,
+          phone: phone || null,
+          b2b_vat_number: vatNumber || null,
+          address: address || null,
+          city: city || null,
+          country: country || null,
+          invoice_cc_emails: ccEmails || null,
+          notes: notes || null,
+          updated_at: new Date().toISOString()
+        });
+        Object.assign(cust, { first_name: firstName, last_name: lastName, display_name: displayName, b2b_company_name: companyName, company: companyName || cust.company, email: email, phone: phone, b2b_vat_number: vatNumber, address: address, city: city, country: country, invoice_cc_emails: ccEmails, notes: notes });
+        document.getElementById('cpTitle').textContent = 'Profile: ' + displayName;
+        toast('Customer saved', 'success');
+        renderCustomers();
+      } catch(e) {
+        console.error('Save customer error:', e);
+        toast('Failed to save: ' + e.message, 'error');
+      }
+    }
 
     async function toggleCustomerStatus() {
       if (!currentProfileCustomerId) return;
