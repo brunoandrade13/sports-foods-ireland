@@ -12641,7 +12641,18 @@ Loading items...
         // Name / Email search
         if (search) {
           const name = [c.first_name, c.last_name].filter(Boolean).join(' ').toLowerCase();
-          if (!name.includes(search) && !(c.email || '').toLowerCase().includes(search)) return false;
+          const dname = (c.display_name || '').toLowerCase();
+          const company = (c.b2b_company_name || c.company || '').toLowerCase();
+          const email = (c.email || '').toLowerCase();
+          const phone = (c.phone || '').toLowerCase();
+          // Also check child/group emails
+          let childMatch = false;
+          if (c._isGroupParent && window.emailToGroupId) {
+            for (const [em, pid] of Object.entries(window.emailToGroupId)) {
+              if (pid === c.id && em.includes(search)) { childMatch = true; break; }
+            }
+          }
+          if (!name.includes(search) && !dname.includes(search) && !company.includes(search) && !email.includes(search) && !phone.includes(search) && !childMatch) return false;
         }
 
         // Value / Orders search
