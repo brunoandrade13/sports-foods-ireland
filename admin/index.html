@@ -2244,7 +2244,7 @@ Only B2B customers
 <label>Currency</label>
 <select id="moCurrency">
 <option value="EUR">EUR €</option>
-<option value="GBP">GBP £</option>
+
 </select>
 </div>
 <div class="form-group">
@@ -3679,13 +3679,13 @@ placeholder="0.00"></div>
 placeholder="0.00" oninput="autoCalcCostFromUsd()">
 <div class="hint">Enter cost in USD — EUR auto-calculated below</div>
 </div>
-<div class="form-group"><label>💷 Cost Price (GBP)</label><input type="number" step="0.01" id="editCostPriceGbp"
+<div class="form-group"><label>💷 Cost Price (GBP/USD)</label><input type="number" step="0.01" id="editCostPriceGbp"
 placeholder="0.00" oninput="autoCalcCostFromGbp()">
-<div class="hint">Enter cost in GBP — EUR auto-calculated below</div>
+<div class="hint">Enter cost in USD or GBP — EUR auto-calculated below</div>
 </div>
 <div class="form-group"><label>💰 Cost Price (EUR)</label><input type="number" step="0.01" id="editCostPrice"
 placeholder="0.00">
-<div class="hint">Auto-filled from USD × 0.92 or GBP × 1.17 (editable)</div>
+<div class="hint">Auto-filled from USD × 0.92 (editable)</div>
 </div>
 <div class="form-group"><label>🧾 VAT Rate (%)</label><input type="number" step="0.01" id="editVatRate"
 placeholder="23.00">
@@ -4124,7 +4124,7 @@ placeholder="Full address"></div>
 </select></div>
 <div class="form-group"><label>Currency</label><select id="supplierCurrency">
 <option value="EUR">EUR</option>
-<option value="GBP">GBP</option>
+
 <option value="USD">USD</option>
 </select></div>
 <div class="form-group full"><label>Notes</label><textarea id="supplierNotes" rows="2"></textarea></div>

@@ -101,7 +101,7 @@
       grid.innerHTML = '<div class="b2b-loading">No products found for this filter.</div>';
       return;
     }
-    const currency = sfi.currency === 'GBP' ? '£' : '€';
+    const currency = '€';
     grid.innerHTML = products.map(p => {
       const imgSrc = p.imagem ? (p.imagem.startsWith('http') ? p.imagem : '../' + p.imagem) : '../img/placeholder.webp';
       const b2bPrice = p.b2b_price != null ? currency + Number(p.b2b_price).toFixed(2) : 'N/A';

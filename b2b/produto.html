@@ -185,7 +185,7 @@ window.addEventListener('DOMContentLoaded', async function() {
     var p = arr[0];
     _product = p;
     var EXVAT = function(v) { return Number(v||0) / 1.23; };
-    var cur = (typeof sfi !== 'undefined' && sfi.currency === 'GBP') ? '\u00a3' : '\u20ac';
+    var cur = '\u20ac';
     var wsPrice = Number(p.wholesale_price_eur) || 0;
     var retailPrice = Number(p.price_eur) || 0;
     var b2bPrice = (wsPrice > 0 && wsPrice < retailPrice) ? wsPrice : retailPrice;
@@ -274,7 +274,7 @@ function renderVariants(p) {
     var lg = ag[ag.length - 1], ls = lg.querySelector('.var-opt.sel');
     if (ls) {
       _selectedVariant = { id: ls.dataset.vid, label: ls.dataset.lbl, price: parseFloat(ls.dataset.pr) || null, sku: (ls.dataset.sku || '') || null };
-      var cur = (typeof sfi !== 'undefined' && sfi.currency === 'GBP') ? '\u00a3' : '\u20ac';
+      var cur = '\u20ac';
       if (_selectedVariant.price) document.getElementById('prodPrice').textContent = cur + EXVAT(_selectedVariant.price).toFixed(2);
       var skuToShow = _selectedVariant.sku || baseSku;
       document.getElementById('prodSku').textContent = skuToShow ? 'SKU: ' + skuToShow : '';

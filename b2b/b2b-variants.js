@@ -29,7 +29,7 @@ window.b2bFetchVariants = async function(lid) {
 window.b2bShowVariantModal = function(pI, vG, onC) {
   var prev = document.getElementById('b2bVarOvl');
   if (prev) prev.remove();
-  var cur = (typeof sfi !== 'undefined' && sfi.currency === 'GBP') ? '\u00a3' : '\u20ac';
+  var cur = '\u20ac';
   var img = pI.image || '';
   if (img && !img.startsWith('http') && !img.startsWith('../')) img = '../' + img;
   if (!img) img = '../img/placeholder.webp';
