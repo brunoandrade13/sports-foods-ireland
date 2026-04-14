@@ -2745,20 +2745,31 @@ Select a financial report above to begin analysis.
 </select>
 </div>
 <div style="overflow-x:auto">
-<table id="boTable" style="width:100%;font-size:0.85rem">
+<table id="boTable" style="width:100%;font-size:0.85rem;display:none">
 <thead><tr>
-<th>Order #</th>
-<th>Customer</th>
-<th>Product</th>
-<th style="text-align:center">Qty</th>
-<th style="text-align:right">Value</th>
-<th>Order Date</th>
-<th>Status</th>
-<th>Notes</th>
-<th>Action</th>
+<th>Order #</th><th>Customer</th><th>Product</th>
+<th style="text-align:center">Qty</th><th style="text-align:right">Value</th>
+<th>Order Date</th><th>Status</th><th>Notes</th><th>Action</th>
 </tr></thead>
 <tbody id="boBody"></tbody>
 </table>
+
+<!-- Customer-grouped view -->
+<div id="boCustomerGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px"></div>
+</div>
+
+<!-- BACKORDER CUSTOMER DETAIL MODAL -->
+<div class="modal-overlay" id="boCustomerModal" onclick="if(event.target===this)closeBoModal()" style="display:none;align-items:center;justify-content:center">
+  <div class="modal" style="max-width:780px;width:95%;max-height:85vh;overflow-y:auto">
+    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1">
+      <div>
+        <h3 id="boModalCustomerName" style="margin:0;font-size:1.05rem"></h3>
+        <div id="boModalCustomerSub" style="font-size:0.82rem;color:var(--text-muted);margin-top:2px"></div>
+      </div>
+      <button onclick="closeBoModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted)">&times;</button>
+    </div>
+    <div class="modal-body" id="boModalBody" style="padding:20px 24px"></div>
+  </div>
 </div>
 </div>
 
@@ -16282,49 +16293,172 @@ document.getElementById('boOldest').textContent = oldestDate ? new Date(oldestDa
 }
 
 function filterBackorders() {
-const search = (document.getElementById('boSearch').value || '').toLowerCase();
-const filter = document.getElementById('boFilter').value;
+  const search = (document.getElementById('boSearch').value || '').toLowerCase();
+  const filter = document.getElementById('boFilter').value;
 
-let filtered = _boData.filter(item => {
-if (search) {
-const cust = (item.order?.customer_name || '').toLowerCase();
-const prod = (item.product_name || '').toLowerCase();
-const orderNum = (item.order?.order_number || '').toLowerCase();
-if (!cust.includes(search) && !prod.includes(search) && !orderNum.includes(search)) return false;
+  let filtered = _boData.filter(item => {
+    const cust   = (item.order?.customer_name || '').toLowerCase();
+    const prod   = (item.product_name || '').toLowerCase();
+    const orderNum = (item.order?.order_number || '').toLowerCase();
+    if (search && !cust.includes(search) && !prod.includes(search) && !orderNum.includes(search)) return false;
+    const status = (item.backorder_status || 'pending').toLowerCase();
+    if (filter === 'pending'  && status !== 'pending' && status !== '') return false;
+    if (filter === 'ordered'  && status !== 'ordered_from_supplier') return false;
+    if (filter === 'partial'  && status !== 'partially_shipped') return false;
+    return true;
+  });
+
+  const grid = document.getElementById('boCustomerGrid');
+  if (!grid) return;
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:12px">✅</div><div style="font-size:16px;font-weight:600">No pending backorders</div><div style="font-size:13px;margin-top:6px">All items have been shipped!</div></div>';
+    return;
+  }
+
+  // Group by customer
+  const byCustomer = {};
+  filtered.forEach(item => {
+    const o    = item.order || {};
+    const key  = o.customer_email || o.customer_name || item.order_id || 'Unknown';
+    const name = o.customer_name || key;
+    if (!byCustomer[key]) {
+      byCustomer[key] = { name, email: o.customer_email || '', items: [], totalValue: 0, orderNumbers: new Set(), oldest: null };
+    }
+    byCustomer[key].items.push(item);
+    byCustomer[key].totalValue += Number(item.total_price || 0);
+    if (o.order_number) byCustomer[key].orderNumbers.add(o.order_number);
+    const d = item.order?.created_at || item.created_at;
+    if (d && (!byCustomer[key].oldest || d < byCustomer[key].oldest)) byCustomer[key].oldest = d;
+  });
+
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const customers = Object.entries(byCustomer).sort((a,b) => b[1].totalValue - a[1].totalValue);
+
+  // Store for modal access
+  window._boCustomerMap = byCustomer;
+
+  grid.innerHTML = customers.map(([key, c]) => {
+    const hasOverdue = c.items.some(i => (i.backorder_status || 'pending') === 'pending' && i.order?.created_at && (Date.now() - new Date(i.order.created_at)) > 7*24*60*60*1000);
+    const statusCounts = { pending: 0, ordered: 0, partial: 0 };
+    c.items.forEach(i => {
+      const s = i.backorder_status || 'pending';
+      if (s === 'pending') statusCounts.pending++;
+      else if (s === 'ordered_from_supplier') statusCounts.ordered++;
+      else if (s === 'partially_shipped') statusCounts.partial++;
+    });
+    const badges = [
+      statusCounts.pending  ? `<span style="background:#fef3c7;color:#d97706;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.pending} pending</span>` : '',
+      statusCounts.ordered  ? `<span style="background:#dbeafe;color:#2563eb;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.ordered} ordered</span>` : '',
+      statusCounts.partial  ? `<span style="background:#e0e7ff;color:#4f46e5;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.partial} partial</span>` : '',
+    ].filter(Boolean).join(' ');
+    const oldestLabel = c.oldest ? new Date(c.oldest).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const orderNums = [...c.orderNumbers].slice(0,3).join(', ') + (c.orderNumbers.size > 3 ? ' +' + (c.orderNumbers.size - 3) : '');
+
+    return `<div onclick="openBoCustomerModal('${key.replace(/'/g,"\\'")}'"
+        style="background:var(--surface-2);border:1px solid ${hasOverdue?'#fca5a5':'var(--border)'};border-radius:10px;padding:16px 18px;cursor:pointer;transition:box-shadow 0.15s"
+        onmouseenter="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.12)'" onmouseleave="this.style.boxShadow=''">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-weight:700;font-size:0.95rem;color:var(--text)">${c.name}</div>
+          ${c.email ? `<div style="font-size:0.78rem;color:var(--text-muted);margin-top:1px">${c.email}</div>` : ''}
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:1.1rem;font-weight:700;color:var(--accent)">${fmt(c.totalValue)}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:8px">
+        <div style="text-align:center;flex:1;background:var(--surface);border-radius:6px;padding:6px">
+          <div style="font-size:1.2rem;font-weight:700;color:var(--text)">${c.items.length}</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase">Products</div>
+        </div>
+        <div style="text-align:center;flex:1;background:var(--surface);border-radius:6px;padding:6px">
+          <div style="font-size:1.2rem;font-weight:700;color:var(--text)">${c.orderNumbers.size}</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase">Orders</div>
+        </div>
+        <div style="text-align:center;flex:1;background:var(--surface);border-radius:6px;padding:6px">
+          <div style="font-size:0.82rem;font-weight:600;color:var(--text)">${oldestLabel}</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase">Since</div>
+        </div>
+      </div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px">Orders: ${orderNums}</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">${badges}</div>
+    </div>`;
+  }).join('');
 }
-const status = (item.backorder_status || 'pending').toLowerCase();
-if (filter === 'pending' && status !== 'pending' && status !== '') return false;
-if (filter === 'ordered' && status !== 'ordered_from_supplier') return false;
-if (filter === 'partial' && status !== 'partially_shipped') return false;
-return true;
-});
 
-const tbody = document.getElementById('boBody');
-if (!filtered.length) {
-tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-dim)"><div style="font-size:40px;margin-bottom:12px">\u2705</div><div style="font-size:16px;font-weight:600">No pending backorders</div><div style="font-size:13px;margin-top:6px">All items have been shipped!</div></td></tr>';
-return;
+function openBoCustomerModal(customerKey) {
+  const c = window._boCustomerMap?.[customerKey];
+  if (!c) return;
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  document.getElementById('boModalCustomerName').textContent = c.name;
+  document.getElementById('boModalCustomerSub').textContent =
+    `${c.items.length} backorder item${c.items.length!==1?'s':''} across ${c.orderNumbers.size} order${c.orderNumbers.size!==1?'s':''} · Total: ${fmt(c.totalValue)}`;
+
+  const rows = c.items.sort((a,b) => (a.order?.created_at||'') < (b.order?.created_at||'') ? -1 : 1).map(item => {
+    const o = item.order || {};
+    const status = item.backorder_status || 'pending';
+    const statusBadge = status === 'pending'
+      ? '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:600">PENDING</span>'
+      : status === 'ordered_from_supplier'
+      ? '<span style="background:#dbeafe;color:#2563eb;padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:600">ORDERED</span>'
+      : status === 'partially_shipped'
+      ? '<span style="background:#e0e7ff;color:#4f46e5;padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:600">PARTIAL</span>'
+      : '<span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:600">' + status.toUpperCase() + '</span>';
+    const orderDate = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+
+    return `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 12px">
+        <div style="font-weight:600;font-size:0.9rem">${item.product_name || '—'}</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px">
+          Order <a href="#" onclick="closeBoModal();openOrderFromList('${o.order_number||''}');return false" style="color:var(--accent)">#${o.order_number||'—'}</a> · ${orderDate}
+        </div>
+      </td>
+      <td style="padding:10px 12px;text-align:center;font-weight:700">${item.quantity||1}</td>
+      <td style="padding:10px 12px;text-align:right;font-weight:700">${fmt(item.total_price||0)}</td>
+      <td style="padding:10px 12px;text-align:center">${statusBadge}</td>
+      <td style="padding:10px 12px">
+        <input type="text" value="${(item.backorder_notes||'').replace(/"/g,'&quot;')}" placeholder="Note…"
+          onchange="updateBackorderNote('${item.id}',this.value)"
+          style="width:100%;padding:4px 8px;font-size:0.8rem;border:1px solid var(--border);border-radius:4px;background:var(--surface-2);color:var(--text)">
+      </td>
+      <td style="padding:10px 12px">
+        <select onchange="updateBackorderStatus('${item.id}',this.value)"
+          style="padding:5px 8px;font-size:0.8rem;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text)">
+          <option value="pending"${status==='pending'?' selected':''}>Pending</option>
+          <option value="ordered_from_supplier"${status==='ordered_from_supplier'?' selected':''}>Ordered</option>
+          <option value="partially_shipped"${status==='partially_shipped'?' selected':''}>Partial</option>
+          <option value="fulfilled">✅ Fulfilled</option>
+        </select>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('boModalBody').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:0.87rem">
+      <thead>
+        <tr style="background:var(--surface-2);font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
+          <th style="padding:9px 12px;text-align:left">Product / Order</th>
+          <th style="padding:9px 12px;text-align:center">Qty</th>
+          <th style="padding:9px 12px;text-align:right">Value</th>
+          <th style="padding:9px 12px;text-align:center">Status</th>
+          <th style="padding:9px 12px;text-align:left">Notes</th>
+          <th style="padding:9px 12px;text-align:center">Action</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  const modal = document.getElementById('boCustomerModal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
-tbody.innerHTML = filtered.map(item => {
-const o = item.order || {};
-const status = item.backorder_status || 'pending';
-const statusBadge = status === 'pending' ? '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">PENDING</span>'
-: status === 'ordered_from_supplier' ? '<span style="background:#dbeafe;color:#2563eb;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">ORDERED</span>'
-: status === 'partially_shipped' ? '<span style="background:#e0e7ff;color:#4f46e5;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">PARTIAL</span>'
-: '<span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">' + status.toUpperCase() + '</span>';
-
-return '<tr>' +
-'<td><a href="#" onclick="openOrderFromList(\'' + (o.order_number || '') + '\');return false" style="color:var(--accent);font-weight:600">' + (o.order_number || '—') + '</a></td>' +
-'<td>' + (o.customer_name || '—') + '</td>' +
-'<td style="font-weight:600">' + (item.product_name || '—') + '</td>' +
-'<td style="text-align:center">' + (item.quantity || 1) + '</td>' +
-'<td style="text-align:right;font-weight:600">\u20ac' + Number(item.total_price || 0).toFixed(2) + '</td>' +
-'<td>' + (o.created_at ? new Date(o.created_at).toLocaleDateString('en-IE') : '—') + '</td>' +
-'<td>' + statusBadge + '</td>' +
-'<td><input type="text" value="' + (item.backorder_notes || '').replace(/"/g, '&quot;') + '" placeholder="Add note..." onchange="updateBackorderNote(\'' + item.id + '\', this.value)" style="width:100%;padding:4px 6px;font-size:0.8rem;border:1px solid var(--border);border-radius:4px;background:var(--surface-2);color:var(--text)"></td>' +
-'<td style="white-space:nowrap"><select onchange="updateBackorderStatus(\'' + item.id + '\', this.value)" style="padding:4px;font-size:0.75rem;border:1px solid var(--border);border-radius:4px;background:var(--surface-2);color:var(--text)"><option value="pending"' + (status==='pending'?' selected':'') + '>Pending</option><option value="ordered_from_supplier"' + (status==='ordered_from_supplier'?' selected':'') + '>Ordered</option><option value="partially_shipped"' + (status==='partially_shipped'?' selected':'') + '>Partial</option><option value="fulfilled"' + '>Fulfilled</option></select></td>' +
-'</tr>';
-}).join('');
+function closeBoModal() {
+  const modal = document.getElementById('boCustomerModal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 async function updateBackorderStatus(itemId, status) {
