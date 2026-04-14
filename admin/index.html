@@ -2394,9 +2394,16 @@ Only B2B customers
         </div>
         <div style="flex:1;min-width:130px">
           <label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:4px">Category</label>
-          <select id="moCategoryFilter" onchange="renderManualOrderProductPicker()"
+          <select id="moCategoryFilter" onchange="renderManualOrderProductPicker();populateMoSubcatFilter()"
             style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
             <option value="">All categories</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:130px">
+          <label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:4px">Subcategory</label>
+          <select id="moSubcatFilter" onchange="renderManualOrderProductPicker()"
+            style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
+            <option value="">All subcategories</option>
           </select>
         </div>
         <div style="flex:2;min-width:200px">
@@ -12139,6 +12146,10 @@ Loading items...
       document.getElementById('moFulfillment').value = 'unfulfilled';
       ['moSubtotal', 'moDiscount', 'moShipping', 'moTax', 'moTotal'].forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; });
       const notesEl = document.getElementById('moNotes'); if (notesEl) notesEl.value = '';
+      // Reset subcategory filter
+      const subcatSel = document.getElementById('moSubcatFilter');
+      if (subcatSel) subcatSel.innerHTML = '<option value="">All subcategories</option>';
+      populateMoSubcatFilter();
       showPage('manual-order');
       window.scrollTo(0,0);
     }
@@ -12191,6 +12202,7 @@ Loading items...
       const custId = document.getElementById('moCustomer').value || null;
       const brandId = document.getElementById('moBrandFilter').value || '';
       const catId = document.getElementById('moCategoryFilter').value || '';
+      const subcatId = document.getElementById('moSubcatFilter')?.value || '';
       const search = (document.getElementById('moProductSearch').value || '').toLowerCase().trim();
       if (!body) return;
       if (!custId) {
@@ -12201,6 +12213,7 @@ Loading items...
         if (p.is_active === false) return false;
         if (brandId && (!p.brands || p.brands.name !== brandId)) return false;
         if (catId && (!p.categories || p.categories.name !== catId)) return false;
+        if (subcatId && String(p.subcategory_id || '') !== subcatId) return false;
         if (search) {
           const txt = (p.name || '').toLowerCase() + ' ' + (p.sku || '').toLowerCase();
           if (!txt.includes(search)) return false;
@@ -12222,6 +12235,22 @@ Loading items...
           <td style="text-align:right"><button class="btn-sm btn-primary" type="button" onclick="addManualOrderItemFromRow(this)">Add</button></td>
         </tr>`;
       }).join('');
+    }
+
+    function populateMoSubcatFilter() {
+      const catSel   = document.getElementById('moCategoryFilter');
+      const subcatSel = document.getElementById('moSubcatFilter');
+      if (!subcatSel) return;
+      const selectedCatName = catSel ? catSel.value : '';
+      // Find the category id that matches the selected category name
+      const cat = (categories || []).find(function(c) { return c.name === selectedCatName; });
+      const catId = cat ? cat.id : null;
+      // Filter global subcategories array
+      const subs = (subcategories || []).filter(function(s) {
+        return !catId || String(s.category_id) === String(catId);
+      }).sort(function(a,b) { return (a.name||'').localeCompare(b.name||''); });
+      subcatSel.innerHTML = '<option value="">All subcategories</option>' +
+        subs.map(function(s) { return `<option value="${s.id}">${esc(s.name||'')}</option>`; }).join('');
     }
 
     function refreshManualOrderFilters() {
