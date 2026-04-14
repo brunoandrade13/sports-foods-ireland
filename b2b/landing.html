@@ -527,7 +527,26 @@ Keep me logged in
 <button onclick="b2bLogin()" id="b2bLoginBtn"
 style="width:100%;padding:14px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;transition:background 0.2s;">Sign
 In to B2B Portal</button>
+<div style="text-align:center;margin-top:10px;">
+  <a href="#" id="forgotPwdLink" onclick="showForgotForm();return false;" style="font-size:13px;color:#2D6A4F;text-decoration:none;">Forgot your password?</a>
+</div>
 <div id="b2bLoginMsg" style="margin-top:12px;font-size:13px;text-align:center;display:none;"></div>
+
+<!-- Forgot Password Panel -->
+<div id="forgotPwdPanel" style="display:none;margin-top:16px;padding:20px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;">
+  <p style="margin:0 0 12px;font-size:14px;color:#166534;font-weight:600;">Reset your password</p>
+  <p style="margin:0 0 14px;font-size:13px;color:#374151;">Enter your email address and we'll send you a link to set a new password.</p>
+  <input type="email" id="forgotEmail" placeholder="your@business.com"
+    style="width:100%;padding:11px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:12px;">
+  <button onclick="sendPasswordReset()" id="forgotBtn"
+    style="width:100%;padding:12px;background:#169B62;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;">
+    Send Reset Link
+  </button>
+  <div id="forgotMsg" style="margin-top:10px;font-size:13px;text-align:center;display:none;"></div>
+  <div style="text-align:center;margin-top:10px;">
+    <a href="#" onclick="hideForgotForm();return false;" style="font-size:12px;color:#64748b;text-decoration:none;">← Back to login</a>
+  </div>
+</div>
 <div style="text-align:center;margin:16px 0 12px;display:flex;align-items:center;gap:12px;">
 <div style="flex:1;height:1px;background:#e2e8f0;"></div>
 <span style="font-size:12px;color:#94a3b8;">or continue with</span>
@@ -876,6 +895,37 @@ class="payment-icon-img">
         });
       });
     }
+    // ---- Forgot Password ----
+    function showForgotForm() {
+      document.getElementById('b2bLoginForm').style.display = 'none';
+      document.getElementById('forgotPwdForm').style.display = 'block';
+      document.getElementById('b2bLoginMsg').style.display = 'none';
+    }
+    function showLoginForm() {
+      document.getElementById('b2bLoginForm').style.display = 'block';
+      document.getElementById('forgotPwdForm').style.display = 'none';
+      document.getElementById('forgotMsg').style.display = 'none';
+    }
+    async function sendPasswordReset() {
+      const email = document.getElementById('forgotEmail').value.trim();
+      const btn = document.getElementById('forgotBtn');
+      const msg = document.getElementById('forgotMsg');
+      if (!email) { msg.textContent = 'Please enter your email.'; msg.style.color = '#ef4444'; msg.style.display = 'block'; return; }
+      btn.textContent = 'Sending…'; btn.disabled = true;
+      try {
+        await waitForSfi();
+        const result = await sfi.auth.resetPassword(email);
+        if (result && result.error) throw new Error(result.error);
+        msg.innerHTML = '✅ If that email is registered, you\'ll receive a reset link within a few minutes. Check your inbox (and spam folder).';
+        msg.style.color = '#166534'; msg.style.display = 'block';
+        btn.style.display = 'none';
+      } catch(e) {
+        msg.textContent = e.message || 'Something went wrong. Please try again.';
+        msg.style.color = '#ef4444'; msg.style.display = 'block';
+        btn.textContent = 'Send Reset Link'; btn.disabled = false;
+      }
+    }
+
     async function b2bLogin() {
       const email = document.getElementById('b2bEmail').value.trim();
       const pass = document.getElementById('b2bPassword').value;
@@ -938,7 +988,55 @@ class="payment-icon-img">
         const el = document.getElementById(id);
         if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') b2bLogin(); });
       });
+      const fe = document.getElementById('forgotEmail');
+      if (fe) fe.addEventListener('keydown', e => { if (e.key === 'Enter') sendPasswordReset(); });
     });
+
+    // Forgot Password
+    function showForgotForm() {
+      document.getElementById('b2bLoginForm').style.display = 'none';
+      document.getElementById('forgotPwdPanel').style.display = 'block';
+      const fe = document.getElementById('forgotEmail');
+      const emailVal = document.getElementById('b2bEmail');
+      if (fe && emailVal && emailVal.value) fe.value = emailVal.value;
+      if (fe) fe.focus();
+    }
+    function hideForgotForm() {
+      document.getElementById('forgotPwdPanel').style.display = 'none';
+      document.getElementById('b2bLoginForm').style.display = 'block';
+    }
+    async function sendPasswordReset() {
+      const email = (document.getElementById('forgotEmail').value || '').trim();
+      const btn = document.getElementById('forgotBtn');
+      const msg = document.getElementById('forgotMsg');
+      if (!email) { showForgotMsg('Please enter your email address.', 'error'); return; }
+      btn.disabled = true; btn.textContent = 'Sending...';
+      try {
+        const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
+        const resp = await fetch(SUPA_URL + '/functions/v1/b2b-reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'request_reset', email })
+        });
+        const result = await resp.json();
+        if (result.success) {
+          showForgotMsg('✅ Reset link sent! Check your email inbox (and spam folder).', 'success');
+          btn.textContent = 'Sent ✓';
+        } else {
+          showForgotMsg(result.error || 'Something went wrong. Please try again.', 'error');
+          btn.disabled = false; btn.textContent = 'Send Reset Link';
+        }
+      } catch (e) {
+        showForgotMsg('Network error. Please try again.', 'error');
+        btn.disabled = false; btn.textContent = 'Send Reset Link';
+      }
+    }
+    function showForgotMsg(text, type) {
+      const el = document.getElementById('forgotMsg');
+      el.style.display = 'block';
+      el.style.color = type === 'success' ? '#166534' : '#dc2626';
+      el.textContent = text;
+    }
 </script>
 <script src="../js/brevo-integration.min.js" defer></script>
 <script>
