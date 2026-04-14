@@ -18,21 +18,12 @@
   const SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
 
-  // Currency detection
-  function detectCurrency() {
-    try {
-      const stored = localStorage.getItem('sfi_currency');
-      if (stored) return stored;
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      if (tz && tz.includes('London')) return 'GBP';
-      if ((navigator.language || '').startsWith('en-GB')) return 'GBP';
-    } catch(e) {}
-    return 'EUR';
-  }
+  // Currency: EUR only (SFI sells in Euro exclusively)
+  function detectCurrency() { return 'EUR'; }
 
-  const CURRENCY = detectCurrency();
-  const PRICE_FIELD = CURRENCY === 'GBP' ? 'price_gbp' : 'price_eur';
-  const COMPARE_FIELD = CURRENCY === 'GBP' ? 'compare_at_price_gbp' : 'compare_at_price_eur';
+  const CURRENCY = 'EUR';
+  const PRICE_FIELD = 'price_eur';
+  const COMPARE_FIELD = 'compare_at_price_eur';
 
   // ============================================================
   // FETCH ALL PRODUCTS FROM SUPABASE
@@ -265,7 +256,8 @@
 
     // Store metadata
     window._sfiDataSource = source;
-    window._sfiCurrency = CURRENCY;
+    window._sfiCurrency = 'EUR';
+    window._sfiCurrencySymbol = '€';
     window._sfiDataReady = true;
 
     // console.log(`[SFI] ${products.length} products loaded from ${source} | Currency: ${CURRENCY}`);

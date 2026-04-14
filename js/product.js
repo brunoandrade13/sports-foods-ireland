@@ -1113,8 +1113,7 @@ function updateVariantPrice(btn, product) {
     const variantPrice = parseFloat(btn.dataset.price);
     const variantOldPrice = parseFloat(btn.dataset.oldPrice);
     if (variantPrice && !isNaN(variantPrice)) {
-        const currency = (window._sfiCurrency === 'GBP') ? '£' : '€';
-        document.getElementById('productPrice').textContent = `${currency}${variantPrice.toFixed(2)}`;
+        document.getElementById('productPrice').textContent = `€${variantPrice.toFixed(2)}`;
         const oldPriceEl = document.getElementById('productOldPrice');
         if (oldPriceEl) oldPriceEl.style.display = 'none';
     }

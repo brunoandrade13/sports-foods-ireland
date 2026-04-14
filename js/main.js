@@ -477,7 +477,7 @@ function initBuscaLive() {
             activeIndex = -1;
             return;
         }
-        const currency = (window._sfiCurrency === 'GBP') ? '£' : '€';
+        const currency = '€';
         let html = results.map((p, i) => {
             const price = parseFloat(p.preco) || 0;
             const oldPrice = parseFloat(p.preco_antigo) || 0;

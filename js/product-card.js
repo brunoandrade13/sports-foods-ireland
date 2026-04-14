@@ -634,7 +634,7 @@ function showSupabaseVariantModal(product, onConfirm) {
     const basePrice = parseFloat(product.preco || product.price) || 0;
     const imgSrc = getCardProductImage(product.imagem || product.image || '', product.id || 0);
     const variants = product.variantes;
-    const currency = (window._sfiCurrency === 'GBP') ? '£' : '€';
+    const currency = '€';
     const backorderAllowed = product.backorder_available === true || product.backorderAvailable === true;
 
     // Se produto sem stock e sem backorder — não abrir modal

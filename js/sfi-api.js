@@ -19,13 +19,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH'; // G
 const DEFAULT_CURRENCY = 'EUR';
 
 function detectCurrency() {
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (tz && tz.includes('London')) return 'GBP';
-    const lang = navigator.language || '';
-    if (lang.startsWith('en-GB')) return 'GBP';
-  } catch (e) { }
-  return localStorage.getItem('sfi_currency') || DEFAULT_CURRENCY;
+  return DEFAULT_CURRENCY; // SFI sells in EUR only
 }
 
 // ============================================================
@@ -105,9 +99,10 @@ const db = new SupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ============================================================
 // HIGH-LEVEL API (matches current frontend usage patterns)
 // ============================================================
-const currency = detectCurrency();
-const priceField = currency === 'GBP' ? 'price_gbp' : 'price_eur';
-const compareField = currency === 'GBP' ? 'compare_at_price_gbp' : 'compare_at_price_eur';
+const currency = 'EUR';
+const currencySymbol = '€';
+const priceField = 'price_eur';
+const compareField = 'compare_at_price_eur';
 
 const sfi = {
   currency,
@@ -621,15 +616,10 @@ const sfi = {
       if (!res.ok) throw new Error(`Supabase error: ${res.status}`);
       const products = await res.json();
 
-      // GBP conversion ratio (approx) for wholesale when no GBP column exists
-      const gbpRatio = 0.86;
-
       return products.map(p => {
         const wsEur = p.wholesale_price_eur && p.wholesale_price_eur > 0 ? Number(p.wholesale_price_eur) : null;
         const retailEur = Number(p[priceField]) || 0;
-        // B2B price: use wholesale if set and valid (< retail), otherwise show retail
         const b2bEur = (wsEur && wsEur < retailEur) ? wsEur : retailEur;
-        const b2bGbp = Math.round(b2bEur * gbpRatio * 100) / 100;
 
         return {
           id: p.legacy_id || p.id,
@@ -641,7 +631,7 @@ const sfi = {
           sku: p.sku,
           retail_price: p[priceField],
           retail_compare: p[compareField],
-          b2b_price: currency === 'GBP' ? b2bGbp : b2bEur,
+          b2b_price: b2bEur,
           has_wholesale: wsEur !== null && wsEur < retailEur,
           b2b_min_qty: 1,
           em_stock: p.in_stock,

@@ -652,9 +652,8 @@ function renderProducts() {
             if (!price || isNaN(price)) return;
             const card = sel.closest('.product-card');
             if (!card) return;
-            const currency = (window._sfiCurrency === 'GBP') ? '£' : '€';
             const newPriceEl = card.querySelector('.new-price');
-            if (newPriceEl) newPriceEl.textContent = `${currency}${price.toFixed(2)}`;
+            if (newPriceEl) newPriceEl.textContent = `€${price.toFixed(2)}`;
             const oldPriceVal = parseFloat(opt.dataset.oldPrice);
             const oldPriceEl = card.querySelector('.old-price');
             if (oldPriceVal && !isNaN(oldPriceVal) && oldPriceVal > price) {
