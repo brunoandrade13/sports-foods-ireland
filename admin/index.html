@@ -13528,57 +13528,35 @@ window.shipViaGLS = async function shipViaGLS() {
   const btn = document.getElementById('btnGlsShip');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Creating shipment...'; }
 
-  // 1. Fetch fresh order from DB
-  let freshOrder = order;
-  try {
-    const fresh = await supaGet('orders', `?id=eq.${order.id}&select=*`);
-    if (fresh && fresh[0]) {
-      freshOrder = fresh[0];
-      window._currentModalOrder = freshOrder;
-      const idx = (allOrders || []).findIndex(o => o.id === order.id);
-      if (idx >= 0) allOrders[idx] = { ...allOrders[idx], ...freshOrder };
-    }
-  } catch(e) { console.warn('[GLS] order fetch:', e); }
-
-  // 2. Fetch customer directly for company name (separate query - avoids RLS join issues)
-  let glsCustomer = null;
-  if (freshOrder.customer_id) {
-    try {
-      const cr = await supaGet('customers',
-        `?id=eq.${freshOrder.customer_id}&select=id,name,customer_type,b2b_company_name,address,city,postcode,email`
-      );
-      if (cr && cr[0]) glsCustomer = cr[0];
-    } catch(e) { console.warn('[GLS] customer fetch:', e); }
-  }
-
   // Build recipient address from shipping_address (fall back to billing_address)
-  const ship = (freshOrder.shipping_address && typeof freshOrder.shipping_address === 'object') ? freshOrder.shipping_address : {};
-  const bill = (freshOrder.billing_address  && typeof freshOrder.billing_address  === 'object') ? freshOrder.billing_address  : {};
-  // Support both WooCommerce format (address_1) and manual order format (addr1)
+  const ship = (order.shipping_address && typeof order.shipping_address === 'object') ? order.shipping_address : {};
+  const bill = (order.billing_address  && typeof order.billing_address  === 'object') ? order.billing_address  : {};
   const addr = (ship.address_1 || ship.address1 || ship.addr1 || ship.address) ? ship : bill;
 
-  // For B2B customers: use company name on label; for B2C: use personal name
+  // Default name from address
   let recipientName = [addr.first_name, addr.last_name].filter(Boolean).join(' ')
-    || freshOrder.customer_name || freshOrder.billing_name || 'Customer';
-  if (glsCustomer && glsCustomer.customer_type === 'b2b' && glsCustomer.b2b_company_name) {
-    recipientName = glsCustomer.b2b_company_name;
-  }
-  // Support both field name formats
-  const street   = addr.address_1 || addr.address1 || addr.addr1 || addr.address || addr.street || '';
-  const city     = addr.city || '';
-  const zipCode  = addr.postcode || addr.postal_code || addr.zip || '';
-  const country  = addr.country_code || addr.country || 'IE';
-  const phone    = addr.phone || bill.phone || freshOrder.customer_phone || '';
-  let email = freshOrder.customer_email || bill.email || ship.email || addr.email || '';
-  if (!email && glsCustomer && glsCustomer.email) email = glsCustomer.email;
+    || order.customer_name || order.billing_name || 'Customer';
 
-  // If street is incomplete (e.g. just a number like "31"), fall back to customer record address
-  let finalStreet = street;
-  if ((!finalStreet || finalStreet.trim().length <= 4) && glsCustomer && glsCustomer.address && glsCustomer.address.trim().length > 4) {
-    finalStreet = glsCustomer.address.trim();
+  // B2B: use company name if available
+  if (order.customer_id) {
+    const cust = (allCustomers || []).find(c => String(c.id) === String(order.customer_id));
+    if (cust && cust.customer_type === 'b2b' && cust.b2b_company_name) {
+      recipientName = cust.b2b_company_name;
+    }
   }
 
-  if (!finalStreet || !city || !zipCode) {
+  const street  = addr.address_1 || addr.address1 || addr.addr1 || addr.address || addr.street || '';
+  const city    = addr.city || '';
+  const zipCode = addr.postcode || addr.postal_code || addr.zip || '';
+  const country = addr.country_code || addr.country || 'IE';
+  const phone   = addr.phone || bill.phone || order.customer_phone || '';
+  let email     = order.customer_email || bill.email || ship.email || addr.email || '';
+  if (!email && order.customer_id) {
+    const cust = (allCustomers || []).find(c => c.id === order.customer_id);
+    if (cust && cust.email) email = cust.email;
+  }
+
+  if (!street || !city || !zipCode) {
     if (btn) { btn.disabled = false; btn.textContent = '📦 Ship via GLS'; }
     toast('Missing shipping address (street, city or postcode)', 'error');
     return;
@@ -13589,16 +13567,16 @@ window.shipViaGLS = async function shipViaGLS() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        order_number:   freshOrder.order_number || freshOrder.id,
+        order_number:   order.order_number || order.id,
         recipient_name: recipientName,
-        street:         finalStreet,
+        street:         street,
         city:           city,
         zip_code:       zipCode,
         country_code:   country,
         contact_phone:  phone,
         contact_email:  email,
         weight:         1.0,
-        references:     freshOrder.order_number || freshOrder.id
+        references:     order.order_number || order.id
       })
     });
 
@@ -13608,7 +13586,7 @@ window.shipViaGLS = async function shipViaGLS() {
       throw new Error(result.error || ('GLS error ' + resp.status));
     }
 
-    // Save parcel number as tracking (primary = parcel_number from barcode)
+    // Parcel number = barcode on label (primary tracking reference)
     const parcelNum = result.parcel_number || result.track_id || '';
 
     // Save tracking number to order
@@ -13621,7 +13599,6 @@ window.shipViaGLS = async function shipViaGLS() {
         };
         if (result.label_pdf_base64) updateData.gls_label_base64 = result.label_pdf_base64;
         await supaUpdate('orders', order.id, updateData);
-        // Update in-memory cache
         const idx = allOrders.findIndex(function(o) { return o.id === order.id; });
         if (idx >= 0) {
           allOrders[idx].tracking_number = parcelNum;
@@ -13630,7 +13607,6 @@ window.shipViaGLS = async function shipViaGLS() {
         }
         window._currentModalOrder.tracking_number = parcelNum;
         if (result.label_pdf_base64) window._currentModalOrder.gls_label_base64 = result.label_pdf_base64;
-        // Update tracking input in modal
         const trackInput = document.getElementById('omTrackingNumber');
         if (trackInput) trackInput.value = parcelNum;
       } catch(e) {
@@ -13638,17 +13614,13 @@ window.shipViaGLS = async function shipViaGLS() {
       }
     }
 
-    // Store label PDF for download
     if (result.label_pdf_base64) {
       _glsLabelBase64 = result.label_pdf_base64;
       const lblBtn = document.getElementById('btnGlsLabel');
       if (lblBtn) lblBtn.style.display = 'inline-block';
     }
 
-    if (btn) {
-      btn.textContent = '✅ Shipped: ' + (parcelNum || 'OK');
-      btn.disabled = true;
-    }
+    if (btn) { btn.textContent = '✅ Shipped: ' + (parcelNum || 'OK'); btn.disabled = true; }
     toast('✅ GLS shipment created! Parcel: ' + (parcelNum || 'N/A'), 'success');
 
   } catch(e) {
