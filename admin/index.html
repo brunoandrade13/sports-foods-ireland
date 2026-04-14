@@ -2354,9 +2354,180 @@ Only B2B customers
 </div>
 </div>
 
+<!-- MANUAL ORDER — FULL PAGE -->
+<div class="page" id="page-manual-order">
+<div class="page-header" style="margin-bottom:24px">
+  <div style="display:flex;align-items:center;gap:14px">
+    <button onclick="showPage('orders')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text-muted);font-size:0.9rem;cursor:pointer">← Orders</button>
+    <h1 style="margin:0">Create Manual Order</h1>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start">
+
+  <!-- LEFT -->
+  <div style="display:flex;flex-direction:column;gap:20px">
+
+    <!-- Customer -->
+    <div class="detail-panel">
+      <h3 style="margin:0 0 14px;font-size:0.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)">Customer</h3>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <select id="moCustomer" onchange="renderManualOrderProductPicker()"
+          style="flex:1;min-width:260px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem">
+          <option value="">Select customer…</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--text-muted);cursor:pointer;white-space:nowrap">
+          <input type="checkbox" id="moOnlyB2B" checked style="width:15px;height:15px"> B2B only
+        </label>
+      </div>
+    </div>
+
+    <!-- Product picker -->
+    <div class="detail-panel">
+      <h3 style="margin:0 0 14px;font-size:0.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)">Add Products</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div style="flex:1;min-width:130px">
+          <label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:4px">Brand</label>
+          <select id="moBrandFilter" onchange="renderManualOrderProductPicker()"
+            style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
+            <option value="">All brands</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:130px">
+          <label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:4px">Category</label>
+          <select id="moCategoryFilter" onchange="renderManualOrderProductPicker()"
+            style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
+            <option value="">All categories</option>
+          </select>
+        </div>
+        <div style="flex:2;min-width:200px">
+          <label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:4px">Search product</label>
+          <input type="text" id="moProductSearch" placeholder="Name or SKU…" oninput="renderManualOrderProductPicker()"
+            style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
+        </div>
+      </div>
+      <div style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
+        <table style="width:100%;font-size:0.85rem;border-collapse:collapse">
+          <thead style="position:sticky;top:0;z-index:1">
+            <tr>
+              <th style="padding:9px 12px;text-align:left;background:var(--surface-2)">Product</th>
+              <th style="padding:9px 12px;text-align:left;background:var(--surface-2)">Brand</th>
+              <th style="padding:9px 12px;text-align:right;background:var(--surface-2)">B2B €</th>
+              <th style="padding:9px 12px;text-align:right;width:110px;background:var(--surface-2)">Qty</th>
+              <th style="padding:9px 12px;width:70px;background:var(--surface-2)"></th>
+            </tr>
+          </thead>
+          <tbody id="moProductPickerBody">
+            <tr><td colspan="5" style="padding:20px;color:var(--text-muted);font-size:0.85rem">Select a B2B customer first.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Items added -->
+    <div class="detail-panel">
+      <h3 style="margin:0 0 14px;font-size:0.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)">Items in This Order</h3>
+      <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <table style="width:100%;font-size:0.87rem;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--surface-2)">
+              <th style="padding:9px 12px;text-align:left">Item</th>
+              <th style="padding:9px 12px;text-align:right">Unit €</th>
+              <th style="padding:9px 12px;text-align:right">Qty</th>
+              <th style="padding:9px 12px;text-align:right">Total €</th>
+              <th style="padding:9px 12px;width:50px"></th>
+            </tr>
+          </thead>
+          <tbody id="moItemsBody">
+            <tr><td colspan="5" style="padding:20px;color:var(--text-muted);font-size:0.85rem">No items added yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="detail-panel">
+      <h3 style="margin:0 0 10px;font-size:0.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)">Internal Notes</h3>
+      <textarea id="moNotes" rows="3" placeholder="PO number, special instructions…"
+        style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem;resize:vertical"></textarea>
+    </div>
+  </div>
+
+  <!-- RIGHT: Details + Totals -->
+  <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:20px">
+
+    <div class="detail-panel">
+      <h3 style="margin:0 0 14px;font-size:0.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)">Order Details</h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Currency</label>
+          <select id="moCurrency" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+            <option value="EUR">EUR €</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Financial Status</label>
+          <select id="moFinancial" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+            <option value="pending">Pending</option>
+            <option value="paid" selected>Paid</option>
+            <option value="authorized">Authorized</option>
+            <option value="partially_paid">Partially Paid</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Fulfillment Status</label>
+          <select id="moFulfillment" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+            <option value="unfulfilled" selected>Unfulfilled</option>
+            <option value="partial">Partial</option>
+            <option value="fulfilled">Fulfilled</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-panel">
+      <h3 style="margin:0 0 14px;font-size:0.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)">Totals</h3>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Subtotal €</label>
+          <input type="number" id="moSubtotal" step="0.01" min="0" oninput="recalcManualOrderTotal()"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+        </div>
+        <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Discount €</label>
+          <input type="number" id="moDiscount" step="0.01" min="0" oninput="recalcManualOrderTotal()"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+        </div>
+        <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Shipping €</label>
+          <input type="number" id="moShipping" step="0.01" min="0" oninput="recalcManualOrderTotal()"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+        </div>
+        <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Tax €</label>
+          <input type="number" id="moTax" step="0.01" min="0" oninput="recalcManualOrderTotal()"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+        </div>
+        <div style="border-top:2px solid var(--border);padding-top:10px;margin-top:2px">
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Total €</label>
+          <input type="number" id="moTotal" step="0.01" min="0"
+            style="width:100%;padding:10px 12px;border:2px solid var(--accent);border-radius:8px;background:var(--surface-2);color:var(--text);font-weight:700;font-size:1.05rem">
+          <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">Auto-calculated · editable if needed</div>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="saveManualOrder()" class="btn btn-primary" style="width:100%;padding:13px;font-size:1rem;font-weight:700;justify-content:center">
+      ✓ Save Order
+    </button>
+    <button onclick="showPage('orders')" class="btn btn-ghost" style="width:100%;padding:10px;justify-content:center">
+      Cancel
+    </button>
+
+  </div>
+</div>
+</div>
+
 <div class="page" id="page-invoices">
-<div class="page-header">
-<h1>Invoices</h1>
 <div class="actions">
 <button class="btn btn-outline" onclick="loadAllData()">Refresh</button>
 </div>
@@ -7024,7 +7195,7 @@ Loading items...
       const titles = {
         dashboard: 'Dashboard', analytics: 'Analytics', products: 'Products', brands: 'Brands', categories: 'Categories',
         reviews: 'Reviews', orders: 'Orders', customers: 'Customers', abandoned: 'Abandoned Carts', discounts: 'Discount Codes',
-        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'monthly-closing': 'Monthly Closing', settings: 'Settings'
+        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'manual-order': 'Create Manual Order', 'monthly-closing': 'Monthly Closing', settings: 'Settings'
       };
       document.getElementById('pageTitle').textContent = titles[page] || page;
 
@@ -11930,8 +12101,8 @@ Loading items...
     }
 
     function openManualOrderModal() {
-      const modal = document.getElementById('manualOrderModal');
-      if (!modal) return;
+      const modal = document.getElementById('manualOrderModal'); // legacy — kept for compat
+      // Reset fields
       const sel = document.getElementById('moCustomer');
       const onlyB2B = document.getElementById('moOnlyB2B');
       if (sel) {
@@ -11968,14 +12139,12 @@ Loading items...
       document.getElementById('moFulfillment').value = 'unfulfilled';
       ['moSubtotal', 'moDiscount', 'moShipping', 'moTax', 'moTotal'].forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; });
       const notesEl = document.getElementById('moNotes'); if (notesEl) notesEl.value = '';
-      modal.classList.add('open');
-      modal.scrollTop = 0;
-      modal.style.zIndex = '220';
+      showPage('manual-order');
+      window.scrollTo(0,0);
     }
 
     function closeManualOrderModal() {
-      const modal = document.getElementById('manualOrderModal');
-      if (modal) modal.classList.remove('open');
+      showPage('orders');
     }
 
     function recalcManualOrderTotal() {
@@ -12278,7 +12447,7 @@ Loading items...
           }
         }
         toast('Manual order created');
-        closeManualOrderModal();
+        showPage('orders');
         manualOrderItems = [];
         await _refreshOrders();
       } catch (e) {
