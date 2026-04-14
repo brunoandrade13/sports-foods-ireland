@@ -3324,5 +3324,14 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+<script>
+// Redirect recovery tokens to update-password page
+(function(){
+  var h = window.location.hash;
+  if (h && h.indexOf('type=recovery') !== -1) {
+    window.location.href = '/update-password.html' + h;
+  }
+})();
+</script>
 </body>
 </html>
