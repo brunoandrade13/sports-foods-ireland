@@ -13583,7 +13583,9 @@ window.shipViaGLS = async function shipViaGLS() {
     const result = await resp.json();
 
     if (!resp.ok || result.error) {
-      throw new Error(result.error || ('GLS error ' + resp.status));
+      const glsMsg = result.error || ('GLS error ' + resp.status);
+      const glsRaw = result.gls_raw ? (' | Raw: ' + result.gls_raw.substring(0, 200)) : '';
+      throw new Error(glsMsg + glsRaw);
     }
 
     // Parcel number = barcode on label (primary tracking reference)
