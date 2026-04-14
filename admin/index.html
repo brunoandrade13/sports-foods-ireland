@@ -4442,7 +4442,9 @@ Loading items...
   <button class="btn" onclick="document.getElementById('omDiscountValue').value='';updateDiscountPreview()"
     style="padding:5px 10px;font-size:0.78rem;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;border-radius:6px">Clear</button>
 </div>
-<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center">
+<button class="btn btn-outline" style="border-color:#f59e0b;color:#f59e0b;margin-right:auto" id="btnEditItems" onclick="toggleOrderEditMode()">✏️ Edit Items</button>
+<button class="btn btn-primary" id="btnSaveItemEdits" style="display:none;background:#f59e0b;border-color:#f59e0b;color:#000" onclick="saveOrderItemEdits().catch(e => alert('ERROR: ' + e.message))">💾 Save Changes</button>
 <button class="btn btn-outline" style="border-color:var(--border)" id="btnGlsShip" onclick="shipViaGLS()">📦 Ship via GLS</button>
 <button class="btn btn-outline" style="border-color:var(--border);display:none" id="btnGlsLabel" onclick="downloadGLSLabel()">🏷️ Print Label</button>
 <button class="btn btn-primary" onclick="generateInvoicePDFFromModal().catch(e => alert('ERROR: ' + e.message))">Generate Invoice</button>
@@ -11794,69 +11796,14 @@ Loading items...
         const items = await supaGet('order_items', `?order_id=eq.${order.id}`);
         window._currentModalItems = items || [];
         window._currentOrderItemsForInvoice = items || [];
+        window._currentModalOrder = order;
+        window._orderEditMode = false;
         if (!items || items.length === 0) {
           const count = order.item_count || '—';
           const source = order.order_source || '—';
-          wrapper.innerHTML = `
-        <div style="color:var(--text-dim);font-size:0.85rem;">⚠ Item details not yet synced from ${source === 'woocommerce' ? 'WooCommerce' : source}. Overall Items count: <strong>${count}</strong>.</div>
-          `;
+          wrapper.innerHTML = `<div style="color:var(--text-dim);font-size:0.85rem;">⚠ Item details not yet synced from ${source === 'woocommerce' ? 'WooCommerce' : source}. Overall Items count: <strong>${count}</strong>.</div>`;
         } else {
-          wrapper.innerHTML = `
-          <table style="width:100%; margin:0; border:none; background:transparent;">
-                <thead style="background:var(--surface-2);">
-                  <tr>
-                    <th style="padding:8px 6px;width:30px;text-align:center"><input type="checkbox" id="omSelectAll" checked onchange="document.querySelectorAll('.om-item-cb').forEach(c=>c.checked=this.checked)" title="Select/Deselect all for invoice"></th>
-                    <th style="padding:8px 10px;">Item</th>
-                    <th style="padding:8px 10px;">SKU</th>
-                    <th style="padding:8px 10px;">Price</th>
-                    <th style="padding:8px 10px;">Qty</th>
-                    <th style="padding:8px 10px;">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${items.map(i => {
-            let realProductName = i.product_name || 'Unknown';
-            if (typeof allProducts !== 'undefined' && allProducts.length > 0) {
-              let matchedProduct = null;
-              if (i.product_id) matchedProduct = allProducts.find(p => p.id === i.product_id);
-              if (!matchedProduct && i.product_sku) matchedProduct = allProducts.find(p => p.sku === i.product_sku);
-              if (matchedProduct && matchedProduct.name) realProductName = matchedProduct.name;
-            }
-            return `
-                    <tr style="border-bottom: 1px solid var(--border-color);">
-                      <td style="padding:8px 6px;text-align:center"><input type="checkbox" class="om-item-cb" data-idx="${items.indexOf(i)}" checked></td>
-                      <td style="padding:8px 10px;">${esc(realProductName)} <span style="font-size:0.8rem;color:var(--text-muted)">${i.product_name && i.product_name !== realProductName ? '(' + esc(i.product_name) + ')' : ''} ${i.variant_label ? ' - ' + esc(i.variant_label) : ''}</span></td>
-                      <td style="padding:8px 10px; font-family:monospace;">${esc(i.product_sku || i.sku || '—')}</td>
-                      <td style="padding:8px 10px;">€${(parseFloat(i.unit_price) || 0).toFixed(2)}</td>
-                      <td style="padding:8px 10px;">${i.quantity || 1}</td>
-                      <td style="padding:8px 10px; font-weight:bold;">€${(parseFloat(i.total_price) || parseFloat(i.total) || 0).toFixed(2)}</td>
-                    </tr>
-                  `}).join('')}
-                </tbody>
-                <tfoot>
-                   ${(() => {
-                     const itemsTotal = items.reduce((s, i) => s + (parseFloat(i.total_price) || parseFloat(i.total) || 0), 0);
-                     const subtotal = parseFloat(order.subtotal) || itemsTotal;
-                     const shipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
-                     const discount = parseFloat(order.discount_amount) || parseFloat(order.discount_total) || 0;
-                     const tax = parseFloat(order.tax_amount) || parseFloat(order.tax_total) || 0;
-                     const total = parseFloat(order.total) || 0;
-                     const pm = order.payment_method || '—';
-                     const sm = order.shipping_method || (shipping > 0 ? 'Standard Shipping' : 'Free Shipping');
-                     const dc = order.discount_code || order.coupon_code || '';
-                     let rows = '';
-                     rows += '<tr><td colspan="5" style="text-align:right;padding:6px 10px;color:var(--text-muted);">Subtotal (ex VAT)</td><td style="padding:6px 10px;">€' + subtotal.toFixed(2) + '</td></tr>';
-                     if (shipping > 0) rows += '<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping (' + esc(sm) + ')</td><td style="padding:4px 10px;">€' + shipping.toFixed(2) + '</td></tr>';
-                     else rows += '<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping</td><td style="padding:4px 10px;color:#22c55e;">Free</td></tr>';
-                     if (discount > 0) rows += '<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Discount' + (dc ? ' (' + esc(dc) + ')' : '') + '</td><td style="padding:4px 10px;color:#ef4444;">-€' + discount.toFixed(2) + '</td></tr>';
-                     if (tax > 0) rows += '<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">VAT (23%)</td><td style="padding:4px 10px;">€' + tax.toFixed(2) + '</td></tr>';
-                     rows += '<tr style="border-top:2px solid var(--border);"><td colspan="5" style="text-align:right;padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">Total</td><td style="padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">€' + total.toFixed(2) + '</td></tr>';
-                     rows += '<tr><td colspan="6" style="text-align:right;padding:4px 10px 8px;font-size:0.8rem;color:var(--text-muted);">💳 ' + esc(pm) + '</td></tr>';
-                     return rows;
-                   })()}
-                </tfoot>
-              </table>
-        `;
+          renderOrderItemsTable(items, order, false);
         }
       } catch (e) {
         wrapper.innerHTML = '<div style="color:#d32f2f">Failed to load order items.</div>';
@@ -12251,6 +12198,13 @@ Loading items...
 
     function closeOrderModal() {
       document.getElementById('orderModal').classList.remove('open');
+      window._orderEditMode = false;
+      window._currentModalItems = null;
+      window._currentModalOrder = null;
+      const editBtn = document.getElementById('btnEditItems');
+      const saveBtn = document.getElementById('btnSaveItemEdits');
+      if (editBtn) editBtn.textContent = '✏️ Edit Items';
+      if (saveBtn) saveBtn.style.display = 'none';
     }
 
     function closeCustomerProfileModal() {
@@ -13965,25 +13919,24 @@ async function sendInvoiceByEmail() {
   const result = await generateInvoicePDFFromModal({ returnBase64: true });
   if (!result) return;
   const { base64, fileName, invNum, order } = result;
-  // Find customer email
+  // BUG FIX 1: usar customer_email (campo correto) em vez de order.email (inexistente)
   const bill = order.billing_address || {};
-  let email = order.email || bill.email || '';
+  let email = order.customer_email || order.guest_email || bill.email || '';
   let ccEmails = [];
   if (order.customer_id) {
     const cust = (allCustomers || []).find(c => c.id === order.customer_id);
     if (cust) {
       if (!email) email = cust.email || '';
-      // If this parent has CC emails, use them
       if (cust.invoice_cc_emails) {
         ccEmails = cust.invoice_cc_emails.split(',').map(e => e.trim()).filter(e => e && e !== email);
       }
     }
-    // If customer is a child (order linked to branch), find parent's CC emails
+    // Se for cliente filho (branch), buscar CC emails do parent
     var parentId = window.customerIdToGroupId ? window.customerIdToGroupId[order.customer_id] : null;
     if (parentId && parentId !== order.customer_id) {
       var parent = (allCustomers || []).find(c => c.id === parentId);
       if (parent) {
-        if (!email) email = order.customer_email || (bill || {}).email || '';
+        if (!email) email = order.customer_email || order.guest_email || bill.email || '';
         if (parent.invoice_cc_emails) {
           ccEmails = parent.invoice_cc_emails.split(',').map(e => e.trim()).filter(e => e && e !== email);
         }
@@ -13998,7 +13951,7 @@ async function sendInvoiceByEmail() {
   const btn = document.querySelector('[onclick*="sendInvoiceByEmail"]');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
   try {
-    const customerName = [bill.first_name, bill.last_name].filter(Boolean).join(' ') || order.customer_name || order.billing_name || email || 'Customer';
+    const customerName = [bill.first_name, bill.last_name].filter(Boolean).join(' ') || order.customer_name || email || 'Customer';
     const htmlContent = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">' +
       '<div style="background:#1B4332;padding:20px;text-align:center"><img src="https://sportsfoodsireland.ie/wp-content/uploads/2021/09/logo.png" alt="SFI" style="height:60px"></div>' +
       '<div style="padding:30px 20px">' +
@@ -14027,8 +13980,46 @@ async function sendInvoiceByEmail() {
     });
     const data = await res.json();
     if (data.success) {
-      toast('Invoice ' + invNum + ' sent to ' + email + (ccEmails.length > 0 ? ' (CC: ' + ccEmails.join(', ') + ')' : ''));
+      // BUG FIX 2 & 3: gravar registro em email_log e invoices após envio bem-sucedido
+      const now = new Date().toISOString();
+      // Registrar no email_log
+      await supaInsert('email_log', {
+        order_id: order.id,
+        customer_id: order.customer_id || null,
+        email: email,
+        email_type: 'invoice',
+        subject: 'Invoice ' + invNum + ' — Sports Foods Ireland',
+        email_status: 'sent',
+        sent_at: now,
+        created_at: now
+      }).catch(err => console.warn('email_log insert failed:', err));
+      // Registrar na tabela invoices
+      await supaInsert('invoices', {
+        order_id: order.id,
+        invoice_number: invNum,
+        total: parseFloat(order.total) || 0,
+        currency: order.currency || 'EUR',
+        invoice_status: 'sent',
+        email_status: 'sent',
+        sent_at: now,
+        customer_name: customerName,
+        created_at: now,
+        updated_at: now
+      }).catch(err => console.warn('invoices insert failed:', err));
+      toast('✅ Invoice ' + invNum + ' sent to ' + email + (ccEmails.length > 0 ? ' (CC: ' + ccEmails.join(', ') + ')' : ''));
     } else {
+      // BUG FIX 3: registrar falha no email_log também
+      const now = new Date().toISOString();
+      await supaInsert('email_log', {
+        order_id: order.id,
+        customer_id: order.customer_id || null,
+        email: email,
+        email_type: 'invoice',
+        subject: 'Invoice ' + invNum + ' — Sports Foods Ireland',
+        email_status: 'failed',
+        sent_at: now,
+        created_at: now
+      }).catch(err => console.warn('email_log failed insert error:', err));
       alert('Failed to send: ' + (data.message || 'Unknown error'));
     }
   } catch (err) {
@@ -14039,6 +14030,212 @@ async function sendInvoiceByEmail() {
   }
 }
 
+
+// ============================================================
+// ORDER ITEMS RENDER + EDIT MODE
+// ============================================================
+function renderOrderItemsTable(items, order, editMode) {
+  const wrapper = document.getElementById('omItemsWrapper');
+  if (!wrapper) return;
+  const editBtn  = document.getElementById('btnEditItems');
+  const saveBtn  = document.getElementById('btnSaveItemEdits');
+  if (editBtn) editBtn.textContent = editMode ? '✕ Cancel Edit' : '✏️ Edit Items';
+  if (saveBtn) saveBtn.style.display = editMode ? 'inline-flex' : 'none';
+
+  function getProductName(i) {
+    let name = i.product_name || 'Unknown';
+    if (typeof allProducts !== 'undefined' && allProducts.length > 0) {
+      let m = null;
+      if (i.product_id) m = allProducts.find(p => p.id === i.product_id);
+      if (!m && i.product_sku) m = allProducts.find(p => p.sku === i.product_sku);
+      if (m && m.name) name = m.name;
+    }
+    return name;
+  }
+
+  const shipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
+  const discount = parseFloat(order.discount_amount) || parseFloat(order.discount_total) || 0;
+  const pm  = order.payment_method || '—';
+  const sm  = order.shipping_method || (shipping > 0 ? 'Standard Shipping' : 'Free Shipping');
+  const dc  = order.discount_code || order.coupon_code || '';
+
+  const bodyRows = items.map((i, idx) => {
+    const isBackorder = i.is_backorder === true;
+    const price = parseFloat(i.unit_price) || 0;
+    const qty   = i.quantity || 1;
+    const total = parseFloat(i.total_price) || parseFloat(i.total) || 0;
+    const name  = getProductName(i);
+    const sub   = (i.product_name && i.product_name !== name ? '(' + esc(i.product_name) + ') ' : '') + (i.variant_label ? ' - ' + esc(i.variant_label) : '');
+
+    if (editMode) {
+      const rowBg = isBackorder ? 'background:#1a1a2e;opacity:0.7;' : '';
+      return `<tr style="border-bottom:1px solid var(--border-color);${rowBg}" data-item-id="${i.id}">
+        <td style="padding:8px 6px;text-align:center"><input type="checkbox" class="om-item-cb" data-idx="${idx}" ${isBackorder ? '' : 'checked'}></td>
+        <td style="padding:8px 10px;">${esc(name)} <span style="font-size:0.78rem;color:var(--text-muted)">${sub}</span></td>
+        <td style="padding:8px 10px;font-family:monospace;font-size:0.82rem;">${esc(i.product_sku || i.sku || '—')}</td>
+        <td style="padding:6px 8px;">
+          <input type="number" class="om-edit-price" data-idx="${idx}" value="${price.toFixed(2)}" min="0" step="0.01"
+            style="width:80px;padding:5px 8px;border:1px solid ${isBackorder ? '#6b21a8' : 'var(--primary-color)'};border-radius:6px;background:var(--bg);color:var(--text);font-size:0.88rem;"
+            oninput="omUpdateRowTotal(this,${idx},${qty})" ${isBackorder ? 'disabled' : ''}>
+        </td>
+        <td style="padding:8px 10px;text-align:center">${qty}</td>
+        <td style="padding:8px 10px;font-weight:bold;" id="om-row-total-${idx}">€${total.toFixed(2)}</td>
+        <td style="padding:6px 8px;">
+          <button onclick="omToggleBackorder(${idx})"
+            style="padding:4px 10px;font-size:0.75rem;border-radius:6px;border:1px solid ${isBackorder ? '#a855f7' : '#f59e0b'};background:${isBackorder ? '#581c87' : 'transparent'};color:${isBackorder ? '#e9d5ff' : '#f59e0b'};cursor:pointer;white-space:nowrap;"
+            title="${isBackorder ? 'Remove from backorder' : 'Mark entire item as backorder'}">
+            ${isBackorder ? '🔄 In Backorder' : '📦 Backorder'}
+          </button>
+        </td>
+      </tr>`;
+    } else {
+      const rowStyle = isBackorder ? 'border-bottom:1px solid var(--border-color);opacity:0.55;' : 'border-bottom:1px solid var(--border-color);';
+      const badge = isBackorder ? ' <span style="font-size:0.7rem;background:#581c87;color:#e9d5ff;padding:1px 6px;border-radius:10px;margin-left:4px;">backorder</span>' : '';
+      return `<tr style="${rowStyle}">
+        <td style="padding:8px 6px;text-align:center"><input type="checkbox" class="om-item-cb" data-idx="${idx}" ${isBackorder ? '' : 'checked'}></td>
+        <td style="padding:8px 10px;">${esc(name)}${badge} <span style="font-size:0.8rem;color:var(--text-muted)">${sub}</span></td>
+        <td style="padding:8px 10px;font-family:monospace;">${esc(i.product_sku || i.sku || '—')}</td>
+        <td style="padding:8px 10px;">€${price.toFixed(2)}</td>
+        <td style="padding:8px 10px;">${qty}</td>
+        <td style="padding:8px 10px;font-weight:bold;">€${total.toFixed(2)}</td>
+      </tr>`;
+    }
+  }).join('');
+
+  const activeItems = items.filter(i => !i.is_backorder);
+  const subtotalCalc = activeItems.reduce((s, i) => s + (parseFloat(i.total_price) || parseFloat(i.total) || 0), 0);
+  const subtotal = parseFloat(order.subtotal) || subtotalCalc;
+  const tax      = parseFloat(order.tax_amount) || parseFloat(order.tax_total) || 0;
+  const total    = parseFloat(order.total) || 0;
+
+  const editExtraTh = editMode ? '<th style="padding:8px 10px;">Action</th>' : '';
+
+  wrapper.innerHTML = `
+  <table style="width:100%;margin:0;border:none;background:transparent;">
+    <thead style="background:var(--surface-2);">
+      <tr>
+        <th style="padding:8px 6px;width:30px;text-align:center"><input type="checkbox" id="omSelectAll" checked onchange="document.querySelectorAll('.om-item-cb').forEach(c=>c.checked=this.checked)"></th>
+        <th style="padding:8px 10px;">Item</th>
+        <th style="padding:8px 10px;">SKU</th>
+        <th style="padding:8px 10px;">Price</th>
+        <th style="padding:8px 10px;">Qty</th>
+        <th style="padding:8px 10px;">Total</th>
+        ${editExtraTh}
+      </tr>
+    </thead>
+    <tbody>${bodyRows}</tbody>
+    <tfoot id="om-tfoot">
+      <tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:6px 10px;color:var(--text-muted);">Subtotal (ex VAT)</td><td style="padding:6px 10px;" id="om-subtotal">€${subtotal.toFixed(2)}</td></tr>
+      ${shipping > 0 ? `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping (${esc(sm)})</td><td style="padding:4px 10px;">€${shipping.toFixed(2)}</td></tr>` : `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping</td><td style="padding:4px 10px;color:#22c55e;">Free</td></tr>`}
+      ${discount > 0 ? `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Discount${dc ? ' (' + esc(dc) + ')' : ''}</td><td style="padding:4px 10px;color:#ef4444;">-€${discount.toFixed(2)}</td></tr>` : ''}
+      ${tax > 0 ? `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">VAT (23%)</td><td style="padding:4px 10px;">€${tax.toFixed(2)}</td></tr>` : ''}
+      <tr style="border-top:2px solid var(--border);"><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">Total</td><td style="padding:10px 10px 4px;font-weight:700;font-size:1.05rem;" id="om-total">€${total.toFixed(2)}</td></tr>
+      <tr><td colspan="${editMode ? 7 : 6}" style="text-align:right;padding:4px 10px 8px;font-size:0.8rem;color:var(--text-muted);">💳 ${esc(pm)}</td></tr>
+    </tfoot>
+  </table>`;
+}
+
+function omUpdateRowTotal(input, idx, qty) {
+  const price = parseFloat(input.value) || 0;
+  const cell = document.getElementById('om-row-total-' + idx);
+  if (cell) cell.textContent = '€' + (price * qty).toFixed(2);
+}
+
+function omToggleBackorder(idx) {
+  const items = window._currentModalItems;
+  if (!items || !items[idx]) return;
+  items[idx].is_backorder = !items[idx].is_backorder;
+  items[idx].backorder_status = items[idx].is_backorder ? 'pending' : null;
+  renderOrderItemsTable(items, window._currentModalOrder, true);
+}
+
+function toggleOrderEditMode() {
+  window._orderEditMode = !window._orderEditMode;
+  const items = window._currentModalItems;
+  const order = window._currentModalOrder;
+  if (!items || !order) return;
+  renderOrderItemsTable(items, order, window._orderEditMode);
+}
+
+async function saveOrderItemEdits() {
+  const items = window._currentModalItems;
+  const order = window._currentModalOrder;
+  if (!items || !order) return;
+
+  const rows = document.querySelectorAll('#omItemsWrapper tbody tr[data-item-id]');
+  const updates = [];
+  rows.forEach((row, idx) => {
+    const item = items[idx];
+    if (!item) return;
+    const priceInput = row.querySelector('.om-edit-price');
+    const newPrice = priceInput ? parseFloat(priceInput.value) || 0 : parseFloat(item.unit_price) || 0;
+    const qty = item.quantity || 1;
+    const newTotal = parseFloat((newPrice * qty).toFixed(2));
+    updates.push({
+      id: item.id,
+      unit_price: newPrice,
+      total_price: newTotal,
+      total: newTotal,
+      is_backorder: item.is_backorder === true,
+      backorder_status: item.is_backorder ? 'pending' : null,
+      fulfillment_status: item.is_backorder ? 'backorder' : (item.fulfillment_status === 'backorder' ? 'unfulfilled' : item.fulfillment_status)
+    });
+    // Update in-memory
+    item.unit_price = newPrice;
+    item.total_price = newTotal;
+    item.total = newTotal;
+  });
+
+  const saveBtn = document.getElementById('btnSaveItemEdits');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+
+  try {
+    // Save each item
+    for (const u of updates) {
+      await supaUpdate('order_items', u.id, {
+        unit_price: u.unit_price,
+        total_price: u.total_price,
+        total: u.total,
+        is_backorder: u.is_backorder,
+        backorder_status: u.backorder_status,
+        fulfillment_status: u.fulfillment_status
+      });
+    }
+
+    // Recalculate order totals (only non-backorder items)
+    const activeItems = items.filter(i => !i.is_backorder);
+    const newSubtotal = activeItems.reduce((s, i) => s + (parseFloat(i.total_price) || 0), 0);
+    const shipping    = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
+    const newVat      = Math.round((newSubtotal + shipping) * 23) / 100;
+    const newTotal    = parseFloat((newSubtotal + shipping + newVat).toFixed(2));
+    const hasBackorder = items.some(i => i.is_backorder);
+
+    await supaUpdate('orders', order.id, {
+      subtotal: parseFloat(newSubtotal.toFixed(2)),
+      tax_amount: newVat,
+      tax_total: newVat,
+      total: newTotal,
+      has_backorder_items: hasBackorder
+    });
+
+    // Update in-memory order
+    order.subtotal    = newSubtotal;
+    order.tax_amount  = newVat;
+    order.tax_total   = newVat;
+    order.total       = newTotal;
+    order.has_backorder_items = hasBackorder;
+    window._currentOrderItemsForInvoice = items.filter(i => !i.is_backorder);
+
+    window._orderEditMode = false;
+    renderOrderItemsTable(items, order, false);
+    toast('✅ Order items saved. Backorder: ' + items.filter(i => i.is_backorder).length + ' item(s).');
+  } catch (err) {
+    console.error('saveOrderItemEdits error:', err);
+    alert('Error saving: ' + err.message);
+  } finally {
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 Save Changes'; }
+  }
+}
 
 function showInvoicePDFModal(pdfUrl, fileName) {
   let modal = document.getElementById('invoicePDFModal');
