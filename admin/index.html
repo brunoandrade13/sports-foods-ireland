@@ -3395,6 +3395,10 @@ style="font-size:0.8rem;padding:4px 8px">
     style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">
     🏷️ Zone3 Discounts
   </button>
+  <button id="b2bTabAR" onclick="switchB2BTab('ar')"
+    style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">
+    💰 Accounts Receivable <span id="arOverdueBadge" style="background:#ef4444;color:#fff;border-radius:999px;padding:1px 7px;font-size:0.75rem;margin-left:4px;display:none">0</span>
+  </button>
 </div>
 
 <!-- APPROVED tab -->
@@ -3445,6 +3449,52 @@ style="font-size:0.8rem;padding:4px 8px">
         <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">Loading...</td></tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- ACCOUNTS RECEIVABLE (QB) tab -->
+<div id="b2bTabContentAR" style="display:none">
+  <div class="detail-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <h3 style="margin:0">Accounts Receivable — QuickBooks <span id="arLastSync" style="font-size:0.8rem;color:var(--text-muted);font-weight:400"></span></h3>
+        <p style="margin:4px 0 0;font-size:0.85rem;color:var(--text-muted)">Open invoices pulled live from QuickBooks Online.</p>
+      </div>
+      <button class="btn btn-primary" onclick="loadARData(true)">🔄 Refresh from QuickBooks</button>
+    </div>
+
+    <!-- Summary cards -->
+    <div id="arSummaryCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px"></div>
+
+    <!-- Filter bar -->
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+      <input type="text" id="arSearch" placeholder="Search customer..." oninput="renderARTable()"
+        style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.88rem;width:240px">
+      <select id="arFilter" onchange="renderARTable()"
+        style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.88rem">
+        <option value="all">All customers</option>
+        <option value="overdue">Overdue only</option>
+        <option value="current">Current only</option>
+        <option value="over1yr">Over 1 year</option>
+        <option value="under1yr">Up to 1 year</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div id="arTableWrap" style="overflow-x:auto">
+      <div style="text-align:center;padding:40px;color:var(--text-muted)">Click "Refresh from QuickBooks" to load data.</div>
+    </div>
+  </div>
+</div>
+
+<!-- AR CUSTOMER DETAIL MODAL -->
+<div class="modal-overlay" id="arDetailModal" onclick="if(event.target===this)closeARModal()" style="display:none;align-items:center;justify-content:center">
+  <div class="modal" style="max-width:720px;width:95%;max-height:85vh;overflow-y:auto">
+    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--border)">
+      <h3 id="arModalTitle" style="margin:0;font-size:1.05rem"></h3>
+      <button class="modal-close" onclick="closeARModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted)">&times;</button>
+    </div>
+    <div class="modal-body" id="arModalBody" style="padding:24px"></div>
   </div>
 </div>
 
@@ -14436,14 +14486,205 @@ function switchB2BTab(tab) {
   document.getElementById('b2bTabContentApproved').style.display = tab === 'approved' ? '' : 'none';
   document.getElementById('b2bTabContentPending').style.display  = tab === 'pending'  ? '' : 'none';
   document.getElementById('b2bTabContentZone3').style.display    = tab === 'zone3'    ? '' : 'none';
+  document.getElementById('b2bTabContentAR').style.display       = tab === 'ar'       ? '' : 'none';
   const active   = 'color:var(--accent);border-bottom:3px solid var(--accent);margin-bottom:-2px';
   const inactive = 'color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px';
   const base = 'padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;';
   document.getElementById('b2bTabApproved').style.cssText = base + (tab==='approved'?active:inactive);
   document.getElementById('b2bTabPending').style.cssText  = base + (tab==='pending' ?active:inactive);
   document.getElementById('b2bTabZone3').style.cssText    = base + (tab==='zone3'   ?active:inactive);
+  document.getElementById('b2bTabAR').style.cssText       = base + (tab==='ar'      ?active:inactive);
   if (tab === 'pending') loadB2BPending();
   if (tab === 'zone3')   renderZone3Discounts();
+  if (tab === 'ar')      loadARData();
+}
+
+// ── ACCOUNTS RECEIVABLE (QB) ──────────────────────────────────
+let _arData = null;
+let _arLoaded = false;
+
+async function loadARData(force = false) {
+  if (_arLoaded && !force) return;
+  const wrap = document.getElementById('arTableWrap');
+  const cards = document.getElementById('arSummaryCards');
+  if (!wrap) return;
+  wrap.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">⏳ Loading from QuickBooks…</div>';
+  cards.innerHTML = '';
+  try {
+    const res = await fetch(`${SUPA_URL}/functions/v1/qb-ar-report`, {
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    _arData = data;
+    _arLoaded = true;
+    const now = new Date().toLocaleString('en-IE');
+    const syncEl = document.getElementById('arLastSync');
+    if (syncEl) syncEl.textContent = '— Last synced: ' + now;
+    // Badge
+    const badge = document.getElementById('arOverdueBadge');
+    if (badge) { badge.textContent = data.summary.customers_with_overdue; badge.style.display = ''; }
+    renderARSummaryCards(data.summary);
+    renderARTable();
+  } catch(e) {
+    wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444">❌ ' + (e.message||'Failed to load') + '</div>';
+  }
+}
+
+function renderARSummaryCards(s) {
+  const cards = document.getElementById('arSummaryCards');
+  if (!cards) return;
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  cards.innerHTML = [
+    { label:'Total Open Balance', value: fmt(s.total_open_balance), color:'#166534', bg:'#f0fdf4' },
+    { label:'Customers with Balance', value: s.customers_with_balance, color:'#1e293b', bg:'#f8fafc' },
+    { label:'Open Invoices', value: s.total_open_invoices, color:'#1e293b', bg:'#f8fafc' },
+    { label:'Customers Overdue', value: s.customers_with_overdue, color:'#dc2626', bg:'#fef2f2' },
+  ].map(c => `<div style="background:${c.bg};border:1px solid ${c.bg==='#f0fdf4'?'#bbf7d0':c.bg==='#fef2f2'?'#fecaca':'var(--border)'};border-radius:10px;padding:14px 18px;text-align:center">
+    <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">${c.label}</div>
+    <div style="font-size:1.6rem;font-weight:700;color:${c.color}">${c.value}</div>
+  </div>`).join('');
+}
+
+function renderARTable() {
+  const wrap = document.getElementById('arTableWrap');
+  if (!wrap || !_arData) return;
+  const q      = (document.getElementById('arSearch')?.value || '').toLowerCase().trim();
+  const filter = document.getElementById('arFilter')?.value || 'all';
+  const today  = new Date();
+  const oneYearAgo = new Date(today); oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+  let rows = (_arData.customers || []).filter(c => {
+    if (q && !(c.name||'').toLowerCase().includes(q)) return false;
+    const oldestDue = c.oldest_due ? new Date(c.oldest_due) : null;
+    if (filter === 'overdue') return c.has_overdue;
+    if (filter === 'current') return !c.has_overdue;
+    if (filter === 'over1yr') return oldestDue && oldestDue < oneYearAgo;
+    if (filter === 'under1yr') return !oldestDue || oldestDue >= oneYearAgo;
+    return true;
+  });
+
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  if (!rows.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted)">No customers match the current filter.</div>';
+    return;
+  }
+
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+    <thead>
+      <tr style="background:var(--surface-2);font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
+        <th style="padding:10px 12px;text-align:left">#</th>
+        <th style="padding:10px 12px;text-align:left">Customer</th>
+        <th style="padding:10px 12px;text-align:right">Open Balance</th>
+        <th style="padding:10px 12px;text-align:center">Invoices</th>
+        <th style="padding:10px 12px;text-align:center">Oldest Due</th>
+        <th style="padding:10px 12px;text-align:center">Age</th>
+        <th style="padding:10px 12px;text-align:center">Status</th>
+      </tr>
+    </thead><tbody>`;
+
+  rows.forEach((c, i) => {
+    const oldestDue = c.oldest_due ? new Date(c.oldest_due) : null;
+    const isOver1yr = oldestDue && oldestDue < oneYearAgo;
+    const overdue   = c.has_overdue;
+    const dueLabel  = c.oldest_due ? new Date(c.oldest_due).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const ageDays   = oldestDue ? Math.floor((today - oldestDue)/(1000*60*60*24)) : 0;
+    const ageLabel  = ageDays > 0 ? (ageDays >= 365 ? Math.floor(ageDays/365)+'y ' + (Math.floor((ageDays%365)/30))+'m' : Math.floor(ageDays/30)+'m '+((ageDays%30))+'d') : 'Future';
+    const statusHtml = overdue
+      ? `<span style="background:#fef2f2;color:#dc2626;border-radius:999px;padding:2px 10px;font-size:0.75rem;font-weight:700">⚠️ Overdue</span>`
+      : `<span style="background:#f0fdf4;color:#16a34a;border-radius:999px;padding:2px 10px;font-size:0.75rem;font-weight:700">✅ Current</span>`;
+    const rowBg = i%2===0 ? '' : 'background:var(--surface-2)';
+    const customerIdx = (_arData.customers || []).indexOf(c);
+    html += `<tr style="${rowBg};border-bottom:1px solid var(--border)" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2===0?'':'var(--surface-2)'}'">
+      <td style="padding:9px 12px;color:var(--text-muted)">${i+1}</td>
+      <td style="padding:9px 12px"><a href="#" onclick="event.preventDefault();openARDetail(${customerIdx})" style="color:var(--accent);font-weight:600;text-decoration:none">${c.name}</a></td>
+      <td style="padding:9px 12px;text-align:right;font-weight:700;color:${overdue?'#dc2626':'#166534'}">${fmt(c.total_open)}</td>
+      <td style="padding:9px 12px;text-align:center">${c.invoices?.length||0}</td>
+      <td style="padding:9px 12px;text-align:center;font-size:0.82rem">${dueLabel}</td>
+      <td style="padding:9px 12px;text-align:center;font-size:0.82rem;color:${isOver1yr?'#dc2626':'var(--text-muted)'}">${ageLabel}</td>
+      <td style="padding:9px 12px;text-align:center">${statusHtml}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function openARDetail(idx) {
+  const c = (_arData?.customers||[])[idx];
+  if (!c) return;
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const today = new Date();
+  const title = document.getElementById('arModalTitle');
+  const body  = document.getElementById('arModalBody');
+  const modal = document.getElementById('arDetailModal');
+  if (!title || !body || !modal) return;
+
+  title.textContent = c.name + ' — Open Balance: ' + fmt(c.total_open);
+
+  let invoicesHtml = '';
+  (c.invoices||[]).sort((a,b) => new Date(a.due) - new Date(b.due)).forEach(inv => {
+    const due     = inv.due ? new Date(inv.due).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const date    = inv.date ? new Date(inv.date).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const overdue = inv.overdue;
+    const daysOverdue = inv.due && overdue ? Math.floor((today - new Date(inv.due))/(1000*60*60*24)) : 0;
+    const overdueTag = overdue ? `<span style="background:#fef2f2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:700;margin-left:4px">⚠️ ${daysOverdue}d overdue</span>` : '';
+    invoicesHtml += `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:9px 12px;font-weight:600;color:var(--accent)">#${inv.doc}</td>
+      <td style="padding:9px 12px;font-size:0.85rem;color:var(--text-muted)">${date}</td>
+      <td style="padding:9px 12px;font-size:0.85rem">${due}${overdueTag}</td>
+      <td style="padding:9px 12px;text-align:right">${fmt(inv.total)}</td>
+      <td style="padding:9px 12px;text-align:right;font-weight:700;color:#dc2626">${fmt(inv.balance)}</td>
+    </tr>`;
+  });
+
+  const hasOverdue = c.has_overdue;
+  body.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px">Total Open</div>
+        <div style="font-size:1.3rem;font-weight:700;color:#166534">${fmt(c.total_open)}</div>
+      </div>
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px">Open Invoices</div>
+        <div style="font-size:1.3rem;font-weight:700">${c.invoices?.length||0}</div>
+      </div>
+      <div style="background:${hasOverdue?'#fef2f2':'#f0fdf4'};border:1px solid ${hasOverdue?'#fecaca':'#bbf7d0'};border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px">Status</div>
+        <div style="font-size:1rem;font-weight:700;color:${hasOverdue?'#dc2626':'#16a34a'}">${hasOverdue?'⚠️ Overdue':'✅ Current'}</div>
+      </div>
+    </div>
+    <h4 style="margin:0 0 10px;font-size:0.9rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Invoice Detail</h4>
+    <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+      <thead>
+        <tr style="background:var(--surface-2);font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
+          <th style="padding:9px 12px;text-align:left">Invoice #</th>
+          <th style="padding:9px 12px;text-align:left">Date</th>
+          <th style="padding:9px 12px;text-align:left">Due Date</th>
+          <th style="padding:9px 12px;text-align:right">Total</th>
+          <th style="padding:9px 12px;text-align:right">Balance Due</th>
+        </tr>
+      </thead>
+      <tbody>${invoicesHtml}</tbody>
+      <tfoot>
+        <tr style="background:var(--surface-2);font-weight:700">
+          <td colspan="4" style="padding:10px 12px;text-align:right">Total Open Balance</td>
+          <td style="padding:10px 12px;text-align:right;color:#dc2626">${fmt(c.total_open)}</td>
+        </tr>
+      </tfoot>
+    </table>
+    <p style="margin:14px 0 0;font-size:0.8rem;color:var(--text-muted)">Source: QuickBooks Online · Click outside to close</p>`;
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeARModal() {
+  const modal = document.getElementById('arDetailModal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 // ── ZONE3 CUSTOMER DISCOUNTS ──────────────────────────────────
