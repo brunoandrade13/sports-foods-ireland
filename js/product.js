@@ -834,6 +834,64 @@ function productPageAddToCart(productId) {
         return;
     }
 
+    // ── Validate variant selection ─────────────────────────────────────────────
+    const variantContainer = document.getElementById('productVariants');
+    if (variantContainer) {
+        const variantGroups = variantContainer.querySelectorAll('.variant-group');
+        if (variantGroups.length > 0) {
+            for (const group of variantGroups) {
+                // Skip hidden groups (cascading variant UI)
+                if (group.style.display === 'none' || group.hidden) continue;
+                const selected = group.querySelector('.variant-option.selected');
+                if (!selected) {
+                    const groupLabel = group.querySelector('.variant-label')?.textContent || 'option';
+                    // Highlight the group to draw attention
+                    group.style.outline = '2px solid #ef4444';
+                    group.style.borderRadius = '8px';
+                    group.style.padding = '8px';
+                    setTimeout(() => {
+                        group.style.outline = '';
+                        group.style.padding = '';
+                    }, 2500);
+                    if (typeof showCartNotification === 'function') {
+                        showCartNotification(`Please select a ${groupLabel} first`);
+                    } else {
+                        alert(`Please select a ${groupLabel} before adding to cart.`);
+                    }
+                    return; // Block add to cart
+                }
+            }
+        }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // ── Collect selected variant info to pass to cart ──────────────────────
+    let selectedVariantLabel = '';
+    let selectedVariantId = null;
+    let selectedVariantPrice = null;
+    if (variantContainer) {
+        const labels = [];
+        variantContainer.querySelectorAll('.variant-group').forEach(group => {
+            if (group.style.display === 'none' || group.hidden) return;
+            const btn = group.querySelector('.variant-option.selected');
+            if (btn) {
+                labels.push(btn.dataset.label || btn.textContent.trim());
+                if (!selectedVariantId) selectedVariantId = btn.dataset.variantId || null;
+                if (!selectedVariantPrice && btn.dataset.price) selectedVariantPrice = parseFloat(btn.dataset.price);
+            }
+        });
+        selectedVariantLabel = labels.join(' — ');
+    }
+    // Build enriched product data with variant
+    const productWithVariant = selectedVariantLabel ? {
+        ...currentProduct,
+        nome: `${currentProduct.nome || currentProduct.name} — ${selectedVariantLabel}`,
+        variant_id: selectedVariantId,
+        variant_label: selectedVariantLabel,
+        preco: selectedVariantPrice ?? currentProduct.preco ?? currentProduct.price,
+    } : currentProduct;
+    // ──────────────────────────────────────────────────────────────────────
+
     // Delegate to cart.js canonical addToCart (handles localStorage, cart count, notification)
     if (typeof window.addToCart === 'function' && window.addToCart !== productPageAddToCart) {
         // Pass subscription info if active
@@ -843,7 +901,7 @@ function productPageAddToCart(productId) {
             discount: SUBSCRIBE_FIRST_DISCOUNT,
             originalPrice: currentProduct.price || parseFloat(currentProduct.preco) || 0
         } : null;
-        window.addToCart(productId, currentQuantity, currentProduct, subData);
+        window.addToCart(productId, currentQuantity, productWithVariant, subData);
     } else {
         // Fallback: add directly to localStorage if cart.js not loaded yet
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -853,8 +911,8 @@ function productPageAddToCart(productId) {
         } else {
             cart.push({
                 id: productId,
-                nome: currentProduct.nome,
-                preco: currentProduct.preco,
+                nome: productWithVariant.nome || currentProduct.nome,
+                preco: productWithVariant.preco || currentProduct.preco,
                 imagem: currentProduct.imagem,
                 quantidade: currentQuantity
             });

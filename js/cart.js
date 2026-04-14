@@ -126,6 +126,8 @@ function addToCart(productId, quantity = 1, productData = null, subscriptionData
             precoOriginal: subscriptionData ? precoNum : undefined,
             imagem: imagemFinal,
             quantidade: quantity,
+            variant_id: productData?.variant_id || undefined,
+            variant_label: productData?.variant_label || undefined,
             subscription: subscriptionData ? {
                 active: true,
                 frequency: subscriptionData.frequency,

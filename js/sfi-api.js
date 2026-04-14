@@ -15,11 +15,20 @@
 const SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH'; // Get from Supabase → Settings → API
 
-// Currency detection (EUR for IE, GBP for GB)
+// SFI sells in EUR only (Ireland). GBP is not supported.
+// Clear any legacy GBP stored in localStorage from old site versions.
+(function() {
+  try {
+    if (localStorage.getItem('sfi_currency') === 'GBP') {
+      localStorage.removeItem('sfi_currency');
+    }
+  } catch(e) {}
+})();
+
 const DEFAULT_CURRENCY = 'EUR';
 
 function detectCurrency() {
-  return DEFAULT_CURRENCY; // SFI sells in EUR only
+  return DEFAULT_CURRENCY; // Always EUR
 }
 
 // ============================================================
@@ -108,7 +117,12 @@ const sfi = {
   currency,
 
   setCurrency(cur) {
-    localStorage.setItem('sfi_currency', cur);
+    // EUR only — GBP not accepted
+    if (cur !== 'EUR') {
+      console.warn('[SFI] Only EUR is supported. Ignoring setCurrency:', cur);
+      return;
+    }
+    localStorage.setItem('sfi_currency', 'EUR');
     window.location.reload();
   },
 
@@ -382,11 +396,34 @@ const sfi = {
     },
 
     async resetPassword(email) {
-      return fetch(`${SUPABASE_URL}/auth/v1/recover`, {
+      // Uses our Edge Function which generates the link via Admin API + sends via Brevo
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/b2b-reset-password`, {
         method: 'POST',
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
+      return res.json();
+    },
+
+    /** Update password using the recovery access_token from URL hash */
+    async updatePassword(newPassword, accessToken) {
+      const token = accessToken || localStorage.getItem('sfi_reset_token') || db.token;
+      if (!token) throw new Error('No valid session. Please use the reset link from your email.');
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        method: 'PUT',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: newPassword })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || err.msg || 'Failed to update password');
+      }
+      localStorage.removeItem('sfi_reset_token');
+      return res.json();
     }
   },
 

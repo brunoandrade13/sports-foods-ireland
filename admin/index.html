@@ -1472,6 +1472,9 @@ authorized staff</p>
 <div class="nav-item" data-page="utm" onclick="showPage('utm')">
 <span class="icon">🔗</span> UTM Campaigns
 </div>
+<div class="nav-item" onclick="window.open('b2b-campaign.html','_blank')" style="cursor:pointer;">
+<span class="icon">📧</span> B2B Campaign
+</div>
 </div>
 <div class="nav-section">
 <div class="nav-section-title">Operations</div>
@@ -12144,7 +12147,13 @@ Loading items...
         if (p && p.weight_grams) totalWeight += (parseInt(p.weight_grams, 10) || 0) * i.qty;
       });
 
+      // Generate order number client-side as fallback (DB also auto-generates)
+      const ts = Date.now().toString().slice(-6);
+      const rnd = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+      const orderNumber = 'SFI-ADM-' + ts + rnd;
+
       const payload = {
+        order_number: orderNumber,
         customer_id: customerId,
         currency,
         subtotal,
@@ -12160,7 +12169,22 @@ Loading items...
         customer_phone,
         customer_name,
         item_count: itemsCount,
-        total_weight_grams: totalWeight
+        total_weight_grams: totalWeight,
+        shipping_address: (() => {
+          // For manual orders: populate from customer record so invoice has address
+          const c = (allCustomers || []).find(x => x.id === customerId);
+          if (c && (c.address || c.city || c.postcode)) {
+            return {
+              first_name: c.first_name || '',
+              last_name:  c.last_name  || '',
+              address_1:  c.address   || '',
+              city:       c.city      || '',
+              postcode:   c.postcode  || '',
+              country:    c.country   || 'IE',
+            };
+          }
+          return {};
+        })()
       };
 
       try {
@@ -12170,6 +12194,7 @@ Loading items...
           for (const i of manualOrderItems) {
             const p = (allProducts || []).find(function (x) { return x.id === i.product_id; }) || {};
             const lineTotal = i.unit_price * i.qty;
+            const baseName = i.name ? i.name.split(' — ')[0] : (p.name || 'Product');
             await supaInsert('order_items', {
               order_id: ord.id,
               product_id: i.product_id,
@@ -12179,8 +12204,8 @@ Loading items...
               unit_price: i.unit_price,
               total: lineTotal,
               total_price: lineTotal,
-              sku: i.sku || null,
-              product_name: i.name || p.name || null,
+              sku: i.sku || p.sku || null,
+              product_name: baseName,
               product_image_url: p.image_url || null,
               requires_shipping: true
             });
@@ -13717,7 +13742,29 @@ if (checkedIndexes.length === 0) return alert('No items selected for invoice. Pl
 var items = checkedIndexes.length > 0 ? allItems.filter(function(_, idx) { return checkedIndexes.includes(idx); }) : allItems;
 const bill = order.billing_address || {}, ship = order.shipping_address || {};
 let company = '';
-if (order.customer_id) { const cust = (allCustomers || []).find(c => c.id === order.customer_id); if (cust) company = cust.b2b_company_name || cust.company || ''; }
+// ── For manual orders: build address fallback from customer record ──
+let custAddrFallback = {};
+if (order.customer_id) {
+  const cust = (allCustomers || []).find(c => c.id === order.customer_id);
+  if (cust) {
+    company = cust.b2b_company_name || cust.company || '';
+    // Build a normalised address object from customer fields
+    custAddrFallback = {
+      first_name: cust.first_name || '',
+      last_name:  cust.last_name  || '',
+      address_1:  cust.address   || '',
+      city:       cust.city      || '',
+      postcode:   cust.postcode  || '',
+      country:    cust.country   || 'IE',
+      email:      cust.email     || '',
+      phone:      cust.phone     || '',
+    };
+  }
+}
+// Use customer fallback when billing/shipping address is empty (manual admin orders)
+const isAddrEmpty = a => !a || Object.keys(a).length === 0 || (!a.address_1 && !a.addr1 && !a.address && !a.city && !a.postcode);
+const billResolved = isAddrEmpty(bill) ? custAddrFallback : bill;
+const shipResolved = isAddrEmpty(ship) ? custAddrFallback : ship;
 const invNum = (order.order_number || '').replace('WOO-', '');
 const invDate = new Date(order.created_at);
 const dueDate = new Date(invDate); dueDate.setDate(dueDate.getDate() + 30);
@@ -13780,7 +13827,7 @@ y += 100;
 // ---- INVOICE TO / SHIP TO ----
 var boxW = (CW - 20) / 2;
 var formatAddr = function(a, comp) { var l = []; var nm = [a.first_name, a.last_name].filter(Boolean).join(' '); if (nm) l.push(nm); if (comp) l.push(comp); var line1 = a.address_1 || a.address1 || a.addr1 || a.address || a.street || ''; var line2 = a.address_2 || a.address2 || a.addr2 || ''; if (line1) l.push(line1); if (line2) l.push(line2); var ct = a.city || '', st = a.state || a.county || ''; if (ct && st) l.push(ct + ', ' + st); else if (ct) l.push(ct); var pc = a.postcode || a.postal_code || '', co = a.country === 'IE' ? 'Ireland' : (a.country === 'GB' ? 'United Kingdom' : (a.country || '')); if (pc && co) l.push(pc + ' ' + co); else if (pc) l.push(pc); else if (co) l.push(co); return l; };
-[[ML, 'INVOICE TO', bill], [ML + boxW + 20, 'SHIP TO', ship]].forEach(function(cfg) {
+[[ML, 'INVOICE TO', billResolved], [ML + boxW + 20, 'SHIP TO', shipResolved]].forEach(function(cfg) {
 var bx = cfg[0], label = cfg[1], addr = cfg[2];
 doc.setFillColor(224,224,224); doc.rect(bx, y, boxW, 14, 'F');
 doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(0,0,0);
@@ -13788,7 +13835,7 @@ doc.text(label, bx + 4, y + 10);
 doc.setFont('helvetica','normal'); doc.setFontSize(8);
 formatAddr(addr, company).forEach(function(ln, i) { doc.text(ln, bx + 4, y + 26 + i * 11); });
 });
-y += 16 + Math.max(formatAddr(bill, company).length, formatAddr(ship, company).length) * 11 + 8;
+y += 16 + Math.max(formatAddr(billResolved, company).length, formatAddr(shipResolved, company).length) * 11 + 8;
 
 // ---- INVOICE DETAILS ROW ----
 var preSubtotal = items.reduce(function(s, i) { return s + (parseInt(i.quantity) || 1) * (parseFloat(i.unit_price) || 0); }, 0);

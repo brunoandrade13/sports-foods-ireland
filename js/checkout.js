@@ -405,14 +405,16 @@
 
         if (btn) { btn.textContent = 'Redirecting to payment...'; btn.disabled = true; }
         const cart = getCart();
-        const currency = window.sfi?.currency || 'EUR';
+        const currency = 'EUR'; // Always EUR — SFI sells in EUR only
 
         const items = cart.map(i => ({
             id: i.id || i._id,
-            name: i.nome,
+            name: i.nome,  // already includes variant label e.g. "Clif Bar 12x68g — Chocolate Chip"
             price: Number(i.preco),
             quantity: i.quantidade || 1,
             image: i.imagem || undefined,
+            variant_id: i.variant_id || undefined,
+            variant_label: i.variant_label || undefined,
         }));
 
         try {
@@ -469,6 +471,7 @@
                         shippingAddress: checkoutData.shipping, coupon: appliedCoupon || null,
                         is_b2b: window._sfiCustomerIsB2B || false,
                         attribution: typeof sfiGetAttribution === 'function' ? sfiGetAttribution() : {},
+                        shipping_cost: data.shipping_cost ?? null,
                     });
                 }
                 window.location.href = data.url;
