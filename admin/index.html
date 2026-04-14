@@ -13562,7 +13562,16 @@ window.shipViaGLS = async function shipViaGLS() {
     if (cust && cust.email) email = cust.email;
   }
 
-  if (!street || !city || !zipCode) {
+  // If street is incomplete (e.g. just a number like "31"), fall back to customer record address
+  let finalStreet = street;
+  if ((!finalStreet || finalStreet.trim().length <= 4) && freshOrder.customer_id) {
+    const cust = (allCustomers || []).find(c => c.id === freshOrder.customer_id);
+    if (cust && cust.address && cust.address.trim().length > 4) {
+      finalStreet = cust.address.trim();
+    }
+  }
+
+  if (!finalStreet || !city || !zipCode) {
     if (btn) { btn.disabled = false; btn.textContent = '📦 Ship via GLS'; }
     toast('Missing shipping address (street, city or postcode)', 'error');
     return;
@@ -13575,7 +13584,7 @@ window.shipViaGLS = async function shipViaGLS() {
       body: JSON.stringify({
         order_number:   freshOrder.order_number || freshOrder.id,
         recipient_name: recipientName,
-        street:         street,
+        street:         finalStreet,
         city:           city,
         zip_code:       zipCode,
         country_code:   country,
@@ -13592,7 +13601,9 @@ window.shipViaGLS = async function shipViaGLS() {
       throw new Error(result.error || ('GLS error ' + resp.status));
     }
 
-    const trackId = result.parcel_number || result.track_id || '';
+    // Use Track ID as primary (shown on label as "Your GLS Track ID"), fallback to parcel number
+    const trackId = result.track_id || result.parcel_number || '';
+    const parcelNumber = result.parcel_number || result.track_id || '';
 
     // Save tracking number to order
     if (trackId) {
