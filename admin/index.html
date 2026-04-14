@@ -16402,16 +16402,19 @@ function filterBackorders() {
   }).join('');
 }
 
+let _boCurrentCustomerKey = null;
+
 function openBoCustomerModal(customerKey) {
   const c = window._boCustomerMap?.[customerKey];
   if (!c) return;
+  _boCurrentCustomerKey = customerKey;
   const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
 
   document.getElementById('boModalCustomerName').textContent = c.name;
   document.getElementById('boModalCustomerSub').textContent =
     `${c.items.length} backorder item${c.items.length!==1?'s':''} across ${c.orderNumbers.size} order${c.orderNumbers.size!==1?'s':''} · Total: ${fmt(c.totalValue)}`;
 
-  const rows = c.items.sort((a,b) => (a.order?.created_at||'') < (b.order?.created_at||'') ? -1 : 1).map(item => {
+  const rows = c.items.sort((a,b) => (a.order?.created_at||'') < (b.order?.created_at||'') ? -1 : 1).map((item, idx) => {
     const o = item.order || {};
     const status = item.backorder_status || 'pending';
     const statusBadge = status === 'pending'
@@ -16419,18 +16422,25 @@ function openBoCustomerModal(customerKey) {
       : status === 'ordered_from_supplier'
       ? '<span style="background:#dbeafe;color:#2563eb;padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:600">ORDERED</span>'
       : status === 'partially_shipped'
-      ? '<span style="background:#e0e7ff;color:#4f46e5;padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:600">PARTIAL</span>'
+      ? '<span style="background:#e0e7ff;color:#4f46e5;padding:2px 7px;border-radius:10px;font-size:0.75rem;font-weight:600">PARTIAL</span>'
       : '<span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:600">' + status.toUpperCase() + '</span>';
     const orderDate = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const qty = Number(item.quantity || 1);
+    const unitPrice = Number(item.unit_price || (item.total_price / qty) || 0);
 
-    return `<tr style="border-bottom:1px solid var(--border)">
+    return `<tr style="border-bottom:1px solid var(--border)" id="boRow_${idx}">
       <td style="padding:10px 12px">
         <div style="font-weight:600;font-size:0.9rem">${item.product_name || '—'}</div>
         <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px">
           Order <a href="#" onclick="closeBoModal();openOrderFromList('${o.order_number||''}');return false" style="color:var(--accent)">#${o.order_number||'—'}</a> · ${orderDate}
         </div>
       </td>
-      <td style="padding:10px 12px;text-align:center;font-weight:700">${item.quantity||1}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:700">${qty}</td>
+      <td style="padding:10px 12px;text-align:center">
+        <input type="number" id="boShipQty_${idx}" value="${qty}" min="0" max="${qty}"
+          style="width:64px;padding:5px 8px;text-align:center;border:2px solid var(--accent);border-radius:6px;background:var(--surface);color:var(--text);font-weight:700;font-size:0.9rem"
+          oninput="this.value=Math.min(${qty},Math.max(0,parseInt(this.value)||0))">
+      </td>
       <td style="padding:10px 12px;text-align:right;font-weight:700">${fmt(item.total_price||0)}</td>
       <td style="padding:10px 12px;text-align:center">${statusBadge}</td>
       <td style="padding:10px 12px">
@@ -16451,11 +16461,15 @@ function openBoCustomerModal(customerKey) {
   }).join('');
 
   document.getElementById('boModalBody').innerHTML = `
+    <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:0.85rem;color:var(--text-muted)">
+      💡 Set the <strong style="color:var(--text)">Ship Now</strong> quantity for each product. Items fully shipped will be marked as fulfilled. Items with remaining qty stay in backorder.
+    </div>
     <table style="width:100%;border-collapse:collapse;font-size:0.87rem">
       <thead>
         <tr style="background:var(--surface-2);font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
           <th style="padding:9px 12px;text-align:left">Product / Order</th>
-          <th style="padding:9px 12px;text-align:center">Qty</th>
+          <th style="padding:9px 12px;text-align:center">BO Qty</th>
+          <th style="padding:9px 12px;text-align:center">Ship Now</th>
           <th style="padding:9px 12px;text-align:right">Value</th>
           <th style="padding:9px 12px;text-align:center">Status</th>
           <th style="padding:9px 12px;text-align:left">Notes</th>
@@ -16463,11 +16477,148 @@ function openBoCustomerModal(customerKey) {
         </tr>
       </thead>
       <tbody>${rows}</tbody>
-    </table>`;
+    </table>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <button onclick="closeBoModal()"
+        style="padding:10px 20px;background:none;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.9rem">
+        Cancel
+      </button>
+      <button onclick="shipBoItems()" id="boShipBtn"
+        style="padding:10px 24px;background:#169B62;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.9rem">
+        📦 Generate Invoice & Ship
+      </button>
+    </div>`;
 
   const modal = document.getElementById('boCustomerModal');
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+}
+
+async function shipBoItems() {
+  const key = _boCurrentCustomerKey;
+  const c = window._boCustomerMap?.[key];
+  if (!c) return;
+
+  // Collect ship quantities
+  const toShip = c.items.map((item, idx) => {
+    const qtyEl = document.getElementById('boShipQty_' + idx);
+    const shipQty = Math.min(Number(item.quantity||1), Math.max(0, parseInt(qtyEl?.value)||0));
+    return { item, shipQty, idx };
+  }).filter(r => r.shipQty > 0);
+
+  if (!toShip.length) {
+    toast('Set at least one quantity to ship.', 'error');
+    return;
+  }
+
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const summary = toShip.map(r => `• ${r.item.product_name} × ${r.shipQty}`).join('\n');
+  if (!confirm(`Generate invoice and ship the following items?\n\n${summary}\n\nContinue?`)) return;
+
+  const btn = document.getElementById('boShipBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Processing…'; }
+
+  try {
+    const h = getAuthHeaders();
+
+    // 1. Pick the first order for customer/address info
+    const refOrder = toShip[0].item.order || {};
+    const { data: oidData } = await (async () => {
+      const r = await fetch(`${SUPA_URL}/rest/v1/rpc/generate_sfi_order_number`, { method:'POST', headers:h, body:'{}' });
+      return r.json().then(v => ({data: v}));
+    })();
+    const newOrderNum = oidData || ('SFI-BO-' + Date.now().toString().slice(-8));
+
+    // 2. Create new order
+    const newTotal = toShip.reduce((s, r) => {
+      const unitP = Number(r.item.unit_price || (r.item.total_price / (r.item.quantity||1)) || 0);
+      return s + unitP * r.shipQty;
+    }, 0);
+
+    const orderRes = await fetch(`${SUPA_URL}/rest/v1/orders`, {
+      method: 'POST',
+      headers: { ...h, 'Prefer': 'return=representation' },
+      body: JSON.stringify({
+        order_number: newOrderNum,
+        status: 'processing',
+        payment_status: 'paid',
+        financial_status: 'paid',
+        total: parseFloat(newTotal.toFixed(2)),
+        subtotal: parseFloat(newTotal.toFixed(2)),
+        currency: 'EUR',
+        customer_name: c.name,
+        customer_email: c.email || refOrder.customer_email || '',
+        order_source: 'backorder_fulfillment',
+        source: 'admin',
+        payment_method: refOrder.payment_method || 'account',
+        item_count: toShip.reduce((s, r) => s + r.shipQty, 0),
+        notes: 'Backorder fulfillment — original order(s): ' + [...c.orderNumbers].join(', '),
+        shipping_address: refOrder.shipping_address || {},
+        billing_address: refOrder.billing_address || {},
+      }),
+    });
+    if (!orderRes.ok) throw new Error('Failed to create order: ' + await orderRes.text());
+    const newOrder = await orderRes.json();
+    const newOrderId = newOrder[0]?.id || newOrder?.id;
+    if (!newOrderId) throw new Error('No order ID returned');
+
+    // 3. Insert order items
+    for (const r of toShip) {
+      const unitP = Number(r.item.unit_price || (r.item.total_price / (r.item.quantity||1)) || 0);
+      await fetch(`${SUPA_URL}/rest/v1/order_items`, {
+        method: 'POST',
+        headers: h,
+        body: JSON.stringify({
+          order_id: newOrderId,
+          product_name: r.item.product_name,
+          quantity: r.shipQty,
+          unit_price: unitP,
+          total_price: parseFloat((unitP * r.shipQty).toFixed(2)),
+          is_backorder: false,
+          fulfillment_status: 'unfulfilled',
+        }),
+      });
+    }
+
+    // 4. Update original backorder items
+    for (const r of toShip) {
+      const origQty = Number(r.item.quantity || 1);
+      const remaining = origQty - r.shipQty;
+
+      if (remaining <= 0) {
+        // Fully shipped — mark as fulfilled
+        await fetch(`${SUPA_URL}/rest/v1/order_items?id=eq.${r.item.id}`, {
+          method: 'PATCH',
+          headers: h,
+          body: JSON.stringify({
+            backorder_status: 'fulfilled',
+            backorder_fulfilled_at: new Date().toISOString(),
+            fulfillment_status: 'fulfilled',
+          }),
+        });
+      } else {
+        // Partially shipped — reduce qty in original BO item
+        const newUnitP = Number(r.item.unit_price || (r.item.total_price / origQty) || 0);
+        await fetch(`${SUPA_URL}/rest/v1/order_items?id=eq.${r.item.id}`, {
+          method: 'PATCH',
+          headers: h,
+          body: JSON.stringify({
+            quantity: remaining,
+            total_price: parseFloat((newUnitP * remaining).toFixed(2)),
+            backorder_status: 'partially_shipped',
+          }),
+        });
+      }
+    }
+
+    toast(`Invoice ${newOrderNum} created — ${toShip.length} item${toShip.length>1?'s':''} shipped ✅`, 'success');
+    closeBoModal();
+    loadBackorders();
+
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '📦 Generate Invoice & Ship'; }
+    toast('Error: ' + (e.message || 'Failed'), 'error');
+  }
 }
 
 function closeBoModal() {
