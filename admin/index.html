@@ -12227,9 +12227,25 @@ Loading items...
           const line = i.unit_price * i.qty;
           return `<tr data-idx="${idx}">
             <td>${esc(i.name)}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div></td>
-            <td style="text-align:right">€${i.unit_price.toFixed(2)}</td>
+            <td style="text-align:right">
+              <div id="moPriceDisplay_${idx}" style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
+                <span>€${i.unit_price.toFixed(2)}</span>
+                <button type="button" onclick="startEditMoPrice(${idx})"
+                  title="Edit price for this item"
+                  style="background:none;border:1px solid var(--border);border-radius:4px;padding:2px 6px;color:var(--text-muted);font-size:0.75rem;cursor:pointer;line-height:1">✏️</button>
+              </div>
+              <div id="moPriceEdit_${idx}" style="display:none;justify-content:flex-end;align-items:center;gap:4px">
+                <input type="number" id="moPriceInput_${idx}" value="${i.unit_price.toFixed(2)}" step="0.01" min="0"
+                  style="width:80px;padding:4px 6px;text-align:right;border:2px solid var(--accent);border-radius:6px;background:var(--surface);color:var(--text);font-size:0.88rem"
+                  onkeydown="if(event.key==='Enter')saveMoPrice(${idx});if(event.key==='Escape')cancelMoPrice(${idx})">
+                <button type="button" onclick="saveMoPrice(${idx})"
+                  style="background:var(--accent);color:#000;border:none;border-radius:4px;padding:3px 8px;font-size:0.78rem;font-weight:700;cursor:pointer">✓</button>
+                <button type="button" onclick="cancelMoPrice(${idx})"
+                  style="background:none;border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:0.78rem;color:var(--text-muted);cursor:pointer">✕</button>
+              </div>
+            </td>
             <td style="text-align:right">${i.qty}</td>
-            <td style="text-align:right">€${line.toFixed(2)}</td>
+            <td style="text-align:right" id="moLineTotal_${idx}">€${line.toFixed(2)}</td>
             <td style="text-align:right"><button class="btn-sm btn-ghost" type="button" onclick="removeManualOrderItem(${idx})">✕</button></td>
           </tr>`;
         }).join('');
@@ -12238,6 +12254,28 @@ Loading items...
       const subEl = document.getElementById('moSubtotal');
       if (subEl) subEl.value = subtotal.toFixed(2);
       recalcManualOrderTotal();
+    }
+
+    function startEditMoPrice(idx) {
+      document.getElementById('moPriceDisplay_' + idx).style.display = 'none';
+      const editDiv = document.getElementById('moPriceEdit_' + idx);
+      editDiv.style.display = 'flex';
+      const input = document.getElementById('moPriceInput_' + idx);
+      if (input) { input.focus(); input.select(); }
+    }
+
+    function saveMoPrice(idx) {
+      const input = document.getElementById('moPriceInput_' + idx);
+      if (!input) return;
+      const newPrice = parseFloat(input.value);
+      if (isNaN(newPrice) || newPrice < 0) { toast('Invalid price', 'error'); return; }
+      manualOrderItems[idx].unit_price = newPrice;
+      renderManualOrderItems();
+    }
+
+    function cancelMoPrice(idx) {
+      document.getElementById('moPriceEdit_' + idx).style.display = 'none';
+      document.getElementById('moPriceDisplay_' + idx).style.display = 'flex';
     }
 
     function removeManualOrderItem(idx) {
