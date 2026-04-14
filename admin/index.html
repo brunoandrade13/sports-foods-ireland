@@ -14032,21 +14032,20 @@ async function sendInvoiceByEmail() {
 
 
 // ============================================================
-// ORDER ITEMS RENDER + EDIT MODE
+// ORDER ITEMS RENDER + EDIT MODE (v2 — partial backorder by qty)
 // ============================================================
 function renderOrderItemsTable(items, order, editMode) {
   const wrapper = document.getElementById('omItemsWrapper');
   if (!wrapper) return;
-  const editBtn  = document.getElementById('btnEditItems');
-  const saveBtn  = document.getElementById('btnSaveItemEdits');
+  const editBtn = document.getElementById('btnEditItems');
+  const saveBtn = document.getElementById('btnSaveItemEdits');
   if (editBtn) editBtn.textContent = editMode ? '✕ Cancel Edit' : '✏️ Edit Items';
   if (saveBtn) saveBtn.style.display = editMode ? 'inline-flex' : 'none';
 
   function getProductName(i) {
     let name = i.product_name || 'Unknown';
     if (typeof allProducts !== 'undefined' && allProducts.length > 0) {
-      let m = null;
-      if (i.product_id) m = allProducts.find(p => p.id === i.product_id);
+      let m = i.product_id ? allProducts.find(p => p.id === i.product_id) : null;
       if (!m && i.product_sku) m = allProducts.find(p => p.sku === i.product_sku);
       if (m && m.name) name = m.name;
     }
@@ -14055,61 +14054,73 @@ function renderOrderItemsTable(items, order, editMode) {
 
   const shipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
   const discount = parseFloat(order.discount_amount) || parseFloat(order.discount_total) || 0;
-  const pm  = order.payment_method || '—';
-  const sm  = order.shipping_method || (shipping > 0 ? 'Standard Shipping' : 'Free Shipping');
-  const dc  = order.discount_code || order.coupon_code || '';
+  const pm = order.payment_method || '—';
+  const sm = order.shipping_method || (shipping > 0 ? 'Standard Shipping' : 'Free Shipping');
+  const dc = order.discount_code || order.coupon_code || '';
+
+  // Only count non-backorder items for totals
+  const activeItems = items.filter(i => !i.is_backorder);
+  const subtotalCalc = activeItems.reduce((s, i) => s + (parseFloat(i.total_price) || parseFloat(i.total) || 0), 0);
+  const subtotal = parseFloat(order.subtotal) || subtotalCalc;
+  const tax   = parseFloat(order.tax_amount)  || parseFloat(order.tax_total) || 0;
+  const total = parseFloat(order.total) || 0;
 
   const bodyRows = items.map((i, idx) => {
-    const isBackorder = i.is_backorder === true;
-    const price = parseFloat(i.unit_price) || 0;
-    const qty   = i.quantity || 1;
-    const total = parseFloat(i.total_price) || parseFloat(i.total) || 0;
-    const name  = getProductName(i);
-    const sub   = (i.product_name && i.product_name !== name ? '(' + esc(i.product_name) + ') ' : '') + (i.variant_label ? ' - ' + esc(i.variant_label) : '');
+    const isBO    = i.is_backorder === true;
+    const price   = parseFloat(i.unit_price) || 0;
+    const qty     = i.quantity || 1;
+    const boQty   = i._boQty !== undefined ? i._boQty : (isBO ? qty : 0);
+    const sendQty = Math.max(0, qty - boQty);
+    const rowTotal = price * sendQty;
+    const name    = getProductName(i);
+    const sub     = (i.product_name && i.product_name !== name ? '(' + esc(i.product_name) + ') ' : '') +
+                    (i.variant_label ? ' - ' + esc(i.variant_label) : '');
+    const fullyBO = boQty >= qty;
 
     if (editMode) {
-      const rowBg = isBackorder ? 'background:#1a1a2e;opacity:0.7;' : '';
-      return `<tr style="border-bottom:1px solid var(--border-color);${rowBg}" data-item-id="${i.id}">
-        <td style="padding:8px 6px;text-align:center"><input type="checkbox" class="om-item-cb" data-idx="${idx}" ${isBackorder ? '' : 'checked'}></td>
-        <td style="padding:8px 10px;">${esc(name)} <span style="font-size:0.78rem;color:var(--text-muted)">${sub}</span></td>
-        <td style="padding:8px 10px;font-family:monospace;font-size:0.82rem;">${esc(i.product_sku || i.sku || '—')}</td>
-        <td style="padding:6px 8px;">
+      const rowStyle = fullyBO ? 'border-bottom:1px solid var(--border-color);opacity:0.6;background:#130f1e;' : 'border-bottom:1px solid var(--border-color);';
+      return `<tr style="${rowStyle}" data-item-id="${i.id}" data-idx="${idx}">
+        <td style="padding:8px 6px;text-align:center">
+          <input type="checkbox" class="om-item-cb" data-idx="${idx}" ${fullyBO ? '' : 'checked'}>
+        </td>
+        <td style="padding:8px 10px;font-size:0.9rem;">
+          ${esc(name)}<span style="font-size:0.78rem;color:var(--text-muted);margin-left:4px">${sub}</span>
+          ${fullyBO ? '<span style="font-size:0.7rem;background:#581c87;color:#e9d5ff;padding:1px 7px;border-radius:10px;margin-left:6px;">backorder</span>' : ''}
+        </td>
+        <td style="padding:8px 8px;font-family:monospace;font-size:0.8rem;">${esc(i.product_sku || i.sku || '—')}</td>
+        <td style="padding:6px 6px;">
           <input type="number" class="om-edit-price" data-idx="${idx}" value="${price.toFixed(2)}" min="0" step="0.01"
-            style="width:80px;padding:5px 8px;border:1px solid ${isBackorder ? '#6b21a8' : 'var(--primary-color)'};border-radius:6px;background:var(--bg);color:var(--text);font-size:0.88rem;"
-            oninput="omUpdateRowTotal(this,${idx},${qty})" ${isBackorder ? 'disabled' : ''}>
+            style="width:76px;padding:5px 7px;border:1px solid var(--primary-color);border-radius:6px;background:var(--bg);color:var(--text);font-size:0.85rem;"
+            oninput="omRecalcRow(${idx})">
         </td>
-        <td style="padding:8px 10px;text-align:center">${qty}</td>
-        <td style="padding:8px 10px;font-weight:bold;" id="om-row-total-${idx}">€${total.toFixed(2)}</td>
-        <td style="padding:6px 8px;">
-          <button onclick="omToggleBackorder(${idx})"
-            style="padding:4px 10px;font-size:0.75rem;border-radius:6px;border:1px solid ${isBackorder ? '#a855f7' : '#f59e0b'};background:${isBackorder ? '#581c87' : 'transparent'};color:${isBackorder ? '#e9d5ff' : '#f59e0b'};cursor:pointer;white-space:nowrap;"
-            title="${isBackorder ? 'Remove from backorder' : 'Mark entire item as backorder'}">
-            ${isBackorder ? '🔄 In Backorder' : '📦 Backorder'}
-          </button>
+        <td style="padding:6px 6px;text-align:center;">
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:2px;">Total: ${qty}</div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <span style="font-size:0.75rem;color:var(--text-muted);">BO:</span>
+            <input type="number" class="om-edit-boqty" data-idx="${idx}" value="${boQty}" min="0" max="${qty}" step="1"
+              style="width:52px;padding:4px 6px;border:1px solid #a855f7;border-radius:6px;background:var(--bg);color:#e9d5ff;font-size:0.85rem;text-align:center;"
+              oninput="omRecalcRow(${idx})" title="Quantity for backorder (0 = none, ${qty} = all)">
+          </div>
+          <div style="font-size:0.75rem;color:#4ade80;margin-top:2px;">Send: <span id="om-send-qty-${idx}">${sendQty}</span></div>
         </td>
+        <td style="padding:8px 8px;font-weight:bold;" id="om-row-total-${idx}">€${rowTotal.toFixed(2)}</td>
       </tr>`;
     } else {
-      const rowStyle = isBackorder ? 'border-bottom:1px solid var(--border-color);opacity:0.55;' : 'border-bottom:1px solid var(--border-color);';
-      const badge = isBackorder ? ' <span style="font-size:0.7rem;background:#581c87;color:#e9d5ff;padding:1px 6px;border-radius:10px;margin-left:4px;">backorder</span>' : '';
+      const rowStyle = isBO ? 'border-bottom:1px solid var(--border-color);opacity:0.5;' : 'border-bottom:1px solid var(--border-color);';
+      const badge    = isBO ? ' <span style="font-size:0.7rem;background:#581c87;color:#e9d5ff;padding:1px 6px;border-radius:10px;margin-left:4px;">backorder</span>' : '';
+      const qtyLabel = (!isBO && i._boQty > 0) ? `${sendQty}/${qty}` : qty;
       return `<tr style="${rowStyle}">
-        <td style="padding:8px 6px;text-align:center"><input type="checkbox" class="om-item-cb" data-idx="${idx}" ${isBackorder ? '' : 'checked'}></td>
-        <td style="padding:8px 10px;">${esc(name)}${badge} <span style="font-size:0.8rem;color:var(--text-muted)">${sub}</span></td>
+        <td style="padding:8px 6px;text-align:center"><input type="checkbox" class="om-item-cb" data-idx="${idx}" ${isBO ? '' : 'checked'}></td>
+        <td style="padding:8px 10px;">${esc(name)}${badge}<span style="font-size:0.8rem;color:var(--text-muted);margin-left:4px">${sub}</span></td>
         <td style="padding:8px 10px;font-family:monospace;">${esc(i.product_sku || i.sku || '—')}</td>
         <td style="padding:8px 10px;">€${price.toFixed(2)}</td>
-        <td style="padding:8px 10px;">${qty}</td>
-        <td style="padding:8px 10px;font-weight:bold;">€${total.toFixed(2)}</td>
+        <td style="padding:8px 10px;text-align:center;">${qtyLabel}</td>
+        <td style="padding:8px 10px;font-weight:bold;">€${(parseFloat(i.total_price) || parseFloat(i.total) || 0).toFixed(2)}</td>
       </tr>`;
     }
   }).join('');
 
-  const activeItems = items.filter(i => !i.is_backorder);
-  const subtotalCalc = activeItems.reduce((s, i) => s + (parseFloat(i.total_price) || parseFloat(i.total) || 0), 0);
-  const subtotal = parseFloat(order.subtotal) || subtotalCalc;
-  const tax      = parseFloat(order.tax_amount) || parseFloat(order.tax_total) || 0;
-  const total    = parseFloat(order.total) || 0;
-
-  const editExtraTh = editMode ? '<th style="padding:8px 10px;">Action</th>' : '';
-
+  const cols = editMode ? 5 : 5;
   wrapper.innerHTML = `
   <table style="width:100%;margin:0;border:none;background:transparent;">
     <thead style="background:var(--surface-2);">
@@ -14118,35 +14129,48 @@ function renderOrderItemsTable(items, order, editMode) {
         <th style="padding:8px 10px;">Item</th>
         <th style="padding:8px 10px;">SKU</th>
         <th style="padding:8px 10px;">Price</th>
-        <th style="padding:8px 10px;">Qty</th>
+        <th style="padding:8px 10px;">${editMode ? 'Qty / Backorder' : 'Qty'}</th>
         <th style="padding:8px 10px;">Total</th>
-        ${editExtraTh}
       </tr>
     </thead>
     <tbody>${bodyRows}</tbody>
-    <tfoot id="om-tfoot">
-      <tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:6px 10px;color:var(--text-muted);">Subtotal (ex VAT)</td><td style="padding:6px 10px;" id="om-subtotal">€${subtotal.toFixed(2)}</td></tr>
-      ${shipping > 0 ? `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping (${esc(sm)})</td><td style="padding:4px 10px;">€${shipping.toFixed(2)}</td></tr>` : `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping</td><td style="padding:4px 10px;color:#22c55e;">Free</td></tr>`}
-      ${discount > 0 ? `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Discount${dc ? ' (' + esc(dc) + ')' : ''}</td><td style="padding:4px 10px;color:#ef4444;">-€${discount.toFixed(2)}</td></tr>` : ''}
-      ${tax > 0 ? `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">VAT (23%)</td><td style="padding:4px 10px;">€${tax.toFixed(2)}</td></tr>` : ''}
-      <tr style="border-top:2px solid var(--border);"><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">Total</td><td style="padding:10px 10px 4px;font-weight:700;font-size:1.05rem;" id="om-total">€${total.toFixed(2)}</td></tr>
-      <tr><td colspan="${editMode ? 7 : 6}" style="text-align:right;padding:4px 10px 8px;font-size:0.8rem;color:var(--text-muted);">💳 ${esc(pm)}</td></tr>
+    <tfoot>
+      <tr><td colspan="5" style="text-align:right;padding:6px 10px;color:var(--text-muted);">Subtotal (ex VAT)</td><td style="padding:6px 10px;" id="om-subtotal">€${subtotal.toFixed(2)}</td></tr>
+      ${shipping > 0 ? `<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping (${esc(sm)})</td><td style="padding:4px 10px;">€${shipping.toFixed(2)}</td></tr>` : `<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping</td><td style="padding:4px 10px;color:#22c55e;">Free</td></tr>`}
+      ${discount > 0 ? `<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Discount${dc ? ' ('+esc(dc)+')' : ''}</td><td style="padding:4px 10px;color:#ef4444;">-€${discount.toFixed(2)}</td></tr>` : ''}
+      ${tax > 0 ? `<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">VAT (23%)</td><td style="padding:4px 10px;">€${tax.toFixed(2)}</td></tr>` : ''}
+      <tr style="border-top:2px solid var(--border);"><td colspan="5" style="text-align:right;padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">Total</td><td style="padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">€${total.toFixed(2)}</td></tr>
+      <tr><td colspan="6" style="text-align:right;padding:4px 10px 8px;font-size:0.8rem;color:var(--text-muted);">💳 ${esc(pm)}</td></tr>
     </tfoot>
-  </table>`;
+  </table>
+  ${editMode ? '<p style="font-size:0.78rem;color:var(--text-muted);padding:6px 4px 0;">💡 <strong>BO</strong> = backorder qty. Ex: ordered 6, BO=2 → envia 4 agora, 2 ficam em backorder.</p>' : ''}`;
 }
 
-function omUpdateRowTotal(input, idx, qty) {
-  const price = parseFloat(input.value) || 0;
-  const cell = document.getElementById('om-row-total-' + idx);
-  if (cell) cell.textContent = '€' + (price * qty).toFixed(2);
-}
-
-function omToggleBackorder(idx) {
+function omRecalcRow(idx) {
   const items = window._currentModalItems;
   if (!items || !items[idx]) return;
-  items[idx].is_backorder = !items[idx].is_backorder;
-  items[idx].backorder_status = items[idx].is_backorder ? 'pending' : null;
-  renderOrderItemsTable(items, window._currentModalOrder, true);
+  const item  = items[idx];
+  const qty   = item.quantity || 1;
+  const priceInput = document.querySelector(`.om-edit-price[data-idx="${idx}"]`);
+  const boInput    = document.querySelector(`.om-edit-boqty[data-idx="${idx}"]`);
+  const price  = priceInput ? (parseFloat(priceInput.value) || 0) : (parseFloat(item.unit_price) || 0);
+  let   boQty  = boInput    ? (parseInt(boInput.value) || 0)   : 0;
+  boQty = Math.min(Math.max(0, boQty), qty);
+  if (boInput) boInput.value = boQty;
+  const sendQty = qty - boQty;
+  const rowTotal = price * sendQty;
+  // Update send qty label
+  const sendEl = document.getElementById('om-send-qty-' + idx);
+  if (sendEl) sendEl.textContent = sendQty;
+  // Update row total cell
+  const totalEl = document.getElementById('om-row-total-' + idx);
+  if (totalEl) totalEl.textContent = '€' + rowTotal.toFixed(2);
+  // Grey out row if fully in BO
+  const row = document.querySelector(`tr[data-idx="${idx}"]`) || document.querySelector(`tr[data-item-id="${item.id}"]`);
+  if (row) row.style.opacity = (boQty >= qty) ? '0.5' : '1';
+  // Uncheck invoice checkbox if fully in BO
+  const cb = document.querySelector(`.om-item-cb[data-idx="${idx}"]`);
+  if (cb) cb.checked = boQty < qty;
 }
 
 function toggleOrderEditMode() {
@@ -14161,74 +14185,80 @@ async function saveOrderItemEdits() {
   const items = window._currentModalItems;
   const order = window._currentModalOrder;
   if (!items || !order) return;
-
-  const rows = document.querySelectorAll('#omItemsWrapper tbody tr[data-item-id]');
-  const updates = [];
-  rows.forEach((row, idx) => {
-    const item = items[idx];
-    if (!item) return;
-    const priceInput = row.querySelector('.om-edit-price');
-    const newPrice = priceInput ? parseFloat(priceInput.value) || 0 : parseFloat(item.unit_price) || 0;
-    const qty = item.quantity || 1;
-    const newTotal = parseFloat((newPrice * qty).toFixed(2));
-    updates.push({
-      id: item.id,
-      unit_price: newPrice,
-      total_price: newTotal,
-      total: newTotal,
-      is_backorder: item.is_backorder === true,
-      backorder_status: item.is_backorder ? 'pending' : null,
-      fulfillment_status: item.is_backorder ? 'backorder' : (item.fulfillment_status === 'backorder' ? 'unfulfilled' : item.fulfillment_status)
-    });
-    // Update in-memory
-    item.unit_price = newPrice;
-    item.total_price = newTotal;
-    item.total = newTotal;
-  });
-
   const saveBtn = document.getElementById('btnSaveItemEdits');
   if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
-
   try {
-    // Save each item
-    for (const u of updates) {
-      await supaUpdate('order_items', u.id, {
-        unit_price: u.unit_price,
-        total_price: u.total_price,
-        total: u.total,
-        is_backorder: u.is_backorder,
-        backorder_status: u.backorder_status,
-        fulfillment_status: u.fulfillment_status
-      });
-    }
+    let totalBackorderCount = 0;
+    for (let idx = 0; idx < items.length; idx++) {
+      const item = items[idx];
+      const priceInput = document.querySelector(`.om-edit-price[data-idx="${idx}"]`);
+      const boInput    = document.querySelector(`.om-edit-boqty[data-idx="${idx}"]`);
+      const newPrice   = priceInput ? (parseFloat(priceInput.value) || 0) : (parseFloat(item.unit_price) || 0);
+      const origQty    = item.quantity || 1;
+      const boQty      = boInput ? Math.min(Math.max(0, parseInt(boInput.value) || 0), origQty) : 0;
+      const sendQty    = origQty - boQty;
 
+      if (boQty === 0) {
+        // Normal item — update price only
+        const newTotal = parseFloat((newPrice * origQty).toFixed(2));
+        await supaUpdate('order_items', item.id, {
+          unit_price: newPrice, total_price: newTotal, total: newTotal,
+          is_backorder: false, backorder_status: null, fulfillment_status: item.fulfillment_status === 'backorder' ? 'unfulfilled' : item.fulfillment_status
+        });
+        item.unit_price = newPrice; item.total_price = newTotal; item.total = newTotal;
+        item.is_backorder = false; item._boQty = 0;
+      } else if (boQty >= origQty) {
+        // Fully in backorder
+        totalBackorderCount += origQty;
+        await supaUpdate('order_items', item.id, {
+          unit_price: newPrice, total_price: 0, total: 0,
+          is_backorder: true, backorder_status: 'pending', fulfillment_status: 'backorder'
+        });
+        item.unit_price = newPrice; item.total_price = 0; item.total = 0;
+        item.is_backorder = true; item._boQty = origQty;
+      } else {
+        // Partial backorder — update send qty on existing record, insert BO record
+        totalBackorderCount += boQty;
+        const sendTotal = parseFloat((newPrice * sendQty).toFixed(2));
+        const boTotal   = parseFloat((newPrice * boQty).toFixed(2));
+        await supaUpdate('order_items', item.id, {
+          quantity: sendQty, unit_price: newPrice, total_price: sendTotal, total: sendTotal,
+          is_backorder: false, backorder_status: null, fulfillment_status: 'unfulfilled'
+        });
+        item.quantity = sendQty; item.unit_price = newPrice;
+        item.total_price = sendTotal; item.total = sendTotal;
+        item.is_backorder = false; item._boQty = 0;
+        // Insert new backorder record
+        await supaInsert('order_items', {
+          order_id: order.id, product_id: item.product_id || null,
+          product_name: item.product_name, product_sku: item.product_sku || item.sku || null,
+          variant_id: item.variant_id || null, variant_label: item.variant_label || null,
+          quantity: boQty, unit_price: newPrice, total_price: boTotal, total: boTotal,
+          is_backorder: true, backorder_status: 'pending', fulfillment_status: 'backorder',
+          product_image: item.product_image || null
+        });
+      }
+    }
     // Recalculate order totals (only non-backorder items)
     const activeItems = items.filter(i => !i.is_backorder);
-    const newSubtotal = activeItems.reduce((s, i) => s + (parseFloat(i.total_price) || 0), 0);
+    const newSubtotal = parseFloat(activeItems.reduce((s, i) => s + (parseFloat(i.total_price) || 0), 0).toFixed(2));
     const shipping    = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
     const newVat      = Math.round((newSubtotal + shipping) * 23) / 100;
     const newTotal    = parseFloat((newSubtotal + shipping + newVat).toFixed(2));
-    const hasBackorder = items.some(i => i.is_backorder);
-
+    const hasBO       = items.some(i => i.is_backorder) || totalBackorderCount > 0;
     await supaUpdate('orders', order.id, {
-      subtotal: parseFloat(newSubtotal.toFixed(2)),
-      tax_amount: newVat,
-      tax_total: newVat,
-      total: newTotal,
-      has_backorder_items: hasBackorder
+      subtotal: newSubtotal, tax_amount: newVat, tax_total: newVat,
+      total: newTotal, has_backorder_items: hasBO
     });
-
-    // Update in-memory order
-    order.subtotal    = newSubtotal;
-    order.tax_amount  = newVat;
-    order.tax_total   = newVat;
-    order.total       = newTotal;
-    order.has_backorder_items = hasBackorder;
-    window._currentOrderItemsForInvoice = items.filter(i => !i.is_backorder);
-
+    order.subtotal = newSubtotal; order.tax_amount = newVat;
+    order.tax_total = newVat; order.total = newTotal; order.has_backorder_items = hasBO;
+    // Reload items from DB to get newly inserted BO records
+    const freshItems = await supaGet('order_items', `?order_id=eq.${order.id}`);
+    window._currentModalItems = freshItems || items;
+    window._currentOrderItemsForInvoice = (freshItems || items).filter(i => !i.is_backorder);
     window._orderEditMode = false;
-    renderOrderItemsTable(items, order, false);
-    toast('✅ Order items saved. Backorder: ' + items.filter(i => i.is_backorder).length + ' item(s).');
+    renderOrderItemsTable(freshItems || items, order, false);
+    toast('✅ Saved. Sending now: ' + (activeItems.reduce((s,i)=>s+(i.quantity||1),0)) + ' unit(s). Backorder: ' + totalBackorderCount + ' unit(s).');
   } catch (err) {
     console.error('saveOrderItemEdits error:', err);
     alert('Error saving: ' + err.message);
