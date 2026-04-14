@@ -13547,8 +13547,15 @@ window.shipViaGLS = async function shipViaGLS() {
   // Support both WooCommerce format (address_1) and manual order format (addr1)
   const addr = (ship.address_1 || ship.address1 || ship.addr1 || ship.address) ? ship : bill;
 
-  const recipientName = [addr.first_name, addr.last_name].filter(Boolean).join(' ')
+  // For B2B customers: use company name on label; for B2C: use personal name
+  let recipientName = [addr.first_name, addr.last_name].filter(Boolean).join(' ')
     || freshOrder.customer_name || freshOrder.billing_name || 'Customer';
+  if (freshOrder.customer_id) {
+    const custForName = (allCustomers || []).find(c => c.id === freshOrder.customer_id);
+    if (custForName && custForName.customer_type === 'b2b' && custForName.b2b_company_name) {
+      recipientName = custForName.b2b_company_name;
+    }
+  }
   // Support both field name formats
   const street   = addr.address_1 || addr.address1 || addr.addr1 || addr.address || addr.street || '';
   const city     = addr.city || '';
