@@ -1818,19 +1818,31 @@ const B2B = (function() {
         addBtn.addEventListener('click', function() {
           var qty = parseInt(qtyInput.value) || 1;
           if (_pmSelVar) {
+            // Variante seleccionada — adiciona normalmente
             var finalPrice = Number(_pmSelVar.price) || Number(b2bPrice);
             if (typeof addToCart === 'function') {
               addToCart(legacyId, qty, { nome: name + ' \u2014 ' + _pmSelVar.label, preco: finalPrice, imagem: rawImg, variant: _pmSelVar.label, variantId: _pmSelVar.id });
               toast('Added ' + qty + 'x to cart');
             }
+            closeProductModal();
+          } else if (hasVariants) {
+            // Produto tem variantes mas nenhuma foi seleccionada — bloqueia
+            var varGroups = document.querySelectorAll('.pm-var-group');
+            varGroups.forEach(function(g) {
+              g.style.outline = '2px solid #ef4444';
+              g.style.borderRadius = '8px';
+              setTimeout(function() { g.style.outline = ''; }, 2500);
+            });
+            toast('Please select an option before adding to cart');
           } else {
+            // Produto sem variantes — adiciona normalmente
             var finalP = Number(b2bPrice);
             if (typeof addToCart === 'function') {
               addToCart(legacyId, qty, { nome: name, preco: finalP, imagem: rawImg });
               toast('Added ' + qty + 'x to cart');
             }
+            closeProductModal();
           }
-          closeProductModal();
         });
       }
 
