@@ -13528,24 +13528,37 @@ window.shipViaGLS = async function shipViaGLS() {
   const btn = document.getElementById('btnGlsShip');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Creating shipment...'; }
 
+  // Fetch fresh order data from DB to avoid stale cache
+  let freshOrder = order;
+  try {
+    const fresh = await supaGet('orders', `?id=eq.${order.id}&select=*`);
+    if (fresh && fresh[0]) {
+      freshOrder = fresh[0];
+      // Update caches
+      window._currentModalOrder = freshOrder;
+      const idx = (allOrders || []).findIndex(o => o.id === order.id);
+      if (idx >= 0) allOrders[idx] = { ...allOrders[idx], ...freshOrder };
+    }
+  } catch(e) { console.warn('[GLS] Could not refresh order data:', e); }
+
   // Build recipient address from shipping_address (fall back to billing_address)
-  const ship = (order.shipping_address && typeof order.shipping_address === 'object') ? order.shipping_address : {};
-  const bill = (order.billing_address  && typeof order.billing_address  === 'object') ? order.billing_address  : {};
+  const ship = (freshOrder.shipping_address && typeof freshOrder.shipping_address === 'object') ? freshOrder.shipping_address : {};
+  const bill = (freshOrder.billing_address  && typeof freshOrder.billing_address  === 'object') ? freshOrder.billing_address  : {};
   // Support both WooCommerce format (address_1) and manual order format (addr1)
   const addr = (ship.address_1 || ship.address1 || ship.addr1 || ship.address) ? ship : bill;
 
   const recipientName = [addr.first_name, addr.last_name].filter(Boolean).join(' ')
-    || order.customer_name || order.billing_name || 'Customer';
+    || freshOrder.customer_name || freshOrder.billing_name || 'Customer';
   // Support both field name formats
   const street   = addr.address_1 || addr.address1 || addr.addr1 || addr.address || addr.street || '';
   const city     = addr.city || '';
   const zipCode  = addr.postcode || addr.postal_code || addr.zip || '';
   const country  = addr.country_code || addr.country || 'IE';
-  const phone    = addr.phone || bill.phone || order.customer_phone || '';
-  let email      = order.customer_email || bill.email || ship.email || addr.email || '';
+  const phone    = addr.phone || bill.phone || freshOrder.customer_phone || '';
+  let email      = freshOrder.customer_email || bill.email || ship.email || addr.email || '';
   // Fallback: get email from customer record if still empty
-  if (!email && order.customer_id) {
-    const cust = (allCustomers || []).find(c => c.id === order.customer_id);
+  if (!email && freshOrder.customer_id) {
+    const cust = (allCustomers || []).find(c => c.id === freshOrder.customer_id);
     if (cust && cust.email) email = cust.email;
   }
 
@@ -13560,7 +13573,7 @@ window.shipViaGLS = async function shipViaGLS() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        order_number:   order.order_number || order.id,
+        order_number:   freshOrder.order_number || freshOrder.id,
         recipient_name: recipientName,
         street:         street,
         city:           city,
@@ -13569,7 +13582,7 @@ window.shipViaGLS = async function shipViaGLS() {
         contact_phone:  phone,
         contact_email:  email,
         weight:         1.0,
-        references:     order.order_number || order.id
+        references:     freshOrder.order_number || freshOrder.id
       })
     });
 
