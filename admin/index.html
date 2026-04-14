@@ -2755,7 +2755,12 @@ Select a financial report above to begin analysis.
 </table>
 
 <!-- Customer-grouped view -->
-<div id="boCustomerGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px"></div>
+<div id="boCustomerGrid">
+  <table style="width:100%;font-size:0.85rem;border-collapse:collapse">
+    <thead id="boCustomerHead"></thead>
+    <tbody id="boCustomerBody"></tbody>
+  </table>
+</div>
 </div>
 
 <!-- BACKORDER CUSTOMER DETAIL MODAL -->
@@ -16297,19 +16302,87 @@ function filterBackorders() {
   const filter = document.getElementById('boFilter').value;
 
   let filtered = _boData.filter(item => {
-    const cust   = (item.order?.customer_name || '').toLowerCase();
-    const prod   = (item.product_name || '').toLowerCase();
+    const cust     = (item.order?.customer_name || '').toLowerCase();
+    const prod     = (item.product_name || '').toLowerCase();
     const orderNum = (item.order?.order_number || '').toLowerCase();
     if (search && !cust.includes(search) && !prod.includes(search) && !orderNum.includes(search)) return false;
     const status = (item.backorder_status || 'pending').toLowerCase();
-    if (filter === 'pending'  && status !== 'pending' && status !== '') return false;
-    if (filter === 'ordered'  && status !== 'ordered_from_supplier') return false;
-    if (filter === 'partial'  && status !== 'partially_shipped') return false;
+    if (filter === 'pending' && status !== 'pending' && status !== '') return false;
+    if (filter === 'ordered' && status !== 'ordered_from_supplier') return false;
+    if (filter === 'partial' && status !== 'partially_shipped') return false;
     return true;
   });
 
-  const grid = document.getElementById('boCustomerGrid');
-  if (!grid) return;
+  const head = document.getElementById('boCustomerHead');
+  const body = document.getElementById('boCustomerBody');
+  if (!head || !body) return;
+
+  if (!filtered.length) {
+    head.innerHTML = '';
+    body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:50px;color:var(--text-muted)"><div style="font-size:36px;margin-bottom:10px">✅</div><div style="font-size:15px;font-weight:600">No pending backorders</div><div style="font-size:12px;margin-top:4px">All items have been shipped!</div></td></tr>';
+    return;
+  }
+
+  // Group by customer
+  const byCustomer = {};
+  filtered.forEach(item => {
+    const o    = item.order || {};
+    const key  = o.customer_email || o.customer_name || item.order_id || 'Unknown';
+    const name = o.customer_name || key;
+    if (!byCustomer[key]) {
+      byCustomer[key] = { name, email: o.customer_email || '', items: [], totalValue: 0, orderNumbers: new Set(), oldest: null };
+    }
+    byCustomer[key].items.push(item);
+    byCustomer[key].totalValue += Number(item.total_price || 0);
+    if (o.order_number) byCustomer[key].orderNumbers.add(o.order_number);
+    const d = item.order?.created_at || item.created_at;
+    if (d && (!byCustomer[key].oldest || d < byCustomer[key].oldest)) byCustomer[key].oldest = d;
+  });
+
+  window._boCustomerMap = byCustomer;
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const customers = Object.entries(byCustomer).sort((a,b) => b[1].totalValue - a[1].totalValue);
+
+  head.innerHTML = `<tr style="background:var(--surface-2);font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
+    <th style="padding:10px 14px;text-align:left">Customer</th>
+    <th style="padding:10px 14px;text-align:center">Products</th>
+    <th style="padding:10px 14px;text-align:center">Orders</th>
+    <th style="padding:10px 14px;text-align:right">Total Value</th>
+    <th style="padding:10px 14px;text-align:center">Oldest Backorder</th>
+    <th style="padding:10px 14px;text-align:center">Status</th>
+  </tr>`;
+
+  body.innerHTML = customers.map(([key, c], i) => {
+    const statusCounts = { pending: 0, ordered: 0, partial: 0 };
+    c.items.forEach(it => {
+      const s = it.backorder_status || 'pending';
+      if (s === 'pending') statusCounts.pending++;
+      else if (s === 'ordered_from_supplier') statusCounts.ordered++;
+      else if (s === 'partially_shipped') statusCounts.partial++;
+    });
+    const badges = [
+      statusCounts.pending ? `<span style="background:#fef3c7;color:#d97706;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.pending} pending</span>` : '',
+      statusCounts.ordered ? `<span style="background:#dbeafe;color:#2563eb;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.ordered} ordered</span>` : '',
+      statusCounts.partial ? `<span style="background:#e0e7ff;color:#4f46e5;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.partial} partial</span>` : '',
+    ].filter(Boolean).join(' ');
+    const oldestLabel = c.oldest ? new Date(c.oldest).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const rowBg = i % 2 !== 0 ? 'background:var(--surface-2)' : '';
+
+    return `<tr style="${rowBg};border-bottom:1px solid var(--border)"
+        onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2!==0?'var(--surface-2)':''}'"  >
+      <td style="padding:10px 14px">
+        <a href="#" onclick="event.preventDefault();openBoCustomerModal('${key.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"
+          style="font-weight:600;color:var(--accent);text-decoration:none">${c.name}</a>
+        ${c.email ? `<div style="font-size:0.78rem;color:var(--text-muted);margin-top:1px">${c.email}</div>` : ''}
+      </td>
+      <td style="padding:10px 14px;text-align:center;font-weight:700">${c.items.length}</td>
+      <td style="padding:10px 14px;text-align:center">${c.orderNumbers.size}</td>
+      <td style="padding:10px 14px;text-align:right;font-weight:700;color:var(--accent)">${fmt(c.totalValue)}</td>
+      <td style="padding:10px 14px;text-align:center;font-size:0.85rem">${oldestLabel}</td>
+      <td style="padding:10px 14px;text-align:center"><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">${badges}</div></td>
+    </tr>`;
+  }).join('');
+}
 
   if (!filtered.length) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:12px">✅</div><div style="font-size:16px;font-weight:600">No pending backorders</div><div style="font-size:13px;margin-top:6px">All items have been shipped!</div></div>';
