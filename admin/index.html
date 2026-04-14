@@ -13528,21 +13528,28 @@ window.shipViaGLS = async function shipViaGLS() {
   const btn = document.getElementById('btnGlsShip');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Creating shipment...'; }
 
-  // Fetch fresh order data + customer in one query (join)
+  // 1. Fetch fresh order from DB
   let freshOrder = order;
-  let glsCustomer = null;
   try {
-    const fresh = await supaGet('orders',
-      `?id=eq.${order.id}&select=*,customer:customers!customer_id(id,customer_type,b2b_company_name,address,city,postcode,email)`
-    );
+    const fresh = await supaGet('orders', `?id=eq.${order.id}&select=*`);
     if (fresh && fresh[0]) {
       freshOrder = fresh[0];
-      glsCustomer = freshOrder.customer || null;
       window._currentModalOrder = freshOrder;
       const idx = (allOrders || []).findIndex(o => o.id === order.id);
       if (idx >= 0) allOrders[idx] = { ...allOrders[idx], ...freshOrder };
     }
-  } catch(e) { console.warn('[GLS] Could not refresh order data:', e); }
+  } catch(e) { console.warn('[GLS] order fetch:', e); }
+
+  // 2. Fetch customer directly for company name (separate query - avoids RLS join issues)
+  let glsCustomer = null;
+  if (freshOrder.customer_id) {
+    try {
+      const cr = await supaGet('customers',
+        `?id=eq.${freshOrder.customer_id}&select=id,name,customer_type,b2b_company_name,address,city,postcode,email`
+      );
+      if (cr && cr[0]) glsCustomer = cr[0];
+    } catch(e) { console.warn('[GLS] customer fetch:', e); }
+  }
 
   // Build recipient address from shipping_address (fall back to billing_address)
   const ship = (freshOrder.shipping_address && typeof freshOrder.shipping_address === 'object') ? freshOrder.shipping_address : {};
@@ -13601,17 +13608,14 @@ window.shipViaGLS = async function shipViaGLS() {
       throw new Error(result.error || ('GLS error ' + resp.status));
     }
 
-    // Parcel number is the primary tracking reference (barcode on label)
-    console.log('[GLS] Raw result:', JSON.stringify(result));
-    const trackId = result.parcel_number || result.track_id || '';
-    const parcelNumber = result.parcel_number || result.track_id || '';
-    toast(`GLS → parcel:${result.parcel_number || 'n/a'} track:${result.track_id || 'n/a'}`, 'info');
+    // Save parcel number as tracking (primary = parcel_number from barcode)
+    const parcelNum = result.parcel_number || result.track_id || '';
 
     // Save tracking number to order
-    if (trackId) {
+    if (parcelNum) {
       try {
         var updateData = {
-          tracking_number: trackId,
+          tracking_number: parcelNum,
           fulfillment_status: 'fulfilled',
           updated_at: new Date().toISOString()
         };
@@ -13620,15 +13624,15 @@ window.shipViaGLS = async function shipViaGLS() {
         // Update in-memory cache
         const idx = allOrders.findIndex(function(o) { return o.id === order.id; });
         if (idx >= 0) {
-          allOrders[idx].tracking_number = trackId;
+          allOrders[idx].tracking_number = parcelNum;
           allOrders[idx].fulfillment_status = 'fulfilled';
           if (result.label_pdf_base64) allOrders[idx].gls_label_base64 = result.label_pdf_base64;
         }
-        window._currentModalOrder.tracking_number = trackId;
+        window._currentModalOrder.tracking_number = parcelNum;
         if (result.label_pdf_base64) window._currentModalOrder.gls_label_base64 = result.label_pdf_base64;
         // Update tracking input in modal
         const trackInput = document.getElementById('omTrackingNumber');
-        if (trackInput) trackInput.value = trackId;
+        if (trackInput) trackInput.value = parcelNum;
       } catch(e) {
         console.error('[GLS] Failed to save tracking number:', e);
       }
@@ -13642,10 +13646,10 @@ window.shipViaGLS = async function shipViaGLS() {
     }
 
     if (btn) {
-      btn.textContent = '✅ Shipped: ' + (trackId || 'OK');
+      btn.textContent = '✅ Shipped: ' + (parcelNum || 'OK');
       btn.disabled = true;
     }
-    toast('✅ GLS shipment created! Track: ' + (trackId || 'N/A'), 'success');
+    toast('✅ GLS shipment created! Parcel: ' + (parcelNum || 'N/A'), 'success');
 
   } catch(e) {
     if (btn) { btn.disabled = false; btn.textContent = '📦 Ship via GLS'; }
