@@ -16246,8 +16246,26 @@ try {
 const items = await supaGet('order_items', '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at&is_backorder=eq.true&order=created_at.desc');
 
 // Also fetch orders with has_backorder_items flag
-const orders = await supaGet('orders', '?select=id,order_number,customer_name,customer_email,created_at,fulfillment_status&has_backorder_items=eq.true&order=created_at.desc');
+const orders = await supaGet('orders', '?select=id,order_number,customer_name,customer_email,created_at,fulfillment_status,customer_id&has_backorder_items=eq.true&order=created_at.desc');
 const orderMap = {};
+
+// Resolve missing customer names via customers table
+const missingNameIds = orders.filter(o => !o.customer_name && !o.customer_email && o.customer_id).map(o => o.customer_id);
+if (missingNameIds.length) {
+  try {
+    const custs = await supaGet('customers', '?select=id,b2b_company_name,company,first_name,last_name,email&id=in.(' + [...new Set(missingNameIds)].join(',') + ')');
+    const custMap = {};
+    custs.forEach(c => { custMap[c.id] = c; });
+    orders.forEach(o => {
+      if (!o.customer_name && o.customer_id && custMap[o.customer_id]) {
+        const c = custMap[o.customer_id];
+        o.customer_name = c.b2b_company_name || c.company || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email || '';
+        if (!o.customer_email) o.customer_email = c.email || '';
+      }
+    });
+  } catch(e) {}
+}
+
 orders.forEach(o => { orderMap[o.id] = o; });
 
 // Also check for items with fulfillment_status = 'backordered' or 'pending_backorder'
@@ -16328,7 +16346,7 @@ function filterBackorders() {
   filtered.forEach(item => {
     const o    = item.order || {};
     const key  = o.customer_email || o.customer_name || item.order_id || 'Unknown';
-    const name = o.customer_name || key;
+    const name = o.customer_name || o.customer_email || 'Unknown Customer';
     if (!byCustomer[key]) {
       byCustomer[key] = { name, email: o.customer_email || '', items: [], totalValue: 0, orderNumbers: new Set(), oldest: null };
     }
