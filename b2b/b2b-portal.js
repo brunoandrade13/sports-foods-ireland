@@ -1054,7 +1054,9 @@ const B2B = (function() {
         name: i.product_name || 'Product',
         price: Number(i.unit_price || i.total || 0),
         quantity: Number(i.quantity || 1),
-        image: imgUrl
+        image: imgUrl,
+        variant_id: i.variant_id || null,
+        variant_label: i.variant_label || null
       };
     });
 
@@ -1102,7 +1104,12 @@ const B2B = (function() {
     let added = 0;
     active.forEach(i => {
       if (i.legacy_id) {
-        addToCart(i.legacy_id, i.quantity, { nome: i.name, preco: Number(i.price), imagem: i.image });
+        const opts = { nome: i.name, preco: Number(i.price), imagem: i.image };
+        if (i.variant_id) {
+          opts.variantId = i.variant_id;
+          opts.variant = i.variant_label || '';
+        }
+        addToCart(i.legacy_id, i.quantity, opts);
         added++;
       }
     });
@@ -1473,7 +1480,7 @@ const B2B = (function() {
       grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">No products found.</p>';
       return;
     }
-    var currency = sfi.currency === 'GBP' ? '£' : '€';
+    var currency = '€';
     var favs = JSON.parse(localStorage.getItem('sfi_b2b_favourites') || '[]');
     grid.innerHTML = products.map(function(p) {
       var rawImg = p.imagem || p.image_url || '';
@@ -1545,7 +1552,7 @@ const B2B = (function() {
       var img = rawImg;
       if (img && !img.startsWith('http') && !img.startsWith('../')) img = '../' + img;
       if (!img) img = '../img/placeholder.webp';
-      var currency = sfi.currency === 'GBP' ? '\u00a3' : '\u20ac';
+      var currency = '€';
       var b2bPrice = (p && p.b2b_price != null) ? p.b2b_price : (fullData && fullData.wholesale_price_eur);
       var retailPrice = (p && p.retail_price) || (fullData && fullData.price_eur);
       var brand = (p && p.brands && p.brands.name) || (p && p.marca) || (fullData && fullData.brands && fullData.brands.name) || '';
@@ -1900,7 +1907,7 @@ const B2B = (function() {
         grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">No recommendations available yet. Order more to get personalised suggestions!</p>';
         return;
       }
-      var currency = sfi.currency === 'GBP' ? '£' : '€';
+      var currency = '€';
       var sectionTitles = {
         1: '🆕 New products in your top category',
         2: '⏰ Products you used to buy — time to restock?',
@@ -2013,7 +2020,7 @@ const B2B = (function() {
       grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">No products found.</p>';
       return;
     }
-    var currency = sfi.currency === 'GBP' ? '£' : '€';
+    var currency = '€';
     grid.innerHTML = products.map(function(p) {
       var rawImg = p.imagem || p.image_url || '';
       var img = rawImg ? (rawImg.startsWith('http') ? rawImg : '../' + rawImg) : '../img/placeholder.webp';
@@ -2144,7 +2151,7 @@ const B2B = (function() {
   }
   function b2bShowVariantModal(pInfo, vGroups, onConfirm) {
     var prev = document.getElementById('b2bVarOvl'); if (prev) prev.remove();
-    var cur = sfi.currency === 'GBP' ? '\u00a3' : '\u20ac';
+    var cur = '€';
     var backorderAllowed = pInfo.backorder_available === true;
     var img = pInfo.image || '';
     if (img && !img.startsWith('http') && !img.startsWith('../')) img = '../' + img;
