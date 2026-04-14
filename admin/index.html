@@ -16343,65 +16343,80 @@ loadReceivables();
 let _boData = [];
 
 async function loadBackorders() {
-try {
-// Fetch order items that are marked as backorder and not yet fulfilled
-const items = await supaGet('order_items', '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at&is_backorder=eq.true&order=created_at.desc');
+  // Show loading state
+  const grid = document.getElementById('boCustomerGrid');
+  if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div class="spinner"></div><div style="margin-top:12px">Loading backorders…</div></div>';
 
-// Also fetch orders with has_backorder_items flag
-const orders = await supaGet('orders', '?select=id,order_number,customer_name,customer_email,created_at,fulfillment_status,customer_id&has_backorder_items=eq.true&order=created_at.desc');
-const orderMap = {};
-
-// Resolve missing customer names via customers table
-const missingNameIds = orders.filter(o => !o.customer_name && !o.customer_email && o.customer_id).map(o => o.customer_id);
-if (missingNameIds.length) {
   try {
-    const custs = await supaGet('customers', '?select=id,b2b_company_name,company,first_name,last_name,email&id=in.(' + [...new Set(missingNameIds)].join(',') + ')');
-    const custMap = {};
-    custs.forEach(c => { custMap[c.id] = c; });
-    orders.forEach(o => {
-      if (!o.customer_name && o.customer_id && custMap[o.customer_id]) {
-        const c = custMap[o.customer_id];
-        o.customer_name = c.b2b_company_name || c.company || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email || '';
-        if (!o.customer_email) o.customer_email = c.email || '';
+    // Fetch backorder items
+    let items = [];
+    try {
+      items = await supaGet('order_items',
+        '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at' +
+        '&is_backorder=eq.true&backorder_fulfilled_at=is.null&order=created_at.desc');
+    } catch(e) { console.warn('BO items query failed:', e); }
+
+    // Fetch extra items by fulfillment_status
+    let extraItems = [];
+    try {
+      extraItems = await supaGet('order_items',
+        '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at' +
+        '&fulfillment_status=eq.backorder&backorder_fulfilled_at=is.null&order=created_at.desc');
+    } catch(e) {}
+
+    // Merge and deduplicate
+    const existingIds = new Set(items.map(i => i.id));
+    extraItems.forEach(i => { if (!existingIds.has(i.id)) items.push(i); });
+
+    // Build order map
+    const orderMap = {};
+    const orderIds = [...new Set(items.map(i => i.order_id).filter(Boolean))];
+
+    if (orderIds.length) {
+      for (let i = 0; i < orderIds.length; i += 20) {
+        try {
+          const batch = orderIds.slice(i, i + 20);
+          const ords = await supaGet('orders',
+            '?select=id,order_number,customer_name,customer_email,customer_id,created_at,fulfillment_status' +
+            '&id=in.(' + batch.join(',') + ')');
+          ords.forEach(o => { orderMap[o.id] = o; });
+        } catch(e) { console.warn('BO orders batch failed:', e); }
       }
-    });
-  } catch(e) {}
-}
+    }
 
-orders.forEach(o => { orderMap[o.id] = o; });
+    // Resolve missing customer names
+    const missingNameOrders = Object.values(orderMap).filter(o => !o.customer_name && !o.customer_email && o.customer_id);
+    if (missingNameOrders.length) {
+      try {
+        const custIds = [...new Set(missingNameOrders.map(o => o.customer_id))];
+        const custs = await supaGet('customers',
+          '?select=id,b2b_company_name,company,first_name,last_name,email&id=in.(' + custIds.join(',') + ')');
+        const custMap = {};
+        custs.forEach(c => { custMap[c.id] = c; });
+        Object.values(orderMap).forEach(o => {
+          if (!o.customer_name && o.customer_id && custMap[o.customer_id]) {
+            const c = custMap[o.customer_id];
+            o.customer_name = c.b2b_company_name || c.company ||
+              [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email || '';
+            if (!o.customer_email) o.customer_email = c.email || '';
+          }
+        });
+      } catch(e) {}
+    }
 
-// Also check for items with fulfillment_status = 'backordered' or 'pending_backorder'
-let extraItems = [];
-try {
-extraItems = await supaGet('order_items', '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at&fulfillment_status=eq.backordered&order=created_at.desc');
-} catch(e) {}
+    _boData = items.map(item => ({
+      ...item,
+      order: orderMap[item.order_id] || {}
+    }));
 
-// Merge and deduplicate
-const allItems = [...items];
-const existingIds = new Set(items.map(i => i.id));
-extraItems.forEach(i => { if (!existingIds.has(i.id)) allItems.push(i); });
+    renderBackordersSummary();
+    filterBackorders();
 
-// Fetch order details for items that don't have order info
-const missingOrderIds = [...new Set(allItems.map(i => i.order_id).filter(id => !orderMap[id]))];
-if (missingOrderIds.length) {
-for (let i = 0; i < missingOrderIds.length; i += 20) {
-const batch = missingOrderIds.slice(i, i + 20);
-const ords = await supaGet('orders', '?select=id,order_number,customer_name,customer_email,created_at&id=in.(' + batch.join(',') + ')');
-ords.forEach(o => { orderMap[o.id] = o; });
-}
-}
-
-_boData = allItems.map(item => ({
-...item,
-order: orderMap[item.order_id] || {}
-})).filter(item => !item.backorder_fulfilled_at); // Exclude already fulfilled
-
-renderBackordersSummary();
-filterBackorders();
-} catch (e) {
-console.error('loadBackorders:', e);
-toast('Failed to load backorders', 'error');
-}
+  } catch(e) {
+    console.error('loadBackorders error:', e);
+    toast('Failed to load backorders: ' + e.message, 'error');
+    if (grid) grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger)">❌ Failed to load. Check console for details.<br><button onclick="loadBackorders()" class="btn btn-outline" style="margin-top:12px">Retry</button></div>';
+  }
 }
 
 function renderBackordersSummary() {
