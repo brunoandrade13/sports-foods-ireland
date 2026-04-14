@@ -13528,13 +13528,16 @@ window.shipViaGLS = async function shipViaGLS() {
   const btn = document.getElementById('btnGlsShip');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Creating shipment...'; }
 
-  // Fetch fresh order data from DB to avoid stale cache
+  // Fetch fresh order data + customer in one query (join)
   let freshOrder = order;
+  let glsCustomer = null;
   try {
-    const fresh = await supaGet('orders', `?id=eq.${order.id}&select=*`);
+    const fresh = await supaGet('orders',
+      `?id=eq.${order.id}&select=*,customer:customers!customer_id(id,customer_type,b2b_company_name,address,city,postcode,email)`
+    );
     if (fresh && fresh[0]) {
       freshOrder = fresh[0];
-      // Update caches
+      glsCustomer = freshOrder.customer || null;
       window._currentModalOrder = freshOrder;
       const idx = (allOrders || []).findIndex(o => o.id === order.id);
       if (idx >= 0) allOrders[idx] = { ...allOrders[idx], ...freshOrder };
@@ -13550,18 +13553,8 @@ window.shipViaGLS = async function shipViaGLS() {
   // For B2B customers: use company name on label; for B2C: use personal name
   let recipientName = [addr.first_name, addr.last_name].filter(Boolean).join(' ')
     || freshOrder.customer_name || freshOrder.billing_name || 'Customer';
-  if (freshOrder.customer_id) {
-    // Try allCustomers cache first, then fetch directly from DB
-    let custForName = (allCustomers || []).find(c => String(c.id) === String(freshOrder.customer_id));
-    if (!custForName) {
-      try {
-        const rows = await supaGet('customers', `?id=eq.${freshOrder.customer_id}&select=id,customer_type,b2b_company_name`);
-        if (rows && rows[0]) custForName = rows[0];
-      } catch(e) { console.warn('[GLS] customer fetch error:', e); }
-    }
-    if (custForName && custForName.customer_type === 'b2b' && custForName.b2b_company_name) {
-      recipientName = custForName.b2b_company_name;
-    }
+  if (glsCustomer && glsCustomer.customer_type === 'b2b' && glsCustomer.b2b_company_name) {
+    recipientName = glsCustomer.b2b_company_name;
   }
   // Support both field name formats
   const street   = addr.address_1 || addr.address1 || addr.addr1 || addr.address || addr.street || '';
@@ -13569,20 +13562,13 @@ window.shipViaGLS = async function shipViaGLS() {
   const zipCode  = addr.postcode || addr.postal_code || addr.zip || '';
   const country  = addr.country_code || addr.country || 'IE';
   const phone    = addr.phone || bill.phone || freshOrder.customer_phone || '';
-  let email      = freshOrder.customer_email || bill.email || ship.email || addr.email || '';
-  // Fallback: get email from customer record if still empty
-  if (!email && freshOrder.customer_id) {
-    const cust = (allCustomers || []).find(c => c.id === freshOrder.customer_id);
-    if (cust && cust.email) email = cust.email;
-  }
+  let email = freshOrder.customer_email || bill.email || ship.email || addr.email || '';
+  if (!email && glsCustomer && glsCustomer.email) email = glsCustomer.email;
 
   // If street is incomplete (e.g. just a number like "31"), fall back to customer record address
   let finalStreet = street;
-  if ((!finalStreet || finalStreet.trim().length <= 4) && freshOrder.customer_id) {
-    const cust = (allCustomers || []).find(c => c.id === freshOrder.customer_id);
-    if (cust && cust.address && cust.address.trim().length > 4) {
-      finalStreet = cust.address.trim();
-    }
+  if ((!finalStreet || finalStreet.trim().length <= 4) && glsCustomer && glsCustomer.address && glsCustomer.address.trim().length > 4) {
+    finalStreet = glsCustomer.address.trim();
   }
 
   if (!finalStreet || !city || !zipCode) {
@@ -13616,8 +13602,10 @@ window.shipViaGLS = async function shipViaGLS() {
     }
 
     // Parcel number is the primary tracking reference (barcode on label)
+    console.log('[GLS] Raw result:', JSON.stringify(result));
     const trackId = result.parcel_number || result.track_id || '';
     const parcelNumber = result.parcel_number || result.track_id || '';
+    toast(`GLS → parcel:${result.parcel_number || 'n/a'} track:${result.track_id || 'n/a'}`, 'info');
 
     // Save tracking number to order
     if (trackId) {
