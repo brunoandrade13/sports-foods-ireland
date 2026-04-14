@@ -13531,11 +13531,13 @@ window.shipViaGLS = async function shipViaGLS() {
   // Build recipient address from shipping_address (fall back to billing_address)
   const ship = (order.shipping_address && typeof order.shipping_address === 'object') ? order.shipping_address : {};
   const bill = (order.billing_address  && typeof order.billing_address  === 'object') ? order.billing_address  : {};
-  const addr = (ship.address_1 || ship.address1) ? ship : bill;
+  // Support both WooCommerce format (address_1) and manual order format (addr1)
+  const addr = (ship.address_1 || ship.address1 || ship.addr1 || ship.address) ? ship : bill;
 
   const recipientName = [addr.first_name, addr.last_name].filter(Boolean).join(' ')
     || order.customer_name || order.billing_name || 'Customer';
-  const street   = addr.address_1 || addr.address || addr.street || '';
+  // Support both field name formats
+  const street   = addr.address_1 || addr.address1 || addr.addr1 || addr.address || addr.street || '';
   const city     = addr.city || '';
   const zipCode  = addr.postcode || addr.postal_code || addr.zip || '';
   const country  = addr.country_code || addr.country || 'IE';
@@ -13773,7 +13775,7 @@ y += 100;
 
 // ---- INVOICE TO / SHIP TO ----
 var boxW = (CW - 20) / 2;
-var formatAddr = function(a, comp) { var l = []; var nm = [a.first_name, a.last_name].filter(Boolean).join(' '); if (nm) l.push(nm); if (comp) l.push(comp); if (a.address_1) l.push(a.address_1); if (a.address_2) l.push(a.address_2); var ct = a.city || '', st = a.state || a.county || ''; if (ct && st) l.push(ct + ', ' + st); else if (ct) l.push(ct); var pc = a.postcode || a.postal_code || '', co = a.country === 'IE' ? 'Ireland' : (a.country === 'GB' ? 'United Kingdom' : (a.country || '')); if (pc && co) l.push(pc + ' ' + co); else if (pc) l.push(pc); else if (co) l.push(co); return l; };
+var formatAddr = function(a, comp) { var l = []; var nm = [a.first_name, a.last_name].filter(Boolean).join(' '); if (nm) l.push(nm); if (comp) l.push(comp); var line1 = a.address_1 || a.address1 || a.addr1 || a.address || a.street || ''; var line2 = a.address_2 || a.address2 || a.addr2 || ''; if (line1) l.push(line1); if (line2) l.push(line2); var ct = a.city || '', st = a.state || a.county || ''; if (ct && st) l.push(ct + ', ' + st); else if (ct) l.push(ct); var pc = a.postcode || a.postal_code || '', co = a.country === 'IE' ? 'Ireland' : (a.country === 'GB' ? 'United Kingdom' : (a.country || '')); if (pc && co) l.push(pc + ' ' + co); else if (pc) l.push(pc); else if (co) l.push(co); return l; };
 [[ML, 'INVOICE TO', bill], [ML + boxW + 20, 'SHIP TO', ship]].forEach(function(cfg) {
 var bx = cfg[0], label = cfg[1], addr = cfg[2];
 doc.setFillColor(224,224,224); doc.rect(bx, y, boxW, 14, 'F');
