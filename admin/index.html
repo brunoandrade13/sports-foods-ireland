@@ -14630,33 +14630,59 @@ function openARDetail(idx) {
   if (!title || !body || !modal) return;
 
   title.textContent = c.name + ' — Open Balance: ' + fmt(c.total_open);
+  _arCurrentCustomerIdx = idx;
+
+  renderARModalBody(c, fmt, today);
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+let _arCurrentCustomerIdx = -1;
+
+function renderARModalBody(c, fmt, today) {
+  const body = document.getElementById('arModalBody');
+  if (!body) return;
+  if (!fmt) fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (!today) today = new Date();
 
   let invoicesHtml = '';
-  (c.invoices||[]).sort((a,b) => new Date(a.due) - new Date(b.due)).forEach(inv => {
+  (c.invoices||[]).sort((a,b) => new Date(a.due) - new Date(b.due)).forEach((inv, iIdx) => {
     const due     = inv.due ? new Date(inv.due).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
     const date    = inv.date ? new Date(inv.date).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
     const overdue = inv.overdue;
     const daysOverdue = inv.due && overdue ? Math.floor((today - new Date(inv.due))/(1000*60*60*24)) : 0;
-    const overdueTag = overdue ? `<span style="background:#fef2f2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:700;margin-left:4px">⚠️ ${daysOverdue}d overdue</span>` : '';
-    invoicesHtml += `<tr style="border-bottom:1px solid var(--border)">
+    const overdueTag = overdue ? `<span style="background:#fef2f2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:700;margin-left:4px">${daysOverdue}d overdue</span>` : '';
+    const isPaid = inv._paid;
+    const markBtn = isPaid
+      ? `<span style="background:#f0fdf4;color:#16a34a;border-radius:4px;padding:2px 8px;font-size:0.75rem;font-weight:700">✅ Paid</span>`
+      : `<button onclick="markARInvoicePaid(${_arCurrentCustomerIdx}, ${iIdx})"
+          style="background:#1B4332;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:0.78rem;font-weight:600;cursor:pointer;white-space:nowrap"
+          title="Mark this invoice as paid in QuickBooks">
+          ✓ Mark Paid
+        </button>`;
+    invoicesHtml += `<tr id="arInvRow_${_arCurrentCustomerIdx}_${iIdx}" style="border-bottom:1px solid var(--border)">
       <td style="padding:9px 12px;font-weight:600;color:var(--accent)">#${inv.doc}</td>
       <td style="padding:9px 12px;font-size:0.85rem;color:var(--text-muted)">${date}</td>
       <td style="padding:9px 12px;font-size:0.85rem">${due}${overdueTag}</td>
       <td style="padding:9px 12px;text-align:right">${fmt(inv.total)}</td>
-      <td style="padding:9px 12px;text-align:right;font-weight:700;color:#dc2626">${fmt(inv.balance)}</td>
+      <td style="padding:9px 12px;text-align:right;font-weight:700;color:${isPaid?'#16a34a':'#dc2626'}">${isPaid ? '€0.00' : fmt(inv.balance)}</td>
+      <td style="padding:9px 12px;text-align:center">${markBtn}</td>
     </tr>`;
   });
 
   const hasOverdue = c.has_overdue;
+  const totalOpen = (c.invoices||[]).filter(i=>!i._paid).reduce((s,i)=>s+i.balance,0);
+
   body.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;text-align:center">
         <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px">Total Open</div>
-        <div style="font-size:1.3rem;font-weight:700;color:#166534">${fmt(c.total_open)}</div>
+        <div id="arModalTotalOpen" style="font-size:1.3rem;font-weight:700;color:#166534">${fmt(totalOpen)}</div>
       </div>
       <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
         <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px">Open Invoices</div>
-        <div style="font-size:1.3rem;font-weight:700">${c.invoices?.length||0}</div>
+        <div id="arModalInvCount" style="font-size:1.3rem;font-weight:700">${(c.invoices||[]).filter(i=>!i._paid).length}</div>
       </div>
       <div style="background:${hasOverdue?'#fef2f2':'#f0fdf4'};border:1px solid ${hasOverdue?'#fecaca':'#bbf7d0'};border-radius:8px;padding:12px;text-align:center">
         <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px">Status</div>
@@ -14672,20 +14698,72 @@ function openARDetail(idx) {
           <th style="padding:9px 12px;text-align:left">Due Date</th>
           <th style="padding:9px 12px;text-align:right">Total</th>
           <th style="padding:9px 12px;text-align:right">Balance Due</th>
+          <th style="padding:9px 12px;text-align:center">Action</th>
         </tr>
       </thead>
       <tbody>${invoicesHtml}</tbody>
       <tfoot>
         <tr style="background:var(--surface-2);font-weight:700">
           <td colspan="4" style="padding:10px 12px;text-align:right">Total Open Balance</td>
-          <td style="padding:10px 12px;text-align:right;color:#dc2626">${fmt(c.total_open)}</td>
+          <td id="arModalTotalFoot" style="padding:10px 12px;text-align:right;color:#dc2626">${fmt(totalOpen)}</td>
+          <td></td>
         </tr>
       </tfoot>
     </table>
     <p style="margin:14px 0 0;font-size:0.8rem;color:var(--text-muted)">Source: QuickBooks Online · Click outside to close</p>`;
+}
 
-  modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+async function markARInvoicePaid(custIdx, invIdx) {
+  const customers = _arData?.customers || [];
+  const c = customers[custIdx];
+  if (!c) return;
+  const inv = c.invoices?.[invIdx];
+  if (!inv || inv._paid) return;
+
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  if (!confirm(`Mark invoice #${inv.doc} (${fmt(inv.balance)}) as paid in QuickBooks?\n\nThis will create a payment record in QB and cannot be easily undone.`)) return;
+
+  // Disable button during request
+  const row = document.getElementById(`arInvRow_${custIdx}_${invIdx}`);
+  const btn = row?.querySelector('button');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Processing…'; }
+
+  try {
+    const token = localStorage.getItem('sfi_admin_token');
+    const res = await fetch(`${_AR_SUPA_URL}/functions/v1/qb-mark-invoice-paid`, {
+      method: 'POST',
+      headers: {
+        'apikey': _AR_ANON_KEY,
+        'Authorization': `Bearer ${token || _AR_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        invoice_id:  inv.qb_id,
+        customer_id: c.customer_id,
+        amount:      inv.balance,
+        invoice_doc: inv.doc,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || 'Failed');
+
+    // Mark locally as paid so UI updates instantly
+    inv._paid = true;
+    c.total_open = Math.max(0, c.total_open - inv.balance);
+
+    // Re-render modal body
+    renderARModalBody(c, fmt, new Date());
+
+    // Update the table row in background
+    renderARTable();
+
+    toast(`Invoice #${inv.doc} marked as paid in QuickBooks ✅`, 'success');
+
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '✓ Mark Paid'; }
+    toast('Error: ' + (e.message || 'Failed to mark as paid'), 'error');
+  }
 }
 
 function closeARModal() {
