@@ -13551,7 +13551,14 @@ window.shipViaGLS = async function shipViaGLS() {
   let recipientName = [addr.first_name, addr.last_name].filter(Boolean).join(' ')
     || freshOrder.customer_name || freshOrder.billing_name || 'Customer';
   if (freshOrder.customer_id) {
-    const custForName = (allCustomers || []).find(c => c.id === freshOrder.customer_id);
+    // Try allCustomers cache first, then fetch directly from DB
+    let custForName = (allCustomers || []).find(c => String(c.id) === String(freshOrder.customer_id));
+    if (!custForName) {
+      try {
+        const rows = await supaGet('customers', `?id=eq.${freshOrder.customer_id}&select=id,customer_type,b2b_company_name`);
+        if (rows && rows[0]) custForName = rows[0];
+      } catch(e) { console.warn('[GLS] customer fetch error:', e); }
+    }
     if (custForName && custForName.customer_type === 'b2b' && custForName.b2b_company_name) {
       recipientName = custForName.b2b_company_name;
     }
@@ -13608,8 +13615,8 @@ window.shipViaGLS = async function shipViaGLS() {
       throw new Error(result.error || ('GLS error ' + resp.status));
     }
 
-    // Use Track ID as primary (shown on label as "Your GLS Track ID"), fallback to parcel number
-    const trackId = result.track_id || result.parcel_number || '';
+    // Parcel number is the primary tracking reference (barcode on label)
+    const trackId = result.parcel_number || result.track_id || '';
     const parcelNumber = result.parcel_number || result.track_id || '';
 
     // Save tracking number to order
