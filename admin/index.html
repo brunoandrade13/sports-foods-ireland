@@ -16435,6 +16435,8 @@ document.getElementById('boOldest').textContent = oldestDate ? new Date(oldestDa
 function filterBackorders() {
   const search = (document.getElementById('boSearch').value || '').toLowerCase();
   const filter = document.getElementById('boFilter').value;
+  const grid   = document.getElementById('boCustomerGrid');
+  if (!grid) return;
 
   let filtered = _boData.filter(item => {
     const cust     = (item.order?.customer_name || '').toLowerCase();
@@ -16448,17 +16450,11 @@ function filterBackorders() {
     return true;
   });
 
-  const head = document.getElementById('boCustomerHead');
-  const body = document.getElementById('boCustomerBody');
-  if (!head || !body) return;
-
   if (!filtered.length) {
-    head.innerHTML = '';
-    body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:50px;color:var(--text-muted)"><div style="font-size:36px;margin-bottom:10px">✅</div><div style="font-size:15px;font-weight:600">No pending backorders</div><div style="font-size:12px;margin-top:4px">All items have been shipped!</div></td></tr>';
+    grid.innerHTML = '<table style="width:100%;border-collapse:collapse"><tbody><tr><td colspan="6" style="text-align:center;padding:50px;color:var(--text-muted)"><div style="font-size:36px;margin-bottom:10px">\u2705</div><div style="font-size:15px;font-weight:600">No pending backorders</div><div style="font-size:12px;margin-top:4px">All items have been shipped!</div></td></tr></tbody></table>';
     return;
   }
 
-  // Group by customer
   const byCustomer = {};
   filtered.forEach(item => {
     const o    = item.order || {};
@@ -16475,19 +16471,19 @@ function filterBackorders() {
   });
 
   window._boCustomerMap = byCustomer;
-  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const fmt = v => '\u20ac' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
   const customers = Object.entries(byCustomer).sort((a,b) => b[1].totalValue - a[1].totalValue);
 
-  head.innerHTML = `<tr style="background:var(--surface-2);font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
+  const headHtml = `<thead><tr style="background:var(--surface-2);font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
     <th style="padding:10px 14px;text-align:left">Customer</th>
     <th style="padding:10px 14px;text-align:center">Products</th>
     <th style="padding:10px 14px;text-align:center">Orders</th>
     <th style="padding:10px 14px;text-align:right">Total Value</th>
     <th style="padding:10px 14px;text-align:center">Oldest Backorder</th>
     <th style="padding:10px 14px;text-align:center">Status</th>
-  </tr>`;
+  </tr></thead>`;
 
-  body.innerHTML = customers.map(([key, c], i) => {
+  const bodyRows = customers.map(([key, c], i) => {
     const statusCounts = { pending: 0, ordered: 0, partial: 0 };
     c.items.forEach(it => {
       const s = it.backorder_status || 'pending';
@@ -16500,14 +16496,12 @@ function filterBackorders() {
       statusCounts.ordered ? `<span style="background:#dbeafe;color:#2563eb;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.ordered} ordered</span>` : '',
       statusCounts.partial ? `<span style="background:#e0e7ff;color:#4f46e5;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.partial} partial</span>` : '',
     ].filter(Boolean).join(' ');
-    const oldestLabel = c.oldest ? new Date(c.oldest).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const oldestLabel = c.oldest ? new Date(c.oldest).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '\u2014';
     const rowBg = i % 2 !== 0 ? 'background:var(--surface-2)' : '';
-
-    return `<tr style="${rowBg};border-bottom:1px solid var(--border)"
-        onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2!==0?'var(--surface-2)':''}'"  >
+    const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<tr style="${rowBg};border-bottom:1px solid var(--border)" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2!==0?'var(--surface-2)':''}'">
       <td style="padding:10px 14px">
-        <a href="#" onclick="event.preventDefault();openBoCustomerModal('${key.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"
-          style="font-weight:600;color:var(--accent);text-decoration:none">${c.name}</a>
+        <a href="#" onclick="event.preventDefault();openBoCustomerModal('${safeKey}')" style="font-weight:600;color:var(--accent);text-decoration:none">${c.name}</a>
         ${c.email ? `<div style="font-size:0.78rem;color:var(--text-muted);margin-top:1px">${c.email}</div>` : ''}
       </td>
       <td style="padding:10px 14px;text-align:center;font-weight:700">${c.items.length}</td>
@@ -16517,7 +16511,10 @@ function filterBackorders() {
       <td style="padding:10px 14px;text-align:center"><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">${badges}</div></td>
     </tr>`;
   }).join('');
+
+  grid.innerHTML = `<table style="width:100%;font-size:0.85rem;border-collapse:collapse">${headHtml}<tbody>${bodyRows}</tbody></table>`;
 }
+
 
 let _boCurrentCustomerKey = null;
 
