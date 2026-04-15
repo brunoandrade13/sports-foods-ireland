@@ -463,6 +463,15 @@ function applyFilters() {
             activeCategories.push(category);
         }
     });
+
+    // DEBUG — log filter state (remove after confirming fix)
+    console.log('[SFI Filter] activeCategories:', activeCategories);
+    const checkedSubs = Array.from(document.querySelectorAll('.subcategory-filter:checked')).map(cb => cb.value + '(' + cb.dataset.category + ')');
+    console.log('[SFI Filter] checked subcategories:', checkedSubs);
+    if (allProducts.length > 0) {
+        const sample = allProducts[0];
+        console.log('[SFI Filter] sample product categoryEn:', sample.categoryEn, '| subcategoria:', sample.subcategoria);
+    }
     
     // General brand filter (applies to all categories)
     const generalBrandFilters = Array.from(document.querySelectorAll('.brand-filter-all:checked')).map(cb => cb.value);
