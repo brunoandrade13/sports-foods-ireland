@@ -895,36 +895,7 @@ class="payment-icon-img">
         });
       });
     }
-    // ---- Forgot Password ----
-    function showForgotForm() {
-      document.getElementById('b2bLoginForm').style.display = 'none';
-      document.getElementById('forgotPwdForm').style.display = 'block';
-      document.getElementById('b2bLoginMsg').style.display = 'none';
-    }
-    function showLoginForm() {
-      document.getElementById('b2bLoginForm').style.display = 'block';
-      document.getElementById('forgotPwdForm').style.display = 'none';
-      document.getElementById('forgotMsg').style.display = 'none';
-    }
-    async function sendPasswordReset() {
-      const email = document.getElementById('forgotEmail').value.trim();
-      const btn = document.getElementById('forgotBtn');
-      const msg = document.getElementById('forgotMsg');
-      if (!email) { msg.textContent = 'Please enter your email.'; msg.style.color = '#ef4444'; msg.style.display = 'block'; return; }
-      btn.textContent = 'Sending…'; btn.disabled = true;
-      try {
-        await waitForSfi();
-        const result = await sfi.auth.resetPassword(email);
-        if (result && result.error) throw new Error(result.error);
-        msg.innerHTML = '✅ If that email is registered, you\'ll receive a reset link within a few minutes. Check your inbox (and spam folder).';
-        msg.style.color = '#166534'; msg.style.display = 'block';
-        btn.style.display = 'none';
-      } catch(e) {
-        msg.textContent = e.message || 'Something went wrong. Please try again.';
-        msg.style.color = '#ef4444'; msg.style.display = 'block';
-        btn.textContent = 'Send Reset Link'; btn.disabled = false;
-      }
-    }
+    // ---- Forgot Password (handled below) ----
 
     async function b2bLogin() {
       const email = document.getElementById('b2bEmail').value.trim();
