@@ -620,7 +620,14 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
         const cart = getCart();
         const currency = window.sfi?.currency || 'EUR';
-        const items = cart.map(i => ({ id: i.id || i._id, name: i.nome, price: Number(i.preco), quantity: i.quantidade || 1 }));
+        const items = cart.map(i => ({
+            id: i.id || i._id,
+            name: i.nome,
+            price: Number(i.preco),
+            quantity: i.quantidade || 1,
+            variant_id: i.variant_id || undefined,
+            variant_label: i.variant_label || undefined,
+        }));
 
         const res = await fetch(SUPABASE_URL + '/functions/v1/create-b2b-order', {
             method: 'POST',

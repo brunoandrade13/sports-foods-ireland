@@ -913,7 +913,10 @@ function productPageAddToCart(productId) {
     } else {
         // Fallback: add directly to localStorage if cart.js not loaded yet
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const existingItem = cart.find(item => item.id === productId);
+        const incomingVariantId = productWithVariant.variant_id || undefined;
+        const existingItem = incomingVariantId
+            ? cart.find(item => (item.id === productId || item.id == productId) && item.variant_id === incomingVariantId)
+            : cart.find(item => (item.id === productId || item.id == productId) && !item.variant_id);
         if (existingItem) {
             existingItem.quantidade += currentQuantity;
         } else {
@@ -922,7 +925,9 @@ function productPageAddToCart(productId) {
                 nome: productWithVariant.nome || currentProduct.nome,
                 preco: productWithVariant.preco || currentProduct.preco,
                 imagem: currentProduct.imagem,
-                quantidade: currentQuantity
+                quantidade: currentQuantity,
+                variant_id: productWithVariant.variant_id || undefined,
+                variant_label: productWithVariant.variant_label || undefined
             });
         }
         localStorage.setItem('cart', JSON.stringify(cart));

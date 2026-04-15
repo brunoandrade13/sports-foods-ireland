@@ -59,6 +59,21 @@ function getCartTotal() {
 }
 
 // ============================================
+// CART ITEM KEY — composite key for variant support
+// Each product+variant combination is a unique cart line
+// ============================================
+function cartItemKey(item) {
+    return item.variant_id ? item.id + '__' + item.variant_id : String(item.id);
+}
+
+function findCartItem(cart, id, variantId) {
+    if (variantId) {
+        return cart.find(item => (item.id === id || item.id == id) && item.variant_id === variantId);
+    }
+    return cart.find(item => (item.id === id || item.id == id) && !item.variant_id);
+}
+
+// ============================================
 // ADD TO CART
 // ============================================
 
@@ -100,7 +115,8 @@ function addToCart(productId, quantity = 1, productData = null, subscriptionData
     }
 
     let cart = getCart();
-    const existingItem = cart.find(item => item.id === id);
+    const incomingVariantId = productData?.variant_id || undefined;
+    const existingItem = findCartItem(cart, id, incomingVariantId);
 
     if (existingItem) {
         existingItem.quantidade = (existingItem.quantidade || 1) + quantity;
@@ -144,13 +160,14 @@ function addToCart(productId, quantity = 1, productData = null, subscriptionData
     // Modal não abre automaticamente - só abre quando clicar no ícone do carrinho
 }
 
-function updateCartQuantity(productId, newQuantity) {
+function updateCartQuantity(productId, newQuantity, variantId) {
     let cart = getCart();
-    const item = cart.find(i => i.id === productId);
+    const item = findCartItem(cart, productId, variantId || undefined);
     
     if (item) {
         if (newQuantity <= 0) {
-            cart = cart.filter(i => i.id !== productId);
+            const key = cartItemKey(item);
+            cart = cart.filter(i => cartItemKey(i) !== key);
         } else {
             item.quantidade = newQuantity;
         }
@@ -158,9 +175,13 @@ function updateCartQuantity(productId, newQuantity) {
     }
 }
 
-function removeFromCart(productId) {
+function removeFromCart(productId, variantId) {
     let cart = getCart();
-    cart = cart.filter(item => item.id !== productId);
+    if (variantId) {
+        cart = cart.filter(item => !(( item.id === productId || item.id == productId) && item.variant_id === variantId));
+    } else {
+        cart = cart.filter(item => !(( item.id === productId || item.id == productId) && !item.variant_id));
+    }
     saveCart(cart);
 }
 
@@ -370,22 +391,25 @@ function updateCartModalContent() {
             const itemImg = (item.imagem || 'img/produto1.jpg');
             const itemImgSrc = itemImg.startsWith('http') ? itemImg : imgPrefix + itemImg;
             const itemImgFallback = imgPrefix + 'img/produto1.jpg';
+            // Escape variant_id for safe use in onclick handlers
+            const vId = item.variant_id ? "'" + item.variant_id + "'" : 'undefined';
+            const itemIdArg = typeof item.id === 'string' ? "'" + item.id + "'" : item.id;
         return `
-        <div class="cart-modal-item" data-id="${item.id}" style="display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(0,31,63,0.1);align-items:flex-start;background:#fff">
+        <div class="cart-modal-item" data-id="${item.id}" data-variant-id="${item.variant_id || ''}" style="display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(0,31,63,0.1);align-items:flex-start;background:#fff">
             <img src="${itemImgSrc}" alt="${item.nome}" style="width:84px !important;height:84px !important;min-width:84px !important;min-height:84px !important;max-width:84px !important;max-height:84px !important;object-fit:contain;border-radius:8px;flex-shrink:0;background:#f9fafb;border:1px solid #e5e7eb;display:block" onerror="this.src='${itemImgFallback}'">
             <div style="flex:1;min-width:0">
                 <div style="font-size:14px;font-weight:600;color:#001f3f;margin-bottom:6px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${item.nome}</div>
                 ${subBadge}
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
                     <div style="display:flex;align-items:center;gap:8px;color:#001f3f">
-                        <button class="qty-btn" onclick="updateCartQuantity(${item.id}, ${(item.quantidade || 1) - 1})">−</button>
+                        <button class="qty-btn" onclick="updateCartQuantity(${itemIdArg}, ${(item.quantidade || 1) - 1}, ${vId})">−</button>
                         <span>${item.quantidade || 1}</span>
-                        <button class="qty-btn" onclick="updateCartQuantity(${item.id}, ${(item.quantidade || 1) + 1})">+</button>
+                        <button class="qty-btn" onclick="updateCartQuantity(${itemIdArg}, ${(item.quantidade || 1) + 1}, ${vId})">+</button>
                     </div>
                     <div style="font-weight:700;color:#001f3f;font-size:15px">${priceDisplay}</div>
                 </div>
             </div>
-            <button onclick="removeFromCart(${item.id})" style="background:none;border:none;font-size:20px;color:#001f3f;cursor:pointer;flex-shrink:0;padding:0 4px">×</button>
+            <button onclick="removeFromCart(${itemIdArg}, ${vId})" style="background:none;border:none;font-size:20px;color:#001f3f;cursor:pointer;flex-shrink:0;padding:0 4px">×</button>
         </div>
     `}).join('');
     
@@ -504,3 +528,5 @@ window.closeCartModal = closeCartModal;
 window.toggleCartModal = toggleCartModal;
 window.updateCartCount = updateCartCount;
 window.updateCartModalContent = updateCartModalContent;
+window.cartItemKey = cartItemKey;
+window.findCartItem = findCartItem;
