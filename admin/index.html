@@ -14080,7 +14080,7 @@ drawItemHeaders();
 
 var subtotal = 0, FS = 7.5, LS = 9.5, RPT = 3, RPB = 2;
 items.forEach(function(item) {
-var qty = parseInt(item.quantity) || 1, sku = item.sku || item.product_sku || '', desc = item.product_name || '', rate = parseFloat(item.unit_price) || 0, amount = qty * rate;
+var qty = parseInt(item.quantity) || 1, sku = item.sku || item.product_sku || '', desc = (item.product_name || '') + (item.variant_label ? ' — ' + item.variant_label : ''), rate = parseFloat(item.unit_price) || 0, amount = qty * rate;
 subtotal += amount;
 
 // Word wrap description
