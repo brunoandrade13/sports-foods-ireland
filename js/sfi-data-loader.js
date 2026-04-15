@@ -22,8 +22,51 @@
   function detectCurrency() { return 'EUR'; }
 
   const CURRENCY = 'EUR';
-  const PRICE_FIELD = 'price_eur';
+
+  // B2B detection: checked before products are transformed
+  // Will be set to true if the logged-in user is a B2B customer
+  let _isB2BCustomer = false;
+
   const COMPARE_FIELD = 'compare_at_price_eur';
+
+  // Price field depends on customer type — set dynamically in loadProducts()
+  // B2B → wholesale_price_eur | B2C → price_eur
+  let PRICE_FIELD = 'price_eur';
+
+  // ============================================================
+  // B2B CUSTOMER CHECK — Fast, runs before product transform
+  // ============================================================
+  async function detectB2BCustomer() {
+    try {
+      const token = localStorage.getItem('sfi_token');
+      if (!token) return false;
+
+      const userRaw = localStorage.getItem('sfi_user');
+      if (!userRaw) return false;
+      const user = JSON.parse(userRaw);
+      if (!user || !user.id) return false;
+
+      // Check token expiry
+      const exp = localStorage.getItem('sfi_token_exp');
+      if (exp && Date.now() > Number(exp)) return false;
+
+      // Query customers table to confirm B2B status
+      const url = `${SUPABASE_URL}/rest/v1/customers?user_id=eq.${user.id}&select=customer_type,b2b_status&limit=1`;
+      const res = await fetch(url, {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) return false;
+      const rows = await res.json();
+      const p = rows && rows[0];
+      if (!p) return false;
+      return p.customer_type === 'b2b' && (p.b2b_status === 'approved' || p.b2b_status === null);
+    } catch (e) {
+      return false;
+    }
+  }
 
   // ============================================================
   // FETCH ALL PRODUCTS FROM SUPABASE
@@ -154,11 +197,37 @@
   // TRANSFORM: Supabase row → dados.json format
   // ============================================================
   function transformProduct(p) {
+    // B2B: use wholesale_price_eur; B2C: use price_eur
+    const retailPrice = p.price_eur || 0;
+    const wholesalePrice = p.wholesale_price_eur || 0;
+    const useB2B = _isB2BCustomer && wholesalePrice > 0 && wholesalePrice < retailPrice;
+    const finalPrice = useB2B ? wholesalePrice : retailPrice;
+
+    // For B2B: show retail as "preco_antigo" (strikethrough) to show savings
+    const comparePrice = useB2B ? retailPrice : (p[COMPARE_FIELD] || null);
+
+    // Also remap variant prices to wholesale when B2B
+    let variantes = buildVariants(p.product_variants || []);
+    if (useB2B && variantes.length > 0) {
+      variantes = variantes.map(function(group) {
+        return Object.assign({}, group, {
+          options: group.options.map(function(opt) {
+            const ws = opt.wholesale_price;
+            const rt = opt.price;
+            if (ws && ws > 0 && rt && ws < rt) {
+              return Object.assign({}, opt, { price: ws, preco_original: rt });
+            }
+            return opt;
+          })
+        });
+      });
+    }
+
     return {
       id: p.legacy_id || p.id,
       nome: p.name,
-      preco: p[PRICE_FIELD] || 0,
-      preco_antigo: p[COMPARE_FIELD] || null,
+      preco: finalPrice,
+      preco_antigo: comparePrice,
       categoria: p.categories?.name || '',
       marca: p.brands?.name || '',
       subcategoria: p.subcategories?.name || '',
@@ -174,7 +243,7 @@
           alt: img.alt_text || p.name,
           is_primary: img.is_primary
         })),
-      variantes: buildVariants(p.product_variants || []),
+      variantes: variantes,
       descricao: p.short_description || '',
       descricao_detalhada: p.description || '',
       sku: p.sku || '',
@@ -217,6 +286,14 @@
   async function loadProducts() {
     let products = [];
     let source = 'unknown';
+
+    // ── Detect B2B customer FIRST so prices are correct from the start ──
+    _isB2BCustomer = await detectB2BCustomer();
+    if (_isB2BCustomer) {
+      PRICE_FIELD = 'wholesale_price_eur';
+      window._sfiCustomerIsB2B = true;
+      console.log('[SFI] B2B customer detected — showing wholesale prices');
+    }
 
     try {
       const raw = await fetchFromSupabase();
@@ -264,10 +341,37 @@
 
     // Dispatch event so other scripts know data is ready
     window.dispatchEvent(new CustomEvent('sfi:products-loaded', {
-      detail: { count: products.length, source, currency: CURRENCY }
+      detail: { count: products.length, source, currency: CURRENCY, isB2B: _isB2BCustomer }
     }));
 
+    // Show B2B price badge on shop/product pages
+    if (_isB2BCustomer) {
+      _showB2BBadge();
+    }
+
     return products;
+  }
+
+  // ── Visual badge: informs B2B user they are seeing wholesale prices ──
+  function _showB2BBadge() {
+    // Only show on shop and product pages
+    const path = location.pathname;
+    if (!path.includes('shop') && !path.includes('produto') && path !== '/' && !path.endsWith('index.html')) return;
+    // Avoid showing on B2B portal pages
+    if (path.includes('b2b/')) return;
+    window.addEventListener('DOMContentLoaded', function() {
+      const badge = document.createElement('div');
+      badge.id = 'sfi-b2b-price-badge';
+      badge.innerHTML = '🏢 <strong>B2B Wholesale Prices Active</strong> — You are seeing your exclusive ex-VAT prices';
+      badge.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1B4332;color:#4ade80;border:1px solid #2D6A4F;padding:10px 20px;border-radius:8px;font-size:0.82rem;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);white-space:nowrap;pointer-events:none;';
+      document.body.appendChild(badge);
+      // Auto-hide after 5 seconds
+      setTimeout(function() {
+        badge.style.transition = 'opacity 0.5s';
+        badge.style.opacity = '0';
+        setTimeout(function() { badge.remove(); }, 500);
+      }, 5000);
+    });
   }
 
   // ============================================================
