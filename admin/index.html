@@ -16343,80 +16343,65 @@ loadReceivables();
 let _boData = [];
 
 async function loadBackorders() {
-  // Show loading state
-  const grid = document.getElementById('boCustomerGrid');
-  if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div class="spinner"></div><div style="margin-top:12px">Loading backorders…</div></div>';
+try {
+// Fetch order items that are marked as backorder and not yet fulfilled
+const items = await supaGet('order_items', '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at&is_backorder=eq.true&order=created_at.desc');
 
+// Also fetch orders with has_backorder_items flag
+const orders = await supaGet('orders', '?select=id,order_number,customer_name,customer_email,created_at,fulfillment_status,customer_id&has_backorder_items=eq.true&order=created_at.desc');
+const orderMap = {};
+
+// Resolve missing customer names via customers table
+const missingNameIds = orders.filter(o => !o.customer_name && !o.customer_email && o.customer_id).map(o => o.customer_id);
+if (missingNameIds.length) {
   try {
-    // Fetch backorder items
-    let items = [];
-    try {
-      items = await supaGet('order_items',
-        '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at' +
-        '&is_backorder=eq.true&backorder_fulfilled_at=is.null&order=created_at.desc');
-    } catch(e) { console.warn('BO items query failed:', e); }
-
-    // Fetch extra items by fulfillment_status
-    let extraItems = [];
-    try {
-      extraItems = await supaGet('order_items',
-        '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at' +
-        '&fulfillment_status=eq.backorder&backorder_fulfilled_at=is.null&order=created_at.desc');
-    } catch(e) {}
-
-    // Merge and deduplicate
-    const existingIds = new Set(items.map(i => i.id));
-    extraItems.forEach(i => { if (!existingIds.has(i.id)) items.push(i); });
-
-    // Build order map
-    const orderMap = {};
-    const orderIds = [...new Set(items.map(i => i.order_id).filter(Boolean))];
-
-    if (orderIds.length) {
-      for (let i = 0; i < orderIds.length; i += 20) {
-        try {
-          const batch = orderIds.slice(i, i + 20);
-          const ords = await supaGet('orders',
-            '?select=id,order_number,customer_name,customer_email,customer_id,created_at,fulfillment_status' +
-            '&id=in.(' + batch.join(',') + ')');
-          ords.forEach(o => { orderMap[o.id] = o; });
-        } catch(e) { console.warn('BO orders batch failed:', e); }
+    const custs = await supaGet('customers', '?select=id,b2b_company_name,company,first_name,last_name,email&id=in.(' + [...new Set(missingNameIds)].join(',') + ')');
+    const custMap = {};
+    custs.forEach(c => { custMap[c.id] = c; });
+    orders.forEach(o => {
+      if (!o.customer_name && o.customer_id && custMap[o.customer_id]) {
+        const c = custMap[o.customer_id];
+        o.customer_name = c.b2b_company_name || c.company || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email || '';
+        if (!o.customer_email) o.customer_email = c.email || '';
       }
-    }
+    });
+  } catch(e) {}
+}
 
-    // Resolve missing customer names
-    const missingNameOrders = Object.values(orderMap).filter(o => !o.customer_name && !o.customer_email && o.customer_id);
-    if (missingNameOrders.length) {
-      try {
-        const custIds = [...new Set(missingNameOrders.map(o => o.customer_id))];
-        const custs = await supaGet('customers',
-          '?select=id,b2b_company_name,company,first_name,last_name,email&id=in.(' + custIds.join(',') + ')');
-        const custMap = {};
-        custs.forEach(c => { custMap[c.id] = c; });
-        Object.values(orderMap).forEach(o => {
-          if (!o.customer_name && o.customer_id && custMap[o.customer_id]) {
-            const c = custMap[o.customer_id];
-            o.customer_name = c.b2b_company_name || c.company ||
-              [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email || '';
-            if (!o.customer_email) o.customer_email = c.email || '';
-          }
-        });
-      } catch(e) {}
-    }
+orders.forEach(o => { orderMap[o.id] = o; });
 
-    _boData = items.map(item => ({
-      ...item,
-      order: orderMap[item.order_id] || {}
-    }));
+// Also check for items with fulfillment_status = 'backordered' or 'pending_backorder'
+let extraItems = [];
+try {
+extraItems = await supaGet('order_items', '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at&fulfillment_status=eq.backordered&order=created_at.desc');
+} catch(e) {}
 
-    renderBackordersSummary();
-    filterBackorders();
+// Merge and deduplicate
+const allItems = [...items];
+const existingIds = new Set(items.map(i => i.id));
+extraItems.forEach(i => { if (!existingIds.has(i.id)) allItems.push(i); });
 
-  } catch(e) {
-    console.error('loadBackorders error:', e);
-    toast('Failed to load backorders: ' + e.message, 'error');
-    if (grid) grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger)">❌ Failed to load. Check console for details.<br><button onclick="loadBackorders()" class="btn btn-outline" style="margin-top:12px">Retry</button></div>';
-  }
+// Fetch order details for items that don't have order info
+const missingOrderIds = [...new Set(allItems.map(i => i.order_id).filter(id => !orderMap[id]))];
+if (missingOrderIds.length) {
+for (let i = 0; i < missingOrderIds.length; i += 20) {
+const batch = missingOrderIds.slice(i, i + 20);
+const ords = await supaGet('orders', '?select=id,order_number,customer_name,customer_email,created_at&id=in.(' + batch.join(',') + ')');
+ords.forEach(o => { orderMap[o.id] = o; });
+}
+}
+
+_boData = allItems.map(item => ({
+...item,
+order: orderMap[item.order_id] || {}
+})).filter(item => !item.backorder_fulfilled_at); // Exclude already fulfilled
+
+renderBackordersSummary();
+filterBackorders();
+} catch (e) {
+console.error('loadBackorders:', e);
+toast('Failed to load backorders', 'error');
+}
 }
 
 function renderBackordersSummary() {
@@ -16433,91 +16418,90 @@ document.getElementById('boOldest').textContent = oldestDate ? new Date(oldestDa
 }
 
 function filterBackorders() {
-  var search = (document.getElementById('boSearch').value || '').toLowerCase();
-  var filter = document.getElementById('boFilter').value;
-  var grid   = document.getElementById('boCustomerGrid');
-  if (!grid) return;
+  const search = (document.getElementById('boSearch').value || '').toLowerCase();
+  const filter = document.getElementById('boFilter').value;
 
-  var filtered = _boData.filter(function(item) {
-    var cust     = (item.order && item.order.customer_name || '').toLowerCase();
-    var prod     = (item.product_name || '').toLowerCase();
-    var orderNum = (item.order && item.order.order_number || '').toLowerCase();
+  let filtered = _boData.filter(item => {
+    const cust     = (item.order?.customer_name || '').toLowerCase();
+    const prod     = (item.product_name || '').toLowerCase();
+    const orderNum = (item.order?.order_number || '').toLowerCase();
     if (search && !cust.includes(search) && !prod.includes(search) && !orderNum.includes(search)) return false;
-    var status = (item.backorder_status || 'pending').toLowerCase();
+    const status = (item.backorder_status || 'pending').toLowerCase();
     if (filter === 'pending' && status !== 'pending' && status !== '') return false;
     if (filter === 'ordered' && status !== 'ordered_from_supplier') return false;
     if (filter === 'partial' && status !== 'partially_shipped') return false;
     return true;
   });
 
+  const head = document.getElementById('boCustomerHead');
+  const body = document.getElementById('boCustomerBody');
+  if (!head || !body) return;
+
   if (!filtered.length) {
-    grid.innerHTML = '<table style="width:100%;border-collapse:collapse"><tbody><tr><td colspan="6" style="text-align:center;padding:50px;color:var(--text-muted)"><div style="font-size:36px;margin-bottom:10px">\u2705</div><div style="font-size:15px;font-weight:600">No pending backorders</div><div style="font-size:12px;margin-top:4px">All items have been shipped!</div></td></tr></tbody></table>';
+    head.innerHTML = '';
+    body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:50px;color:var(--text-muted)"><div style="font-size:36px;margin-bottom:10px">✅</div><div style="font-size:15px;font-weight:600">No pending backorders</div><div style="font-size:12px;margin-top:4px">All items have been shipped!</div></td></tr>';
     return;
   }
 
-  var byCustomer = {};
-  filtered.forEach(function(item) {
-    var o    = item.order || {};
-    var key  = o.customer_email || o.customer_name || item.order_id || 'Unknown';
-    var name = o.customer_name || o.customer_email || 'Unknown Customer';
+  // Group by customer
+  const byCustomer = {};
+  filtered.forEach(item => {
+    const o    = item.order || {};
+    const key  = o.customer_email || o.customer_name || item.order_id || 'Unknown';
+    const name = o.customer_name || o.customer_email || 'Unknown Customer';
     if (!byCustomer[key]) {
-      byCustomer[key] = { name: name, email: o.customer_email || '', items: [], totalValue: 0, orderNumbers: new Set(), oldest: null };
+      byCustomer[key] = { name, email: o.customer_email || '', items: [], totalValue: 0, orderNumbers: new Set(), oldest: null };
     }
     byCustomer[key].items.push(item);
     byCustomer[key].totalValue += Number(item.total_price || 0);
     if (o.order_number) byCustomer[key].orderNumbers.add(o.order_number);
-    var d = (o.created_at) || item.created_at;
+    const d = item.order?.created_at || item.created_at;
     if (d && (!byCustomer[key].oldest || d < byCustomer[key].oldest)) byCustomer[key].oldest = d;
   });
 
   window._boCustomerMap = byCustomer;
-  var fmt = function(v) { return '\u20ac' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2}); };
-  var customers = Object.entries(byCustomer).sort(function(a,b) { return b[1].totalValue - a[1].totalValue; });
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const customers = Object.entries(byCustomer).sort((a,b) => b[1].totalValue - a[1].totalValue);
 
-  var html = '<table style="width:100%;font-size:0.85rem;border-collapse:collapse">';
-  html += '<thead><tr style="background:var(--surface-2);font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">';
-  html += '<th style="padding:10px 14px;text-align:left">Customer</th>';
-  html += '<th style="padding:10px 14px;text-align:center">Products</th>';
-  html += '<th style="padding:10px 14px;text-align:center">Orders</th>';
-  html += '<th style="padding:10px 14px;text-align:right">Total Value</th>';
-  html += '<th style="padding:10px 14px;text-align:center">Oldest Backorder</th>';
-  html += '<th style="padding:10px 14px;text-align:center">Status</th>';
-  html += '</tr></thead><tbody>';
+  head.innerHTML = `<tr style="background:var(--surface-2);font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
+    <th style="padding:10px 14px;text-align:left">Customer</th>
+    <th style="padding:10px 14px;text-align:center">Products</th>
+    <th style="padding:10px 14px;text-align:center">Orders</th>
+    <th style="padding:10px 14px;text-align:right">Total Value</th>
+    <th style="padding:10px 14px;text-align:center">Oldest Backorder</th>
+    <th style="padding:10px 14px;text-align:center">Status</th>
+  </tr>`;
 
-  customers.forEach(function(entry, i) {
-    var key = entry[0], c = entry[1];
-    var sc = { pending: 0, ordered: 0, partial: 0 };
-    c.items.forEach(function(it) {
-      var s = it.backorder_status || 'pending';
-      if (s === 'pending') sc.pending++;
-      else if (s === 'ordered_from_supplier') sc.ordered++;
-      else if (s === 'partially_shipped') sc.partial++;
+  body.innerHTML = customers.map(([key, c], i) => {
+    const statusCounts = { pending: 0, ordered: 0, partial: 0 };
+    c.items.forEach(it => {
+      const s = it.backorder_status || 'pending';
+      if (s === 'pending') statusCounts.pending++;
+      else if (s === 'ordered_from_supplier') statusCounts.ordered++;
+      else if (s === 'partially_shipped') statusCounts.partial++;
     });
-    var badges = '';
-    if (sc.pending) badges += '<span style="background:#fef3c7;color:#d97706;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">' + sc.pending + ' pending</span> ';
-    if (sc.ordered) badges += '<span style="background:#dbeafe;color:#2563eb;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">' + sc.ordered + ' ordered</span> ';
-    if (sc.partial) badges += '<span style="background:#e0e7ff;color:#4f46e5;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">' + sc.partial + ' partial</span>';
-    var oldest = c.oldest ? new Date(c.oldest).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '\u2014';
-    var rowBg  = i % 2 !== 0 ? 'var(--surface-2)' : 'transparent';
-    var safeKey = encodeURIComponent(key);
-    html += '<tr style="background:' + rowBg + ';border-bottom:1px solid var(--border)"'
-          + ' onmouseenter="this.style.background=\'var(--hover)\'"'
-          + ' onmouseleave="this.style.background=\'' + rowBg + '\'">';
-    html += '<td style="padding:10px 14px">';
-    html += '<a href="#" onclick="event.preventDefault();openBoCustomerModal(decodeURIComponent(\'' + safeKey + '\'))"'
-          + ' style="font-weight:600;color:var(--accent);text-decoration:none">' + c.name + '</a>';
-    if (c.email) html += '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:1px">' + c.email + '</div>';
-    html += '</td>';
-    html += '<td style="padding:10px 14px;text-align:center;font-weight:700">' + c.items.length + '</td>';
-    html += '<td style="padding:10px 14px;text-align:center">' + c.orderNumbers.size + '</td>';
-    html += '<td style="padding:10px 14px;text-align:right;font-weight:700;color:var(--accent)">' + fmt(c.totalValue) + '</td>';
-    html += '<td style="padding:10px 14px;text-align:center;font-size:0.85rem">' + oldest + '</td>';
-    html += '<td style="padding:10px 14px;text-align:center"><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">' + badges + '</div></td>';
-    html += '</tr>';
-  });
+    const badges = [
+      statusCounts.pending ? `<span style="background:#fef3c7;color:#d97706;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.pending} pending</span>` : '',
+      statusCounts.ordered ? `<span style="background:#dbeafe;color:#2563eb;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.ordered} ordered</span>` : '',
+      statusCounts.partial ? `<span style="background:#e0e7ff;color:#4f46e5;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700">${statusCounts.partial} partial</span>` : '',
+    ].filter(Boolean).join(' ');
+    const oldestLabel = c.oldest ? new Date(c.oldest).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const rowBg = i % 2 !== 0 ? 'background:var(--surface-2)' : '';
 
-  html += '</tbody></table>';
-  grid.innerHTML = html;
+    return `<tr style="${rowBg};border-bottom:1px solid var(--border)"
+        onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2!==0?'var(--surface-2)':''}'"  >
+      <td style="padding:10px 14px">
+        <a href="#" onclick="event.preventDefault();openBoCustomerModal('${key.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"
+          style="font-weight:600;color:var(--accent);text-decoration:none">${c.name}</a>
+        ${c.email ? `<div style="font-size:0.78rem;color:var(--text-muted);margin-top:1px">${c.email}</div>` : ''}
+      </td>
+      <td style="padding:10px 14px;text-align:center;font-weight:700">${c.items.length}</td>
+      <td style="padding:10px 14px;text-align:center">${c.orderNumbers.size}</td>
+      <td style="padding:10px 14px;text-align:right;font-weight:700;color:var(--accent)">${fmt(c.totalValue)}</td>
+      <td style="padding:10px 14px;text-align:center;font-size:0.85rem">${oldestLabel}</td>
+      <td style="padding:10px 14px;text-align:center"><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">${badges}</div></td>
+    </tr>`;
+  }).join('');
 }
 
 
