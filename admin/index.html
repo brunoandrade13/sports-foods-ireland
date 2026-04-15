@@ -14218,7 +14218,7 @@ async function sendInvoiceByEmail() {
   try {
     const customerName = [bill.first_name, bill.last_name].filter(Boolean).join(' ') || order.customer_name || email || 'Customer';
     const htmlContent = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">' +
-      '<div style="background:#1B4332;padding:20px;text-align:center"><img src="https://sportsfoodsireland.ie/wp-content/uploads/2021/09/logo.png" alt="SFI" style="height:60px"></div>' +
+      '<div style="background:#1B4332;padding:20px;text-align:center"><img src="https://sportsfoodsireland.ie/img/logo.png" alt="SFI" style="height:60px"></div>' +
       '<div style="padding:30px 20px">' +
       '<h2 style="color:#1B4332;margin:0 0 16px">Invoice ' + invNum + '</h2>' +
       '<p>Dear ' + (customerName || 'Customer') + ',</p>' +
@@ -17310,7 +17310,7 @@ function buildStatementHTML(d) {
     }
   }
   return '<div style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto">' +
-    '<div style="background:#1B4332;padding:20px;text-align:center"><img src="https://sportsfoodsireland.ie/wp-content/uploads/2021/09/logo.png" alt="SFI" style="height:60px"></div>' +
+    '<div style="background:#1B4332;padding:20px;text-align:center"><img src="https://sportsfoodsireland.ie/img/logo.png" alt="SFI" style="height:60px"></div>' +
     '<div style="padding:30px 20px">' +
     '<h2 style="color:#1B4332;margin:0 0 8px">Monthly Statement — ' + monthName + ' ' + year + '</h2>' +
     '<p>Dear ' + esc(name || 'Partner') + ',</p>' +
