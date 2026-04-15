@@ -6340,7 +6340,7 @@ Loading items...
 
       pe.forEach(r => {
         const pid = r.product_id || 'unknown';
-        const name = prodNameMap[String(pid)] || r.product_name || pid;
+        const name = prodNameMap[String(pid)] || ('Product #' + pid);
         if(!byProd[pid]) byProd[pid]={views:0,clicks:0,carts:0,name};
         if(r.event_type==='view') byProd[pid].views++;
         if(r.event_type==='click') byProd[pid].clicks++;
@@ -6350,7 +6350,7 @@ Loading items...
       const pvProds = saPageViews.filter(r=>r.page_type==='product' && r.product_id);
       pvProds.forEach(r => {
         const pid = r.product_id;
-        const name = prodNameMap[String(pid)] || r.product_name || pid;
+        const name = prodNameMap[String(pid)] || ('Product #' + pid);
         if(!byProd[pid]) byProd[pid]={views:0,clicks:0,carts:0,name};
         byProd[pid].timeSum = (byProd[pid].timeSum||0) + (r.time_on_page_seconds||0);
         byProd[pid].pvCount = (byProd[pid].pvCount||0) + 1;
