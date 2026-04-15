@@ -7491,8 +7491,11 @@ Loading items...
       const stockVal = active.reduce((s, p) => s + (p.price_eur || 0) * (p.stock_quantity || 0), 0);
 
       // Revenue and Orders — use RPC for accurate all-time totals
-      const paidOrders500 = (allOrders || []).filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status));
-      const pendOrd = (allOrders || []).filter(o => o.fulfillment_status === 'unfulfilled').length;
+      // Exclude QB "Web Orders" from stats (duplicates of WooCommerce orders)
+      const _isWebDupe = o => o.order_source === 'quickbooks' && (o.customer_name || '').trim() === 'Web Orders';
+      const dedupedOrders = (allOrders || []).filter(o => !_isWebDupe(o));
+      const paidOrders500 = dedupedOrders.filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status));
+      const pendOrd = dedupedOrders.filter(o => o.fulfillment_status === 'unfulfilled').length;
       // Temporary values from loaded orders; will be overridden by RPC below
       let totalRev = paidOrders500.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
       let avgOrder = paidOrders500.length > 0 ? (totalRev / paidOrders500.length) : 0;
@@ -7503,13 +7506,13 @@ Loading items...
       const startOfWeek = now.getTime() - (7 * 24 * 60 * 60 * 1000);
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
-      const ordersToday = (allOrders || []).filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status) && o.created_at && new Date(o.created_at).getTime() >= startOfDay);
+      const ordersToday = dedupedOrders.filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status) && o.created_at && new Date(o.created_at).getTime() >= startOfDay);
       const revToday = ordersToday.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
 
-      const ordersWeek = (allOrders || []).filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status) && o.created_at && new Date(o.created_at).getTime() >= startOfWeek);
+      const ordersWeek = dedupedOrders.filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status) && o.created_at && new Date(o.created_at).getTime() >= startOfWeek);
       const revWeek = ordersWeek.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
 
-      const ordersMonth = (allOrders || []).filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status) && o.created_at && new Date(o.created_at).getTime() >= startOfMonth);
+      const ordersMonth = dedupedOrders.filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status) && o.created_at && new Date(o.created_at).getTime() >= startOfMonth);
       const revMonth = ordersMonth.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
 
       const activeBrandIds = new Set(active.map(p => p.brand_id).filter(id => id));
@@ -9653,10 +9656,14 @@ Loading items...
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
         const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).getTime();
 
+        // Exclude QB "Web Orders" from stats — they are duplicates of WooCommerce orders
+        const _isDupe = o => o.order_source === 'quickbooks' && (o.customer_name || '').trim() === 'Web Orders';
+        const statsOrders = filteredOrders.filter(o => !_isDupe(o));
+
         let ordToday = 0, ordYesterday = 0, ordWeek = 0, ordLastWeek = 0, ordMonth = 0, ordLastMonth = 0;
         let revToday = 0, revYesterday = 0, revWeek = 0, revLastWeek = 0, revMonth = 0, revLastMonth = 0;
 
-        filteredOrders.forEach(o => {
+        statsOrders.forEach(o => {
           const val = parseFloat(o.total) || 0;
           totalRevenue += val;
           if (o.financial_status === 'pending') pendingPay++;
@@ -9689,7 +9696,7 @@ Loading items...
           el.className = 'change ' + chgClass(curr, prev);
         };
 
-        if (document.getElementById('ordTotal')) document.getElementById('ordTotal').textContent = filteredOrders.length;
+        if (document.getElementById('ordTotal')) document.getElementById('ordTotal').textContent = statsOrders.length;
         if (document.getElementById('ordToday')) document.getElementById('ordToday').textContent = ordToday;
         if (document.getElementById('revToday')) document.getElementById('revToday').textContent = `€${revToday.toFixed(2)}`;
         setChg('ordTodayChg', ordToday, ordYesterday);
@@ -9708,9 +9715,10 @@ Loading items...
         if (document.getElementById('ordAvgWeek')) document.getElementById('ordAvgWeek').textContent = ordWeek > 0 ? `€${(revWeek / ordWeek).toFixed(2)}` : '€0.00';
         if (document.getElementById('ordCancelled')) document.getElementById('ordCancelled').textContent = cancelledMonth;
 
-        if (document.getElementById('ordAvg')) document.getElementById('ordAvg').textContent = filteredOrders.length > 0 ? `€${(totalRevenue / filteredOrders.length).toFixed(2)}` : '€0.00';
+        if (document.getElementById('ordAvg')) document.getElementById('ordAvg').textContent = statsOrders.length > 0 ? `€${(totalRevenue / statsOrders.length).toFixed(2)}` : '€0.00';
         if (document.getElementById('ordAction')) document.getElementById('ordAction').textContent = `${unfulfilled + pendingPay}`;
         if (document.getElementById('ordActionSub')) document.getElementById('ordActionSub').textContent = `${unfulfilled} unfulfilled / ${pendingPay} pending pay`;
+        if (document.getElementById('ordTotal')) document.getElementById('ordTotal').textContent = statsOrders.length;
       }
 
       const start = (orderPage - 1) * PER_PAGE;
