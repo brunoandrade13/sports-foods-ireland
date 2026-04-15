@@ -13964,17 +13964,15 @@ const orderRef = (titleEl.textContent || '').replace('Order ', '').trim();
 const order = allOrders.find(o => String(o.order_number) === orderRef || String(o.order_number) === 'WOO-' + orderRef || String(o.id).startsWith(orderRef));
 if (!order) return alert('Order not found: ' + orderRef);
 let allItems = [];
-try { allItems = await supaGet('order_items', `?order_id=eq.${order.id}&is_backorder=eq.false&select=product_name,product_sku,sku,quantity,unit_price,total_price,variant_label`); } catch(e) { console.error(e); }
-if (!allItems || !allItems.length) return alert('No items found for this order');
-
-// Filter to only checked items (if checkboxes exist in the order modal)
-var checkedIndexes = [];
-var checkboxes = document.querySelectorAll('.om-item-cb');
-if (checkboxes.length > 0) {
-checkboxes.forEach(function(cb) { if (cb.checked) checkedIndexes.push(parseInt(cb.dataset.idx)); });
-if (checkedIndexes.length === 0) return alert('No items selected for invoice. Please check at least one item.');
-}
-var items = checkedIndexes.length > 0 ? allItems.filter(function(_, idx) { return checkedIndexes.includes(idx); }) : allItems;
+try {
+  // Fetch only items to be shipped (is_backorder=false OR is_backorder is null)
+  // Use fulfillment_status != backorder as secondary filter to catch all non-backorder items
+  allItems = await supaGet('order_items', `?order_id=eq.${order.id}&fulfillment_status=neq.backorder&select=id,product_name,product_sku,sku,quantity,unit_price,total_price,variant_label,is_backorder,fulfillment_status`);
+  // Extra safety: exclude any that still have is_backorder=true
+  allItems = (allItems || []).filter(function(i) { return i.is_backorder !== true; });
+} catch(e) { console.error(e); }
+if (!allItems || !allItems.length) return alert('No items to ship found for this order');
+var items = allItems;
 const bill = order.billing_address || {}, ship = order.shipping_address || {};
 let company = '';
 // ── For manual orders: build address fallback from customer record ──
