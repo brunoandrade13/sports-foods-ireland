@@ -652,7 +652,9 @@ const sfi = {
       if (sort === 'name') order = 'name.asc';
       if (sort === 'category') order = 'name.asc';
 
-      const selectStr = encodeURIComponent(`*,${brandsJoin},${catsJoin},${subsJoin}`);
+      // Include default variant to get wholesale_price when product-level wholesale_price_eur is missing
+      const variantsJoin = 'product_variants(wholesale_price,price,is_default,is_active)';
+      const selectStr = encodeURIComponent(`*,${brandsJoin},${catsJoin},${subsJoin},${variantsJoin}`);
       const url = `${SUPABASE_URL}/rest/v1/products?select=${selectStr}&is_active=eq.true${extraFilters}&order=${order}&limit=${perPage}&offset=${(page - 1) * perPage}`;
       
       const res = await fetch(url, {
@@ -666,7 +668,14 @@ const sfi = {
       const products = await res.json();
 
       return products.map(p => {
-        const wsEur = p.wholesale_price_eur && p.wholesale_price_eur > 0 ? Number(p.wholesale_price_eur) : null;
+        // 1. Try product-level wholesale_price_eur first
+        let wsEur = p.wholesale_price_eur && p.wholesale_price_eur > 0 ? Number(p.wholesale_price_eur) : null;
+        // 2. Fallback: use min wholesale_price from active variants (default variant preferred)
+        if (!wsEur && p.product_variants && p.product_variants.length > 0) {
+          const activeVars = p.product_variants.filter(v => v.is_active !== false && v.wholesale_price > 0);
+          const defaultVar = activeVars.find(v => v.is_default) || activeVars[0];
+          if (defaultVar && defaultVar.wholesale_price > 0) wsEur = Number(defaultVar.wholesale_price);
+        }
         const retailEur = Number(p[priceField]) || 0;
         const b2bEur = (wsEur && wsEur < retailEur) ? wsEur : retailEur;
 
@@ -681,7 +690,7 @@ const sfi = {
           retail_price: p[priceField],
           retail_compare: p[compareField],
           b2b_price: b2bEur,
-          has_wholesale: wsEur !== null && wsEur < retailEur,
+          has_wholesale: wsEur !== null && wsEur > 0 && wsEur < retailEur,
           b2b_min_qty: 1,
           em_stock: p.in_stock,
           backorder_available: p.backorder_available || false,
