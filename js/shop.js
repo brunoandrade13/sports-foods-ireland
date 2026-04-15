@@ -457,6 +457,13 @@ function applyFilters() {
         return;
     }
     
+    // Get active categories (from expanded toggles)
+    const activeCategories = [];
+    document.querySelectorAll('.filter-category-toggle.active').forEach(toggle => {
+        const category = toggle.getAttribute('data-category');
+        if (category) activeCategories.push(category);
+    });
+
     // General brand filter (applies to all categories)
     const generalBrandFilters = Array.from(document.querySelectorAll('.brand-filter-all:checked')).map(cb => cb.value);
     
