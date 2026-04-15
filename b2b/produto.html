@@ -184,7 +184,7 @@ window.addEventListener('DOMContentLoaded', async function() {
     if (!arr || !arr[0]) throw new Error('Product not found');
     var p = arr[0];
     _product = p;
-    var EXVAT = function(v) { return Number(v||0) / 1.23; };
+    var EXVAT = function(v) { return Number(v||0); }; // prices already ex-VAT in DB
     var cur = '\u20ac';
     var wsPrice = Number(p.wholesale_price_eur) || 0;
     var retailPrice = Number(p.price_eur) || 0;
