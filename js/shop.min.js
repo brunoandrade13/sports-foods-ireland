@@ -453,7 +453,8 @@ function applyFilters() {
         });
         currentPage = 1;
         renderProducts();
-        updateResultsCount();
+        const countEl = document.getElementById('resultsCount');
+        if (countEl) countEl.textContent = filteredProducts.length + ' products';
         return;
     }
     
