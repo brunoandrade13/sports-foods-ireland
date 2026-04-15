@@ -3469,6 +3469,10 @@ style="font-size:0.8rem;padding:4px 8px">
     style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">
     💰 Accounts Receivable <span id="arOverdueBadge" style="background:#ef4444;color:#fff;border-radius:999px;padding:1px 7px;font-size:0.75rem;margin-left:4px;display:none">0</span>
   </button>
+  <button id="b2bTabCM" onclick="switchB2BTab('cm')"
+    style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">
+    📝 Credit Memos <span id="cmCountBadge" style="background:#2563eb;color:#fff;border-radius:999px;padding:1px 7px;font-size:0.75rem;margin-left:4px;display:none">0</span>
+  </button>
 </div>
 
 <!-- APPROVED tab -->
@@ -3553,6 +3557,32 @@ style="font-size:0.8rem;padding:4px 8px">
     <!-- Table -->
     <div id="arTableWrap" style="overflow-x:auto">
       <div style="text-align:center;padding:40px;color:var(--text-muted)">Click "Refresh from QuickBooks" to load data.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CREDIT MEMOS TAB -->
+<div id="b2bTabContentCM" style="display:none">
+  <div class="detail-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <h3 style="margin:0">Credit Memos — QuickBooks <span id="cmLastSync" style="font-size:0.8rem;color:var(--text-muted);font-weight:400"></span></h3>
+      <button class="btn btn-primary" onclick="loadCreditMemos(true)">🔄 Refresh from QuickBooks</button>
+    </div>
+    <div id="cmSummaryCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px"></div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <input type="text" id="cmSearch" placeholder="Search customer..." oninput="renderCMTable()"
+        style="flex:1;min-width:200px;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem">
+      <select id="cmFilter" onchange="renderCMTable()"
+        style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem">
+        <option value="all">All Credit Memos</option>
+        <option value="2026">2026</option>
+        <option value="2025">2025</option>
+        <option value="2024">2024</option>
+        <option value="old">Before 2024</option>
+      </select>
+    </div>
+    <div id="cmTableWrap">
+      <div style="text-align:center;padding:40px;color:var(--text-muted)">Loading credit memos...</div>
     </div>
   </div>
 </div>
@@ -14698,6 +14728,7 @@ function switchB2BTab(tab) {
   document.getElementById('b2bTabContentPending').style.display  = tab === 'pending'  ? '' : 'none';
   document.getElementById('b2bTabContentZone3').style.display    = tab === 'zone3'    ? '' : 'none';
   document.getElementById('b2bTabContentAR').style.display       = tab === 'ar'       ? '' : 'none';
+  document.getElementById('b2bTabContentCM').style.display       = tab === 'cm'       ? '' : 'none';
   const active   = 'color:var(--accent);border-bottom:3px solid var(--accent);margin-bottom:-2px';
   const inactive = 'color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px';
   const base = 'padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:600;';
@@ -14705,9 +14736,11 @@ function switchB2BTab(tab) {
   document.getElementById('b2bTabPending').style.cssText  = base + (tab==='pending' ?active:inactive);
   document.getElementById('b2bTabZone3').style.cssText    = base + (tab==='zone3'   ?active:inactive);
   document.getElementById('b2bTabAR').style.cssText       = base + (tab==='ar'      ?active:inactive);
+  document.getElementById('b2bTabCM').style.cssText       = base + (tab==='cm'      ?active:inactive);
   if (tab === 'pending') loadB2BPending();
   if (tab === 'zone3')   renderZone3Discounts();
   if (tab === 'ar')      loadARData();
+  if (tab === 'cm')      loadCreditMemos();
 }
 
 // ── ACCOUNTS RECEIVABLE (QB) ──────────────────────────────────
@@ -15283,6 +15316,132 @@ function closeARModal() {
   const modal = document.getElementById('arDetailModal');
   if (modal) modal.style.display = 'none';
   document.body.style.overflow = '';
+}
+
+// ── CREDIT MEMOS ──────────────────────────────────────────────
+let _cmData = null;
+let _cmLoaded = false;
+
+async function loadCreditMemos(force = false) {
+  if (_cmLoaded && !force) return;
+  const wrap = document.getElementById('cmTableWrap');
+  const cards = document.getElementById('cmSummaryCards');
+  if (!wrap) return;
+  wrap.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">⏳ Loading credit memos from Supabase…</div>';
+  try {
+    const cms = await supaGet('credit_memos', '?select=*&status=eq.open&order=txn_date.desc');
+    _cmData = cms || [];
+    _cmLoaded = true;
+    const syncEl = document.getElementById('cmLastSync');
+    if (syncEl) syncEl.textContent = '— ' + _cmData.length + ' credit memos';
+    const badge = document.getElementById('cmCountBadge');
+    if (badge) { badge.textContent = _cmData.length; badge.style.display = ''; }
+    renderCMSummaryCards();
+    renderCMTable();
+  } catch(e) {
+    wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444">❌ ' + (e.message||'Failed') + '</div>';
+  }
+}
+
+function renderCMSummaryCards() {
+  const cards = document.getElementById('cmSummaryCards');
+  if (!cards || !_cmData) return;
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const totalBal = _cmData.reduce((s, cm) => s + Number(cm.balance||0), 0);
+  const totalAmt = _cmData.reduce((s, cm) => s + Number(cm.total_amount||0), 0);
+  const customers = new Set(_cmData.map(cm => cm.customer_name)).size;
+  const thisYear = _cmData.filter(cm => (cm.txn_date||'').startsWith('2026'));
+  const thisYearTotal = thisYear.reduce((s, cm) => s + Number(cm.balance||0), 0);
+  cards.innerHTML = [
+    { label:'Total Open Credits', value: fmt(totalBal), color:'#2563eb', bg:'#eff6ff' },
+    { label:'Credit Memos', value: _cmData.length, color:'#1e293b', bg:'#f8fafc' },
+    { label:'Customers', value: customers, color:'#1e293b', bg:'#f8fafc' },
+    { label:'This Year (2026)', value: fmt(thisYearTotal), color:'#7c3aed', bg:'#f5f3ff' },
+  ].map(c => `<div style="background:${c.bg};border:1px solid var(--border);border-radius:10px;padding:14px 18px;text-align:center">
+    <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">${c.label}</div>
+    <div style="font-size:1.6rem;font-weight:700;color:${c.color}">${c.value}</div>
+  </div>`).join('');
+}
+
+function renderCMTable() {
+  const wrap = document.getElementById('cmTableWrap');
+  if (!wrap || !_cmData) return;
+  const q = (document.getElementById('cmSearch')?.value || '').toLowerCase().trim();
+  const filter = document.getElementById('cmFilter')?.value || 'all';
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  let rows = _cmData.filter(cm => {
+    if (q && !(cm.customer_name||'').toLowerCase().includes(q)) return false;
+    if (filter === '2026') return (cm.txn_date||'').startsWith('2026');
+    if (filter === '2025') return (cm.txn_date||'').startsWith('2025');
+    if (filter === '2024') return (cm.txn_date||'').startsWith('2024');
+    if (filter === 'old') return (cm.txn_date||'') < '2024';
+    return true;
+  });
+
+  // Group by customer
+  const byCustomer = {};
+  rows.forEach(cm => {
+    const k = cm.customer_name || 'Unknown';
+    if (!byCustomer[k]) byCustomer[k] = { name: k, cms: [], total: 0 };
+    byCustomer[k].cms.push(cm);
+    byCustomer[k].total += Number(cm.balance||0);
+  });
+  const sorted = Object.values(byCustomer).sort((a,b) => b.total - a.total);
+
+  if (!sorted.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted)">No credit memos match the current filter.</div>';
+    return;
+  }
+
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+    <thead><tr style="background:var(--surface-2);font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
+      <th style="padding:10px 12px;text-align:left">#</th>
+      <th style="padding:10px 12px;text-align:left">Customer</th>
+      <th style="padding:10px 12px;text-align:right">Credit Balance</th>
+      <th style="padding:10px 12px;text-align:center">Memos</th>
+      <th style="padding:10px 12px;text-align:center">Latest</th>
+      <th style="padding:10px 12px;text-align:center">Oldest</th>
+    </tr></thead><tbody>`;
+
+  sorted.forEach((c, i) => {
+    const dates = c.cms.map(cm => cm.txn_date).sort();
+    const latest = dates[dates.length-1] ? new Date(dates[dates.length-1]).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const oldest = dates[0] ? new Date(dates[0]).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const rowBg = i%2===0 ? '' : 'background:var(--surface-2)';
+    html += `<tr style="${rowBg};border-bottom:1px solid var(--border)" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2===0?'':'var(--surface-2)'}'" onclick="toggleCMDetail(this)">
+      <td style="padding:9px 12px;color:var(--text-muted)">${i+1}</td>
+      <td style="padding:9px 12px;font-weight:600">${c.name}</td>
+      <td style="padding:9px 12px;text-align:right;font-weight:700;color:#2563eb">${fmt(c.total)}</td>
+      <td style="padding:9px 12px;text-align:center">${c.cms.length}</td>
+      <td style="padding:9px 12px;text-align:center;font-size:0.82rem">${latest}</td>
+      <td style="padding:9px 12px;text-align:center;font-size:0.82rem">${oldest}</td>
+    </tr>`;
+    // Detail rows (hidden by default)
+    html += `<tr class="cm-detail-row" style="display:none"><td colspan="6" style="padding:0 12px 12px 40px;background:var(--surface-2)">
+      <table style="width:100%;font-size:0.82rem;border-collapse:collapse;margin-top:4px">
+        <tr style="color:var(--text-muted);font-size:0.72rem"><th style="text-align:left;padding:4px 8px">Doc#</th><th style="text-align:left;padding:4px 8px">Date</th><th style="text-align:right;padding:4px 8px">Original</th><th style="text-align:right;padding:4px 8px">Balance</th></tr>`;
+    c.cms.sort((a,b) => (b.txn_date||'').localeCompare(a.txn_date||'')).forEach(cm => {
+      const d = cm.txn_date ? new Date(cm.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+      html += `<tr style="border-top:1px solid var(--border)">
+        <td style="padding:4px 8px;font-family:monospace">${cm.doc_number||cm.qb_credit_memo_id}</td>
+        <td style="padding:4px 8px">${d}</td>
+        <td style="padding:4px 8px;text-align:right">${fmt(cm.total_amount)}</td>
+        <td style="padding:4px 8px;text-align:right;font-weight:600;color:#2563eb">${fmt(cm.balance)}</td>
+      </tr>`;
+    });
+    html += `</table></td></tr>`;
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function toggleCMDetail(row) {
+  const detail = row.nextElementSibling;
+  if (detail && detail.classList.contains('cm-detail-row')) {
+    detail.style.display = detail.style.display === 'none' ? '' : 'none';
+  }
 }
 
 // ── ZONE3 CUSTOMER DISCOUNTS ──────────────────────────────────
