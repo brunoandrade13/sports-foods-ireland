@@ -1,7 +1,7 @@
-// SFI Service Worker v3.0 — Cache with correct versioning
-const CACHE_NAME = 'sfi-v3';
-const CACHE_STATIC = 'sfi-static-v3';
-const CACHE_IMAGES = 'sfi-images-v3';
+// SFI Service Worker v3.1 — Cache with correct versioning
+const CACHE_NAME = 'sfi-v3.1';
+const CACHE_STATIC = 'sfi-static-v3.1';
+const CACHE_IMAGES = 'sfi-images-v3.1';
 
 // Critical resources to precache on install
 const PRECACHE_URLS = [
@@ -84,7 +84,7 @@ self.addEventListener('fetch', event => {
         cache.match(request).then(cached => {
           if (cached) return cached;
           return fetch(request).then(response => {
-            if (isSafeToCacheResponse(response)) cache.put(request, response.clone());
+            if (isSafeToCacheResponse(response)) { const c = response.clone(); cache.put(request, c); }
             return response;
           }).catch(() => cached);
         })
@@ -100,7 +100,7 @@ self.addEventListener('fetch', event => {
         cache.match(request).then(cached => {
           if (cached) return cached;
           return fetch(request).then(response => {
-            if (isSafeToCacheResponse(response)) cache.put(request, response.clone());
+            if (isSafeToCacheResponse(response)) { const c = response.clone(); cache.put(request, c); }
             return response;
           });
         })
@@ -115,7 +115,8 @@ self.addEventListener('fetch', event => {
       fetch(request)
         .then(response => {
           if (response.ok) {
-            caches.open(CACHE_STATIC).then(cache => cache.put(request, response.clone()));
+            const cloned = response.clone(); // clone BEFORE consuming response
+            caches.open(CACHE_STATIC).then(cache => cache.put(request, cloned));
           }
           return response;
         })

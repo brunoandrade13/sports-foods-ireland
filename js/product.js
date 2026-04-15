@@ -7,16 +7,24 @@ let selectedVariants = {};
 
 // Helper function para obter produtos (com fallback para file://)
 async function getProductsData() {
-    // Quando a página é aberta via file:// (sem servidor), usar dados embutidos
+    // Use sfi-data-loader cache if available (fastest path, avoids fetch entirely)
+    if (Array.isArray(window.PRODUTOS) && window.PRODUTOS.length > 0) {
+        return window.PRODUTOS;
+    }
+    // Wait for sfi-data-loader promise if in progress
+    if (window._sfiProductsPromise) {
+        try {
+            const data = await window._sfiProductsPromise;
+            if (Array.isArray(data) && data.length > 0) return data;
+        } catch(e) { /* fall through to fetch */ }
+    }
+    // file:// fallback
     if (window.location.protocol === 'file:' && Array.isArray(window.EMBEDDED_PRODUCTS)) {
         return window.EMBEDDED_PRODUCTS;
     }
-
-    // Load products data via fetch
+    // Last resort — fetch (intercepted by sfi-data-loader on https, or real file on file://)
     const response = await fetch('js/dados.json');
     const data = await response.json();
-
-    // Suporta tanto array direto quanto objeto com .produtos
     return Array.isArray(data) ? data : data.produtos;
 }
 
