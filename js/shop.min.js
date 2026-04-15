@@ -957,7 +957,17 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleBrandSubcategories(e.target);
             currentPage = 1;
             applyFilters();
-        } else if (e.target.matches('.brand-filter, .subcategory-filter, .dietary-filter, .brand-sub-filter')) {
+        } else if (e.target.matches('.subcategory-filter')) {
+            // Exclusive subcategory: uncheck others in same category
+            if (e.target.checked) {
+                const cat = e.target.getAttribute('data-category');
+                document.querySelectorAll(`.subcategory-filter[data-category="${cat}"]`).forEach(cb => {
+                    if (cb !== e.target) cb.checked = false;
+                });
+            }
+            currentPage = 1;
+            applyFilters();
+        } else if (e.target.matches('.brand-filter, .dietary-filter, .brand-sub-filter')) {
             currentPage = 1;
             applyFilters();
         }
@@ -1000,19 +1010,32 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const category = toggle.getAttribute('data-category');
             const subcategoryGroup = document.getElementById(`filter-subcategory-${category}`);
-            
-            // Toggle active class
+            const isActivating = !toggle.classList.contains('active');
+
+            // Deactivate ALL other category toggles and clear their checkboxes
+            document.querySelectorAll('.filter-category-toggle').forEach(t => {
+                if (t !== toggle) {
+                    t.classList.remove('active');
+                    const otherCat = t.getAttribute('data-category');
+                    const otherGroup = document.getElementById(`filter-subcategory-${otherCat}`);
+                    if (otherGroup) {
+                        otherGroup.classList.remove('active');
+                        otherGroup.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                    }
+                }
+            });
+
+            // Toggle this category
             toggle.classList.toggle('active');
-            
-            // Expand/collapse subcategory group
             if (subcategoryGroup) {
                 if (toggle.classList.contains('active')) {
                     subcategoryGroup.classList.add('active');
                 } else {
                     subcategoryGroup.classList.remove('active');
+                    subcategoryGroup.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
                 }
             }
-            
+
             // Apply filters
             currentPage = 1;
             applyFilters();
