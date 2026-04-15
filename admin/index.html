@@ -6115,6 +6115,18 @@ Loading items...
     // ============================================================
     let saPageViews = [];
     let saProductEvents = [];
+    let _dadosJsonMap = null; // cache for dados.json id→name lookup
+
+    async function getDadosJsonMap() {
+      if (_dadosJsonMap) return _dadosJsonMap;
+      try {
+        const r = await fetch('../js/dados.json');
+        const data = await r.json();
+        _dadosJsonMap = {};
+        data.forEach(p => { if(p.id) _dadosJsonMap[String(p.id)] = p.nome || p.name || ('Product #' + p.id); });
+      } catch(e) { _dadosJsonMap = {}; }
+      return _dadosJsonMap;
+    }
     let saFunnelEvents = [];
     let saChart1 = null, saChart2 = null;
     let saPeriod = '30d';
@@ -6201,7 +6213,7 @@ Loading items...
         switch(type) {
           case 'overview': renderSAOverview(); break;
           case 'pages': renderSAPages(); break;
-          case 'products': renderSAProducts(); break;
+          case 'products': await renderSAProducts(); break;
           case 'brands': renderSABrands(); break;
           case 'categories': renderSACategories(); break;
           case 'sources': renderSASources(); break;
@@ -6326,11 +6338,12 @@ Loading items...
       ).join('');
     }
 
-    function renderSAProducts() {
+    async function renderSAProducts() {
       const pe = saProductEvents;
       const byProd = {};
-      // Build product name lookup: map woo_product_id (numeric) AND uuid id → name
-      const prodNameMap = {};
+      // Build product name lookup: woo_product_id, legacy_id, uuid → name
+      const dadosMap = await getDadosJsonMap();
+      const prodNameMap = { ...dadosMap };
       (allProducts || []).forEach(p => {
         const name = p.name || p.sku || p.id;
         if(p.id) prodNameMap[String(p.id)] = name;
