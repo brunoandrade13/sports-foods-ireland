@@ -255,6 +255,80 @@ async function loadProducts() {
             if (!matched) {
             }
         }
+
+        // Check URL category + sub parameters (from mobile menu links)
+        const categoryParam = urlParams.get('category');
+        const subParam = urlParams.get('sub');
+        if (categoryParam) {
+            const catKey = categoryParam.toLowerCase();
+
+            // Activate the category toggle
+            const toggle = document.querySelector(`.filter-category-toggle[data-category="${catKey}"]`);
+            if (toggle) {
+                toggle.classList.add('active');
+                const subcatGroup = document.getElementById(`filter-subcategory-${catKey}`);
+                if (subcatGroup) subcatGroup.classList.add('active');
+            }
+
+            // Map URL sub slugs → exact checkbox values
+            const subMap = {
+                // Nutrition
+                'gels':        'Gels',
+                'shots':       'Shots',
+                'drinks':      'Sports Drinks',
+                'bars':        'Bars',
+                'amino':       'Amino Acids',
+                'electrolytes':'Electrolytes',
+                'recovery':    'Recovery',
+                'endurance':   'Endurance Fuel',
+                'chews':       'Energy Chews',
+                'minerals':    'Minerals',
+                // Cycling
+                'jerseys':     'Jerseys & Gilets',
+                'baselayers':  'Baselayers',
+                'shorts':      'Shorts',
+                'gloves':      'Gloves',
+                'overshoes':   'Overshoes',
+                'warmers':     'Warmers',
+                'socks':       'Socks',
+                'computers':   'Bike Computers',
+                'lights':      'Lights',
+                'sensors':     'Sensors & Monitors',
+                'antichafing': 'Anti-Chafing',
+                'bottles':     'Bottles & Other',
+                // Swimming
+                'wetsuits-mens':   "Men's",
+                'wetsuits-womens': "Women's",
+                'wetsuits-kids':   'Kids',
+                'thermal':         'Thermal',
+                'costumes':        'Costumes',
+                'jammers':         'Jammers & Shorts',
+                'yulex':           'Yulex Collection',
+                'neoprene':        'Neoprene Layers',
+                'trisuits':        'Trisuits',
+                'goggles':         'Goggles',
+                'swimcaps':        'Swim Caps',
+                'beanies':         'Beanies & Headwear',
+                'safety':          'Safety Buoys',
+                'robes':           'Robes & Towels',
+                'training':        'Training Aids',
+                // Running
+                'shoes':       'Running Shoes',
+                'accessories': 'Accessories',
+                'belts':       'Race Belts',
+                'laces':       'Laces',
+            };
+
+            if (subParam) {
+                const checkboxValue = subMap[subParam.toLowerCase()];
+                if (checkboxValue) {
+                    const cb = document.querySelector(
+                        `.subcategory-filter[data-category="${catKey}"][value="${checkboxValue}"]`
+                    );
+                    if (cb) cb.checked = true;
+                }
+            }
+        }
         
         applyFilters();
     } catch (error) {
