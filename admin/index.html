@@ -2870,8 +2870,16 @@ Select a financial report above to begin analysis.
 <h2>📋 Accounts Receivable</h2>
 <button class="btn btn-primary" onclick="loadReceivables()">↻ Refresh</button>
 </div>
+<div id="recRealARBanner" style="background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #86efac;border-radius:10px;padding:16px 20px;margin-bottom:16px;display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+<div><span style="font-size:0.8rem;color:#166534;text-transform:uppercase;letter-spacing:0.5px;font-weight:600">QuickBooks Real AR (Net of Credit Memos)</span>
+<div style="font-size:1.8rem;font-weight:800;color:#166534" id="recRealAR">—</div></div>
+<div style="text-align:right;font-size:0.82rem;color:#6b7280">
+<div>Invoice Total: <span id="recInvoiceTotal" style="font-weight:600">—</span></div>
+<div>Credit Memos: <span id="recCreditMemos" style="font-weight:600;color:#dc2626">—</span></div>
+</div></div></div>
 <div id="receivablesSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px">
-<div class="stat-card" style="border-left:3px solid var(--danger)"><div class="label">Total Pending</div><div class="value" id="recTotalPending">—</div></div>
+<div class="stat-card" style="border-left:3px solid var(--danger)"><div class="label">Total Pending (qb_balance)</div><div class="value" id="recTotalPending">—</div></div>
 <div class="stat-card" style="border-left:3px solid #f59e0b"><div class="label">Overdue (>30d)</div><div class="value" id="recOverdue">—</div></div>
 <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Pending Orders</div><div class="value" id="recOrderCount">—</div></div>
 <div class="stat-card" style="border-left:3px solid var(--info)"><div class="label">Customers with Balance</div><div class="value" id="recCustomerCount">—</div></div>
@@ -14747,10 +14755,12 @@ function renderARSummaryCards(s) {
   if (!cards) return;
   const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
   cards.innerHTML = [
-    { label:'Total Open Balance', value: fmt(s.total_open_balance), color:'#166534', bg:'#f0fdf4' },
-    { label:'Customers with Balance', value: s.customers_with_balance, color:'#1e293b', bg:'#f8fafc' },
+    { label:'Real AR Balance', value: fmt(s.real_ar_balance || s.total_open_balance), color:'#166534', bg:'#f0fdf4' },
+    { label:'Invoice Total (bruto)', value: fmt(s.invoice_total || s.total_open_balance), color:'#6b7280', bg:'#f9fafb' },
+    { label:'Credit Memos', value: '−' + fmt(s.credit_memo_total || 0), color:'#dc2626', bg:'#fef2f2' },
+    { label:'Customers Owing', value: s.customers_owing || s.customers_with_balance, color:'#1e293b', bg:'#f8fafc' },
     { label:'Open Invoices', value: s.total_open_invoices, color:'#1e293b', bg:'#f8fafc' },
-    { label:'Customers Overdue', value: s.customers_with_overdue, color:'#dc2626', bg:'#fef2f2' },
+    { label:'Customers with Credit', value: s.customers_with_credit || 0, color:'#2563eb', bg:'#eff6ff' },
   ].map(c => `<div style="background:${c.bg};border:1px solid ${c.bg==='#f0fdf4'?'#bbf7d0':c.bg==='#fef2f2'?'#fecaca':'var(--border)'};border-radius:10px;padding:14px 18px;text-align:center">
     <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">${c.label}</div>
     <div style="font-size:1.6rem;font-weight:700;color:${c.color}">${c.value}</div>
@@ -14810,7 +14820,7 @@ function renderARTable() {
     html += `<tr style="${rowBg};border-bottom:1px solid var(--border)" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2===0?'':'var(--surface-2)'}'">
       <td style="padding:9px 12px;color:var(--text-muted)">${i+1}</td>
       <td style="padding:9px 12px"><a href="#" onclick="event.preventDefault();openARDetail(${customerIdx})" style="color:var(--accent);font-weight:600;text-decoration:none">${c.name}</a></td>
-      <td style="padding:9px 12px;text-align:right;font-weight:700;color:${overdue?'#dc2626':'#166534'}">${fmt(c.total_open)}</td>
+      <td style="padding:9px 12px;text-align:right;font-weight:700;color:${overdue?'#dc2626':'#166534'}">${fmt(c.real_balance != null ? c.real_balance : c.total_open)}</td>
       <td style="padding:9px 12px;text-align:center">${c.invoices?.length||0}</td>
       <td style="padding:9px 12px;text-align:center;font-size:0.82rem">${dueLabel}</td>
       <td style="padding:9px 12px;text-align:center;font-size:0.82rem;color:${isOver1yr?'#dc2626':'var(--text-muted)'}">${ageLabel}</td>
@@ -14832,7 +14842,7 @@ function openARDetail(idx) {
   const modal = document.getElementById('arDetailModal');
   if (!title || !body || !modal) return;
 
-  title.textContent = c.name + ' — Open Balance: ' + fmt(c.total_open);
+  title.textContent = c.name + ' — Real Balance: ' + fmt(c.real_balance != null ? c.real_balance : c.total_open);
   _arCurrentCustomerIdx = idx;
 
   // Render invoice table
@@ -16602,9 +16612,11 @@ let _recSortDir = 'desc';
 
 async function loadReceivables() {
 try {
+// Load Real AR from QB report (async, non-blocking)
+loadRealARBanner();
 // Only show genuine accounts receivable (B2B invoices, Net 30, COD, Check)
 // Exclude abandoned online payments (PayPal, Stripe, Google Pay, Credit Card)
-const allPending = await supaGet('orders', '?select=order_number,customer_name,customer_email,total,financial_status,payment_method,order_source,created_at,payment_due_date,notes&financial_status=eq.pending&order=created_at.desc');
+const allPending = await supaGet('orders', '?select=order_number,customer_name,customer_email,total,qb_balance,financial_status,payment_method,order_source,created_at,payment_due_date,notes&financial_status=in.(pending,partially_paid)&order=created_at.desc');
 _recData = allPending.filter(o => {
 const pm = (o.payment_method || '').toLowerCase();
 const src = (o.order_source || '').toLowerCase();
@@ -16624,11 +16636,28 @@ filterReceivables();
 } catch (e) { console.error('loadReceivables:', e); toast('Failed to load receivables', 'error'); }
 }
 
+async function loadRealARBanner() {
+  try {
+    const res = await fetch(`${_AR_SUPA_URL || SUPABASE_URL}/functions/v1/qb-ar-report`);
+    if (!res.ok) return;
+    const d = await res.json();
+    if (!d.summary) return;
+    const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const banner = document.getElementById('recRealARBanner');
+    if (banner) {
+      document.getElementById('recRealAR').textContent = fmt(d.summary.real_ar_balance);
+      document.getElementById('recInvoiceTotal').textContent = fmt(d.summary.invoice_total);
+      document.getElementById('recCreditMemos').textContent = '−' + fmt(d.summary.credit_memo_total);
+      banner.style.display = '';
+    }
+  } catch(e) { console.warn('loadRealARBanner:', e); }
+}
+
 function renderReceivablesSummary() {
 const now = new Date();
-const totalPending = _recData.reduce((s, o) => s + Number(o.total), 0);
+const totalPending = _recData.reduce((s, o) => s + Number(o.qb_balance != null ? o.qb_balance : o.total), 0);
 const overdue = _recData.filter(o => o.payment_due_date && new Date(o.payment_due_date) < now);
-const overdueAmount = overdue.reduce((s, o) => s + Number(o.total), 0);
+const overdueAmount = overdue.reduce((s, o) => s + Number(o.qb_balance != null ? o.qb_balance : o.total), 0);
 const customers = new Set(_recData.map(o => o.customer_name || o.customer_email)).size;
 
 document.getElementById('recTotalPending').textContent = '\u20ac' + totalPending.toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -16641,7 +16670,7 @@ const byCustomer = {};
 _recData.forEach(o => {
 const key = o.customer_name || o.customer_email || 'Unknown';
 if (!byCustomer[key]) byCustomer[key] = { name: key, email: o.customer_email, total: 0, orders: 0, oldest: o.created_at };
-byCustomer[key].total += Number(o.total);
+byCustomer[key].total += Number(o.qb_balance != null ? o.qb_balance : o.total);
 byCustomer[key].orders++;
 if (o.created_at < byCustomer[key].oldest) byCustomer[key].oldest = o.created_at;
 });
