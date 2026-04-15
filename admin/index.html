@@ -7149,7 +7149,7 @@ Loading items...
       try {
         // ── PHASE 1: Essential data (products + catalog + orders + customers) ──
         const [prods, br, cats, subcats, dc, vt, pv, custs, ords, z3disc] = await Promise.all([
-          supaGet('products', '?select=*,brands(name),categories(name)&is_active=eq.true&order=name'),
+          supaGetAll('products', '?select=*,brands(name),categories(name)&order=name'),
           supaGet('brands', '?order=name'),
           supaGet('categories', '?order=name'),
           supaGet('subcategories', '?select=*,categories(name)&order=name').catch(() => []),
@@ -7161,7 +7161,7 @@ Loading items...
           supaGet('zone3_customer_discounts', '?is_active=eq.true&select=*').catch(() => [])
         ]);
 
-        allProducts = (prods || []).filter(p => p.is_active !== false);
+        allProducts = prods || [];
         filteredProducts = [...allProducts];
         brands = br || [];
         categories = cats || [];
@@ -7274,10 +7274,10 @@ Loading items...
     // ============================================================
     async function _refreshProducts() {
       const [prods, pv] = await Promise.all([
-        supaGet('products', '?select=*,brands(name),categories(name)&is_active=eq.true&order=name'),
+        supaGetAll('products', '?select=*,brands(name),categories(name)&order=name'),
         supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => [])
       ]);
-      allProducts = (prods || []).filter(p => p.is_active !== false);
+      allProducts = prods || [];
       filteredProducts = [...allProducts];
       productVariantsCache = {};
       (pv || []).forEach(v => {
