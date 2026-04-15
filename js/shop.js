@@ -5,6 +5,7 @@ let currentPage = 1;
 const productsPerPage = 20;
 let currentView = 'grid';
 let currentSort = 'relevance';
+let _urlSubFilter = null; // { catKey, subcategoriaValue } — set from mobile menu URL params
 
 // Helper: Função para obter imagem válida do produto na página shop
 const SHOP_EXISTING_IMAGES = ['produto1.jpg', 'produto2.jpg', 'produto3.jpg', 'produto4.jpg', 'produto5.jpg'];
@@ -270,63 +271,51 @@ async function loadProducts() {
                 if (subcatGroup) subcatGroup.classList.add('active');
             }
 
-            // Map URL sub slugs → exact checkbox values
-            const subMap = {
-                // Nutrition
-                'gels':        'Gels',
-                'shots':       'Shots',
-                'drinks':      'Sports Drinks',
-                'bars':        'Bars',
-                'amino':       'Amino Acids',
-                'electrolytes':'Electrolytes',
-                'recovery':    'Recovery',
-                'endurance':   'Endurance Fuel',
-                'chews':       'Energy Chews',
-                'minerals':    'Minerals',
-                // Cycling
-                'jerseys':     'Jerseys & Gilets',
-                'baselayers':  'Baselayers',
-                'shorts':      'Shorts',
-                'gloves':      'Gloves',
-                'overshoes':   'Overshoes',
-                'warmers':     'Warmers',
-                'socks':       'Socks',
-                'computers':   'Bike Computers',
-                'lights':      'Lights',
-                'sensors':     'Sensors & Monitors',
-                'antichafing': 'Anti-Chafing',
-                'bottles':     'Bottles & Other',
-                // Swimming
-                'wetsuits-mens':   "Men's",
-                'wetsuits-womens': "Women's",
-                'wetsuits-kids':   'Kids',
-                'thermal':         'Thermal',
-                'costumes':        'Costumes',
-                'jammers':         'Jammers & Shorts',
-                'yulex':           'Yulex Collection',
-                'neoprene':        'Neoprene Layers',
-                'trisuits':        'Trisuits',
-                'goggles':         'Goggles',
-                'swimcaps':        'Swim Caps',
-                'beanies':         'Beanies & Headwear',
-                'safety':          'Safety Buoys',
-                'robes':           'Robes & Towels',
-                'training':        'Training Aids',
-                // Running
-                'shoes':       'Running Shoes',
-                'accessories': 'Accessories',
-                'belts':       'Race Belts',
-                'laces':       'Laces',
-            };
-
             if (subParam) {
-                const checkboxValue = subMap[subParam.toLowerCase()];
-                if (checkboxValue) {
-                    const cb = document.querySelector(
-                        `.subcategory-filter[data-category="${catKey}"][value="${checkboxValue}"]`
-                    );
-                    if (cb) cb.checked = true;
+                // Map mobile slug → exact Supabase subcategoria value (p.subcategoria)
+                const slugToSubcategoria = {
+                    // Swimming
+                    'wetsuits':     'Wetsuits',
+                    'swimwear':     'Swimwear',
+                    'goggles':      'Goggles & Caps',
+                    'caps':         'Goggles & Caps',
+                    'safety':       'Safety Buoys',
+                    'accessories':  'Accessories',
+                    'triathlon':    'Triathlon',
+                    // Nutrition — subcategoria names match exactly in Supabase
+                    'gels':         'Gels',
+                    'shots':        'Shots',
+                    'drinks':       'Sports Drinks',
+                    'bars':         'Bars',
+                    'amino':        'Amino Acids',
+                    'electrolytes': 'Electrolytes',
+                    'recovery':     'Recovery',
+                    'endurance':    'Endurance Fuel',
+                    'chews':        'Energy Chews',
+                    'minerals':     'Minerals',
+                    // Cycling
+                    'jerseys':      'Clothing',
+                    'baselayers':   'Clothing',
+                    'shorts':       'Clothing',
+                    'gloves':       'Clothing',
+                    'overshoes':    'Clothing',
+                    'warmers':      'Clothing',
+                    'socks':        'Socks',
+                    'computers':    'Electronics',
+                    'lights':       'Electronics',
+                    'sensors':      'Electronics',
+                    'antichafing':  'Accessories',
+                    'bottles':      'Accessories',
+                    // Running
+                    'runningacc':   'Accessories',
+                };
+                const subcatValue = slugToSubcategoria[subParam.toLowerCase()];
+                if (subcatValue) {
+                    _urlSubFilter = { catKey, subcategoriaValue: subcatValue };
                 }
+            } else {
+                // Category only — filter all products in that category
+                _urlSubFilter = { catKey, subcategoriaValue: null };
             }
         }
         
@@ -454,23 +443,18 @@ function toggleBrandSubcategories(checkbox) {
 // Apply filters
 function applyFilters() {
     filteredProducts = [...allProducts];
-    
-    // Get active categories (from expanded groups)
-    const activeCategories = [];
-    document.querySelectorAll('.filter-category-toggle.active').forEach(toggle => {
-        const category = toggle.getAttribute('data-category');
-        if (category) {
-            activeCategories.push(category);
-        }
-    });
 
-    // DEBUG — log filter state (remove after confirming fix)
-    console.log('[SFI Filter] activeCategories:', activeCategories);
-    const checkedSubs = Array.from(document.querySelectorAll('.subcategory-filter:checked')).map(cb => cb.value + '(' + cb.dataset.category + ')');
-    console.log('[SFI Filter] checked subcategories:', checkedSubs);
-    if (allProducts.length > 0) {
-        const sample = allProducts[0];
-        console.log('[SFI Filter] sample product categoryEn:', sample.categoryEn, '| subcategoria:', sample.subcategoria);
+    // URL-based subcategory filter (from mobile menu links) — takes priority
+    if (_urlSubFilter) {
+        filteredProducts = filteredProducts.filter(p => {
+            if (p.categoryEn !== _urlSubFilter.catKey) return false;
+            if (_urlSubFilter.subcategoriaValue === null) return true; // category only, no sub
+            return p.subcategoria === _urlSubFilter.subcategoriaValue;
+        });
+        currentPage = 1;
+        renderProducts();
+        updateResultsCount();
+        return;
     }
     
     // General brand filter (applies to all categories)
@@ -953,6 +937,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Filter event listeners (use event delegation for dynamically loaded content)
     document.addEventListener('change', (e) => {
+        _urlSubFilter = null; // clear URL filter when user manually changes sidebar
         if (e.target.matches('.brand-filter-all')) {
             toggleBrandSubcategories(e.target);
             currentPage = 1;
@@ -1013,6 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isActivating = !toggle.classList.contains('active');
 
             // Deactivate ALL other category toggles and clear their checkboxes
+            _urlSubFilter = null; // clear URL filter when user manually clicks sidebar
             document.querySelectorAll('.filter-category-toggle').forEach(t => {
                 if (t !== toggle) {
                     t.classList.remove('active');
