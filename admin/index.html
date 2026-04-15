@@ -3745,8 +3745,13 @@ id="settCustomerCount">—</span>
 <div class="detail-panel">
 <h3>🏥 Health Check</h3>
 <div id="healthChecks"><span class="loading-overlay"><span class="spinner"></span></span></div>
-<button class="btn btn-ghost" onclick="runHealthCheck()" style="margin-top:12px">🔄 Run Health
-Check</button>
+<button class="btn btn-ghost" onclick="runHealthCheck()" style="margin-top:12px">🔄 Run Health Check</button>
+</div>
+<div class="detail-panel" style="margin-top:20px;grid-column:1/-1">
+<h3>🔧 Database Maintenance</h3>
+<p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px">Auto-links missing <code>customer_id</code> in orders, <code>user_id</code> in customers, and <code>product_id</code> in order items. Run this if you notice missing links after orders are created.</p>
+<button class="btn btn-primary" onclick="runDbMaintenance()" id="btnDbMaintenance">🔗 Run Link Maintenance</button>
+<div id="maintenanceResult" style="margin-top:10px;font-size:0.85rem;display:none"></div>
 </div>
 </div>
 </div>
@@ -13222,6 +13227,24 @@ Loading items...
       document.getElementById('settProductCount').textContent = allProducts.length;
       document.getElementById('settCustomerCount').textContent = allCustomers.length;
       document.getElementById('settOrderCount').textContent = allOrders.length;
+    }
+
+    async function runDbMaintenance() {
+      const btn = document.getElementById('btnDbMaintenance');
+      const result = document.getElementById('maintenanceResult');
+      btn.disabled = true; btn.textContent = '⏳ Running...';
+      result.style.display = 'none';
+      try {
+        const data = await supaRpc('sfi_link_orphaned_records', {});
+        result.style.display = 'block';
+        result.style.color = 'var(--accent)';
+        result.innerHTML = '✅ Done — Orders fixed: <strong>' + (data.orders_fixed||0) + '</strong> &nbsp; Items fixed: <strong>' + (data.items_fixed||0) + '</strong> &nbsp; Users fixed: <strong>' + (data.users_fixed||0) + '</strong>';
+      } catch(e) {
+        result.style.display = 'block';
+        result.style.color = '#ef4444';
+        result.textContent = '❌ Error: ' + e.message;
+      }
+      btn.disabled = false; btn.textContent = '🔗 Run Link Maintenance';
     }
 
     async function runHealthCheck() {
