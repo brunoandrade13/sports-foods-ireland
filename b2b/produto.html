@@ -296,7 +296,7 @@ function addProductToCart() {
 
   if (_selectedVariant) {
     name = name + ' \u2014 ' + _selectedVariant.label;
-    if (_selectedVariant.price) price = _selectedVariant.price;
+    if (_selectedVariant.price) price = EXVAT(_selectedVariant.price);
   }
 
   if (typeof addToCart === 'function') {

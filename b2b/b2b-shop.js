@@ -226,19 +226,25 @@
     loadProducts();
   };
 
-  // --- Add to cart (B2B) ---
+  // --- Add to cart (B2B) — uses main cart.js addToCart for correct checkout flow ---
   window.addB2BToCart = function(id, name, price, isBackorder) {
-    if (typeof sfi !== 'undefined' && sfi.cart) {
-      const cart = JSON.parse(localStorage.getItem('sfi_cart') || '[]');
+    if (typeof window.addToCart === 'function') {
+      window.addToCart(id, 1, {
+        nome: name,
+        preco: price / 1.23, // ex-VAT for B2B
+        imagem: '',
+      });
+    } else {
+      // Fallback: use main cart localStorage
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
       const existing = cart.find(item => item.id === id);
       if (existing) {
-        existing.quantity += 1;
+        existing.quantidade = (existing.quantidade || 1) + 1;
       } else {
-        cart.push({ id, name, price: price / 1.23, quantity: 1, b2b: true, backorder: !!isBackorder });
+        cart.push({ id, nome: name, preco: price / 1.23, quantidade: 1, imagem: '' });
       }
-      localStorage.setItem('sfi_cart', JSON.stringify(cart));
-      const badge = document.querySelector('.cart-count, .cart-badge, #cartCount');
-      if (badge) badge.textContent = cart.reduce((s, i) => s + i.quantity, 0);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      if (typeof updateCartCount === 'function') updateCartCount();
     }
     // Quick feedback
     const btn = event?.target;

@@ -115,7 +115,7 @@ function addToCart(productId, quantity = 1, productData = null, subscriptionData
     }
 
     let cart = getCart();
-    const incomingVariantId = productData?.variant_id || undefined;
+    const incomingVariantId = productData?.variant_id || productData?.variantId || undefined;
     const existingItem = findCartItem(cart, id, incomingVariantId);
 
     if (existingItem) {
@@ -142,8 +142,8 @@ function addToCart(productId, quantity = 1, productData = null, subscriptionData
             precoOriginal: subscriptionData ? precoNum : undefined,
             imagem: imagemFinal,
             quantidade: quantity,
-            variant_id: productData?.variant_id || undefined,
-            variant_label: productData?.variant_label || undefined,
+            variant_id: productData?.variant_id || productData?.variantId || undefined,
+            variant_label: productData?.variant_label || productData?.variant || undefined,
             subscription: subscriptionData ? {
                 active: true,
                 frequency: subscriptionData.frequency,

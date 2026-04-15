@@ -9,7 +9,7 @@ window.b2bFetchVariants = async function(lid) {
   try {
     var U = 'https://styynhgzrkyoioqjssuw.supabase.co';
     var K = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
-    var r = await fetch(U + '/rest/v1/products?legacy_id=eq.' + lid + '&select=id,product_variants(id,label,price,stock,is_default,sort_order,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: { 'apikey': K, 'Authorization': 'Bearer ' + K } });
+    var r = await fetch(U + '/rest/v1/products?legacy_id=eq.' + lid + '&select=id,product_variants(id,label,price,wholesale_price,stock,is_default,sort_order,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: { 'apikey': K, 'Authorization': 'Bearer ' + K } });
     var a = await r.json();
     var pv = (a && a[0] && a[0].product_variants) || [];
     if (!pv.length) { _b2bVarCache[lid] = null; return null; }
@@ -18,7 +18,7 @@ window.b2bFetchVariants = async function(lid) {
       var t = v.variant_types || { name: 'Option', slug: 'option' };
       var k = t.slug || 'option';
       if (!g[k]) g[k] = { type: t.name, slug: k, options: [] };
-      g[k].options.push({ id: v.id, label: v.label, price: v.price, stock: v.stock });
+      g[k].options.push({ id: v.id, label: v.label, price: (v.wholesale_price > 0 ? v.wholesale_price : v.price), stock: v.stock });
     });
     var res = Object.values(g);
     _b2bVarCache[lid] = res;
