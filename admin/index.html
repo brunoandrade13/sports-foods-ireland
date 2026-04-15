@@ -7118,6 +7118,11 @@ Loading items...
       if (page === 'b2b') loadB2BData();
       if (page === 'site-analytics') loadSAReport(saCurrentReport);
       if (page === 'receivables') loadReceivables();
+      // Products: always reset status filter to active on page visit
+      if (page === 'products') {
+        const sf = document.getElementById('productStatusFilter');
+        if (sf && sf.value !== 'active') { sf.value = 'active'; filterProducts(); }
+      }
       if (page === 'backorders') loadBackorders();
       if (page === 'monthly-closing') initMonthlyClosing();
     }
