@@ -1875,7 +1875,7 @@ const B2B = (function() {
       favs.splice(idx, 1);
       if (btn) { btn.textContent = '☆'; btn.style.color = '#d1d5db'; }
     } else {
-      favs.push({ id: id, name: name, price: price, image: image, brand: brand });
+      favs.push({ id: id, name: name, price: price, wholesale_price: price, image: image, brand: brand }); // price here is already b2b_price
       if (btn) { btn.textContent = '★'; btn.style.color = '#f59e0b'; }
     }
     localStorage.setItem('sfi_b2b_favourites', JSON.stringify(favs));
@@ -2093,7 +2093,7 @@ const B2B = (function() {
   function addFavToCart(id) {
     var favs = JSON.parse(localStorage.getItem('sfi_b2b_favourites') || '[]');
     var p = favs.find(function(f) { return f.id === id; });
-    if (p) { b2bAddWithVariants(p.id, p.name, Number(p.price||0), p.image||''); }
+    if (p) { b2bAddWithVariants(p.id, p.name, Number(p.wholesale_price || p.price || 0), p.image||''); }
   }
 
 
@@ -2108,7 +2108,8 @@ const B2B = (function() {
       var _uuid = isNaN(_numLid) || String(_numLid) !== String(lid).trim();
       if (!_uuid) lid = _numLid;
       var _filt = _uuid ? 'id=eq.' + lid : 'legacy_id=eq.' + lid;
-      var r = await fetch(U + '/rest/v1/products?' + _filt + '&select=id,product_variants(id,sku,label,price,wholesale_price,cost_price,compare_at_price,stock,is_default,sort_order,image_url,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: { 'apikey': K, 'Authorization': 'Bearer ' + K } });
+      // Include parent_variant_id to correctly build compound variants (same as sfi-data-loader)
+      var r = await fetch(U + '/rest/v1/products?' + _filt + '&select=id,product_variants(id,sku,label,price,wholesale_price,cost_price,compare_at_price,stock,is_default,sort_order,image_url,parent_variant_id,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: { 'apikey': K, 'Authorization': 'Bearer ' + K } });
       var a = await r.json(), pv = (a && a[0] && a[0].product_variants) || [];
       if (!pv.length) { _b2bVarCache[lid] = null; return null; }
       // Agrupar por tipo mantendo a ordem original
@@ -2121,29 +2122,40 @@ const B2B = (function() {
       });
       var groups = typeOrder.map(function(k) { return g[k]; });
 
-      // Detectar par primário+secundário para compostos
-      // Ignora grupos singleton (1 opção); aceita 2+ grupos reais
-      var realGroups = groups.filter(function(gr) { return gr.options.length > 1; });
-      if (realGroups.length >= 2) {
-        // Usar os 2 primeiros grupos reais como Flavor+Pack
-        var primaryType   = realGroups[0].type;
-        var secondaryType = realGroups[1].type;
-        var compoundOpts = [], curPrimary = null;
-        pv.forEach(function(v) {
-          var vt = v.variant_types ? (v.variant_types.name || 'Option') : 'Option';
-          if (vt === primaryType) { curPrimary = v; }
-          else if (vt === secondaryType && curPrimary) {
-            compoundOpts.push(Object.assign({}, v, {
-              label: curPrimary.label + ' / ' + v.label,
-              l1: curPrimary.label, l2: v.label, _primaryStock: curPrimary.stock
-            }));
-          }
+      // Build compound variants using parent_variant_id (same logic as sfi-data-loader)
+      var children = pv.filter(function(v) { return v.parent_variant_id; });
+      var parents  = pv.filter(function(v) { return !v.parent_variant_id; });
+      if (children.length > 0) {
+        var parentMap = {};
+        parents.forEach(function(p) { parentMap[p.id] = p; });
+        var compoundOpts = [];
+        children.forEach(function(child) {
+          var parent = parentMap[child.parent_variant_id];
+          if (!parent) return;
+          compoundOpts.push(Object.assign({}, child, {
+            label: parent.label + ' / ' + child.label,
+            l1: parent.label,
+            l2: child.label,
+            // Use child wholesale price; fall back to parent's, then zero
+            wholesale_price: child.wholesale_price || parent.wholesale_price || 0,
+            price: child.price || parent.price || 0,
+            stock: child.stock,
+            _primaryStock: parent.stock
+          }));
+        });
+        // Also include parents that have NO children as standalone options
+        var childParentIds = new Set(children.map(function(c) { return c.parent_variant_id; }));
+        parents.forEach(function(p) {
+          if (!childParentIds.has(p.id)) compoundOpts.push(Object.assign({}, p, { l1: p.label, l2: '' }));
         });
         if (compoundOpts.length > 0) {
-          var compGroup = [{ type: primaryType, options: compoundOpts, _isCompound: true, _secondaryType: secondaryType }];
+          var primaryType = parents[0] && parents[0].variant_types ? (parents[0].variant_types.name || 'Flavor') : 'Flavor';
+          var compGroup = [{ type: primaryType, options: compoundOpts, _isCompound: true }];
           _b2bVarCache[lid] = compGroup; return compGroup;
         }
       }
+      // Fallback: flat variants with no parent-child relationship
+      // (no compound detection needed — just return groups as-is)
 
       var res = groups;
       _b2bVarCache[lid] = res; return res;

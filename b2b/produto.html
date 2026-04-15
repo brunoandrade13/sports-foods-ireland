@@ -179,7 +179,7 @@ window.addEventListener('DOMContentLoaded', async function() {
     var h = { 'apikey': K, 'Authorization': 'Bearer ' + K };
 
     // Fetch product with relations (including variant SKU when existir)
-    var res = await fetch(U + '/rest/v1/products?legacy_id=eq.' + legacyId + '&select=*,brands(name,slug),categories(name,slug),subcategories(name,slug),product_variants(id,label,price,compare_at_price,stock,is_default,sort_order,sku,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: h });
+    var res = await fetch(U + '/rest/v1/products?legacy_id=eq.' + legacyId + '&select=*,brands(name,slug),categories(name,slug),subcategories(name,slug),product_variants(id,label,price,wholesale_price,compare_at_price,stock,is_default,sort_order,sku,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: h });
     var arr = await res.json();
     if (!arr || !arr[0]) throw new Error('Product not found');
     var p = arr[0];
@@ -260,7 +260,8 @@ function renderVariants(p) {
     return '<div class="var-group" data-gi="' + gi + '"' + hidden + '><div class="var-label">' + g.type + '</div><div class="var-opts">' +
       g.options.map(function(o) {
         var oos = o.stock != null && o.stock <= 0;
-        return '<button class="var-opt' + (oos ? ' dis' : '') + '" data-vid="' + o.id + '" data-lbl="' + (o.label || '') + '" data-pr="' + (o.price || '') + '" data-sku="' + (o.sku || '') + '"' + (oos ? ' disabled' : '') + '>' + (o.label || '') + (oos ? ' (Backorder)' : '') + '</button>';
+        var wsP = o.wholesale_price > 0 ? o.wholesale_price : o.price;
+        return '<button class="var-opt' + (oos ? ' dis' : '') + '" data-vid="' + o.id + '" data-lbl="' + (o.label || '') + '" data-pr="' + (o.price || '') + '" data-b2bpr="' + (wsP || '') + '" data-sku="' + (o.sku || '') + '"' + (oos ? ' disabled' : '') + '>' + (o.label || '') + (oos ? ' (Backorder)' : '') + '</button>';
       }).join('') + '</div></div>';
   }).join('');
 
@@ -273,7 +274,9 @@ function renderVariants(p) {
     if (gi + 1 < ag.length) { ag[gi + 1].style.display = ''; for (var i = gi + 1; i < ag.length; i++) { ag[i].querySelectorAll('.var-opt').forEach(function(b) { b.classList.remove('sel'); }); if (i > gi + 1) ag[i].style.display = 'none'; } }
     var lg = ag[ag.length - 1], ls = lg.querySelector('.var-opt.sel');
     if (ls) {
-      _selectedVariant = { id: ls.dataset.vid, label: ls.dataset.lbl, price: parseFloat(ls.dataset.pr) || null, sku: (ls.dataset.sku || '') || null };
+      var selB2bPr = parseFloat(ls.dataset.b2bpr); var selRtPr = parseFloat(ls.dataset.pr);
+      var selPrice = (selB2bPr > 0) ? selB2bPr : selRtPr;
+      _selectedVariant = { id: ls.dataset.vid, label: ls.dataset.lbl, price: selPrice || null, sku: (ls.dataset.sku || '') || null };
       var cur = '\u20ac';
       if (_selectedVariant.price) document.getElementById('prodPrice').textContent = cur + EXVAT(_selectedVariant.price).toFixed(2);
       var skuToShow = _selectedVariant.sku || baseSku;
