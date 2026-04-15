@@ -508,6 +508,7 @@ Apply for a B2B Account →
 <div id="b2bLoginBox"
 style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,0.05);">
 <div id="b2bLoginForm">
+<div id="loginFields">
 <div style="margin-bottom:16px;">
 <label style="display:block;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px;">Email</label>
 <input type="email" id="b2bEmail" placeholder="your@business.com"
@@ -530,7 +531,7 @@ In to B2B Portal</button>
 <div style="text-align:center;margin-top:10px;">
   <a href="#" id="forgotPwdLink" onclick="showForgotForm();return false;" style="font-size:13px;color:#2D6A4F;text-decoration:none;">Forgot your password?</a>
 </div>
-<div id="b2bLoginMsg" style="margin-top:12px;font-size:13px;text-align:center;display:none;"></div>
+</div><!-- end #loginFields -->
 
 <!-- Forgot Password Panel -->
 <div id="forgotPwdPanel" style="display:none;margin-top:16px;padding:20px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;">
@@ -547,6 +548,8 @@ In to B2B Portal</button>
     <a href="#" onclick="hideForgotForm();return false;" style="font-size:12px;color:#64748b;text-decoration:none;">← Back to login</a>
   </div>
 </div>
+<div id="b2bLoginMsg" style="margin-top:12px;font-size:13px;text-align:center;display:none;"></div>
+
 <div style="text-align:center;margin:16px 0 12px;display:flex;align-items:center;gap:12px;">
 <div style="flex:1;height:1px;background:#e2e8f0;"></div>
 <span style="font-size:12px;color:#94a3b8;">or continue with</span>
@@ -965,7 +968,7 @@ class="payment-icon-img">
 
     // Forgot Password
     function showForgotForm() {
-      document.getElementById('b2bLoginForm').style.display = 'none';
+      document.getElementById('loginFields').style.display = 'none';
       document.getElementById('forgotPwdPanel').style.display = 'block';
       const fe = document.getElementById('forgotEmail');
       const emailVal = document.getElementById('b2bEmail');
@@ -974,7 +977,7 @@ class="payment-icon-img">
     }
     function hideForgotForm() {
       document.getElementById('forgotPwdPanel').style.display = 'none';
-      document.getElementById('b2bLoginForm').style.display = 'block';
+      document.getElementById('loginFields').style.display = 'block';
     }
     async function sendPasswordReset() {
       const email = (document.getElementById('forgotEmail').value || '').trim();
