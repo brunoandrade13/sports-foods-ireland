@@ -6270,6 +6270,7 @@ Loading items...
       pv.forEach(r => { const d = r.created_at.slice(0,10); if(!daily[d]) daily[d]={views:0,sessions:new Set()}; daily[d].views++; daily[d].sessions.add(r.session_id); });
       const labels = Object.keys(daily).sort();
       const ctx = document.getElementById('saChart').getContext('2d');
+      if(saChart1){saChart1.destroy();saChart1=null;} else { const _ex=Chart.getChart(ctx.canvas); if(_ex)_ex.destroy(); }
       saChart1 = new Chart(ctx, {
         type:'bar', data: {
           labels: labels.map(l=>l.slice(5)),
@@ -6353,6 +6354,7 @@ Loading items...
         <div class="stat-card" style="border-left:3px solid #f472b6"><div class="stat-value">${pe.filter(r=>r.event_type==='add_to_cart').length}</div><div class="stat-label">Add to Cart Events</div></div>`;
 
       const ctx = document.getElementById('saChart').getContext('2d');
+      if(saChart1){saChart1.destroy();saChart1=null;} else { const _ex=Chart.getChart(ctx.canvas); if(_ex)_ex.destroy(); }
       saChart1 = new Chart(ctx, {
         type:'bar', data:{ labels:top20.map(s=>s[1].name.slice(0,20)),
           datasets:[
@@ -6423,6 +6425,7 @@ Loading items...
         <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">${top10[0]?top10[0].name.slice(0,18):'-'}</div><div class="stat-label">Top brand by views</div></div>`;
 
       const ctx = document.getElementById('saChart').getContext('2d');
+      if(saChart1){saChart1.destroy();saChart1=null;} else { const _ex=Chart.getChart(ctx.canvas); if(_ex)_ex.destroy(); }
       saChart1 = new Chart(ctx, {
         type:'bar',
         data:{
@@ -6493,6 +6496,7 @@ Loading items...
         <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">${top10[0]?top10[0].name.slice(0,18):'-'}</div><div class="stat-label">Top category</div></div>`;
 
       const ctx = document.getElementById('saChart').getContext('2d');
+      if(saChart1){saChart1.destroy();saChart1=null;} else { const _ex=Chart.getChart(ctx.canvas); if(_ex)_ex.destroy(); }
       saChart1 = new Chart(ctx, {
         type:'bar',
         data:{
@@ -6535,6 +6539,7 @@ Loading items...
 
       const colors = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa','#22d3ee','#fb923c','#e879f9','#34d399','#f87171'];
       const ctx = document.getElementById('saChart').getContext('2d');
+      if(saChart1){saChart1.destroy();saChart1=null;} else { const _ex=Chart.getChart(ctx.canvas); if(_ex)_ex.destroy(); }
       saChart1 = new Chart(ctx, {
         type:'doughnut', data:{ labels:sorted.slice(0,10).map(s=>s[0]), datasets:[{ data:sorted.slice(0,10).map(s=>s[1].views), backgroundColor:colors }] },
         options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right',labels:{color:'#94a3b8'}}} }
@@ -6547,6 +6552,7 @@ Loading items...
       if(campSorted.length > 0) {
         document.getElementById('saChart2Wrap').style.display = 'block';
         const ctx2 = document.getElementById('saChart2').getContext('2d');
+        if(saChart2){saChart2.destroy();saChart2=null;} else { const _ex2=Chart.getChart(ctx2.canvas); if(_ex2)_ex2.destroy(); }
         saChart2 = new Chart(ctx2, {
           type:'bar', data:{ labels:campSorted.slice(0,10).map(s=>s[0]), datasets:[{ label:'Views by Campaign', data:campSorted.slice(0,10).map(s=>s[1]), backgroundColor:'rgba(167,139,250,0.6)', borderRadius:4 }] },
           options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#94a3b8'}},title:{display:true,text:'UTM Campaigns',color:'#94a3b8'}}, scales:{ x:{ticks:{color:'#64748b',maxRotation:45}}, y:{ticks:{color:'#64748b'},grid:{color:'rgba(51,65,85,0.3)'}} } }
@@ -6585,6 +6591,7 @@ Loading items...
 
       const colors = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa'];
       const ctx = document.getElementById('saChart').getContext('2d');
+      if(saChart1){saChart1.destroy();saChart1=null;} else { const _ex=Chart.getChart(ctx.canvas); if(_ex)_ex.destroy(); }
       saChart1 = new Chart(ctx, {
         type:'doughnut', data:{ labels:devSorted.map(s=>s[0]), datasets:[{ data:devSorted.map(s=>s[1]), backgroundColor:colors }] },
         options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right',labels:{color:'#94a3b8'}},title:{display:true,text:'Device Types',color:'#94a3b8'}} }
@@ -6593,7 +6600,8 @@ Loading items...
       // Browser chart
       document.getElementById('saChart2Wrap').style.display = 'block';
       const ctx2 = document.getElementById('saChart2').getContext('2d');
-      saChart2 = new Chart(ctx2, {
+      if(saChart2){saChart2.destroy();saChart2=null;} else { const _ex2=Chart.getChart(ctx2.canvas); if(_ex2)_ex2.destroy(); }
+        saChart2 = new Chart(ctx2, {
         type:'bar', data:{ labels:brSorted.map(s=>s[0]), datasets:[
           { label:'Browser', data:brSorted.map(s=>s[1]), backgroundColor:'rgba(96,165,250,0.6)', borderRadius:4 }
         ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#94a3b8'}},title:{display:true,text:'Browsers & OS',color:'#94a3b8'}},
@@ -6634,6 +6642,7 @@ Loading items...
 
       const funnelColors = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa'];
       const ctx = document.getElementById('saChart').getContext('2d');
+      if(saChart1){saChart1.destroy();saChart1=null;} else { const _ex=Chart.getChart(ctx.canvas); if(_ex)_ex.destroy(); }
       saChart1 = new Chart(ctx, {
         type:'bar', data:{ labels:stepLabels, datasets:[{ label:'Events', data:steps.map(s=>counts[s]||0), backgroundColor:funnelColors, borderRadius:4 }] },
         options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
@@ -6690,6 +6699,7 @@ Loading items...
       // City chart
       const colors = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa','#22d3ee','#fb923c','#e879f9','#34d399','#f87171'];
       const ctx = document.getElementById('saChart').getContext('2d');
+      if(saChart1){saChart1.destroy();saChart1=null;} else { const _ex=Chart.getChart(ctx.canvas); if(_ex)_ex.destroy(); }
       saChart1 = new Chart(ctx, {
         type:'bar', data:{ labels:citySorted.slice(0,15).map(s=>s[0]),
           datasets:[{ label:'Page Views by City', data:citySorted.slice(0,15).map(s=>s[1]), backgroundColor:colors.concat(colors), borderRadius:4 }]
@@ -6701,7 +6711,8 @@ Loading items...
       // Country chart
       document.getElementById('saChart2Wrap').style.display = 'block';
       const ctx2 = document.getElementById('saChart2').getContext('2d');
-      saChart2 = new Chart(ctx2, {
+      if(saChart2){saChart2.destroy();saChart2=null;} else { const _ex2=Chart.getChart(ctx2.canvas); if(_ex2)_ex2.destroy(); }
+        saChart2 = new Chart(ctx2, {
         type:'doughnut', data:{ labels:countrySorted.slice(0,10).map(s=>s[0]), datasets:[{ data:countrySorted.slice(0,10).map(s=>s[1]), backgroundColor:colors }] },
         options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right',labels:{color:'#94a3b8'}},title:{display:true,text:'Countries',color:'#94a3b8'}} }
       });
