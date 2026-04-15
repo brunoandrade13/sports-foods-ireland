@@ -7500,19 +7500,20 @@ Loading items...
       let totalRev = paidOrders500.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
       let avgOrder = paidOrders500.length > 0 ? (totalRev / paidOrders500.length) : 0;
 
-      // Sales Timeframes
+      // Sales Timeframes — same logic as Orders panel (Monday-based week, all orders)
       const now = new Date();
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-      const startOfWeek = now.getTime() - (7 * 24 * 60 * 60 * 1000);
+      const dayOfWeek = now.getDay() || 7; // Mon=1..Sun=7
+      const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1).getTime();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
-      const ordersToday = dedupedOrders.filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status) && o.created_at && new Date(o.created_at).getTime() >= startOfDay);
+      const ordersToday = dedupedOrders.filter(o => o.created_at && new Date(o.created_at).getTime() >= startOfDay);
       const revToday = ordersToday.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
 
-      const ordersWeek = dedupedOrders.filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status) && o.created_at && new Date(o.created_at).getTime() >= startOfWeek);
+      const ordersWeek = dedupedOrders.filter(o => o.created_at && new Date(o.created_at).getTime() >= startOfWeek);
       const revWeek = ordersWeek.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
 
-      const ordersMonth = dedupedOrders.filter(o => ['paid','partially_refunded','partially_paid'].includes(o.financial_status) && o.created_at && new Date(o.created_at).getTime() >= startOfMonth);
+      const ordersMonth = dedupedOrders.filter(o => o.created_at && new Date(o.created_at).getTime() >= startOfMonth);
       const revMonth = ordersMonth.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
 
       const activeBrandIds = new Set(active.map(p => p.brand_id).filter(id => id));
