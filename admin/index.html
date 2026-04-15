@@ -6329,9 +6329,14 @@ Loading items...
     function renderSAProducts() {
       const pe = saProductEvents;
       const byProd = {};
-      // Build product name lookup from allProducts
+      // Build product name lookup: map woo_product_id (numeric) AND uuid id → name
       const prodNameMap = {};
-      (allProducts || []).forEach(p => { if(p.id) prodNameMap[String(p.id)] = p.name || p.sku || p.id; });
+      (allProducts || []).forEach(p => {
+        const name = p.name || p.sku || p.id;
+        if(p.id) prodNameMap[String(p.id)] = name;
+        if(p.woo_product_id) prodNameMap[String(p.woo_product_id)] = name;
+        if(p.legacy_id) prodNameMap[String(p.legacy_id)] = name;
+      });
 
       pe.forEach(r => {
         const pid = r.product_id || 'unknown';
