@@ -6329,9 +6329,14 @@ Loading items...
     function renderSAProducts() {
       const pe = saProductEvents;
       const byProd = {};
+      // Build product name lookup from allProducts
+      const prodNameMap = {};
+      (allProducts || []).forEach(p => { if(p.id) prodNameMap[String(p.id)] = p.name || p.sku || p.id; });
+
       pe.forEach(r => {
         const pid = r.product_id || 'unknown';
-        if(!byProd[pid]) byProd[pid]={views:0,clicks:0,carts:0,name:pid};
+        const name = prodNameMap[String(pid)] || r.product_name || pid;
+        if(!byProd[pid]) byProd[pid]={views:0,clicks:0,carts:0,name};
         if(r.event_type==='view') byProd[pid].views++;
         if(r.event_type==='click') byProd[pid].clicks++;
         if(r.event_type==='add_to_cart') byProd[pid].carts++;
@@ -6340,7 +6345,8 @@ Loading items...
       const pvProds = saPageViews.filter(r=>r.page_type==='product' && r.product_id);
       pvProds.forEach(r => {
         const pid = r.product_id;
-        if(!byProd[pid]) byProd[pid]={views:0,clicks:0,carts:0,name:pid};
+        const name = prodNameMap[String(pid)] || r.product_name || pid;
+        if(!byProd[pid]) byProd[pid]={views:0,clicks:0,carts:0,name};
         byProd[pid].timeSum = (byProd[pid].timeSum||0) + (r.time_on_page_seconds||0);
         byProd[pid].pvCount = (byProd[pid].pvCount||0) + 1;
       });
