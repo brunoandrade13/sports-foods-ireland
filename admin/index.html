@@ -15015,7 +15015,13 @@ function renderARModalBody(c, fmt, today) {
         </tr>
       </tfoot>
     </table>
-    <p style="margin:14px 0 0;font-size:0.8rem;color:var(--text-muted)">Source: QuickBooks Online · Click outside to close</p>`;
+    <p style="margin:14px 0 0;font-size:0.8rem;color:var(--text-muted)">Source: QuickBooks Online · Click outside to close</p>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+      <button onclick="generateARStatement(${_arCurrentCustomerIdx})"
+        style="padding:10px 22px;background:#169B62;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.9rem">
+        📄 Generate Statement
+      </button>
+    </div>`;
 }
 
 async function markARInvoicePaid(custIdx, invIdx) {
@@ -15069,6 +15075,155 @@ async function markARInvoicePaid(custIdx, invIdx) {
     if (btn) { btn.disabled = false; btn.textContent = '✓ Mark Paid'; }
     toast('Error: ' + (e.message || 'Failed to mark as paid'), 'error');
   }
+}
+
+function generateARStatement(idx) {
+  const c = (_arData?.customers||[])[idx];
+  if (!c) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, ML = 18, MR = 18;
+  const today = new Date();
+  let y = 18;
+  const fmt = v => '€' + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  // Logo
+  try { doc.addImage(window._sfiLogoB64, 'JPEG', ML, y, 28, 18); } catch(e) {}
+
+  // Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor('#169B62');
+  doc.text('ACCOUNT STATEMENT', W - MR, y + 6, { align: 'right' });
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor('#555');
+  doc.text('Date: ' + today.toLocaleDateString('en-IE', {day:'2-digit',month:'long',year:'numeric'}), W - MR, y + 12, { align: 'right' });
+  doc.text('Sports Foods Ireland Ltd', W - MR, y + 17, { align: 'right' });
+  y += 28;
+
+  // Divider
+  doc.setDrawColor('#169B62');
+  doc.setLineWidth(0.8);
+  doc.line(ML, y, W - MR, y);
+  y += 7;
+
+  // Customer info
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor('#111');
+  doc.text('Customer:', ML, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(c.name, ML + 26, y);
+  y += 8;
+
+  // Summary boxes (text)
+  const openInvs = (c.invoices||[]).filter(i => !i._paid);
+  const totalOpen = openInvs.reduce((s, i) => s + i.balance, 0);
+  const overdueCount = openInvs.filter(i => i.overdue).length;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor('#555');
+  doc.text('Total Open Balance: ' + fmt(totalOpen) + '   |   Open Invoices: ' + openInvs.length + '   |   Overdue: ' + overdueCount, ML, y);
+  y += 8;
+
+  // Section title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor('#169B62');
+  doc.text('OPEN INVOICES', ML, y);
+  y += 4;
+  doc.setDrawColor('#ddd');
+  doc.setLineWidth(0.3);
+  doc.line(ML, y, W - MR, y);
+  y += 5;
+
+  // Table header
+  const c1 = ML, c2 = ML + 42, c3 = ML + 82, c4 = ML + 118, c5 = W - MR;
+  doc.setFillColor('#1B4332');
+  doc.rect(ML, y - 3, W - ML - MR, 8, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor('#ffffff');
+  doc.text('Invoice #', c1 + 2, y + 2);
+  doc.text('Date', c2, y + 2);
+  doc.text('Due Date', c3, y + 2);
+  doc.text('Days Overdue', c4, y + 2);
+  doc.text('Balance Due', c5, y + 2, { align: 'right' });
+  y += 8;
+
+  // Rows — sorted oldest first
+  const rows = openInvs.sort((a, b) => new Date(a.due||a.date) - new Date(b.due||b.date));
+  rows.forEach(function(inv, i) {
+    if (y > 265) { doc.addPage(); y = 20; }
+    const dueDate  = inv.due  ? new Date(inv.due)  : null;
+    const invDate  = inv.date ? new Date(inv.date) : null;
+    const daysOver = dueDate && inv.overdue ? Math.floor((today - dueDate) / (1000*60*60*24)) : 0;
+    const dueLbl   = dueDate ? dueDate.toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const dateLbl  = invDate ? invDate.toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const rowBg    = i % 2 === 0 ? '#f9fafb' : '#ffffff';
+
+    doc.setFillColor(rowBg);
+    doc.rect(ML, y - 3, W - ML - MR, 7, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor('#169B62');
+    doc.text('#' + inv.doc, c1 + 2, y + 1);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor('#333');
+    doc.text(dateLbl, c2, y + 1);
+    doc.text(dueLbl, c3, y + 1);
+
+    if (inv.overdue) {
+      doc.setTextColor('#dc2626');
+      doc.setFont('helvetica', 'bold');
+      doc.text(daysOver + 'd overdue', c4, y + 1);
+    } else {
+      doc.setTextColor('#16a34a');
+      doc.setFont('helvetica', 'normal');
+      doc.text('Current', c4, y + 1);
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(inv.overdue ? '#dc2626' : '#111');
+    doc.text(fmt(inv.balance), c5, y + 1, { align: 'right' });
+    y += 7;
+  });
+
+  // Total
+  y += 2;
+  doc.setDrawColor('#169B62');
+  doc.setLineWidth(0.5);
+  doc.line(ML, y, W - MR, y);
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor('#111');
+  doc.text('TOTAL OUTSTANDING', c4, y);
+  doc.setTextColor('#dc2626');
+  doc.setFontSize(11);
+  doc.text(fmt(totalOpen), c5, y, { align: 'right' });
+  y += 10;
+
+  // Footer note
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(8);
+  doc.setTextColor('#888');
+  doc.text('This statement reflects open invoices as of ' + today.toLocaleDateString('en-IE') + '. Source: QuickBooks Online.', ML, y);
+  y += 4;
+  doc.text('Sports Foods Ireland Ltd · info@sportsfoodsireland.ie · +353 1 840 0403', ML, y);
+  y += 4;
+  doc.setDrawColor('#169B62');
+  doc.setLineWidth(0.4);
+  doc.line(ML, y, W - MR, y);
+
+  const filename = 'Statement_' + c.name.replace(/[^a-zA-Z0-9]/g,'_') + '_' + today.toISOString().slice(0,10) + '.pdf';
+  doc.save(filename);
+  toast('Statement generated ✅', 'success');
 }
 
 function closeARModal() {
