@@ -465,15 +465,27 @@ const sfi = {
       if (!user) return false;
       await sfi.auth.ensureAuth();
       try {
-        const rows = await db.query('customers', {
+        // Try user_id first, fall back to email match (handles legacy customers with null user_id)
+        let rows = await db.query('customers', {
           select: 'is_b2b,b2b_status,customer_type',
           filters: { user_id: user.id },
           limit: 1
         });
-        const p = rows[0];
+        if (!rows || !rows[0]) {
+          // Fallback: match by email
+          rows = await db.query('customers', {
+            select: 'is_b2b,b2b_status,customer_type',
+            filters: { email: user.email },
+            limit: 1
+          });
+        }
+        const p = rows && rows[0];
         if (!p) return false;
-        // Accept either is_b2b=true OR customer_type='b2b', AND b2b_status approved
-        return (p.is_b2b === true || p.customer_type === 'b2b') && p.b2b_status === 'approved';
+        // Accept customer_type='b2b' with approved or null status (legacy imports)
+        if (p.customer_type === 'b2b' || p.is_b2b === true) {
+          return p.b2b_status === 'approved' || p.b2b_status === null;
+        }
+        return false;
       } catch (e) { return false; }
     },
 
