@@ -12364,10 +12364,21 @@ Loading items...
         if (p && p.weight_grams) totalWeight += (parseInt(p.weight_grams, 10) || 0) * i.qty;
       });
 
-      // Generate order number client-side as fallback (DB also auto-generates)
-      const ts = Date.now().toString().slice(-6);
-      const rnd = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-      const orderNumber = 'SFI-ADM-' + ts + rnd;
+      // Generate order number from DB sequence (same as B2B/B2C checkout)
+      let orderNumber;
+      try {
+        const seqRes = await fetch(SUPABASE_URL + '/rest/v1/rpc/generate_sfi_order_number', {
+          method: 'POST',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+          body: '{}'
+        });
+        const seqData = await seqRes.json();
+        orderNumber = typeof seqData === 'string' ? seqData : ('SFI-ADM-' + Date.now().toString().slice(-6) + Math.floor(Math.random()*100).toString().padStart(2,'0'));
+      } catch(e) {
+        const ts = Date.now().toString().slice(-6);
+        const rnd = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+        orderNumber = 'SFI-ADM-' + ts + rnd;
+      }
 
       const payload = {
         order_number: orderNumber,
