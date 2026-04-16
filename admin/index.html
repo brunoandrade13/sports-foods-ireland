@@ -14672,8 +14672,7 @@ function renderOrderItemsTable(items, order, editMode) {
     const sendQty = Math.max(0, qty - boQty);
     const rowTotal = price * sendQty;
     const name    = getProductName(i);
-    const sub     = (i.product_name && i.product_name !== name ? '(' + esc(i.product_name) + ') ' : '') +
-                    (i.variant_label ? ' - ' + esc(i.variant_label) : '');
+    const sub     = (i.variant_label ? ' - ' + esc(i.variant_label) : '');
     const fullyBO = boQty >= qty;
 
     if (editMode) {
