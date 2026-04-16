@@ -15611,7 +15611,7 @@ async function loadAPTab() {
   const wrap = document.getElementById('qbFinTabContentAP');
   if (!wrap) return;
   try {
-    const bills = await supaGet('bills', '?select=vendor_name,balance,total_amount,txn_date,due_date,doc_number,status&balance=gt.0&order=balance.desc&limit=100');
+    const bills = await supaGet('bills', '?select=vendor_name,balance,total_amount,txn_date,due_date,doc_number&balance=gt.0&order=balance.desc&limit=100');
     const byVendor = {};
     (bills||[]).forEach(b => { const k=b.vendor_name||'?'; if(!byVendor[k])byVendor[k]={name:k,bills:0,total:0}; byVendor[k].bills++; byVendor[k].total+=Number(b.balance||0); });
     const sorted = Object.values(byVendor).sort((a,b) => b.total - a.total);
@@ -15632,13 +15632,13 @@ async function loadVendorsTab() {
   const wrap = document.getElementById('qbFinTabContentVendors');
   if (!wrap) return;
   try {
-    const vendors = await supaGet('vendors', '?select=*&order=display_name&limit=100');
+    const vendors = await supaGet('vendors', '?select=name,email,phone,balance,active&order=name&limit=100');
     const fmt = v => '€'+Number(v).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2});
     let html = `<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">#</th><th style="padding:8px 10px;text-align:left">Vendor</th><th style="padding:8px 10px;text-align:left">Email</th><th style="padding:8px 10px;text-align:left">Phone</th><th style="padding:8px 10px;text-align:right">Balance</th><th style="padding:8px 10px;text-align:center">Active</th></tr></thead><tbody>`;
     (vendors||[]).forEach((v,i) => {
       const bg = i%2 ? 'background:var(--surface-2)' : '';
       const bal = Number(v.balance||0);
-      html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px;color:var(--text-muted)">${i+1}</td><td style="padding:7px 10px;font-weight:600">${v.display_name||''}</td><td style="padding:7px 10px;font-size:0.82rem">${v.email||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${v.phone||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:${bal>0?'700':'400'};color:${bal>0?'#dc2626':'var(--text-muted)'}">${bal!==0?fmt(bal):'—'}</td><td style="padding:7px 10px;text-align:center">${v.active?'✅':'❌'}</td></tr>`;
+      html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px;color:var(--text-muted)">${i+1}</td><td style="padding:7px 10px;font-weight:600">${v.name||''}</td><td style="padding:7px 10px;font-size:0.82rem">${v.email||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${v.phone||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:${bal>0?'700':'400'};color:${bal>0?'#dc2626':'var(--text-muted)'}">${bal!==0?fmt(bal):'—'}</td><td style="padding:7px 10px;text-align:center">${v.active?'✅':'❌'}</td></tr>`;
     });
     html += '</tbody></table>';
     wrap.innerHTML = html;
