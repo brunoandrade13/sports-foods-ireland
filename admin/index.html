@@ -11662,9 +11662,9 @@ Loading items...
       if (!email) return alert('No email for this customer');
       if (!confirm('Login as "' + name + '" (' + email + ') on the B2B portal?\n\nThis will open a new tab logged in as this customer. Their password will NOT be changed.')) return;
       try {
-        const res = await fetch(SUPABASE_URL + '/functions/v1/b2b-impersonate', {
+        const res = await fetch(SUPA_URL + '/functions/v1/b2b-impersonate', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
           body: JSON.stringify({ email: email })
         });
         const data = await res.json();
