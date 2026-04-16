@@ -15545,12 +15545,14 @@ async function loadStatement() {
   if (btn) { btn.disabled = false; btn.textContent = '🔍 Generate'; }
 }
 function renderStatement(d) {
-  var c = d.customer, s = d.summary, tl = d.timeline || [];
+  var c = d.customer, s = d.summary, tl = d.timeline || [], ob = d.opening_balance || 0;
   var fmt = function(v) { return (c.currency === 'GBP' ? '£' : '€') + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2}); };
   var fmtDate = function(iso) { return iso ? new Date(iso).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—'; };
   var html = '<div id="stmtPrintArea">';
-  // Summary cards
-  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">';
+  // Summary cards - 5 columns with opening balance
+  html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px">';
+  var obColor = ob > 0 ? '#dc2626' : ob < 0 ? '#16a34a' : 'var(--text)';
+  html += '<div style="background:var(--surface-2);padding:12px;border-radius:8px;text-align:center;border:1px solid #a78bfa"><div style="font-size:0.68rem;color:#7c3aed;text-transform:uppercase">Opening Bal.</div><div style="font-size:1.1rem;font-weight:700;color:' + obColor + '">' + fmt(ob) + '</div></div>';
   html += '<div style="background:var(--surface-2);padding:12px;border-radius:8px;text-align:center"><div style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase">Invoiced</div><div style="font-size:1.1rem;font-weight:700;color:var(--text)">' + fmt(s.total_invoiced) + '</div></div>';
   html += '<div style="background:var(--surface-2);padding:12px;border-radius:8px;text-align:center"><div style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase">Paid</div><div style="font-size:1.1rem;font-weight:700;color:#16a34a">' + fmt(s.total_paid) + '</div></div>';
   html += '<div style="background:var(--surface-2);padding:12px;border-radius:8px;text-align:center"><div style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase">Credits</div><div style="font-size:1.1rem;font-weight:700;color:var(--text)">' + fmt(s.total_credits) + '</div></div>';
@@ -15581,6 +15583,13 @@ function renderStatement(d) {
     html += '<td style="padding:7px 10px;text-align:right;font-weight:600;color:' + rbColor + '">' + rb + '</td>';
     html += '</tr>';
   });
+  // Opening balance row at the bottom (oldest entry in DESC order)
+  var obRowColor = ob > 0 ? '#dc2626' : ob < 0 ? '#16a34a' : 'var(--text)';
+  html += '<tr style="border-top:2px solid #7c3aed;background:rgba(124,58,237,0.08)">';
+  html += '<td style="padding:8px 10px;font-weight:700;color:#7c3aed" colspan="4">\u{1F4CB} Opening Balance (before ' + fmtDate(d.period?.from) + ')</td>';
+  html += '<td style="padding:8px 10px"></td><td style="padding:8px 10px"></td>';
+  html += '<td style="padding:8px 10px;text-align:right;font-weight:700;color:' + obRowColor + '">' + fmt(ob) + '</td>';
+  html += '</tr>';
   html += '</tbody></table></div>';
   // Footer
   html += '<div style="margin-top:16px;padding:12px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;text-align:center">';
