@@ -15782,7 +15782,7 @@ function renderARModalBody(c, fmt, today) {
   if (!today) today = new Date();
 
   let invoicesHtml = '';
-  (c.invoices||[]).sort((a,b) => new Date(a.due) - new Date(b.due)).forEach((inv, iIdx) => {
+  (c.invoices||[]).sort((a,b) => new Date(b.date || b.due) - new Date(a.date || a.due)).forEach((inv, iIdx) => {
     const due     = inv.due ? new Date(inv.due).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
     const date    = inv.date ? new Date(inv.date).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
     const overdue = inv.overdue;
