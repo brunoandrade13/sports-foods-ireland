@@ -334,16 +334,24 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
     .stat-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 18px;
+      border-radius: 10px;
+      padding: 14px 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,.15);
     }
 
     .stat-card .label {
       font-size: 0.7rem;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.7px;
       font-weight: 500;
+      margin-bottom: 4px;
     }
 
     .stat-card .value {
@@ -1525,41 +1533,41 @@ authorized staff</p>
 <div class="dash-group">
 <div class="dash-group-title">💰 Finance, Sales & Orders</div>
 <div class="stats-grid">
-<div class="stat-card" style="border-left:3px solid var(--info)">
+<div class="stat-card" style="background:rgba(22,163,74,0.1)">
 <div class="label">Sales Today</div>
-<div class="value" id="statSalesToday">—</div>
+<div class="value" style="color:#16a34a" id="statSalesToday">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--accent)">
+<div class="stat-card" style="background:rgba(22,163,74,0.08)">
 <div class="label">Sales This Week</div>
-<div class="value" id="statSalesWeek">—</div>
+<div class="value" style="color:#15803d" id="statSalesWeek">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--primary-color)">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">Sales This Month</div>
-<div class="value" id="statSalesMonth">—</div>
+<div class="value" style="color:#2563eb" id="statSalesMonth">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--warn)">
+<div class="stat-card" style="background:rgba(202,138,4,0.08)">
 <div class="label">Pending Orders</div>
-<div class="value" id="statPendingOrders">—</div>
+<div class="value" style="color:#ca8a04" id="statPendingOrders">—</div>
 </div>
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(124,58,237,0.08)">
 <div class="label">Total Revenue</div>
-<div class="value" id="statRevenue">—</div>
+<div class="value" style="color:#7c3aed" id="statRevenue">—</div>
 </div>
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(8,145,178,0.08)">
 <div class="label">Avg Order Value</div>
-<div class="value" id="statAvgOrder">—</div>
+<div class="value" style="color:#0891b2" id="statAvgOrder">—</div>
 </div>
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">Total Invoices</div>
-<div class="value" id="statInvoices">—</div>
+<div class="value" style="color:#1d4ed8" id="statInvoices">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--danger)">
+<div class="stat-card" style="background:rgba(220,38,38,0.08)">
 <div class="label">Abandoned Carts</div>
-<div class="value" id="statAbandoned">—</div>
+<div class="value" style="color:#dc2626" id="statAbandoned">—</div>
 </div>
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(202,138,4,0.08)">
 <div class="label">Pending Reviews</div>
-<div class="value" id="statPendingReviews">—</div>
+<div class="value" style="color:#ca8a04" id="statPendingReviews">—</div>
 </div>
 </div>
 </div>
@@ -1567,21 +1575,21 @@ authorized staff</p>
 <div class="dash-group">
 <div class="dash-group-title">📊 Inventory & Stock</div>
 <div class="stats-grid">
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">Stock Value</div>
-<div class="value" id="statStockValue">—</div>
+<div class="value" style="color:#2563eb" id="statStockValue">—</div>
 </div>
-<div class="stat-card accent">
+<div class="stat-card" style="background:rgba(202,138,4,0.08)">
 <div class="label">Low Stock</div>
-<div class="value" id="statLowStock">—</div>
+<div class="value" style="color:#ca8a04" id="statLowStock">—</div>
 </div>
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(220,38,38,0.08)">
 <div class="label">Out of Stock</div>
-<div class="value" id="statOutStock">—</div>
+<div class="value" style="color:#dc2626" id="statOutStock">—</div>
 </div>
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(8,145,178,0.08)">
 <div class="label">Avg Price</div>
-<div class="value" id="statAvgPrice">—</div>
+<div class="value" style="color:#0891b2" id="statAvgPrice">—</div>
 </div>
 </div>
 </div>
@@ -1589,25 +1597,25 @@ authorized staff</p>
 <div class="dash-group">
 <div class="dash-group-title">📝 Registration Summary</div>
 <div class="stats-grid">
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(124,58,237,0.08)">
 <div class="label">Total Products</div>
-<div class="value" id="statProducts">—</div>
+<div class="value" style="color:#7c3aed" id="statProducts">—</div>
 </div>
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(22,163,74,0.08)">
 <div class="label">Active Brands</div>
-<div class="value" id="statBrands">—</div>
+<div class="value" style="color:#16a34a" id="statBrands">—</div>
 </div>
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">Categories</div>
-<div class="value" id="statCategories">—</div>
+<div class="value" style="color:#2563eb" id="statCategories">—</div>
 </div>
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(8,145,178,0.08)">
 <div class="label">Total Customers</div>
-<div class="value" id="statCustomers">—</div>
+<div class="value" style="color:#0891b2" id="statCustomers">—</div>
 </div>
-<div class="stat-card">
+<div class="stat-card" style="background:rgba(107,114,128,0.08)">
 <div class="label">Total Suppliers</div>
-<div class="value" id="statSuppliers">—</div>
+<div class="value" style="color:#6b7280" id="statSuppliers">—</div>
 </div>
 </div>
 </div>
@@ -1862,11 +1870,11 @@ oninput="filterProducts()">
 <div class="actions"><button class="btn btn-primary" onclick="openBrandModal()">+ Add Brand</button></div>
 </div>
 <div class="stat-cards-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
-<div class="stat-card" style="border-left:3px solid var(--info)">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">Total Brands</div>
 <div class="value" id="brandsStatTotal">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--accent)">
+<div class="stat-card" style="background:rgba(22,163,74,0.08)">
 <div class="label">Active Brands</div>
 <div class="value" id="brandsStatActive">—</div>
 </div>
@@ -2059,7 +2067,7 @@ class="btn btn-primary" onclick="saveCategory()">Save Category</button></div>
 <div class="label">Total Reviews</div>
 <div class="value" id="revTotal">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--warn)">
+<div class="stat-card" style="background:rgba(202,138,4,0.08)">
 <div class="label">Pending Moderation</div>
 <div class="value" id="revPending">—</div>
 </div>
@@ -2126,47 +2134,47 @@ oninput="filterReviews()">
 </div>
 </div>
 <div class="stats-grid">
-<div class="stat-card" style="border-left:3px solid var(--primary-color)">
+<div class="stat-card" style="background:rgba(22,163,74,0.1)">
 <div class="label">Orders Today</div>
-<div class="value" id="ordToday">—</div>
+<div class="value" style="color:#16a34a" id="ordToday">—</div>
 <div class="change" id="ordTodayChg"></div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--primary-color)">
+<div class="stat-card" style="background:rgba(22,163,74,0.08)">
 <div class="label">Revenue Today</div>
-<div class="value" id="revToday">—</div>
+<div class="value" style="color:#15803d" id="revToday">—</div>
 <div class="change" id="revTodayChg"></div>
 </div>
-<div class="stat-card" style="border-left:3px solid #8b5cf6">
+<div class="stat-card" style="background:rgba(124,58,237,0.08)">
 <div class="label">Orders This Week</div>
-<div class="value" id="ordWeek">—</div>
+<div class="value" style="color:#7c3aed" id="ordWeek">—</div>
 <div class="change" id="ordWeekChg"></div>
 </div>
-<div class="stat-card" style="border-left:3px solid #8b5cf6">
+<div class="stat-card" style="background:rgba(124,58,237,0.06)">
 <div class="label">Revenue This Week</div>
-<div class="value" id="revWeek">—</div>
+<div class="value" style="color:#7c3aed" id="revWeek">—</div>
 <div class="change" id="revWeekChg"></div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--accent)">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">Orders This Month</div>
-<div class="value" id="ordMonth">—</div>
+<div class="value" style="color:#2563eb" id="ordMonth">—</div>
 <div class="change" id="ordMonthChg"></div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--accent)">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">Revenue This Month</div>
-<div class="value" id="revMonth">—</div>
+<div class="value" style="color:#1d4ed8" id="revMonth">—</div>
 <div class="change" id="revMonthChg"></div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--info)">
+<div class="stat-card" style="background:rgba(8,145,178,0.08)">
 <div class="label">Avg Order Value</div>
-<div class="value" id="ordAvgWeek">—</div>
+<div class="value" style="color:#0891b2" id="ordAvgWeek">—</div>
 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:3px">This week</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--warn)">
+<div class="stat-card" style="background:rgba(202,138,4,0.08)">
 <div class="label">Pending Action</div>
 <div class="value" id="ordAction" style="font-size:1.5rem">—</div>
 <div style="font-size:0.75rem; color:var(--text-muted); margin-top:5px" id="ordActionSub">Unfulfilled / Pending Pay</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--danger)">
+<div class="stat-card" style="background:rgba(220,38,38,0.08)">
 <div class="label">Cancelled / Failed</div>
 <div class="value" id="ordCancelled">—</div>
 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:3px">This month</div>
@@ -2627,21 +2635,21 @@ Select a financial report above to begin analysis.
 <h1>Customers</h1>
 </div>
 <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
-<div class="stat-card" style="border-left:3px solid var(--primary-color)">
+<div class="stat-card" style="background:rgba(124,58,237,0.08)">
 <div class="label">Total Customers</div>
 <div class="value" id="custTotal">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid #a78bfa">
+<div class="stat-card" style="background:rgba(124,58,237,0.06)">
 <div class="label">🏢 B2B Customers</div>
 <div class="value" id="custB2B">—</div>
 <div style="font-size:0.7rem;color:var(--text-muted)" id="custB2Bpct"></div>
 </div>
-<div class="stat-card" style="border-left:3px solid #4ade80">
+<div class="stat-card" style="background:rgba(22,163,74,0.08)">
 <div class="label">🛒 B2C Customers</div>
 <div class="value" id="custB2C">—</div>
 <div style="font-size:0.7rem;color:var(--text-muted)" id="custB2Cpct"></div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--accent)">
+<div class="stat-card" style="background:rgba(22,163,74,0.08)">
 <div class="label">💰 Total Revenue</div>
 <div class="value" id="custTotalRev">—</div>
 </div>
@@ -2653,17 +2661,17 @@ Select a financial report above to begin analysis.
 <div class="label">Avg Spend/Customer</div>
 <div class="value" id="custAvgSpend">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid #fbbf24">
+<div class="stat-card" style="background:rgba(202,138,4,0.08)">
 <div class="label">🏆 Top Spender</div>
 <div class="value" id="custTopName" style="font-size:0.95rem">—</div>
 <div style="font-size:0.75rem;color:var(--accent)" id="custTopVal"></div>
 </div>
-<div class="stat-card" style="border-left:3px solid #60a5fa">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">🔁 Repeat Buyers</div>
 <div class="value" id="custRepeat">—</div>
 <div style="font-size:0.7rem;color:var(--text-muted)" id="custRepeatPct"></div>
 </div>
-<div class="stat-card" style="border-left:3px solid #22d3ee">
+<div class="stat-card" style="background:rgba(8,145,178,0.08)">
 <div class="label">🆕 New (Last 30d)</div>
 <div class="value" id="custNew30">—</div>
 </div>
@@ -2799,10 +2807,10 @@ Select a financial report above to begin analysis.
 <button class="btn btn-primary" onclick="loadBackorders()">↻ Refresh</button>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px">
-<div class="stat-card" style="border-left:3px solid #f59e0b"><div class="label">Pending Backorder Items</div><div class="value" id="boTotalItems">—</div></div>
-<div class="stat-card" style="border-left:3px solid var(--danger)"><div class="label">Orders with Backorders</div><div class="value" id="boTotalOrders">—</div></div>
-<div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Total Value Pending</div><div class="value" id="boTotalValue">—</div></div>
-<div class="stat-card" style="border-left:3px solid var(--info)"><div class="label">Oldest Backorder</div><div class="value" id="boOldest">—</div></div>
+<div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">Pending Backorder Items</div><div class="value" style="color:#ca8a04" id="boTotalItems">—</div></div>
+<div class="stat-card" style="background:rgba(220,38,38,0.08)"><div class="label">Orders with Backorders</div><div class="value" style="color:#dc2626" id="boTotalOrders">—</div></div>
+<div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Total Value Pending</div><div class="value" style="color:#16a34a" id="boTotalValue">—</div></div>
+<div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Oldest Backorder</div><div class="value" style="color:#2563eb" id="boOldest">—</div></div>
 </div>
 <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
 <input type="text" id="boSearch" placeholder="Search customer or product..." oninput="filterBackorders()" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text)">
@@ -2912,10 +2920,10 @@ Select a financial report above to begin analysis.
 <div>Credit Memos: <span id="recCreditMemos" style="font-weight:600;color:#dc2626">—</span></div>
 </div></div></div>
 <div id="receivablesSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px">
-<div class="stat-card" style="border-left:3px solid var(--danger)"><div class="label">Total Pending (qb_balance)</div><div class="value" id="recTotalPending">—</div></div>
-<div class="stat-card" style="border-left:3px solid #f59e0b"><div class="label">Overdue (>30d)</div><div class="value" id="recOverdue">—</div></div>
-<div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Pending Orders</div><div class="value" id="recOrderCount">—</div></div>
-<div class="stat-card" style="border-left:3px solid var(--info)"><div class="label">Customers with Balance</div><div class="value" id="recCustomerCount">—</div></div>
+<div class="stat-card" style="background:rgba(220,38,38,0.08)"><div class="label">Total Pending (qb_balance)</div><div class="value" id="recTotalPending">—</div></div>
+<div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">Overdue (>30d)</div><div class="value" id="recOverdue">—</div></div>
+<div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Pending Orders</div><div class="value" id="recOrderCount">—</div></div>
+<div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Customers with Balance</div><div class="value" id="recCustomerCount">—</div></div>
 </div>
 <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
 <input type="text" id="recSearch" placeholder="Search customer..." oninput="filterReceivables()" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text)">
@@ -3093,27 +3101,27 @@ Select a financial report above to begin analysis.
 <div class="label">Total Units</div>
 <div class="value" id="statTotalUnits">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--accent)">
+<div class="stat-card" style="background:rgba(22,163,74,0.08)">
 <div class="label">Stock Value (EUR)</div>
 <div class="value" id="stkTotalValue">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid #a78bfa">
+<div class="stat-card" style="background:rgba(124,58,237,0.06)">
 <div class="label">B2B Stock Value</div>
 <div class="value" id="stkTotalValueB2B">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid #f59e0b">
+<div class="stat-card" style="background:rgba(202,138,4,0.08)">
 <div class="label">Stock Value (Cost)</div>
 <div class="value" id="stkTotalValueCost">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--info)">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">Avg. Stock / Product</div>
 <div class="value" id="stkAvgStock">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--warn)">
+<div class="stat-card" style="background:rgba(202,138,4,0.08)">
 <div class="label">Low Stock (&lt;10)</div>
 <div class="value" id="statLowStockCount">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--danger)">
+<div class="stat-card" style="background:rgba(220,38,38,0.08)">
 <div class="label">Out of Stock</div>
 <div class="value" id="statOutStockCount">—</div>
 </div>
@@ -3355,23 +3363,23 @@ style="font-size:0.8rem;padding:4px 8px">
 <div class="label">Total POs</div>
 <div class="value" id="poStatTotal">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--info)">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">Draft</div>
 <div class="value" id="poStatDraft">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--warn)">
+<div class="stat-card" style="background:rgba(202,138,4,0.08)">
 <div class="label">Ordered</div>
 <div class="value" id="poStatOrdered">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid #a78bfa">
+<div class="stat-card" style="background:rgba(124,58,237,0.06)">
 <div class="label">Partial</div>
 <div class="value" id="poStatPartial">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--accent)">
+<div class="stat-card" style="background:rgba(22,163,74,0.08)">
 <div class="label">Received</div>
 <div class="value" id="poStatReceived">—</div>
 </div>
-<div class="stat-card" style="border-left:3px solid var(--accent)">
+<div class="stat-card" style="background:rgba(22,163,74,0.08)">
 <div class="label">Total Value</div>
 <div class="value" id="poStatValue">—</div>
 </div>
@@ -4182,7 +4190,7 @@ placeholder="Optional description"></div>
 <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input
 type="checkbox" id="discountActive" checked style="width:18px;height:18px;accent-color:var(--accent)">
 Active</label>
-<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 14px;border:2px solid #059669;border-radius:8px;background:#ecfdf5"><input
+<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 14px;border:2px solid #059669;border-radius:8px;background:rgba(22,163,74,0.1)"><input
 type="checkbox" id="discountFreeShipping" style="width:18px;height:18px;accent-color:#059669">
 🚚 Free Delivery</label>
 </div>
@@ -4493,15 +4501,15 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 </div>
 </div>
 <div class="stats-grid" style="margin-bottom:20px;grid-template-columns:1fr 1fr 1fr 1fr">
-<div class="stat-card" style="border-left:3px solid var(--accent)">
+<div class="stat-card" style="background:rgba(22,163,74,0.08)">
 <div class="label">Last Year</div>
 <div class="value" id="cpStatsLastYear">0 ped · €0</div>
 </div>
-<div class="stat-card" style="border-left:3px solid #60a5fa">
+<div class="stat-card" style="background:rgba(37,99,235,0.08)">
 <div class="label">Last 6 Months</div>
 <div class="value" id="cpStatsLast6Months">0 ped · €0</div>
 </div>
-<div class="stat-card" style="border-left:3px solid #a78bfa">
+<div class="stat-card" style="background:rgba(124,58,237,0.06)">
 <div class="label">Largest Order</div>
 <div class="value" id="cpStatsLargestOrder">€0.00</div>
 </div>
@@ -5367,7 +5375,7 @@ Loading items...
       const curLabel = { thisMonth:'This Month', lastMonth:'Last Month', quarter:'Last 3 Months', semester:'Last 6 Months', year:'Last 12 Months', all:'All Time', custom:'Custom Period' }[currentFinancePeriod] || 'All Time';
 
       wrap.innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--accent)">
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)">
           <div class="label">Total Revenue (${curLabel})</div>
           <div class="value" style="color:var(--accent)">${fmt(curStats.rev)}</div>
           <div style="font-size:0.75rem;color:var(--text-muted)">${curStats.ord} paid orders</div>
@@ -5770,10 +5778,10 @@ Loading items...
 
       out.innerHTML = `
         <div class="stats-grid" style="margin-bottom:16px">
-          <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
-          <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="label">Total Orders</div><div class="value">${totalOrd}</div></div>
-          <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="label">Items Sold</div><div class="value">${totalQty}</div></div>
-          <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="label">Avg Order Value</div><div class="value">€${avgOrd.toFixed(2)}</div></div>
+          <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+          <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="label">Total Orders</div><div class="value">${totalOrd}</div></div>
+          <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Items Sold</div><div class="value">${totalQty}</div></div>
+          <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">Avg Order Value</div><div class="value">€${avgOrd.toFixed(2)}</div></div>
         </div>
         <div style="background:var(--card-bg);border-radius:8px;padding:16px;border:1px solid var(--border);margin-bottom:16px">
           <canvas id="finMainChart" height="280"></canvas>
@@ -5849,10 +5857,10 @@ Loading items...
 
       out.innerHTML = `
         <div class="stats-grid" style="margin-bottom:16px">
-          <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toFixed(2)}</div></div>
+          <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toFixed(2)}</div></div>
           <div class="stat-card" style="border-left:3px solid #16a34a"><div class="label">Total Profit</div><div class="value" style="color:#16a34a">€${totalProfit.toFixed(2)}</div><div style="font-size:0.75rem;color:var(--text-muted)">Margin: ${totalRev>0?((totalProfit/totalRev)*100).toFixed(1):'0.0'}%</div></div>
-          <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="label">${field==='brand_name'?'Brands':'Categories'}</div><div class="value">${sorted.length}</div></div>
-          <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="label">#1 ${field==='brand_name'?'Brand':'Category'}</div><div class="value" style="font-size:0.95rem">${top10[0]?top10[0][0]:'—'}</div><div style="font-size:0.75rem;color:var(--accent)">${top10[0]?'€'+top10[0][1].rev.toFixed(2):''}</div></div>
+          <div class="stat-card" style="background:rgba(124,58,237,0.06)"><div class="label">${field==='brand_name'?'Brands':'Categories'}</div><div class="value">${sorted.length}</div></div>
+          <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">#1 ${field==='brand_name'?'Brand':'Category'}</div><div class="value" style="font-size:0.95rem">${top10[0]?top10[0][0]:'—'}</div><div style="font-size:0.75rem;color:var(--accent)">${top10[0]?'€'+top10[0][1].rev.toFixed(2):''}</div></div>
         </div>
         <div style="background:var(--card-bg);border-radius:8px;padding:16px;border:1px solid var(--border);margin-bottom:16px">
           <canvas id="finMainChart" height="300"></canvas>
@@ -5917,9 +5925,9 @@ Loading items...
 
       out.innerHTML = `
         <div class="stats-grid" style="margin-bottom:16px">
-          <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toFixed(2)}</div></div>
-          <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="label">Unique Products</div><div class="value">${sorted.length}</div></div>
-          <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="label">#1 Product</div><div class="value" style="font-size:0.85rem">${top20ForChart[0]?top20ForChart[0][0].slice(0,30):'—'}</div><div style="font-size:0.75rem;color:var(--accent)">${top20ForChart[0]?'€'+top20ForChart[0][1].rev.toFixed(2):''}</div></div>
+          <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toFixed(2)}</div></div>
+          <div class="stat-card" style="background:rgba(124,58,237,0.06)"><div class="label">Unique Products</div><div class="value">${sorted.length}</div></div>
+          <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">#1 Product</div><div class="value" style="font-size:0.85rem">${top20ForChart[0]?top20ForChart[0][0].slice(0,30):'—'}</div><div style="font-size:0.75rem;color:var(--accent)">${top20ForChart[0]?'€'+top20ForChart[0][1].rev.toFixed(2):''}</div></div>
           <div class="stat-card"><div class="label">Top 20 Revenue Share</div><div class="value">${totalRev>0?((top20ForChart.reduce((s,e)=>s+e[1].rev,0)/totalRev)*100).toFixed(1):0}%</div></div>
         </div>
         <div style="background:var(--card-bg);border-radius:8px;padding:16px;border:1px solid var(--border);margin-bottom:16px">
@@ -5982,9 +5990,9 @@ Loading items...
 
         out.innerHTML = `
           <div class="stats-grid" style="margin-bottom:16px">
-            <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toFixed(2)}</div></div>
-            <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="label">Orders</div><div class="value">${paid.length}</div></div>
-            <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="label">Sources</div><div class="value">${sorted.length}</div></div>
+            <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toFixed(2)}</div></div>
+            <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Orders</div><div class="value">${paid.length}</div></div>
+            <div class="stat-card" style="background:rgba(124,58,237,0.06)"><div class="label">Sources</div><div class="value">${sorted.length}</div></div>
           </div>
           <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
             <div style="flex:1;min-width:280px;background:var(--card-bg);border-radius:8px;padding:16px;border:1px solid var(--border)"><canvas id="finMainChart" height="250"></canvas></div>
@@ -6042,9 +6050,9 @@ Loading items...
 
         out.innerHTML = `
           <div class="stats-grid" style="margin-bottom:16px">
-            <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Overall AOV</div><div class="value" style="color:var(--accent)">€${overallAvg.toFixed(2)}</div></div>
-            <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="label">Total Orders</div><div class="value">${paid.length}</div></div>
-            <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="label">Best Month AOV</div><div class="value">€${best?best.avg.toFixed(2):'—'}</div><div style="font-size:0.7rem;color:var(--text-muted)">${best?best.label:''}</div></div>
+            <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Overall AOV</div><div class="value" style="color:var(--accent)">€${overallAvg.toFixed(2)}</div></div>
+            <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Total Orders</div><div class="value">${paid.length}</div></div>
+            <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">Best Month AOV</div><div class="value">€${best?best.avg.toFixed(2):'—'}</div><div style="font-size:0.7rem;color:var(--text-muted)">${best?best.label:''}</div></div>
             <div class="stat-card"><div class="label">Months Analysed</div><div class="value">${months.length}</div></div>
           </div>
           <div style="background:var(--card-bg);border-radius:8px;padding:16px;border:1px solid var(--border);margin-bottom:16px">
@@ -6117,10 +6125,10 @@ Loading items...
       const avgO = totC > 0 ? totR/totC : 0;
 
       document.getElementById('finMonthKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Revenue</div><div class="value" style="color:var(--accent)">€${totR.toFixed(2)}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="label">Orders</div><div class="value">${totC}</div></div>
-        <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="label">AOV</div><div class="value">€${avgO.toFixed(2)}</div></div>
-        <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="label">Active Days</div><div class="value">${actD}<span style="font-size:0.7rem;color:var(--text-muted)"> / ${lastDay}</span></div></div>`;
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Revenue</div><div class="value" style="color:var(--accent)">€${totR.toFixed(2)}</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="label">Orders</div><div class="value">${totC}</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">AOV</div><div class="value">€${avgO.toFixed(2)}</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Active Days</div><div class="value">${actD}<span style="font-size:0.7rem;color:var(--text-muted)"> / ${lastDay}</span></div></div>`;
 
       finMCtx.dayData = dayData;
 
@@ -6186,7 +6194,7 @@ Loading items...
       const kpi=document.getElementById('finMonthKPIs');
       const old=document.getElementById('fmYoYCard');if(old)old.remove();
       kpi.insertAdjacentHTML('beforeend',`
-        <div class="stat-card" id="fmYoYCard" style="border-left:3px solid #fbbf24;grid-column:span 2">
+        <div class="stat-card" id="fmYoYCard" style="background:rgba(202,138,4,0.08);grid-column:span 2">
           <div class="label">📊 vs ${MONTH_FULL[mo-1]} ${pyr}</div>
           <div style="display:flex;gap:20px;margin-top:6px">
             <div><span style="font-size:0.75rem;color:var(--text-muted)">Revenue</span><br>
@@ -6360,14 +6368,14 @@ Loading items...
       const bounceRate = pv.length>0 ? ((bounceEst/pv.length)*100).toFixed(1) : '0.0';
 
       document.getElementById('saKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="stat-value">${pv.length.toLocaleString()}</div><div class="stat-label">Page Views</div></div>
-        <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="stat-value">${sessions.toLocaleString()}</div><div class="stat-label">Sessions</div></div>
-        <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="stat-value">${avgTime}s</div><div class="stat-label">Avg Time on Page</div></div>
-        <div class="stat-card" style="border-left:3px solid #22d3ee"><div class="stat-value">${avgScroll}%</div><div class="stat-label">Avg Scroll Depth</div></div>
-        <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">${prodViews.toLocaleString()}</div><div class="stat-label">Product Views</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="stat-value">${pv.length.toLocaleString()}</div><div class="stat-label">Page Views</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="stat-value">${sessions.toLocaleString()}</div><div class="stat-label">Sessions</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.06)"><div class="stat-value">${avgTime}s</div><div class="stat-label">Avg Time on Page</div></div>
+        <div class="stat-card" style="background:rgba(8,145,178,0.08)"><div class="stat-value">${avgScroll}%</div><div class="stat-label">Avg Scroll Depth</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="stat-value">${prodViews.toLocaleString()}</div><div class="stat-label">Product Views</div></div>
         <div class="stat-card" style="border-left:3px solid #f472b6"><div class="stat-value">${addCarts}</div><div class="stat-label">Add to Cart</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="stat-value">${convRate}%</div><div class="stat-label">Conversion Rate</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--danger)"><div class="stat-value">${bounceRate}%</div><div class="stat-label">Bounce Rate (est.)</div></div>`;
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="stat-value">${convRate}%</div><div class="stat-label">Conversion Rate</div></div>
+        <div class="stat-card" style="background:rgba(220,38,38,0.08)"><div class="stat-value">${bounceRate}%</div><div class="stat-label">Bounce Rate (est.)</div></div>`;
 
       // Daily chart
       const daily = {};
@@ -6412,9 +6420,9 @@ Loading items...
       const totalViews = pv.length;
 
       document.getElementById('saKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="stat-value">${sorted.length}</div><div class="stat-label">Unique Pages</div></div>
-        <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="stat-value">${totalViews.toLocaleString()}</div><div class="stat-label">Total Page Views</div></div>
-        <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">${sorted[0]?sorted[0][0]:'-'}</div><div class="stat-label">Most Visited Page</div></div>`;
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="stat-value">${sorted.length}</div><div class="stat-label">Unique Pages</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="stat-value">${totalViews.toLocaleString()}</div><div class="stat-label">Total Page Views</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="stat-value">${sorted[0]?sorted[0][0]:'-'}</div><div class="stat-label">Most Visited Page</div></div>`;
 
       const ctx = document.getElementById('saChart').getContext('2d');
       const colors = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa','#22d3ee','#fb923c','#e879f9','#34d399','#f87171'];
@@ -6464,9 +6472,9 @@ Loading items...
       const top20 = sorted.slice(0,20);
 
       document.getElementById('saKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="stat-value">${sorted.length}</div><div class="stat-label">Products Interacted</div></div>
-        <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="stat-value">${pe.filter(r=>r.event_type==='view').length}</div><div class="stat-label">Product Views</div></div>
-        <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">${pe.filter(r=>r.event_type==='click').length}</div><div class="stat-label">Product Clicks</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="stat-value">${sorted.length}</div><div class="stat-label">Products Interacted</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="stat-value">${pe.filter(r=>r.event_type==='view').length}</div><div class="stat-label">Product Views</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="stat-value">${pe.filter(r=>r.event_type==='click').length}</div><div class="stat-label">Product Clicks</div></div>
         <div class="stat-card" style="border-left:3px solid #f472b6"><div class="stat-value">${pe.filter(r=>r.event_type==='add_to_cart').length}</div><div class="stat-label">Add to Cart Events</div></div>`;
 
       const ctx = document.getElementById('saChart').getContext('2d');
@@ -6536,9 +6544,9 @@ Loading items...
 
       const totalViews = arr.reduce((s,b) => s + b.views, 0);
       document.getElementById('saKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="stat-value">${sorted.length}</div><div class="stat-label">Brands with traffic</div></div>
-        <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="stat-value">${totalViews}</div><div class="stat-label">Total product views</div></div>
-        <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">${top10[0]?top10[0].name.slice(0,18):'-'}</div><div class="stat-label">Top brand by views</div></div>`;
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="stat-value">${sorted.length}</div><div class="stat-label">Brands with traffic</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="stat-value">${totalViews}</div><div class="stat-label">Total product views</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="stat-value">${top10[0]?top10[0].name.slice(0,18):'-'}</div><div class="stat-label">Top brand by views</div></div>`;
 
       const ctx = document.getElementById('saChart').getContext('2d');
       if(saChart1){saChart1.destroy();saChart1=null;} else { const _ex=Chart.getChart(ctx.canvas); if(_ex)_ex.destroy(); }
@@ -6607,9 +6615,9 @@ Loading items...
       const totalViews = arr.reduce((s,c) => s + c.views, 0);
 
       document.getElementById('saKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="stat-value">${sorted.length}</div><div class="stat-label">Categories with traffic</div></div>
-        <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="stat-value">${totalViews}</div><div class="stat-label">Total product views</div></div>
-        <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">${top10[0]?top10[0].name.slice(0,18):'-'}</div><div class="stat-label">Top category</div></div>`;
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="stat-value">${sorted.length}</div><div class="stat-label">Categories with traffic</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="stat-value">${totalViews}</div><div class="stat-label">Total product views</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="stat-value">${top10[0]?top10[0].name.slice(0,18):'-'}</div><div class="stat-label">Top category</div></div>`;
 
       const ctx = document.getElementById('saChart').getContext('2d');
       if(saChart1){saChart1.destroy();saChart1=null;} else { const _ex=Chart.getChart(ctx.canvas); if(_ex)_ex.destroy(); }
@@ -6649,9 +6657,9 @@ Loading items...
       const totalViews = pv.length;
 
       document.getElementById('saKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="stat-value">${sorted.length}</div><div class="stat-label">Traffic Sources</div></div>
-        <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="stat-value">${sorted[0]?sorted[0][0]:'-'}</div><div class="stat-label">#1 Source</div></div>
-        <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">${sorted[0]?((sorted[0][1].views/totalViews)*100).toFixed(1)+'%':'-'}</div><div class="stat-label">#1 Source Share</div></div>`;
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="stat-value">${sorted.length}</div><div class="stat-label">Traffic Sources</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="stat-value">${sorted[0]?sorted[0][0]:'-'}</div><div class="stat-label">#1 Source</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="stat-value">${sorted[0]?((sorted[0][1].views/totalViews)*100).toFixed(1)+'%':'-'}</div><div class="stat-label">#1 Source Share</div></div>`;
 
       const colors = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa','#22d3ee','#fb923c','#e879f9','#34d399','#f87171'];
       const ctx = document.getElementById('saChart').getContext('2d');
@@ -6700,10 +6708,10 @@ Loading items...
       const mobileShare = byDevice['mobile'] ? ((byDevice['mobile']/pv.length)*100).toFixed(1) : '0.0';
 
       document.getElementById('saKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="stat-value">${devSorted[0]?devSorted[0][0]:'-'}</div><div class="stat-label">Top Device</div></div>
-        <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="stat-value">${mobileShare}%</div><div class="stat-label">Mobile Share</div></div>
-        <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">${brSorted[0]?brSorted[0][0]:'-'}</div><div class="stat-label">Top Browser</div></div>
-        <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="stat-value">${osSorted[0]?osSorted[0][0]:'-'}</div><div class="stat-label">Top OS</div></div>`;
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="stat-value">${devSorted[0]?devSorted[0][0]:'-'}</div><div class="stat-label">Top Device</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="stat-value">${mobileShare}%</div><div class="stat-label">Mobile Share</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="stat-value">${brSorted[0]?brSorted[0][0]:'-'}</div><div class="stat-label">Top Browser</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.06)"><div class="stat-value">${osSorted[0]?osSorted[0][0]:'-'}</div><div class="stat-label">Top OS</div></div>`;
 
       const colors = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa'];
       const ctx = document.getElementById('saChart').getContext('2d');
@@ -6751,10 +6759,10 @@ Loading items...
       const funnelConv = ((totalPurchases/viewCarts)*100).toFixed(1);
 
       document.getElementById('saKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="stat-value">${fe.length}</div><div class="stat-label">Total Funnel Events</div></div>
-        <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="stat-value">${totalPurchases}</div><div class="stat-label">Purchases</div></div>
-        <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">€${avgCartVal}</div><div class="stat-label">Avg Cart Value</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="stat-value">${funnelConv}%</div><div class="stat-label">Funnel Conversion</div></div>`;
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="stat-value">${fe.length}</div><div class="stat-label">Total Funnel Events</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="stat-value">${totalPurchases}</div><div class="stat-label">Purchases</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="stat-value">€${avgCartVal}</div><div class="stat-label">Avg Cart Value</div></div>
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="stat-value">${funnelConv}%</div><div class="stat-label">Funnel Conversion</div></div>`;
 
       const funnelColors = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa'];
       const ctx = document.getElementById('saChart').getContext('2d');
@@ -6805,12 +6813,12 @@ Loading items...
       const returning = pv.length - firstVisits;
 
       document.getElementById('saKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="stat-value">${totalSessions.toLocaleString()}</div><div class="stat-label">Total Sessions</div></div>
-        <div class="stat-card" style="border-left:3px solid #60a5fa"><div class="stat-value">${avgPages}</div><div class="stat-label">Avg Pages/Session</div></div>
-        <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="stat-value">${avgSessionTime}s</div><div class="stat-label">Avg Session Duration</div></div>
-        <div class="stat-card" style="border-left:3px solid #22d3ee"><div class="stat-value">${countrySorted[0]?countrySorted[0][0]:'-'}</div><div class="stat-label">Top Country</div></div>
-        <div class="stat-card" style="border-left:3px solid #fbbf24"><div class="stat-value">${citySorted[0]?citySorted[0][0]:'-'}</div><div class="stat-label">Top City</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="stat-value">${firstVisits}</div><div class="stat-label">First-time Views</div></div>`;
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="stat-value">${totalSessions.toLocaleString()}</div><div class="stat-label">Total Sessions</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="stat-value">${avgPages}</div><div class="stat-label">Avg Pages/Session</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.06)"><div class="stat-value">${avgSessionTime}s</div><div class="stat-label">Avg Session Duration</div></div>
+        <div class="stat-card" style="background:rgba(8,145,178,0.08)"><div class="stat-value">${countrySorted[0]?countrySorted[0][0]:'-'}</div><div class="stat-label">Top Country</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="stat-value">${citySorted[0]?citySorted[0][0]:'-'}</div><div class="stat-label">Top City</div></div>
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="stat-value">${firstVisits}</div><div class="stat-label">First-time Views</div></div>`;
 
       // City chart
       const colors = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa','#22d3ee','#fb923c','#e879f9','#34d399','#f87171'];
@@ -9228,13 +9236,13 @@ Loading items...
       const totalValueB2B = products.reduce((s, p) => s + ((p.wholesale_price_eur != null && p.wholesale_price_eur > 0 ? p.wholesale_price_eur : p.price_eur || 0) * (p.stock_quantity || 0)), 0);
       const totalValueCost = products.reduce((s, p) => s + ((p.cost_price_eur || 0) * (p.stock_quantity || 0)), 0);
       kpiEl.innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Products</div><div class="value">${products.length}</div></div>
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Products</div><div class="value">${products.length}</div></div>
         <div class="stat-card"><div class="label">Unidades</div><div class="value">${totalUnits.toLocaleString()}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Value (EUR)</div><div class="value">€${totalValue.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
-        <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="label">Value B2B</div><div class="value">€${totalValueB2B.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
-        <div class="stat-card" style="border-left:3px solid #f59e0b"><div class="label">Value Cost</div><div class="value">€${totalValueCost.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--warn)"><div class="label">Low Stock</div><div class="value">${data.low || 0}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--danger)"><div class="label">Out of Stock</div><div class="value">${data.out || 0}</div></div>
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Value (EUR)</div><div class="value">€${totalValue.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.06)"><div class="label">Value B2B</div><div class="value">€${totalValueB2B.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">Value Cost</div><div class="value">€${totalValueCost.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">Low Stock</div><div class="value">${data.low || 0}</div></div>
+        <div class="stat-card" style="background:rgba(220,38,38,0.08)"><div class="label">Out of Stock</div><div class="value">${data.out || 0}</div></div>
       `;
       const byValue = [...products].sort((a, b) => {
         const va = (a.price_eur || 0) * (a.stock_quantity || 0);
@@ -9282,10 +9290,10 @@ Loading items...
         <div class="stat-card"><div class="label">SKU</div><div class="value" style="font-size:0.85rem">${esc(p.sku || '—')}</div></div>
         <div class="stat-card"><div class="label">Brand</div><div class="value" style="font-size:0.85rem">${esc(p.brands?.name || '—')}</div></div>
         <div class="stat-card"><div class="label">Category</div><div class="value" style="font-size:0.85rem">${esc(p.categories?.name || '—')}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Price (EUR)</div><div class="value">€${(p.price_eur || 0).toFixed(2)}</div></div>
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Price (EUR)</div><div class="value">€${(p.price_eur || 0).toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">B2B Price</div><div class="value">€${(p.wholesale_price_eur || p.price_eur || 0).toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">Cost</div><div class="value">€${(p.cost_price_eur || 0).toFixed(2)}</div></div>
-        <div class="stat-card" style="border-left:3px solid #4ade80"><div class="label">Stock</div><div class="value">${p.stock_quantity || 0}</div></div>
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Stock</div><div class="value">${p.stock_quantity || 0}</div></div>
         <div class="stat-card"><div class="label">Stock Value (retail)</div><div class="value">€${val.toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">Stock Value B2B</div><div class="value">€${valB2B.toFixed(2)}</div></div>
         <div class="stat-card"><div class="label">Stock Value (cost)</div><div class="value">€${valCost.toFixed(2)}</div></div>
@@ -9325,7 +9333,7 @@ Loading items...
           <div class="stat-card"><div class="label">30 days</div><div class="value">${q30} un. · €${v30.toFixed(2)}</div></div>
           <div class="stat-card"><div class="label">90 days</div><div class="value">${q90} un. · €${v90.toFixed(2)}</div></div>
           <div class="stat-card"><div class="label">180 days</div><div class="value">${q180} un. · €${v180.toFixed(2)}</div></div>
-          <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Total</div><div class="value">${qL} un. · €${vL.toFixed(2)}</div></div>
+          <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Total</div><div class="value">${qL} un. · €${vL.toFixed(2)}</div></div>
         `;
 
         const sorted = items.slice().sort((a, b) => new Date(b.orders?.created_at || 0) - new Date(a.orders?.created_at || 0));
@@ -10576,11 +10584,11 @@ Loading items...
 
       // KPIs
       document.getElementById('monthDetailKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toFixed(2)}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="label">Total Orders</div><div class="value">${totalOrd}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--info)"><div class="label">Avg Order</div><div class="value">€${avg}</div></div>
-        <div class="stat-card" style="border-left:3px solid #8b5cf6"><div class="label">${avgLabel}</div><div class="value">€${avgVal}</div><div style="font-size:0.7rem;color:var(--text-muted)">${activeBuckets} ${activeLabel}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--warn)"><div class="label">${bestLabel}</div><div class="value">${bestObj ? bestObj.label : '-'}</div><div style="font-size:0.7rem;color:var(--text-muted)">€${bestObj ? bestObj.revenue.toFixed(2) : '0'} (${bestObj ? bestObj.orders : 0} orders)</div></div>
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toFixed(2)}</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="label">Total Orders</div><div class="value">${totalOrd}</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Avg Order</div><div class="value">€${avg}</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="label">${avgLabel}</div><div class="value">€${avgVal}</div><div style="font-size:0.7rem;color:var(--text-muted)">${activeBuckets} ${activeLabel}</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">${bestLabel}</div><div class="value">${bestObj ? bestObj.label : '-'}</div><div style="font-size:0.7rem;color:var(--text-muted)">€${bestObj ? bestObj.revenue.toFixed(2) : '0'} (${bestObj ? bestObj.orders : 0} orders)</div></div>
       `;
 
       // Save context for YoY comparison (all bucket types: day, week, fortnight, month)
@@ -10762,7 +10770,7 @@ Loading items...
       const existingYoY = document.getElementById('yoySummaryCard');
       if (existingYoY) existingYoY.remove();
       kpiDiv.insertAdjacentHTML('beforeend', `
-        <div class="stat-card" id="yoySummaryCard" style="border-left:3px solid #fbbf24;grid-column:span 2">
+        <div class="stat-card" id="yoySummaryCard" style="background:rgba(202,138,4,0.08);grid-column:span 2">
           <div class="label">📊 vs ${periodLabel}</div>
           <div style="display:flex;gap:20px;margin-top:6px">
             <div><span style="font-size:0.75rem;color:var(--text-muted)">Revenue</span><br><span style="font-weight:700;color:${revUp?'var(--accent)':'var(--danger)'}">${revUp?'▲':'▼'} ${revChange}%</span><span style="font-size:0.75rem;color:var(--text-muted)"> (€${prevTotal.toFixed(0)} → €${curTotal.toFixed(0)})</span></div>
@@ -10923,10 +10931,10 @@ Loading items...
       const best=monthData.slice().sort((a,b)=>b.r-a.r)[0];
       const bucketLabel = (rptCtx.bucketType==='day') ? 'Day' : (rptCtx.bucketType==='week') ? 'Week' : (rptCtx.bucketType==='fortnight') ? 'Fortnight' : 'Month';
       document.getElementById('reportDetailKPIs').innerHTML=`
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${tRev.toFixed(2)}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="label">Total ${cLabel}</div><div class="value">${tCnt}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--info)"><div class="label">Avg / ${bucketLabel}</div><div class="value">€${avgBuckets.toFixed(0)}</div><div style="font-size:0.7rem;color:var(--text-muted)">${actBuckets} active</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--warn)"><div class="label">Best ${bucketLabel}</div><div class="value">${best?best.label:'—'}</div><div style="font-size:0.7rem;color:var(--text-muted)">€${best?best.r.toFixed(2):'0'}</div></div>`;
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${tRev.toFixed(2)}</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="label">Total ${cLabel}</div><div class="value">${tCnt}</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Avg / ${bucketLabel}</div><div class="value">€${avgBuckets.toFixed(0)}</div><div style="font-size:0.7rem;color:var(--text-muted)">${actBuckets} active</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">Best ${bucketLabel}</div><div class="value">${best?best.label:'—'}</div><div style="font-size:0.7rem;color:var(--text-muted)">€${best?best.r.toFixed(2):'0'}</div></div>`;
       const ctx=document.getElementById('reportDetailChart').getContext('2d');
       rptChart=new Chart(ctx,{type:'bar',data:{labels:monthData.map(d=>d.label),datasets:[
         {label:'Revenue (€)',data:monthData.map(d=>d.r),backgroundColor:'rgba(74,222,128,0.6)',borderColor:'#4ade80',borderWidth:1,borderRadius:3,yAxisID:'y'},
@@ -11040,7 +11048,7 @@ Loading items...
       const rPct=pR>0?(((curR-pR)/pR)*100).toFixed(1):'∞';const cPct=pC>0?(((curC-pC)/pC)*100).toFixed(1):'∞';
       const rUp=curR>=pR,cUp=curC>=pC;
       const kpi=document.getElementById('reportDetailKPIs');const old=document.getElementById('rptYoYCard');if(old)old.remove();
-      kpi.insertAdjacentHTML('beforeend',`<div class="stat-card" id="rptYoYCard" style="border-left:3px solid #fbbf24;grid-column:span 2"><div class="label">📊 vs Same period ${prevYearLabel}</div><div style="display:flex;gap:20px;margin-top:6px"><div><span style="font-size:0.75rem;color:var(--text-muted)">Revenue</span><br><span style="font-weight:700;color:${rUp?'var(--accent)':'var(--danger)'}">${rUp?'▲':'▼'} ${rPct}%</span><span style="font-size:0.75rem;color:var(--text-muted)"> (€${pR.toFixed(0)} → €${curR.toFixed(0)})</span></div><div><span style="font-size:0.75rem;color:var(--text-muted)">${cLabel}</span><br><span style="font-weight:700;color:${cUp?'var(--accent)':'var(--danger)'}">${cUp?'▲':'▼'} ${cPct}%</span><span style="font-size:0.75rem;color:var(--text-muted)"> (${pC} → ${curC})</span></div></div></div>`);
+      kpi.insertAdjacentHTML('beforeend',`<div class="stat-card" id="rptYoYCard" style="background:rgba(202,138,4,0.08);grid-column:span 2"><div class="label">📊 vs Same period ${prevYearLabel}</div><div style="display:flex;gap:20px;margin-top:6px"><div><span style="font-size:0.75rem;color:var(--text-muted)">Revenue</span><br><span style="font-weight:700;color:${rUp?'var(--accent)':'var(--danger)'}">${rUp?'▲':'▼'} ${rPct}%</span><span style="font-size:0.75rem;color:var(--text-muted)"> (€${pR.toFixed(0)} → €${curR.toFixed(0)})</span></div><div><span style="font-size:0.75rem;color:var(--text-muted)">${cLabel}</span><br><span style="font-weight:700;color:${cUp?'var(--accent)':'var(--danger)'}">${cUp?'▲':'▼'} ${cPct}%</span><span style="font-size:0.75rem;color:var(--text-muted)"> (${pC} → ${curC})</span></div></div></div>`);
       rptCtx.yoyActive=true;btn.textContent='✕ Remove Comparison';btn.style.background='rgba(251,191,36,0.15)';btn.disabled=false;
     }
 
@@ -11096,10 +11104,10 @@ Loading items...
       const actD=dayData.filter(d=>d.c>0).length;const avgD=actD>0?(tRev/actD):0;
       const best=dayData.slice().sort((a,b)=>b.r-a.r)[0];
       document.getElementById('reportDayKPIs').innerHTML=`
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Revenue</div><div class="value" style="color:var(--accent)">€${tRev.toFixed(2)}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="label">${cLabel}</div><div class="value">${tCnt}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--info)"><div class="label">Avg / Active Day</div><div class="value">€${avgD.toFixed(0)}</div><div style="font-size:0.7rem;color:var(--text-muted)">${actD} active days</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--warn)"><div class="label">Best Day</div><div class="value">Day ${best.day}</div><div style="font-size:0.7rem;color:var(--text-muted)">€${best.r.toFixed(2)} (${best.c} ${cLabel.toLowerCase()})</div></div>`;
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Revenue</div><div class="value" style="color:var(--accent)">€${tRev.toFixed(2)}</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="label">${cLabel}</div><div class="value">${tCnt}</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Avg / Active Day</div><div class="value">€${avgD.toFixed(0)}</div><div style="font-size:0.7rem;color:var(--text-muted)">${actD} active days</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">Best Day</div><div class="value">Day ${best.day}</div><div style="font-size:0.7rem;color:var(--text-muted)">€${best.r.toFixed(2)} (${best.c} ${cLabel.toLowerCase()})</div></div>`;
       const ctx=document.getElementById('reportDayChart').getContext('2d');
       rdChart=new Chart(ctx,{type:'bar',data:{labels:dayData.map(d=>d.lbl),datasets:[
         {label:'Revenue (€)',data:dayData.map(d=>d.r),backgroundColor:'rgba(74,222,128,0.6)',borderColor:'#4ade80',borderWidth:1,borderRadius:3,yAxisID:'y'},
@@ -11150,7 +11158,7 @@ Loading items...
       const rPct=pR>0?(((curR-pR)/pR)*100).toFixed(1):'∞';const cPct=pC>0?(((curC-pC)/pC)*100).toFixed(1):'∞';
       const rUp=curR>=pR,cUp=curC>=pC;
       const kpi=document.getElementById('reportDayKPIs');const old=document.getElementById('rdYoYCard');if(old)old.remove();
-      kpi.insertAdjacentHTML('beforeend',`<div class="stat-card" id="rdYoYCard" style="border-left:3px solid #fbbf24;grid-column:span 2"><div class="label">📊 vs ${pyr}</div><div style="display:flex;gap:20px;margin-top:6px"><div><span style="font-size:0.75rem;color:var(--text-muted)">Revenue</span><br><span style="font-weight:700;color:${rUp?'var(--accent)':'var(--danger)'}">${rUp?'▲':'▼'} ${rPct}%</span><span style="font-size:0.75rem;color:var(--text-muted)"> (€${pR.toFixed(0)} → €${curR.toFixed(0)})</span></div><div><span style="font-size:0.75rem;color:var(--text-muted)">${cLabel}</span><br><span style="font-weight:700;color:${cUp?'var(--accent)':'var(--danger)'}">${cUp?'▲':'▼'} ${cPct}%</span><span style="font-size:0.75rem;color:var(--text-muted)"> (${pC} → ${curC})</span></div></div></div>`);
+      kpi.insertAdjacentHTML('beforeend',`<div class="stat-card" id="rdYoYCard" style="background:rgba(202,138,4,0.08);grid-column:span 2"><div class="label">📊 vs ${pyr}</div><div style="display:flex;gap:20px;margin-top:6px"><div><span style="font-size:0.75rem;color:var(--text-muted)">Revenue</span><br><span style="font-weight:700;color:${rUp?'var(--accent)':'var(--danger)'}">${rUp?'▲':'▼'} ${rPct}%</span><span style="font-size:0.75rem;color:var(--text-muted)"> (€${pR.toFixed(0)} → €${curR.toFixed(0)})</span></div><div><span style="font-size:0.75rem;color:var(--text-muted)">${cLabel}</span><br><span style="font-weight:700;color:${cUp?'var(--accent)':'var(--danger)'}">${cUp?'▲':'▼'} ${cPct}%</span><span style="font-size:0.75rem;color:var(--text-muted)"> (${pC} → ${curC})</span></div></div></div>`);
       rdCtx.yoyActive=true;btn.textContent='✕ Remove Comparison';btn.style.background='rgba(251,191,36,0.15)';btn.disabled=false;
     }
 
@@ -11316,10 +11324,10 @@ Loading items...
       const totalRev = totB2B + totB2C;
 
       document.getElementById('b2bDetailKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid #a78bfa"><div class="label">🏢 B2B Revenue</div><div class="value" style="color:#a78bfa">€${totB2B.toFixed(2)}</div><div style="font-size:0.75rem;color:var(--text-muted)">${ordB2B} orders · ${totalRev>0?((totB2B/totalRev)*100).toFixed(1):0}%</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">🛒 B2C Revenue</div><div class="value" style="color:var(--accent)">€${totB2C.toFixed(2)}</div><div style="font-size:0.75rem;color:var(--text-muted)">${ordB2C} orders · ${totalRev>0?((totB2C/totalRev)*100).toFixed(1):0}%</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--info)"><div class="label">Total Revenue</div><div class="value">€${totalRev.toFixed(2)}</div><div style="font-size:0.75rem;color:var(--text-muted)">${ordB2B+ordB2C} total orders</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--warn)"><div class="label">Avg Order</div><div class="value">€${(ordB2B+ordB2C)>0?(totalRev/(ordB2B+ordB2C)).toFixed(0):'0'}</div><div style="font-size:0.75rem;color:var(--text-muted)">B2B: €${ordB2B>0?(totB2B/ordB2B).toFixed(0):'0'} · B2C: €${ordB2C>0?(totB2C/ordB2C).toFixed(0):'0'}</div></div>`;
+        <div class="stat-card" style="background:rgba(124,58,237,0.06)"><div class="label">🏢 B2B Revenue</div><div class="value" style="color:#a78bfa">€${totB2B.toFixed(2)}</div><div style="font-size:0.75rem;color:var(--text-muted)">${ordB2B} orders · ${totalRev>0?((totB2B/totalRev)*100).toFixed(1):0}%</div></div>
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">🛒 B2C Revenue</div><div class="value" style="color:var(--accent)">€${totB2C.toFixed(2)}</div><div style="font-size:0.75rem;color:var(--text-muted)">${ordB2C} orders · ${totalRev>0?((totB2C/totalRev)*100).toFixed(1):0}%</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Total Revenue</div><div class="value">€${totalRev.toFixed(2)}</div><div style="font-size:0.75rem;color:var(--text-muted)">${ordB2B+ordB2C} total orders</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">Avg Order</div><div class="value">€${(ordB2B+ordB2C)>0?(totalRev/(ordB2B+ordB2C)).toFixed(0):'0'}</div><div style="font-size:0.75rem;color:var(--text-muted)">B2B: €${ordB2B>0?(totB2B/ordB2B).toFixed(0):'0'} · B2C: €${ordB2C>0?(totB2C/ordB2C).toFixed(0):'0'}</div></div>`;
 
       const periodTh = document.getElementById('b2bDetailTable').querySelector('thead tr th');
       if (periodTh) periodTh.textContent = chartBucket === 'day' ? 'Day' : chartBucket === 'week' ? 'Week' : chartBucket === 'fortnight' ? 'Fortnight' : 'Month';
@@ -11473,7 +11481,7 @@ Loading items...
       const kpi = document.getElementById('b2bDetailKPIs');
       const old = document.getElementById('b2bYoYCard'); if(old) old.remove();
       kpi.insertAdjacentHTML('beforeend', `
-        <div class="stat-card" id="b2bYoYCard" style="border-left:3px solid #fbbf24;grid-column:span 2">
+        <div class="stat-card" id="b2bYoYCard" style="background:rgba(202,138,4,0.08);grid-column:span 2">
           <div class="label">📊 vs Same period ${pyr}</div>
           <div style="display:flex;gap:20px;margin-top:6px">
             <div><span style="font-size:0.75rem;color:var(--text-muted)">🏢 B2B Revenue</span><br>
@@ -12625,10 +12633,10 @@ Loading items...
       const best = dayData.slice().sort((a,b)=>b.r-a.r)[0];
 
       document.getElementById('custDayKPIs').innerHTML = `
-        <div class="stat-card" style="border-left:3px solid var(--accent)"><div class="label">Revenue</div><div class="value" style="color:var(--accent)">€${totR.toFixed(2)}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--primary-color)"><div class="label">Orders</div><div class="value">${totC}</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--info)"><div class="label">Active Days</div><div class="value">${actD}</div><div style="font-size:0.7rem;color:var(--text-muted)">of ${lastDay} days</div></div>
-        <div class="stat-card" style="border-left:3px solid var(--warn)"><div class="label">Best Day</div><div class="value">Day ${best&&best.c>0?best.day:'—'}</div><div style="font-size:0.7rem;color:var(--text-muted)">€${best&&best.c>0?best.r.toFixed(2):'0'}</div></div>`;
+        <div class="stat-card" style="background:rgba(22,163,74,0.08)"><div class="label">Revenue</div><div class="value" style="color:var(--accent)">€${totR.toFixed(2)}</div></div>
+        <div class="stat-card" style="background:rgba(124,58,237,0.08)"><div class="label">Orders</div><div class="value">${totC}</div></div>
+        <div class="stat-card" style="background:rgba(37,99,235,0.08)"><div class="label">Active Days</div><div class="value">${actD}</div><div style="font-size:0.7rem;color:var(--text-muted)">of ${lastDay} days</div></div>
+        <div class="stat-card" style="background:rgba(202,138,4,0.08)"><div class="label">Best Day</div><div class="value">Day ${best&&best.c>0?best.day:'—'}</div><div style="font-size:0.7rem;color:var(--text-muted)">€${best&&best.c>0?best.r.toFixed(2):'0'}</div></div>`;
 
       // Chart
       const ctx = document.getElementById('custDayChart').getContext('2d');
@@ -12712,7 +12720,7 @@ Loading items...
       const kpi = document.getElementById('custDayKPIs');
       const old = document.getElementById('cdYoYCard'); if(old) old.remove();
       kpi.insertAdjacentHTML('beforeend', `
-        <div class="stat-card" id="cdYoYCard" style="border-left:3px solid #fbbf24;grid-column:span 2">
+        <div class="stat-card" id="cdYoYCard" style="background:rgba(202,138,4,0.08);grid-column:span 2">
           <div class="label">📊 vs ${mFL[mo-1]} ${pyr}</div>
           <div style="display:flex;gap:20px;margin-top:6px">
             <div><span style="font-size:0.75rem;color:var(--text-muted)">Revenue</span><br>
@@ -14960,8 +14968,8 @@ function renderARTable() {
     const ageDays   = oldestDue ? Math.floor((today - oldestDue)/(1000*60*60*24)) : 0;
     const ageLabel  = ageDays > 0 ? (ageDays >= 365 ? Math.floor(ageDays/365)+'y ' + (Math.floor((ageDays%365)/30))+'m' : Math.floor(ageDays/30)+'m '+((ageDays%30))+'d') : 'Future';
     const statusHtml = overdue
-      ? `<span style="background:#fef2f2;color:#dc2626;border-radius:999px;padding:2px 10px;font-size:0.75rem;font-weight:700">⚠️ Overdue</span>`
-      : `<span style="background:#f0fdf4;color:#16a34a;border-radius:999px;padding:2px 10px;font-size:0.75rem;font-weight:700">✅ Current</span>`;
+      ? `<span style="background:rgba(220,38,38,0.08);color:#dc2626;border-radius:999px;padding:2px 10px;font-size:0.75rem;font-weight:700">⚠️ Overdue</span>`
+      : `<span style="background:rgba(22,163,74,0.08);color:#16a34a;border-radius:999px;padding:2px 10px;font-size:0.75rem;font-weight:700">✅ Current</span>`;
     const rowBg = i%2===0 ? '' : 'background:var(--surface-2)';
     const customerIdx = (_arData.customers || []).indexOf(c);
     html += `<tr style="${rowBg};border-bottom:1px solid var(--border)" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2===0?'':'var(--surface-2)'}'">
@@ -15080,7 +15088,7 @@ function previewARPayment() {
 
   for (const p of _arPaymentPlan) {
     const tag = p.fullyPaid
-      ? '<span style="background:#f0fdf4;color:#166534;border-radius:4px;padding:2px 8px;font-weight:700;font-size:0.75rem">✅ FULLY PAID</span>'
+      ? '<span style="background:rgba(22,163,74,0.08);color:#166534;border-radius:4px;padding:2px 8px;font-weight:700;font-size:0.75rem">✅ FULLY PAID</span>'
       : '<span style="background:#fef3c7;color:#92400e;border-radius:4px;padding:2px 8px;font-weight:700;font-size:0.75rem">⚡ PARTIAL</span>';
     html += '<tr style="border-bottom:1px solid var(--border)">' +
       '<td style="padding:6px 10px;font-weight:600">#' + p.inv.doc + '</td>' +
@@ -15157,10 +15165,10 @@ function renderARModalBody(c, fmt, today) {
     const date    = inv.date ? new Date(inv.date).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—';
     const overdue = inv.overdue;
     const daysOverdue = inv.due && overdue ? Math.floor((today - new Date(inv.due))/(1000*60*60*24)) : 0;
-    const overdueTag = overdue ? `<span style="background:#fef2f2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:700;margin-left:4px">${daysOverdue}d overdue</span>` : '';
+    const overdueTag = overdue ? `<span style="background:rgba(220,38,38,0.08);color:#dc2626;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:700;margin-left:4px">${daysOverdue}d overdue</span>` : '';
     const isPaid = inv._paid;
     const markBtn = isPaid
-      ? `<span style="background:#f0fdf4;color:#16a34a;border-radius:4px;padding:2px 8px;font-size:0.75rem;font-weight:700">✅ Paid</span>`
+      ? `<span style="background:rgba(22,163,74,0.08);color:#16a34a;border-radius:4px;padding:2px 8px;font-size:0.75rem;font-weight:700">✅ Paid</span>`
       : `<button onclick="markARInvoicePaid(${_arCurrentCustomerIdx}, ${iIdx})"
           style="background:#1B4332;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:0.78rem;font-weight:600;cursor:pointer;white-space:nowrap"
           title="Mark this invoice as paid in QuickBooks">
@@ -15181,7 +15189,7 @@ function renderARModalBody(c, fmt, today) {
 
   body.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;text-align:center">
+      <div style="background:rgba(22,163,74,0.08);border:1px solid #bbf7d0;border-radius:8px;padding:12px;text-align:center">
         <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px">Total Open</div>
         <div id="arModalTotalOpen" style="font-size:1.3rem;font-weight:700;color:#166534">${fmt(totalOpen)}</div>
       </div>
@@ -15660,7 +15668,7 @@ async function loadPOsTab() {
     (pos||[]).forEach((p,i) => {
       const bg = i%2 ? 'background:var(--surface-2)' : '';
       const d = p.txn_date ? new Date(p.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-      const stHtml = p.status==='open' ? '<span style="background:#eff6ff;color:#2563eb;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">Open</span>' : '<span style="background:#f0fdf4;color:#16a34a;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">Closed</span>';
+      const stHtml = p.status==='open' ? '<span style="background:rgba(37,99,235,0.08);color:#2563eb;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">Open</span>' : '<span style="background:rgba(22,163,74,0.08);color:#16a34a;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">Closed</span>';
       html += `<tr style="${bg};border-bottom:1px solid var(--border);cursor:pointer" onclick="showPODetail('${p.id}')" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2?'var(--surface-2)':''}'"><td style="padding:7px 10px;font-family:monospace;font-size:0.82rem">${p.doc_number||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${d}</td><td style="padding:7px 10px;font-weight:600">${p.vendor_name||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:700">${fmt(p.total_amount)}</td><td style="padding:7px 10px;text-align:center">${stHtml}</td></tr>`;
     });
     html += '</tbody></table>';
@@ -16216,7 +16224,7 @@ html += '</div>';
 html += '<div style="padding:20px">';
 accounts.forEach(function(acc, ai) {
 var isMain = ai === 0;
-var border = isMain ? 'border-left:3px solid var(--accent)' : 'border-left:3px solid var(--border)';
+var border = isMain ? 'background:rgba(22,163,74,0.08)' : 'border-left:3px solid var(--border)';
 html += '<div style="background:var(--surface-2);border-radius:8px;padding:16px;margin-bottom:12px;' + border + '">';
 // Header row
 html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
@@ -16543,7 +16551,7 @@ html += '<div style="text-align:center"><div style="font-size:1.3rem;font-weight
 html += '</div>';
 // Editable fields
 html += '<div style="padding:20px">';
-html += '<div style="background:var(--surface-2);border-radius:8px;padding:16px;border-left:3px solid var(--accent)">';
+html += '<div style="background:var(--surface-2);border-radius:8px;padding:16px;background:rgba(22,163,74,0.08)">';
 // Row 1: First Name + Last Name
 html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
 html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">First Name</label><input type="text" data-b2c-cid="' + c.customer_id + '" data-field="first_name" value="' + esc(c.first_name || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.9rem"></div>';
