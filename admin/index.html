@@ -1443,6 +1443,9 @@ authorized staff</p>
 <div class="nav-section">
 <div class="nav-section-title">Finance</div>
 <div class="nav-item" data-page="finance" onclick="showPage('finance')">
+<span class="icon">💰</span> Financial Reports
+</div>
+<div class="nav-item" data-page="qb-financial" onclick="showPage('qb-financial')">
 <span class="icon">📊</span> QuickBooks Financial
 </div>
 <div class="nav-item" data-page="receivables" onclick="showPage('receivables')">
@@ -2769,13 +2772,14 @@ Select a financial report above to begin analysis.
 </div>
 </div>
 
-<!-- QB FINANCIAL OVERVIEW (inside page-finance) -->
-<div style="margin-top:30px;border-top:2px solid var(--border);padding-top:24px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-<h2 style="margin:0;font-size:1.2rem">📊 QuickBooks Financial Overview</h2>
+<div class="page" id="page-qb-financial">
+<div class="page-header">
+<h1>📊 QuickBooks Financial</h1>
 <button class="btn btn-primary" onclick="loadQBFinancials()">🔄 Sync from QuickBooks</button>
 </div>
-<div id="qbFinSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px"></div>
+
+<div id="qbFinSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px"></div>
+
 <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;overflow-x:auto">
 <button id="qbFinTabAP" onclick="switchQBFinTab('ap')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--accent);border-bottom:3px solid var(--accent);margin-bottom:-2px">📋 Bills / AP</button>
 <button id="qbFinTabVendors" onclick="switchQBFinTab('vendors')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">🏢 Vendors</button>
@@ -2786,8 +2790,6 @@ Select a financial report above to begin analysis.
 <div id="qbFinTabContentVendors" style="display:none"></div>
 <div id="qbFinTabContentPOs" style="display:none"></div>
 <div id="qbFinTabContentEstimates" style="display:none"></div>
-</div>
-
 </div>
 
 <div class="page" id="page-backorders">
@@ -7194,7 +7196,7 @@ Loading items...
       const titles = {
         dashboard: 'Dashboard', analytics: 'Analytics', products: 'Products', brands: 'Brands', categories: 'Categories',
         reviews: 'Reviews', orders: 'Orders', customers: 'Customers', abandoned: 'Abandoned Carts', discounts: 'Discount Codes',
-        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'manual-order': 'Create Manual Order', 'monthly-closing': 'Monthly Closing', finance: 'Financial Reports', settings: 'Settings'
+        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'manual-order': 'Create Manual Order', 'monthly-closing': 'Monthly Closing', finance: 'Financial Reports', 'qb-financial': 'QuickBooks Financial', settings: 'Settings'
       };
       document.getElementById('pageTitle').textContent = titles[page] || page;
 
@@ -7207,7 +7209,7 @@ Loading items...
       if (page === 'b2b') loadB2BData();
       if (page === 'site-analytics') loadSAReport(saCurrentReport);
       if (page === 'receivables') loadReceivables();
-      if (page === 'finance' && !_qbFinLoaded) { loadQBFinancials(); }
+      if (page === 'qb-financial' && !_qbFinLoaded) { loadQBFinancials(); }
       // Products: always reset status filter to active on page visit
       if (page === 'products') {
         const sf = document.getElementById('productStatusFilter');
