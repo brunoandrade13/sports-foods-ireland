@@ -15793,7 +15793,11 @@ async function showPODetail(poId) {
       html += '<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">Item</th><th style="padding:8px 10px;text-align:center">Qty</th><th style="padding:8px 10px;text-align:right">Rate</th><th style="padding:8px 10px;text-align:right">Amount</th></tr></thead><tbody>';
       items.forEach((it,i) => {
         const bg = i%2 ? 'background:var(--surface-2)' : '';
-        html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px">${it.item||it.description||'—'}</td><td style="padding:7px 10px;text-align:center">${it.qty||1}</td><td style="padding:7px 10px;text-align:right">${fmt(it.rate||0)}</td><td style="padding:7px 10px;text-align:right;font-weight:600">${fmt(it.amount||0)}</td></tr>`;
+        const name = it.description || it.item_name || it.item || '—';
+        const qty = it.qty || it.quantity || 1;
+        const rate = it.unit_price || it.unit_cost || it.rate || 0;
+        const amt = it.amount || it.total || 0;
+        html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px">${name}</td><td style="padding:7px 10px;text-align:center">${qty}</td><td style="padding:7px 10px;text-align:right">${fmt(rate)}</td><td style="padding:7px 10px;text-align:right;font-weight:600">${fmt(amt)}</td></tr>`;
       });
       html += '</tbody></table>';
     } else {
@@ -15828,7 +15832,11 @@ async function showEstimateDetail(estId) {
       html += '<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">Item</th><th style="padding:8px 10px;text-align:center">Qty</th><th style="padding:8px 10px;text-align:right">Rate</th><th style="padding:8px 10px;text-align:right">Amount</th></tr></thead><tbody>';
       items.forEach((it,i) => {
         const bg = i%2 ? 'background:var(--surface-2)' : '';
-        html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px">${it.item||it.description||'—'}</td><td style="padding:7px 10px;text-align:center">${it.qty||1}</td><td style="padding:7px 10px;text-align:right">${fmt(it.rate||0)}</td><td style="padding:7px 10px;text-align:right;font-weight:600">${fmt(it.amount||0)}</td></tr>`;
+        const name = it.description || it.item_name || it.item || '—';
+        const qty = it.qty || it.quantity || 1;
+        const rate = it.unit_price || it.unit_cost || it.rate || 0;
+        const amt = it.amount || it.total || 0;
+        html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px">${name}</td><td style="padding:7px 10px;text-align:center">${qty}</td><td style="padding:7px 10px;text-align:right">${fmt(rate)}</td><td style="padding:7px 10px;text-align:right;font-weight:600">${fmt(amt)}</td></tr>`;
       });
       html += '</tbody></table>';
     } else {
