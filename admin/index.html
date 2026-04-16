@@ -3617,6 +3617,30 @@ style="font-size:0.8rem;padding:4px 8px">
   </div>
 </div>
 
+<!-- STATEMENT MODAL -->
+<div id="statementModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999999;overflow-y:auto;padding:20px">
+  <div style="background:var(--card-bg,#1e293b);border-radius:16px;max-width:900px;margin:40px auto;position:relative">
+    <button onclick="document.getElementById('statementModal').style.display='none'" style="position:absolute;top:14px;right:18px;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer;z-index:2">&times;</button>
+    <div style="padding:24px 28px 8px">
+      <h3 style="margin:0;color:var(--text)">📊 Account Statement</h3>
+      <p id="stmtCustName" style="margin:4px 0 0;color:var(--text-muted);font-size:0.88rem"></p>
+    </div>
+    <div style="padding:8px 28px 16px;display:flex;gap:12px;align-items:end;flex-wrap:wrap">
+      <div>
+        <label style="font-size:0.72rem;color:var(--text-muted);display:block;margin-bottom:3px">From</label>
+        <input type="date" id="stmtDateFrom" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
+      </div>
+      <div>
+        <label style="font-size:0.72rem;color:var(--text-muted);display:block;margin-bottom:3px">To</label>
+        <input type="date" id="stmtDateTo" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
+      </div>
+      <button id="stmtLoadBtn" onclick="loadStatement()" class="btn btn-primary" style="padding:8px 20px;font-size:0.85rem">🔍 Generate</button>
+      <button id="stmtPrintBtn" onclick="printStatement()" class="btn btn-outline" style="padding:8px 16px;font-size:0.85rem;display:none">🖨️ Print / PDF</button>
+    </div>
+    <div id="stmtContent" style="padding:0 28px 24px"></div>
+  </div>
+</div>
+
 <!-- CREDIT MEMOS TAB -->
 <div id="b2bTabContentCM" style="display:none">
   <div class="detail-panel">
@@ -15456,6 +15480,7 @@ function renderARTable() {
         <th style="padding:10px 12px;text-align:center">Oldest Due</th>
         <th style="padding:10px 12px;text-align:center">Age</th>
         <th style="padding:10px 12px;text-align:center">Status</th>
+        <th style="padding:10px 12px;text-align:center">Statement</th>
       </tr>
     </thead><tbody>`;
 
@@ -15479,11 +15504,109 @@ function renderARTable() {
       <td style="padding:9px 12px;text-align:center;font-size:0.82rem">${dueLabel}</td>
       <td style="padding:9px 12px;text-align:center;font-size:0.82rem;color:${isOver1yr?'#dc2626':'var(--text-muted)'}">${ageLabel}</td>
       <td style="padding:9px 12px;text-align:center">${statusHtml}</td>
+      <td style="padding:9px 12px;text-align:center"><button onclick="event.preventDefault();openStatementModal('${c.qb_customer_id||''}','${(c.name||'').replace(/'/g,"\\'")}')" class="btn-sm" style="font-size:0.72rem;padding:3px 8px;background:#4f46e5;color:#fff;border:none;border-radius:5px;cursor:pointer" title="Generate Statement">📊</button></td>
     </tr>`;
   });
 
   html += '</tbody></table>';
   wrap.innerHTML = html;
+}
+
+// --- ACCOUNT STATEMENT ---
+var _stmtQbCustId = '';
+function openStatementModal(qbCustId, custName) {
+  _stmtQbCustId = qbCustId;
+  if (!qbCustId) { toast('No QB customer ID for this customer', 'error'); return; }
+  document.getElementById('stmtCustName').textContent = custName || 'Customer';
+  var today = new Date().toISOString().split('T')[0];
+  var from = new Date(); from.setMonth(from.getMonth() - 3);
+  document.getElementById('stmtDateFrom').value = from.toISOString().split('T')[0];
+  document.getElementById('stmtDateTo').value = today;
+  document.getElementById('stmtContent').innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:30px">Select period and click Generate</p>';
+  document.getElementById('stmtPrintBtn').style.display = 'none';
+  document.getElementById('statementModal').style.display = 'block';
+}
+async function loadStatement() {
+  var btn = document.getElementById('stmtLoadBtn');
+  var content = document.getElementById('stmtContent');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
+  content.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-muted)">Loading from QuickBooks...</p>';
+  try {
+    var resp = await fetch(SUPA_URL + '/functions/v1/qb-customer-statement', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ qb_customer_id: _stmtQbCustId, from_date: document.getElementById('stmtDateFrom').value, to_date: document.getElementById('stmtDateTo').value })
+    });
+    var data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error || 'Failed');
+    window._lastStmtData = data;
+    renderStatement(data);
+    document.getElementById('stmtPrintBtn').style.display = 'inline-block';
+  } catch(e) { content.innerHTML = '<p style="color:#ef4444;text-align:center;padding:30px">Error: ' + e.message + '</p>'; }
+  if (btn) { btn.disabled = false; btn.textContent = '🔍 Generate'; }
+}
+function renderStatement(d) {
+  var c = d.customer, s = d.summary, tl = d.timeline || [];
+  var fmt = function(v) { return (c.currency === 'GBP' ? '£' : '€') + Number(v||0).toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2}); };
+  var fmtDate = function(iso) { return iso ? new Date(iso).toLocaleDateString('en-IE', {day:'2-digit',month:'short',year:'numeric'}) : '—'; };
+  var html = '<div id="stmtPrintArea">';
+  // Summary cards
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">';
+  html += '<div style="background:var(--surface-2);padding:12px;border-radius:8px;text-align:center"><div style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase">Invoiced</div><div style="font-size:1.1rem;font-weight:700;color:var(--text)">' + fmt(s.total_invoiced) + '</div></div>';
+  html += '<div style="background:var(--surface-2);padding:12px;border-radius:8px;text-align:center"><div style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase">Paid</div><div style="font-size:1.1rem;font-weight:700;color:#16a34a">' + fmt(s.total_paid) + '</div></div>';
+  html += '<div style="background:var(--surface-2);padding:12px;border-radius:8px;text-align:center"><div style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase">Credits</div><div style="font-size:1.1rem;font-weight:700;color:var(--text)">' + fmt(s.total_credits) + '</div></div>';
+  html += '<div style="background:#fef2f2;padding:12px;border-radius:8px;text-align:center;border:1px solid #fca5a5"><div style="font-size:0.68rem;color:#991b1b;text-transform:uppercase">Balance Due</div><div style="font-size:1.1rem;font-weight:700;color:#dc2626">' + fmt(s.current_balance) + '</div></div>';
+  html += '</div>';
+  // Transaction table
+  html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.82rem">';
+  html += '<thead><tr style="background:var(--surface-2);font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">';
+  html += '<th style="padding:8px 10px;text-align:left">Date</th><th style="padding:8px 10px;text-align:left">Type</th><th style="padding:8px 10px;text-align:left">Reference</th><th style="padding:8px 10px;text-align:left">Status</th>';
+  html += '<th style="padding:8px 10px;text-align:right">Debit</th><th style="padding:8px 10px;text-align:right">Credit</th><th style="padding:8px 10px;text-align:right">Running Bal.</th></tr></thead><tbody>';
+  tl.forEach(function(t, i) {
+    var bg = t.type === 'payment' ? 'background:rgba(22,163,74,0.06)' : (i % 2 === 0 ? '' : 'background:var(--surface-2)');
+    var typeLabel = t.type === 'invoice' ? '📄 Invoice' : t.type === 'payment' ? '💳 Payment' : '🔄 Credit';
+    var ref = t.doc_number || t.reference || t.method || '';
+    var status = t.status || '';
+    var statusHtml = status === 'Paid' ? '<span style="color:#16a34a;font-weight:600">Paid</span>' : status === 'Partial' ? '<span style="color:#d97706;font-weight:600">Partial</span>' : status === 'Open' ? '<span style="color:#dc2626;font-weight:600">Open</span>' : '';
+    var debit = t.type === 'invoice' ? fmt(t.total) : '';
+    var credit = t.type === 'payment' ? '<span style="color:#16a34a;font-weight:700">' + fmt(t.amount) + '</span>' : t.type === 'credit' ? '<span style="color:#16a34a">' + fmt(t.total) + '</span>' : '';
+    var rb = t.running_balance != null ? fmt(t.running_balance) : '';
+    var rbColor = t.running_balance > 0 ? '#dc2626' : '#16a34a';
+    html += '<tr style="border-bottom:1px solid var(--border);' + bg + '">';
+    html += '<td style="padding:7px 10px;white-space:nowrap">' + fmtDate(t.date) + '</td>';
+    html += '<td style="padding:7px 10px">' + typeLabel + '</td>';
+    html += '<td style="padding:7px 10px;font-family:monospace;font-size:0.78rem">' + esc(ref) + '</td>';
+    html += '<td style="padding:7px 10px">' + statusHtml + '</td>';
+    html += '<td style="padding:7px 10px;text-align:right">' + debit + '</td>';
+    html += '<td style="padding:7px 10px;text-align:right">' + credit + '</td>';
+    html += '<td style="padding:7px 10px;text-align:right;font-weight:600;color:' + rbColor + '">' + rb + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  // Footer
+  html += '<div style="margin-top:16px;padding:12px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;text-align:center">';
+  html += '<span style="font-size:1rem;font-weight:700;color:#dc2626">Current Balance Due: ' + fmt(s.current_balance) + '</span></div>';
+  html += '<p style="text-align:center;margin-top:10px;font-size:0.72rem;color:var(--text-muted)">Statement generated ' + new Date().toLocaleDateString('en-IE', {day:'2-digit',month:'long',year:'numeric'}) + ' — Sports Foods Ireland Ltd</p>';
+  html += '</div>';
+  document.getElementById('stmtContent').innerHTML = html;
+}
+function printStatement() {
+  var area = document.getElementById('stmtPrintArea');
+  if (!area) return;
+  var d = window._lastStmtData;
+  var custName = d?.customer?.name || 'Customer';
+  var w = window.open('', '_blank', 'width=900,height=700');
+  w.document.write('<html><head><title>Statement — ' + custName + '</title>');
+  w.document.write('<style>body{font-family:Arial,sans-serif;padding:20px;font-size:13px;color:#1e293b}table{width:100%;border-collapse:collapse}th,td{padding:6px 8px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#f1f5f9;font-size:11px;text-transform:uppercase;color:#64748b}h2{color:#1B4332;margin:0 0 4px}@media print{body{padding:10px}}</style>');
+  w.document.write('</head><body>');
+  w.document.write('<h2>Sports Foods Ireland Ltd</h2>');
+  w.document.write('<p style="margin:0 0 8px;font-size:11px;color:#636E72">Unit 12 Northwest Centre, Northwest Business Park, Blanchardstown, Dublin D15 YC53</p>');
+  w.document.write('<hr style="border:1px solid #1B4332;margin:8px 0">');
+  w.document.write('<h3 style="text-align:center;color:#1B4332;margin:12px 0 4px">ACCOUNT STATEMENT</h3>');
+  w.document.write('<p style="text-align:center;margin:0 0 12px;font-size:12px;color:#636E72">' + custName + ' — ' + (d?.period?.from || '') + ' to ' + (d?.period?.to || '') + '</p>');
+  w.document.write(area.innerHTML.replace(/var\(--[^)]+\)/g, '#e2e8f0').replace(/var\(--text-muted\)/g, '#636E72').replace(/var\(--text\)/g, '#1e293b').replace(/var\(--surface-2\)/g, '#f8fafc').replace(/var\(--border\)/g, '#e2e8f0'));
+  w.document.write('</body></html>');
+  w.document.close();
+  setTimeout(function() { w.print(); }, 500);
 }
 
 function openARDetail(idx) {
