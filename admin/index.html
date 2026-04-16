@@ -14670,8 +14670,11 @@ function omEditSearchProducts() {
     if (catName && (!p.categories || p.categories.name !== catName)) return false;
     if (subcatId && String(p.subcategory_id || '') !== subcatId) return false;
     if (search) {
-      var txt = ((p.name||'') + ' ' + (p.sku||'')).toLowerCase();
-      if (!txt.includes(search)) return false;
+      var txt = ((p.name||'') + ' ' + (p.sku||'') + ' ' + ((p.brands && p.brands.name)||'') + ' ' + ((p.categories && p.categories.name)||'')).toLowerCase();
+      var words = search.split(/\s+/);
+      for (var w = 0; w < words.length; w++) {
+        if (words[w] && !txt.includes(words[w])) return false;
+      }
     }
     return true;
   }).slice(0, 80);
@@ -14780,7 +14783,7 @@ function omEditShowVariantPicker(prod, variants, custId, qty) {
     html += '<td style="padding:6px 8px;text-align:right;font-weight:600">€' + vPrice.toFixed(2) + '</td>';
     html += '<td style="padding:6px 8px;text-align:right;' + stockColor + '">' + stock + '</td>';
     html += '<td style="padding:6px 8px;text-align:right"><input type="number" min="1" value="' + qty + '" class="om-edit-vqty" data-vid="' + v.id + '" style="width:55px;padding:3px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:center"></td>';
-    html += '<td style="padding:6px 8px;text-align:center"><button class="btn-sm btn-primary" style="font-size:0.78rem;padding:4px 10px" onclick="omEditAddVariant(\'' + prod.id + '\',\'' + v.id + '\',' + vPrice + ',\'' + esc((prod.name||'').replace(/'/g,"\\\'")) + '\',\'' + esc((label||'').replace(/'/g,"\\\'")) + '\',\'' + esc((v.sku||'').replace(/'/g,"\\\'")) + '\',this)">Add</button></td>';
+    html += '<td style="padding:6px 8px;text-align:center"><button class="btn-sm btn-primary" style="font-size:0.78rem;padding:4px 10px" onclick="omEditAddVariant(\'' + prod.id + '\',\'' + v.id + '\',' + vPrice + ',\'' + esc((prod.name||'').replace(/'/g,"\\\'")) + '\',\'' + esc((v.label||'').replace(/'/g,"\\\'")) + '\',\'' + esc((v.sku||'').replace(/'/g,"\\\'")) + '\',this)">Add</button></td>';
     html += '</tr>';
   });
   html += '</tbody></table>';
@@ -14800,7 +14803,7 @@ function omEditAddVariant(prodId, variantId, price, prodName, variantLabel, vari
       product_id: prodId,
       variant_id: variantId,
       variant_label: variantLabel,
-      name: prodName + ' — ' + variantLabel,
+      name: prodName,
       sku: variantSku || '',
       unit_price: price,
       qty: qty,
@@ -14831,7 +14834,7 @@ function omRenderNewItems() {
   html += '<table style="width:100%;font-size:0.83rem;border-collapse:collapse">';
   items.forEach(function(ni, idx) {
     html += '<tr style="border-bottom:1px solid rgba(22,163,98,0.2)">' +
-      '<td style="padding:6px 8px">' + esc(ni.name) + '<span style="font-size:0.75rem;color:var(--text-muted);margin-left:6px">' + esc(ni.sku) + '</span></td>' +
+      '<td style="padding:6px 8px">' + esc(ni.name) + (ni.variant_label ? '<span style="color:var(--text-muted)"> - ' + esc(ni.variant_label) + '</span>' : '') + '<span style="font-size:0.75rem;color:var(--text-muted);margin-left:6px">' + esc(ni.sku) + '</span></td>' +
       '<td style="padding:6px 8px;text-align:right"><input type="number" min="0.01" step="0.01" value="' + ni.unit_price.toFixed(2) + '" style="width:70px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:right;font-size:0.83rem" onchange="window._editNewItems[' + idx + '].unit_price=parseFloat(this.value)||0;omRenderNewItems()">€</td>' +
       '<td style="padding:6px 8px;text-align:center"><input type="number" min="1" value="' + ni.qty + '" style="width:50px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:center;font-size:0.83rem" onchange="window._editNewItems[' + idx + '].qty=parseInt(this.value)||1;omRenderNewItems()"></td>' +
       '<td style="padding:6px 8px;text-align:right;font-weight:bold">€' + (ni.unit_price * ni.qty).toFixed(2) + '</td>' +
