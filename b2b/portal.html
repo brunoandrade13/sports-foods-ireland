@@ -2434,6 +2434,26 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
         html[data-theme="dark"] .reorder-modal div[style*="border-top"] {
             border-color: #333 !important;
         }
+
+        /* ── Hide B2C discount badges/tags on B2B portal ── */
+        .badge-desconto,
+        .badge-desconto *,
+        .product-card .badge-desconto,
+        span.badge-desconto,
+        [class*="badge-desconto"],
+        [class*="badge-promo"],
+        .product-discount,
+        .old-price,
+        .sfi-sr-old {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            position: absolute !important;
+            pointer-events: none !important;
+        }
 </style>
 
 <script>
