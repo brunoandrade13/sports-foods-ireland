@@ -14552,12 +14552,32 @@ function renderOrderItemsTable(items, order, editMode) {
   <div style="margin-top:12px;padding:14px;border:2px dashed var(--primary-color);border-radius:10px;background:rgba(22,163,98,0.05);">
     <h4 style="margin:0 0 10px;font-size:0.85rem;color:var(--primary-color);">➕ Add Product to Order</h4>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      <input type="text" id="omEditProductSearch" placeholder="Search by name or SKU…" oninput="omEditSearchProducts()"
-        style="flex:1;min-width:200px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
-      <select id="omEditBrandFilter" onchange="omEditSearchProducts()"
-        style="padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
-        <option value="">All brands</option>
-      </select>
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:0.72rem;color:var(--text-muted);display:block;margin-bottom:3px">Brand</label>
+        <select id="omEditBrandFilter" onchange="omEditSearchProducts()"
+          style="width:100%;padding:7px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.82rem">
+          <option value="">All brands</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:0.72rem;color:var(--text-muted);display:block;margin-bottom:3px">Category</label>
+        <select id="omEditCatFilter" onchange="omEditSearchProducts();omEditPopulateSubcats()"
+          style="width:100%;padding:7px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.82rem">
+          <option value="">All categories</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:0.72rem;color:var(--text-muted);display:block;margin-bottom:3px">Subcategory</label>
+        <select id="omEditSubcatFilter" onchange="omEditSearchProducts()"
+          style="width:100%;padding:7px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.82rem">
+          <option value="">All subcategories</option>
+        </select>
+      </div>
+      <div style="flex:2;min-width:180px">
+        <label style="font-size:0.72rem;color:var(--text-muted);display:block;margin-bottom:3px">Search</label>
+        <input type="text" id="omEditProductSearch" placeholder="Name or SKU…" oninput="omEditSearchProducts()"
+          style="width:100%;padding:7px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.82rem">
+      </div>
     </div>
     <div style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;">
       <table style="width:100%;font-size:0.83rem;border-collapse:collapse">
@@ -14616,44 +14636,53 @@ function toggleOrderEditMode() {
   const order = window._currentModalOrder;
   if (!items || !order) return;
   renderOrderItemsTable(items, order, window._orderEditMode);
-  // Populate brand filter for product picker
+  // Populate all filters for product picker
   if (window._orderEditMode) {
     setTimeout(function() {
-      const brandSel = document.getElementById('omEditBrandFilter');
+      var brandSel = document.getElementById('omEditBrandFilter');
       if (brandSel && brandSel.options.length <= 1) {
         brandSel.innerHTML = '<option value="">All brands</option>' +
-          (brands || []).map(b => '<option value="' + b.id + '">' + esc(b.name || '') + '</option>').join('');
+          (brands || []).sort(function(a,b){return (a.name||'').localeCompare(b.name||'')}).map(function(b) { return '<option value="' + esc(b.name || '') + '">' + esc(b.name || '') + '</option>'; }).join('');
+      }
+      var catSel = document.getElementById('omEditCatFilter');
+      if (catSel && catSel.options.length <= 1) {
+        catSel.innerHTML = '<option value="">All categories</option>' +
+          (categories || []).sort(function(a,b){return (a.name||'').localeCompare(b.name||'')}).map(function(c) { return '<option value="' + esc(c.name || '') + '">' + esc(c.name || '') + '</option>'; }).join('');
       }
     }, 100);
   }
 }
 
 function omEditSearchProducts() {
-  const body = document.getElementById('omEditProductPickerBody');
+  var body = document.getElementById('omEditProductPickerBody');
   if (!body) return;
-  const search = (document.getElementById('omEditProductSearch')?.value || '').toLowerCase().trim();
-  const brandId = document.getElementById('omEditBrandFilter')?.value || '';
-  if (!search && !brandId) {
-    body.innerHTML = '<tr><td colspan="5" style="padding:14px;color:var(--text-muted);font-size:0.83rem;text-align:center">Type to search products…</td></tr>';
+  var search = (document.getElementById('omEditProductSearch')?.value || '').toLowerCase().trim();
+  var brandName = document.getElementById('omEditBrandFilter')?.value || '';
+  var catName = document.getElementById('omEditCatFilter')?.value || '';
+  var subcatId = document.getElementById('omEditSubcatFilter')?.value || '';
+  if (!search && !brandName && !catName && !subcatId) {
+    body.innerHTML = '<tr><td colspan="5" style="padding:14px;color:var(--text-muted);font-size:0.83rem;text-align:center">Type to search or select a filter…</td></tr>';
     return;
   }
-  let list = (allProducts || []).filter(function(p) {
+  var list = (allProducts || []).filter(function(p) {
     if (p.is_active === false) return false;
-    if (brandId && (!p.brands || String(p.brands.id || '') !== brandId && p.brands.name !== brandId)) return false;
+    if (brandName && (!p.brands || p.brands.name !== brandName)) return false;
+    if (catName && (!p.categories || p.categories.name !== catName)) return false;
+    if (subcatId && String(p.subcategory_id || '') !== subcatId) return false;
     if (search) {
-      const txt = ((p.name||'') + ' ' + (p.sku||'')).toLowerCase();
+      var txt = ((p.name||'') + ' ' + (p.sku||'')).toLowerCase();
       if (!txt.includes(search)) return false;
     }
     return true;
-  }).slice(0, 50);
+  }).slice(0, 80);
   if (!list.length) {
     body.innerHTML = '<tr><td colspan="5" style="padding:14px;color:var(--text-muted);font-size:0.83rem;text-align:center">No products found.</td></tr>';
     return;
   }
   body.innerHTML = list.map(function(p) {
-    const brand = (p.brands && p.brands.name) || '';
-    const price = parseFloat(p.b2b_price || p.price || 0);
-    return '<tr>' +
+    var brand = (p.brands && p.brands.name) || '';
+    var price = parseFloat(p.b2b_price || p.price || 0);
+    return '<tr style="border-bottom:1px solid var(--border)">' +
       '<td style="padding:6px 10px">' + esc(p.name||'') + '<div style="font-size:0.72rem;color:var(--text-muted)">' + esc(brand) + '</div></td>' +
       '<td style="padding:6px 10px;font-family:monospace;font-size:0.8rem">' + esc(p.sku||'') + '</td>' +
       '<td style="padding:6px 10px;text-align:right">€' + price.toFixed(2) + '</td>' +
@@ -14661,6 +14690,19 @@ function omEditSearchProducts() {
       '<td style="padding:6px 10px;text-align:center"><button class="btn-sm btn-primary" style="font-size:0.78rem;padding:4px 10px" onclick="omEditAddToOrder(\'' + p.id + '\',this)">+ Add</button></td>' +
       '</tr>';
   }).join('');
+}
+
+function omEditPopulateSubcats() {
+  var catName = document.getElementById('omEditCatFilter')?.value || '';
+  var subcatSel = document.getElementById('omEditSubcatFilter');
+  if (!subcatSel) return;
+  var cat = (categories || []).find(function(c) { return c.name === catName; });
+  var catId = cat ? cat.id : null;
+  var subs = (subcategories || []).filter(function(s) {
+    return !catId || String(s.category_id) === String(catId);
+  }).sort(function(a,b) { return (a.name||'').localeCompare(b.name||''); });
+  subcatSel.innerHTML = '<option value="">All subcategories</option>' +
+    subs.map(function(s) { return '<option value="' + s.id + '">' + esc(s.name||'') + '</option>'; }).join('');
 }
 
 function omEditAddToOrder(productId, btn) {
