@@ -9693,12 +9693,10 @@ Loading items...
       status.textContent = 'Calling QuickBooks sync...';
 
       try {
-        const _bt = await getValidBearerToken();
-        const resp = await fetch(`${SUPA_URL}/functions/v1/qb-sync-orders`, {
+        const resp = await fetch(`${SUPA_URL}/functions/v1/trigger-qb-sync`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${_bt}`
+            'Content-Type': 'application/json'
           }
         });
 
