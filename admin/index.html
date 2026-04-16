@@ -14679,15 +14679,20 @@ function omEditSearchProducts() {
     body.innerHTML = '<tr><td colspan="5" style="padding:14px;color:var(--text-muted);font-size:0.83rem;text-align:center">No products found.</td></tr>';
     return;
   }
+  var order = window._currentModalOrder;
+  var custId = order ? (order.customer_id || null) : null;
   body.innerHTML = list.map(function(p) {
     var brand = (p.brands && p.brands.name) || '';
-    var price = parseFloat(p.b2b_price || p.price || 0);
+    var price = (typeof getB2BPriceForProduct === 'function' && custId) ? getB2BPriceForProduct(p, custId) : (parseFloat(p.wholesale_price_eur) || parseFloat(p.price_eur) || parseFloat(p.price) || 0);
+    var hasVars = productVariantsCache && productVariantsCache[p.id] && productVariantsCache[p.id].filter(function(v){return v.is_active !== false}).length > 0;
+    var addLabel = hasVars ? '⊕ Variants' : '+ Add';
+    var addStyle = hasVars ? 'font-size:0.78rem;padding:4px 8px;background:#7c3aed;border-color:#7c3aed' : 'font-size:0.78rem;padding:4px 10px';
     return '<tr style="border-bottom:1px solid var(--border)">' +
       '<td style="padding:6px 10px">' + esc(p.name||'') + '<div style="font-size:0.72rem;color:var(--text-muted)">' + esc(brand) + '</div></td>' +
       '<td style="padding:6px 10px;font-family:monospace;font-size:0.8rem">' + esc(p.sku||'') + '</td>' +
       '<td style="padding:6px 10px;text-align:right">€' + price.toFixed(2) + '</td>' +
       '<td style="padding:6px 10px;text-align:right"><input type="number" min="1" value="1" class="om-edit-newqty" data-pid="' + p.id + '" style="width:60px;padding:4px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:center"></td>' +
-      '<td style="padding:6px 10px;text-align:center"><button class="btn-sm btn-primary" style="font-size:0.78rem;padding:4px 10px" onclick="omEditAddToOrder(\'' + p.id + '\',this)">+ Add</button></td>' +
+      '<td style="padding:6px 10px;text-align:center"><button class="btn-sm btn-primary" style="' + addStyle + '" onclick="omEditAddToOrder(\'' + p.id + '\',this)">'+addLabel+'</button></td>' +
       '</tr>';
   }).join('');
 }
@@ -14706,13 +14711,24 @@ function omEditPopulateSubcats() {
 }
 
 function omEditAddToOrder(productId, btn) {
-  const prod = (allProducts || []).find(p => p.id === productId);
+  var prod = (allProducts || []).find(function(p) { return p.id === productId; });
   if (!prod) return;
-  const qtyInput = btn?.closest('tr')?.querySelector('.om-edit-newqty');
-  const qty = Math.max(1, parseInt(qtyInput?.value || '1'));
-  const price = parseFloat(prod.b2b_price || prod.price || 0);
+  var qtyInput = btn ? btn.closest('tr')?.querySelector('.om-edit-newqty') : null;
+  var qty = Math.max(1, parseInt(qtyInput?.value || '1'));
+  var order = window._currentModalOrder;
+  var custId = order ? (order.customer_id || null) : null;
+  var price = (typeof getB2BPriceForProduct === 'function' && custId) ? getB2BPriceForProduct(prod, custId) : (parseFloat(prod.wholesale_price_eur) || parseFloat(prod.price_eur) || 0);
+
+  // Check for active variants
+  var variants = (productVariantsCache && productVariantsCache[productId] || []).filter(function(v) { return v.is_active !== false; });
+  if (variants.length > 0) {
+    omEditShowVariantPicker(prod, variants, custId, qty);
+    return;
+  }
+
+  // No variants — add directly
   if (!window._editNewItems) window._editNewItems = [];
-  const existing = window._editNewItems.find(i => i.product_id === productId && !i.variant_id);
+  var existing = window._editNewItems.find(function(i) { return i.product_id === productId && !i.variant_id; });
   if (existing) {
     existing.qty += qty;
   } else {
@@ -14729,7 +14745,73 @@ function omEditAddToOrder(productId, btn) {
   if (btn) {
     btn.textContent = '✓ Added';
     btn.style.background = '#16a34a';
-    setTimeout(() => { btn.textContent = '+ Add'; btn.style.background = ''; }, 1200);
+    setTimeout(function() { btn.textContent = '+ Add'; btn.style.background = ''; }, 1200);
+  }
+}
+
+function omEditShowVariantPicker(prod, variants, custId, qty) {
+  var modal = document.getElementById('omEditVariantModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'omEditVariantModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div style="background:var(--card-bg,#1e293b);border-radius:16px;padding:24px;max-width:650px;width:100%;max-height:80vh;overflow-y:auto;position:relative"><button onclick="document.getElementById(\'omEditVariantModal\').style.display=\'none\'" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer">×</button><div id="omEditVariantContent"></div></div>';
+    document.body.appendChild(modal);
+  }
+  var basePrice = (typeof getB2BPriceForProduct === 'function' && custId) ? getB2BPriceForProduct(prod, custId) : (parseFloat(prod.wholesale_price_eur) || parseFloat(prod.price_eur) || 0);
+  var html = '<h3 style="margin:0 0 4px">' + esc(prod.name) + '</h3>';
+  html += '<p style="color:var(--text-muted);margin:0 0 16px;font-size:0.85rem">Select a variant to add:</p>';
+  html += '<table class="data-table" style="width:100%"><thead><tr><th>Variant</th><th>SKU</th><th style="text-align:right">Price</th><th style="text-align:right">Stock</th><th style="text-align:right;width:70px">Qty</th><th></th></tr></thead><tbody>';
+
+  // Identify leaf variants (exclude parent variants that have children)
+  var parentIds = {};
+  variants.forEach(function(v) { if (v.parent_variant_id) parentIds[v.parent_variant_id] = true; });
+
+  variants.forEach(function(v) {
+    if (parentIds[v.id]) return; // skip parent-level variants
+    var parentVariant = v.parent_variant_id ? variants.find(function(pv) { return pv.id === v.parent_variant_id; }) : null;
+    var label = parentVariant ? (parentVariant.label + ' — ' + v.label) : (v.label || '—');
+    var vPrice = parseFloat(v.wholesale_price) || parseFloat(v.price) || basePrice;
+    var stock = v.stock != null ? v.stock : '—';
+    var stockColor = v.stock != null && v.stock <= 0 ? 'color:#ef4444' : '';
+    html += '<tr style="border-bottom:1px solid var(--border)">';
+    html += '<td style="padding:6px 8px"><strong>' + esc(label) + '</strong></td>';
+    html += '<td style="padding:6px 8px;font-size:0.8rem;font-family:monospace">' + esc(v.sku || '') + '</td>';
+    html += '<td style="padding:6px 8px;text-align:right;font-weight:600">€' + vPrice.toFixed(2) + '</td>';
+    html += '<td style="padding:6px 8px;text-align:right;' + stockColor + '">' + stock + '</td>';
+    html += '<td style="padding:6px 8px;text-align:right"><input type="number" min="1" value="' + qty + '" class="om-edit-vqty" data-vid="' + v.id + '" style="width:55px;padding:3px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:center"></td>';
+    html += '<td style="padding:6px 8px;text-align:center"><button class="btn-sm btn-primary" style="font-size:0.78rem;padding:4px 10px" onclick="omEditAddVariant(\'' + prod.id + '\',\'' + v.id + '\',' + vPrice + ',\'' + esc((prod.name||'').replace(/'/g,"\\\'")) + '\',\'' + esc((label||'').replace(/'/g,"\\\'")) + '\',\'' + esc((v.sku||'').replace(/'/g,"\\\'")) + '\',this)">Add</button></td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('omEditVariantContent').innerHTML = html;
+  modal.style.display = 'flex';
+}
+
+function omEditAddVariant(prodId, variantId, price, prodName, variantLabel, variantSku, btn) {
+  var qtyInput = btn ? btn.closest('tr')?.querySelector('.om-edit-vqty') : null;
+  var qty = Math.max(1, parseInt(qtyInput?.value || '1'));
+  if (!window._editNewItems) window._editNewItems = [];
+  var existing = window._editNewItems.find(function(i) { return i.product_id === prodId && i.variant_id === variantId; });
+  if (existing) {
+    existing.qty += qty;
+  } else {
+    window._editNewItems.push({
+      product_id: prodId,
+      variant_id: variantId,
+      variant_label: variantLabel,
+      name: prodName + ' — ' + variantLabel,
+      sku: variantSku || '',
+      unit_price: price,
+      qty: qty,
+      image: null
+    });
+  }
+  omRenderNewItems();
+  if (btn) {
+    btn.textContent = '✓';
+    btn.style.background = '#16a34a';
+    setTimeout(function() { btn.textContent = 'Add'; btn.style.background = ''; }, 1000);
   }
 }
 
