@@ -1445,6 +1445,15 @@ authorized staff</p>
 <div class="nav-item" data-page="finance" onclick="showPage('finance')">
 <span class="icon">💰</span> Financial Reports
 </div>
+<div class="nav-item" data-page="bills" onclick="showPage('bills')">
+<span class="icon">🧾</span> Bills / AP
+</div>
+<div class="nav-item" data-page="vendors" onclick="showPage('vendors')">
+<span class="icon">🏭</span> Vendors
+</div>
+<div class="nav-item" data-page="purchase-orders" onclick="showPage('purchase-orders')">
+<span class="icon">📦</span> Purchase Orders
+</div>
 <div class="nav-item" data-page="receivables" onclick="showPage('receivables')">
 <span class="icon">📋</span> Accounts Receivable
 </div>
@@ -2821,6 +2830,30 @@ Select a financial report above to begin analysis.
     </div>
     <div class="modal-body" id="boModalBody" style="padding:20px 24px"></div>
   </div>
+</div>
+</div>
+
+<!-- QB FINANCIAL OVERVIEW SECTION (inside finance page) -->
+<div style="margin-top:30px;border-top:2px solid var(--border);padding-top:24px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<h2 style="margin:0;font-size:1.2rem">📊 QuickBooks Financial Overview</h2>
+<button class="btn btn-primary" onclick="loadQBFinancials()">🔄 Sync from QuickBooks</button>
+</div>
+
+<!-- P&L + Balance Sheet Summary -->
+<div id="qbFinSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px"></div>
+
+<!-- Tabbed sections: AP | Vendors | POs | Estimates -->
+<div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;overflow-x:auto">
+<button id="qbFinTabAP" onclick="switchQBFinTab('ap')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--accent);border-bottom:3px solid var(--accent);margin-bottom:-2px">📋 Bills / AP</button>
+<button id="qbFinTabVendors" onclick="switchQBFinTab('vendors')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">🏢 Vendors</button>
+<button id="qbFinTabPOs" onclick="switchQBFinTab('pos')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">📦 Purchase Orders</button>
+<button id="qbFinTabEstimates" onclick="switchQBFinTab('estimates')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">📝 Estimates</button>
+</div>
+<div id="qbFinTabContentAP"></div>
+<div id="qbFinTabContentVendors" style="display:none"></div>
+<div id="qbFinTabContentPOs" style="display:none"></div>
+<div id="qbFinTabContentEstimates" style="display:none"></div>
 </div>
 </div>
 
@@ -7164,7 +7197,7 @@ Loading items...
       const titles = {
         dashboard: 'Dashboard', analytics: 'Analytics', products: 'Products', brands: 'Brands', categories: 'Categories',
         reviews: 'Reviews', orders: 'Orders', customers: 'Customers', abandoned: 'Abandoned Carts', discounts: 'Discount Codes',
-        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'manual-order': 'Create Manual Order', 'monthly-closing': 'Monthly Closing', settings: 'Settings'
+        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'manual-order': 'Create Manual Order', 'monthly-closing': 'Monthly Closing', finance: 'Financial Reports', settings: 'Settings'
       };
       document.getElementById('pageTitle').textContent = titles[page] || page;
 
@@ -7177,6 +7210,7 @@ Loading items...
       if (page === 'b2b') loadB2BData();
       if (page === 'site-analytics') loadSAReport(saCurrentReport);
       if (page === 'receivables') loadReceivables();
+      if (page === 'finance' && !_qbFinLoaded) { loadQBFinancials(); }
       // Products: always reset status filter to active on page visit
       if (page === 'products') {
         const sf = document.getElementById('productStatusFilter');
@@ -15523,6 +15557,137 @@ function toggleCMDetail(row) {
     detail.style.display = detail.style.display === 'none' ? '' : 'none';
   }
 }
+
+// ── QB FINANCIAL OVERVIEW ──────────────────────────────────
+let _qbFinLoaded = false;
+async function loadQBFinancials() {
+  const summ = document.getElementById('qbFinSummary');
+  if (summ) summ.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted)">⏳ Syncing from QuickBooks...</div>';
+  try {
+    const res = await fetch(`${_AR_SUPA_URL}/functions/v1/qb-full-sync?section=reports`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    const reps = data.stats?.reports || {};
+    renderQBFinSummary(reps);
+    _qbFinLoaded = true;
+  } catch(e) { if (summ) summ.innerHTML = `<div style="grid-column:1/-1;color:#ef4444">❌ ${e.message}</div>`; }
+  // Load tabs from Supabase
+  loadAPTab(); loadVendorsTab(); loadPOsTab(); loadEstimatesTab();
+}
+
+function renderQBFinSummary(reps) {
+  const summ = document.getElementById('qbFinSummary');
+  if (!summ) return;
+  const fmt = v => { try { const n=parseFloat(v); return isNaN(n)?v:'€'+n.toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2}); } catch{return v;} };
+  const pl = reps.profit_loss || {};
+  const plLY = reps.profit_loss_last_year || {};
+  const bs = reps.balance_sheet || {};
+  const cards = [
+    { label:'Revenue (YTD)', value: fmt(pl['Total Income']||0), color:'#16a34a', bg:'#f0fdf4' },
+    { label:'COGS (YTD)', value: fmt(pl['Total Cost of Sales']||0), color:'#dc2626', bg:'#fef2f2' },
+    { label:'Gross Profit (YTD)', value: fmt(pl['Gross Profit']||0), color:'#2563eb', bg:'#eff6ff' },
+    { label:'Net Income (YTD)', value: fmt(pl['Net Income']||0), color:'#7c3aed', bg:'#f5f3ff' },
+    { label:'Revenue (Last Year)', value: fmt(plLY['Total Income']||0), color:'#6b7280', bg:'#f9fafb' },
+    { label:'Net Income (Last Year)', value: fmt(plLY['Net Income']||0), color:'#6b7280', bg:'#f9fafb' },
+    { label:'AR (Customer Balance)', value: fmt(reps.customer_balance_total||0), color:'#166534', bg:'#f0fdf4' },
+    { label:'Cash at Bank', value: fmt(bs['Total Cash at bank and in hand']||0), color:'#0891b2', bg:'#ecfeff' },
+  ];
+  summ.innerHTML = cards.map(c => `<div style="background:${c.bg};border:1px solid var(--border);border-radius:10px;padding:14px 18px;text-align:center">
+    <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">${c.label}</div>
+    <div style="font-size:1.4rem;font-weight:700;color:${c.color}">${c.value}</div></div>`).join('');
+}
+
+function switchQBFinTab(tab) {
+  const tabs = {ap:'AP', vendors:'Vendors', pos:'POs', estimates:'Estimates'};
+  Object.entries(tabs).forEach(([k,v]) => {
+    const el = document.getElementById('qbFinTabContent' + v);
+    const btn = document.getElementById('qbFinTab' + v);
+    if (el) el.style.display = k === tab ? '' : 'none';
+    if (btn) { btn.style.color = k===tab?'var(--accent)':'var(--text-muted)'; btn.style.borderBottomColor = k===tab?'var(--accent)':'transparent'; }
+  });
+}
+
+async function loadAPTab() {
+  const wrap = document.getElementById('qbFinTabContentAP');
+  if (!wrap) return;
+  try {
+    const bills = await supaGet('bills', '?select=vendor_name,balance,total_amount,txn_date,due_date,doc_number,status&balance=gt.0&order=balance.desc&limit=100');
+    const byVendor = {};
+    (bills||[]).forEach(b => { const k=b.vendor_name||'?'; if(!byVendor[k])byVendor[k]={name:k,bills:0,total:0}; byVendor[k].bills++; byVendor[k].total+=Number(b.balance||0); });
+    const sorted = Object.values(byVendor).sort((a,b) => b.total - a.total);
+    const fmt = v => '€'+Number(v).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const grandTotal = sorted.reduce((s,v) => s+v.total, 0);
+    let html = `<div style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">Total AP: <b style="color:#dc2626">${fmt(grandTotal)}</b> across ${sorted.length} vendors</div>`;
+    html += `<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">#</th><th style="padding:8px 10px;text-align:left">Vendor</th><th style="padding:8px 10px;text-align:right">Owed</th><th style="padding:8px 10px;text-align:center">Bills</th></tr></thead><tbody>`;
+    sorted.forEach((v,i) => {
+      const bg = i%2 ? 'background:var(--surface-2)' : '';
+      html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px;color:var(--text-muted)">${i+1}</td><td style="padding:7px 10px;font-weight:600">${v.name}</td><td style="padding:7px 10px;text-align:right;font-weight:700;color:#dc2626">${fmt(v.total)}</td><td style="padding:7px 10px;text-align:center">${v.bills}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  } catch(e) { wrap.innerHTML = `<div style="color:#ef4444">❌ ${e.message}</div>`; }
+}
+
+async function loadVendorsTab() {
+  const wrap = document.getElementById('qbFinTabContentVendors');
+  if (!wrap) return;
+  try {
+    const vendors = await supaGet('vendors', '?select=*&order=display_name&limit=100');
+    const fmt = v => '€'+Number(v).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2});
+    let html = `<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">#</th><th style="padding:8px 10px;text-align:left">Vendor</th><th style="padding:8px 10px;text-align:left">Email</th><th style="padding:8px 10px;text-align:left">Phone</th><th style="padding:8px 10px;text-align:right">Balance</th><th style="padding:8px 10px;text-align:center">Active</th></tr></thead><tbody>`;
+    (vendors||[]).forEach((v,i) => {
+      const bg = i%2 ? 'background:var(--surface-2)' : '';
+      const bal = Number(v.balance||0);
+      html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px;color:var(--text-muted)">${i+1}</td><td style="padding:7px 10px;font-weight:600">${v.display_name||''}</td><td style="padding:7px 10px;font-size:0.82rem">${v.email||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${v.phone||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:${bal>0?'700':'400'};color:${bal>0?'#dc2626':'var(--text-muted)'}">${bal!==0?fmt(bal):'—'}</td><td style="padding:7px 10px;text-align:center">${v.active?'✅':'❌'}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  } catch(e) { wrap.innerHTML = `<div style="color:#ef4444">❌ ${e.message}</div>`; }
+}
+
+async function loadPOsTab() {
+  const wrap = document.getElementById('qbFinTabContentPOs');
+  if (!wrap) return;
+  try {
+    const pos = await supaGet('purchase_orders', '?select=*&order=txn_date.desc&limit=80');
+    const fmt = v => '€'+Number(v).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const openPOs = (pos||[]).filter(p => p.status === 'open');
+    const totalOpen = openPOs.reduce((s,p) => s+Number(p.total_amount||0), 0);
+    let html = `<div style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">Open POs: <b>${openPOs.length}</b> | Total value: <b style="color:#2563eb">${fmt(totalOpen)}</b></div>`;
+    html += `<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">PO#</th><th style="padding:8px 10px;text-align:left">Date</th><th style="padding:8px 10px;text-align:left">Vendor</th><th style="padding:8px 10px;text-align:right">Amount</th><th style="padding:8px 10px;text-align:center">Status</th></tr></thead><tbody>`;
+    (pos||[]).forEach((p,i) => {
+      const bg = i%2 ? 'background:var(--surface-2)' : '';
+      const d = p.txn_date ? new Date(p.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+      const stHtml = p.status==='open' ? '<span style="background:#eff6ff;color:#2563eb;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">Open</span>' : '<span style="background:#f0fdf4;color:#16a34a;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">Closed</span>';
+      html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px;font-family:monospace;font-size:0.82rem">${p.doc_number||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${d}</td><td style="padding:7px 10px;font-weight:600">${p.vendor_name||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:700">${fmt(p.total_amount)}</td><td style="padding:7px 10px;text-align:center">${stHtml}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  } catch(e) { wrap.innerHTML = `<div style="color:#ef4444">❌ ${e.message}</div>`; }
+}
+
+async function loadEstimatesTab() {
+  const wrap = document.getElementById('qbFinTabContentEstimates');
+  if (!wrap) return;
+  try {
+    const ests = await supaGet('estimates', '?select=*&order=txn_date.desc');
+    const fmt = v => '€'+Number(v).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2});
+    let html = `<div style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">Total estimates: <b>${(ests||[]).length}</b></div>`;
+    html += `<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">Est#</th><th style="padding:8px 10px;text-align:left">Date</th><th style="padding:8px 10px;text-align:left">Customer</th><th style="padding:8px 10px;text-align:right">Amount</th><th style="padding:8px 10px;text-align:center">Status</th></tr></thead><tbody>`;
+    (ests||[]).forEach((e,i) => {
+      const bg = i%2 ? 'background:var(--surface-2)' : '';
+      const d = e.txn_date ? new Date(e.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+      const colors = { pending:'#eab308', accepted:'#16a34a', rejected:'#dc2626', converted:'#2563eb', expired:'#6b7280' };
+      const stHtml = `<span style="background:${(colors[e.status]||'#6b7280')+'15'};color:${colors[e.status]||'#6b7280'};border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">${(e.status||'—').charAt(0).toUpperCase()+(e.status||'').slice(1)}</span>`;
+      html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px;font-family:monospace;font-size:0.82rem">${e.doc_number||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${d}</td><td style="padding:7px 10px;font-weight:600">${e.customer_name||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:700">${fmt(e.total_amount)}</td><td style="padding:7px 10px;text-align:center">${stHtml}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  } catch(e) { wrap.innerHTML = `<div style="color:#ef4444">❌ ${e.message}</div>`; }
+}
+
+// Auto-load when finance page opens
+const _origShowPage = typeof showPage === 'function' ? showPage : null;
 
 // ── ZONE3 CUSTOMER DISCOUNTS ──────────────────────────────────
 function renderZone3Discounts() {
