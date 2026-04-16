@@ -2768,6 +2768,26 @@ Select a financial report above to begin analysis.
 </table>
 </div>
 </div>
+
+<!-- QB FINANCIAL OVERVIEW (inside page-finance) -->
+<div style="margin-top:30px;border-top:2px solid var(--border);padding-top:24px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<h2 style="margin:0;font-size:1.2rem">📊 QuickBooks Financial Overview</h2>
+<button class="btn btn-primary" onclick="loadQBFinancials()">🔄 Sync from QuickBooks</button>
+</div>
+<div id="qbFinSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px"></div>
+<div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;overflow-x:auto">
+<button id="qbFinTabAP" onclick="switchQBFinTab('ap')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--accent);border-bottom:3px solid var(--accent);margin-bottom:-2px">📋 Bills / AP</button>
+<button id="qbFinTabVendors" onclick="switchQBFinTab('vendors')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">🏢 Vendors</button>
+<button id="qbFinTabPOs" onclick="switchQBFinTab('pos')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">📦 Purchase Orders</button>
+<button id="qbFinTabEstimates" onclick="switchQBFinTab('estimates')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">📝 Estimates</button>
+</div>
+<div id="qbFinTabContentAP"></div>
+<div id="qbFinTabContentVendors" style="display:none"></div>
+<div id="qbFinTabContentPOs" style="display:none"></div>
+<div id="qbFinTabContentEstimates" style="display:none"></div>
+</div>
+
 </div>
 
 <div class="page" id="page-backorders">
@@ -2823,31 +2843,6 @@ Select a financial report above to begin analysis.
   </div>
 </div>
 </div>
-
-<!-- QB FINANCIAL OVERVIEW SECTION (inside finance page) -->
-<div style="margin-top:30px;border-top:2px solid var(--border);padding-top:24px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-<h2 style="margin:0;font-size:1.2rem">📊 QuickBooks Financial Overview</h2>
-<button class="btn btn-primary" onclick="loadQBFinancials()">🔄 Sync from QuickBooks</button>
-</div>
-
-<!-- P&L + Balance Sheet Summary -->
-<div id="qbFinSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px"></div>
-
-<!-- Tabbed sections: AP | Vendors | POs | Estimates -->
-<div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;overflow-x:auto">
-<button id="qbFinTabAP" onclick="switchQBFinTab('ap')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--accent);border-bottom:3px solid var(--accent);margin-bottom:-2px">📋 Bills / AP</button>
-<button id="qbFinTabVendors" onclick="switchQBFinTab('vendors')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">🏢 Vendors</button>
-<button id="qbFinTabPOs" onclick="switchQBFinTab('pos')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">📦 Purchase Orders</button>
-<button id="qbFinTabEstimates" onclick="switchQBFinTab('estimates')" style="padding:10px 20px;border:none;background:none;cursor:pointer;font-size:0.92rem;font-weight:600;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px">📝 Estimates</button>
-</div>
-<div id="qbFinTabContentAP"></div>
-<div id="qbFinTabContentVendors" style="display:none"></div>
-<div id="qbFinTabContentPOs" style="display:none"></div>
-<div id="qbFinTabContentEstimates" style="display:none"></div>
-</div>
-</div>
-
 <!-- QB FINANCIAL DETAIL MODAL -->
 <div class="modal-overlay" id="qbFinModal" onclick="if(event.target===this)closeQBFinModal()" style="display:none;align-items:center;justify-content:center">
   <div class="modal" style="max-width:800px;width:95%;max-height:85vh;overflow-y:auto">
