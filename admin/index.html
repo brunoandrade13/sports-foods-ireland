@@ -4663,6 +4663,7 @@ Loading items...
 <button class="btn btn-outline" style="border-color:var(--border);display:none" id="btnGlsLabel" onclick="downloadGLSLabel()">🏷️ Print Label</button>
 <button class="btn btn-primary" onclick="generateInvoicePDFFromModal().catch(e => alert('ERROR: ' + e.message))">Generate Invoice</button>
 <button class="btn btn-outline" style="border-color:#2D6A4F;color:#2D6A4F" onclick="sendInvoiceByEmail().catch(e => alert('ERROR: ' + e.message))">📧 Send Invoice</button>
+<button class="btn btn-outline" id="btnQbInvoice" style="border-color:#4f46e5;color:#4f46e5" onclick="sendInvoiceToQB().catch(e => alert('ERROR: ' + e.message))">📤 Send to QuickBooks</button>
 </div>
 </div>
 </div>
@@ -12054,6 +12055,22 @@ Loading items...
       // For unshipped orders, hide label button; for shipped orders it's already visible
       if (!order.tracking_number) lblBtn.style.display = 'none';
 
+      // QB Invoice button state
+      var qbBtn = document.getElementById('btnQbInvoice');
+      if (qbBtn) {
+        if (order.qb_invoice_id) {
+          qbBtn.textContent = '✅ QB #' + (order.qb_invoice_id);
+          qbBtn.disabled = true;
+          qbBtn.style.borderColor = '#16a34a';
+          qbBtn.style.color = '#16a34a';
+        } else {
+          qbBtn.textContent = '📤 Send to QuickBooks';
+          qbBtn.disabled = false;
+          qbBtn.style.borderColor = '#4f46e5';
+          qbBtn.style.color = '#4f46e5';
+        }
+      }
+
       try {
         const items = await supaGet('order_items', `?order_id=eq.${order.id}`);
         window._currentModalItems = items || [];
@@ -14066,6 +14083,30 @@ window.confirmGLSShip = async function confirmGLSShip() {
     if (btn) { btn.disabled = false; btn.textContent = '🚚 Create Shipment'; }
     toast('GLS error: ' + e.message, 'error');
     console.error('[GLS] confirmGLSShip error:', e);
+  }
+};
+
+window.sendInvoiceToQB = async function sendInvoiceToQB() {
+  var order = window._currentModalOrder;
+  if (!order) { toast('No order open', 'error'); return; }
+  var btn = document.getElementById('btnQbInvoice');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Sending to QB...'; }
+  try {
+    var resp = await fetch(SUPA_URL + '/functions/v1/qb-create-invoice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order_id: order.id })
+    });
+    var result = await resp.json();
+    if (!resp.ok || result.error) {
+      throw new Error(result.error || 'QB error ' + resp.status);
+    }
+    if (btn) { btn.textContent = '✅ QB #' + (result.qb_doc_number || result.qb_invoice_id); btn.style.borderColor = '#16a34a'; btn.style.color = '#16a34a'; }
+    toast('✅ Invoice sent to QuickBooks! QB #' + (result.qb_doc_number || result.qb_invoice_id), 'success');
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '📤 Send to QuickBooks'; }
+    toast('QB Error: ' + e.message, 'error');
+    console.error('[QB Invoice] Error:', e);
   }
 };
 
