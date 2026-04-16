@@ -2848,6 +2848,17 @@ Select a financial report above to begin analysis.
 </div>
 </div>
 
+<!-- QB FINANCIAL DETAIL MODAL -->
+<div class="modal-overlay" id="qbFinModal" onclick="if(event.target===this)closeQBFinModal()" style="display:none;align-items:center;justify-content:center">
+  <div class="modal" style="max-width:800px;width:95%;max-height:85vh;overflow-y:auto">
+    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--border)">
+      <h3 id="qbFinModalTitle" style="margin:0;font-size:1.05rem"></h3>
+      <button onclick="closeQBFinModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted)">&times;</button>
+    </div>
+    <div id="qbFinModalBody" style="padding:20px 24px"></div>
+  </div>
+</div>
+
 <!-- MONTHLY CLOSING PAGE -->
 <div class="page" id="page-monthly-closing">
 <div class="page-header">
@@ -15569,23 +15580,25 @@ async function loadQBFinancials() {
 function renderQBFinSummary(reps) {
   const summ = document.getElementById('qbFinSummary');
   if (!summ) return;
+  window._qbReports = reps;
   const fmt = v => { try { const n=parseFloat(v); return isNaN(n)?v:'€'+n.toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2}); } catch{return v;} };
   const pl = reps.profit_loss || {};
   const plLY = reps.profit_loss_last_year || {};
   const bs = reps.balance_sheet || {};
   const cards = [
-    { label:'Revenue (YTD)', value: fmt(pl['Total Income']||0), color:'#16a34a', bg:'#f0fdf4' },
-    { label:'COGS (YTD)', value: fmt(pl['Total Cost of Sales']||0), color:'#dc2626', bg:'#fef2f2' },
-    { label:'Gross Profit (YTD)', value: fmt(pl['Gross Profit']||0), color:'#2563eb', bg:'#eff6ff' },
-    { label:'Net Income (YTD)', value: fmt(pl['Net Income']||0), color:'#7c3aed', bg:'#f5f3ff' },
-    { label:'Revenue (Last Year)', value: fmt(plLY['Total Income']||0), color:'#6b7280', bg:'#f9fafb' },
-    { label:'Net Income (Last Year)', value: fmt(plLY['Net Income']||0), color:'#6b7280', bg:'#f9fafb' },
-    { label:'AR (Customer Balance)', value: fmt(reps.customer_balance_total||0), color:'#166534', bg:'#f0fdf4' },
-    { label:'Cash at Bank', value: fmt(bs['Total Cash at bank and in hand']||0), color:'#0891b2', bg:'#ecfeff' },
+    { label:'Revenue (YTD)', value: fmt(pl['Total Income']||0), color:'#16a34a', bg:'#f0fdf4', click:"showPLDetail('ytd')" },
+    { label:'COGS (YTD)', value: fmt(pl['Total Cost of Sales']||0), color:'#dc2626', bg:'#fef2f2', click:"showPLDetail('ytd')" },
+    { label:'Gross Profit (YTD)', value: fmt(pl['Gross Profit']||0), color:'#2563eb', bg:'#eff6ff', click:"showPLDetail('ytd')" },
+    { label:'Net Income (YTD)', value: fmt(pl['Net Income']||0), color:'#7c3aed', bg:'#f5f3ff', click:"showPLDetail('ytd')" },
+    { label:'Revenue (Last Year)', value: fmt(plLY['Total Income']||0), color:'#6b7280', bg:'#f9fafb', click:"showPLDetail('ly')" },
+    { label:'Net Income (Last Year)', value: fmt(plLY['Net Income']||0), color:'#6b7280', bg:'#f9fafb', click:"showPLDetail('ly')" },
+    { label:'AR (Customer Balance)', value: fmt(reps.customer_balance_total||0), color:'#166534', bg:'#f0fdf4', click:"showBSDetail('ar')" },
+    { label:'Cash at Bank', value: fmt(bs['Total Cash at bank and in hand']||0), color:'#0891b2', bg:'#ecfeff', click:"showBSDetail('bs')" },
   ];
-  summ.innerHTML = cards.map(c => `<div style="background:${c.bg};border:1px solid var(--border);border-radius:10px;padding:14px 18px;text-align:center">
+  summ.innerHTML = cards.map(c => `<div onclick="${c.click}" style="background:${c.bg};border:1px solid var(--border);border-radius:10px;padding:14px 18px;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,.1)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
     <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">${c.label}</div>
-    <div style="font-size:1.4rem;font-weight:700;color:${c.color}">${c.value}</div></div>`).join('');
+    <div style="font-size:1.4rem;font-weight:700;color:${c.color}">${c.value}</div>
+    <div style="font-size:0.65rem;color:var(--text-muted);margin-top:4px">click for details</div></div>`).join('');
 }
 
 function switchQBFinTab(tab) {
@@ -15612,7 +15625,7 @@ async function loadAPTab() {
     html += `<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">#</th><th style="padding:8px 10px;text-align:left">Vendor</th><th style="padding:8px 10px;text-align:right">Owed</th><th style="padding:8px 10px;text-align:center">Bills</th></tr></thead><tbody>`;
     sorted.forEach((v,i) => {
       const bg = i%2 ? 'background:var(--surface-2)' : '';
-      html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px;color:var(--text-muted)">${i+1}</td><td style="padding:7px 10px;font-weight:600">${v.name}</td><td style="padding:7px 10px;text-align:right;font-weight:700;color:#dc2626">${fmt(v.total)}</td><td style="padding:7px 10px;text-align:center">${v.bills}</td></tr>`;
+      html += `<tr style="${bg};border-bottom:1px solid var(--border);cursor:pointer" onclick="showVendorBills('${v.name.replace(/'/g,"\\'")}')" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2?'var(--surface-2)':''}'"><td style="padding:7px 10px;color:var(--text-muted)">${i+1}</td><td style="padding:7px 10px;font-weight:600">${v.name}</td><td style="padding:7px 10px;text-align:right;font-weight:700;color:#dc2626">${fmt(v.total)}</td><td style="padding:7px 10px;text-align:center">${v.bills}</td></tr>`;
     });
     html += '</tbody></table>';
     wrap.innerHTML = html;
@@ -15650,7 +15663,7 @@ async function loadPOsTab() {
       const bg = i%2 ? 'background:var(--surface-2)' : '';
       const d = p.txn_date ? new Date(p.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
       const stHtml = p.status==='open' ? '<span style="background:#eff6ff;color:#2563eb;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">Open</span>' : '<span style="background:#f0fdf4;color:#16a34a;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">Closed</span>';
-      html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px;font-family:monospace;font-size:0.82rem">${p.doc_number||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${d}</td><td style="padding:7px 10px;font-weight:600">${p.vendor_name||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:700">${fmt(p.total_amount)}</td><td style="padding:7px 10px;text-align:center">${stHtml}</td></tr>`;
+      html += `<tr style="${bg};border-bottom:1px solid var(--border);cursor:pointer" onclick="showPODetail('${p.doc_number||''}','${(p.vendor_name||'').replace(/'/g,"\\'")}')" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2?'var(--surface-2)':''}'"><td style="padding:7px 10px;font-family:monospace;font-size:0.82rem">${p.doc_number||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${d}</td><td style="padding:7px 10px;font-weight:600">${p.vendor_name||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:700">${fmt(p.total_amount)}</td><td style="padding:7px 10px;text-align:center">${stHtml}</td></tr>`;
     });
     html += '</tbody></table>';
     wrap.innerHTML = html;
@@ -15670,7 +15683,7 @@ async function loadEstimatesTab() {
       const d = e.txn_date ? new Date(e.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
       const colors = { pending:'#eab308', accepted:'#16a34a', rejected:'#dc2626', converted:'#2563eb', expired:'#6b7280' };
       const stHtml = `<span style="background:${(colors[e.status]||'#6b7280')+'15'};color:${colors[e.status]||'#6b7280'};border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">${(e.status||'—').charAt(0).toUpperCase()+(e.status||'').slice(1)}</span>`;
-      html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px;font-family:monospace;font-size:0.82rem">${e.doc_number||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${d}</td><td style="padding:7px 10px;font-weight:600">${e.customer_name||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:700">${fmt(e.total_amount)}</td><td style="padding:7px 10px;text-align:center">${stHtml}</td></tr>`;
+      html += `<tr style="${bg};border-bottom:1px solid var(--border);cursor:pointer" onclick="showEstimateDetail('${e.qb_estimate_id}')" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2?'var(--surface-2)':''}'"><td style="padding:7px 10px;font-family:monospace;font-size:0.82rem">${e.doc_number||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${d}</td><td style="padding:7px 10px;font-weight:600">${e.customer_name||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:700">${fmt(e.total_amount)}</td><td style="padding:7px 10px;text-align:center">${stHtml}</td></tr>`;
     });
     html += '</tbody></table>';
     wrap.innerHTML = html;
@@ -15679,6 +15692,144 @@ async function loadEstimatesTab() {
 
 // Auto-load when finance page opens
 const _origShowPage = typeof showPage === 'function' ? showPage : null;
+
+// ── QB FINANCIAL MODALS ──────────────────────────────────
+function openQBFinModal(title, bodyHtml) {
+  document.getElementById('qbFinModalTitle').textContent = title;
+  document.getElementById('qbFinModalBody').innerHTML = bodyHtml;
+  document.getElementById('qbFinModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeQBFinModal() {
+  document.getElementById('qbFinModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function showPLDetail(period) {
+  const reps = window._qbReports || {};
+  const pl = period === 'ly' ? (reps.profit_loss_last_year || {}) : (reps.profit_loss || {});
+  const title = period === 'ly' ? 'Profit & Loss — Last Year' : 'Profit & Loss — Year to Date';
+  const fmt = v => { try { const n=parseFloat(v); return isNaN(n)?v:'€'+n.toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2}); } catch{return v;} };
+  const skip = ['title','period'];
+  let html = `<div style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">${pl.period || ''}</div>`;
+  html += '<table style="width:100%;border-collapse:collapse;font-size:0.88rem">';
+  for (const [k, v] of Object.entries(pl)) {
+    if (skip.includes(k)) continue;
+    const isTotal = k.startsWith('Total') || k.startsWith('Gross') || k.startsWith('Net');
+    const isSub = k.includes(' > ');
+    const indent = isSub ? 'padding-left:28px;font-size:0.82rem;color:var(--text-muted)' : '';
+    const weight = isTotal ? 'font-weight:700' : '';
+    const border = isTotal ? 'border-top:2px solid var(--border);border-bottom:1px solid var(--border)' : 'border-bottom:1px solid var(--border)';
+    const label = isSub ? k.split(' > ')[1] : k;
+    const val = parseFloat(v);
+    const color = isTotal && val < 0 ? 'color:#dc2626' : isTotal && k.includes('Net') ? 'color:#7c3aed' : '';
+    html += `<tr style="${border}"><td style="padding:8px 12px;${indent};${weight}">${label}</td><td style="padding:8px 12px;text-align:right;${weight};${color}">${fmt(v)}</td></tr>`;
+  }
+  html += '</table>';
+  openQBFinModal(title, html);
+}
+
+function showBSDetail(section) {
+  const reps = window._qbReports || {};
+  const bs = reps.balance_sheet || {};
+  const title = section === 'ar' ? 'Accounts Receivable Details' : 'Balance Sheet';
+  const fmt = v => { try { const n=parseFloat(v); return isNaN(n)?v:'€'+n.toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2}); } catch{return v;} };
+  const skip = ['title','period'];
+  let html = `<div style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">${bs.period || ''}</div>`;
+  html += '<table style="width:100%;border-collapse:collapse;font-size:0.88rem">';
+  for (const [k, v] of Object.entries(bs)) {
+    if (skip.includes(k)) continue;
+    const isTotal = k.startsWith('Total') || k.startsWith('Net') || k.includes('net assets');
+    const isSub = k.includes(' > ');
+    const indent = isSub ? 'padding-left:28px;font-size:0.82rem;color:var(--text-muted)' : '';
+    const weight = isTotal ? 'font-weight:700' : '';
+    const border = isTotal ? 'border-top:2px solid var(--border);border-bottom:1px solid var(--border)' : 'border-bottom:1px solid var(--border)';
+    const label = isSub ? k.split(' > ')[1] : k;
+    html += `<tr style="${border}"><td style="padding:8px 12px;${indent};${weight}">${label}</td><td style="padding:8px 12px;text-align:right;${weight}">${fmt(v)}</td></tr>`;
+  }
+  html += '</table>';
+  openQBFinModal(title, html);
+}
+
+async function showVendorBills(vendorName) {
+  openQBFinModal(vendorName + ' — Bills', '<div style="text-align:center;padding:20px;color:var(--text-muted)">⏳ Loading...</div>');
+  try {
+    const bills = await supaGet('bills', `?select=doc_number,txn_date,due_date,total_amount,balance,memo&vendor_name=eq.${encodeURIComponent(vendorName)}&balance=gt.0&order=txn_date.desc`);
+    const fmt = v => '€'+Number(v).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const total = (bills||[]).reduce((s,b) => s+Number(b.balance||0), 0);
+    let html = `<div style="margin-bottom:12px;font-size:0.85rem">Total owed: <b style="color:#dc2626">${fmt(total)}</b> | ${(bills||[]).length} bills</div>`;
+    html += '<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">Bill#</th><th style="padding:8px 10px;text-align:left">Date</th><th style="padding:8px 10px;text-align:left">Due</th><th style="padding:8px 10px;text-align:right">Total</th><th style="padding:8px 10px;text-align:right">Balance</th><th style="padding:8px 10px;text-align:left">Memo</th></tr></thead><tbody>';
+    (bills||[]).forEach((b,i) => {
+      const d = b.txn_date ? new Date(b.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+      const due = b.due_date ? new Date(b.due_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+      const overdue = b.due_date && new Date(b.due_date) < new Date();
+      const bg = i%2 ? 'background:var(--surface-2)' : '';
+      html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px;font-family:monospace;font-size:0.82rem">${b.doc_number||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${d}</td><td style="padding:7px 10px;font-size:0.82rem;${overdue?'color:#dc2626;font-weight:600':''}">${due}</td><td style="padding:7px 10px;text-align:right">${fmt(b.total_amount)}</td><td style="padding:7px 10px;text-align:right;font-weight:700;color:#dc2626">${fmt(b.balance)}</td><td style="padding:7px 10px;font-size:0.8rem;color:var(--text-muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.memo||''}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('qbFinModalBody').innerHTML = html;
+  } catch(e) { document.getElementById('qbFinModalBody').innerHTML = '<div style="color:#ef4444">❌ '+e.message+'</div>'; }
+}
+
+async function showPODetail(docNum, vendorName) {
+  openQBFinModal('PO #' + docNum + ' — ' + vendorName, '<div style="text-align:center;padding:20px;color:var(--text-muted)">⏳ Loading...</div>');
+  try {
+    const pos = await supaGet('purchase_orders', `?select=*&doc_number=eq.${encodeURIComponent(docNum)}&limit=1`);
+    const po = (pos||[])[0];
+    if (!po) { document.getElementById('qbFinModalBody').innerHTML = '<div>PO not found</div>'; return; }
+    const fmt = v => '€'+Number(v).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const d = po.txn_date ? new Date(po.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    let html = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;font-size:0.88rem">
+      <div><span style="color:var(--text-muted)">Vendor:</span> <b>${po.vendor_name||'—'}</b></div>
+      <div><span style="color:var(--text-muted)">Date:</span> <b>${d}</b></div>
+      <div><span style="color:var(--text-muted)">Total:</span> <b style="color:#2563eb">${fmt(po.total_amount)}</b></div>
+      <div><span style="color:var(--text-muted)">Status:</span> <b>${po.status||'—'}</b></div>
+      ${po.memo ? `<div style="grid-column:1/-1"><span style="color:var(--text-muted)">Memo:</span> ${po.memo}</div>` : ''}
+    </div>`;
+    const items = po.line_items || [];
+    if (items.length) {
+      html += '<h4 style="margin:12px 0 8px;font-size:0.9rem">Line Items</h4>';
+      html += '<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">Item</th><th style="padding:8px 10px;text-align:center">Qty</th><th style="padding:8px 10px;text-align:right">Rate</th><th style="padding:8px 10px;text-align:right">Amount</th></tr></thead><tbody>';
+      items.forEach((it,i) => {
+        const bg = i%2 ? 'background:var(--surface-2)' : '';
+        html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px">${it.item||it.description||'—'}</td><td style="padding:7px 10px;text-align:center">${it.qty||1}</td><td style="padding:7px 10px;text-align:right">${fmt(it.rate||0)}</td><td style="padding:7px 10px;text-align:right;font-weight:600">${fmt(it.amount||0)}</td></tr>`;
+      });
+      html += '</tbody></table>';
+    }
+    document.getElementById('qbFinModalBody').innerHTML = html;
+  } catch(e) { document.getElementById('qbFinModalBody').innerHTML = '<div style="color:#ef4444">❌ '+e.message+'</div>'; }
+}
+
+async function showEstimateDetail(estId) {
+  openQBFinModal('Estimate Details', '<div style="text-align:center;padding:20px;color:var(--text-muted)">⏳ Loading...</div>');
+  try {
+    const ests = await supaGet('estimates', `?select=*&qb_estimate_id=eq.${estId}&limit=1`);
+    const e = (ests||[])[0];
+    if (!e) { document.getElementById('qbFinModalBody').innerHTML = '<div>Estimate not found</div>'; return; }
+    const fmt = v => '€'+Number(v).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const d = e.txn_date ? new Date(e.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const exp = e.expiry_date ? new Date(e.expiry_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    let html = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;font-size:0.88rem">
+      <div><span style="color:var(--text-muted)">Customer:</span> <b>${e.customer_name||'—'}</b></div>
+      <div><span style="color:var(--text-muted)">Date:</span> <b>${d}</b></div>
+      <div><span style="color:var(--text-muted)">Total:</span> <b style="color:#2563eb">${fmt(e.total_amount)}</b></div>
+      <div><span style="color:var(--text-muted)">Expires:</span> <b>${exp}</b></div>
+      <div><span style="color:var(--text-muted)">Status:</span> <b>${e.status||'—'}</b></div>
+      <div><span style="color:var(--text-muted)">Doc#:</span> <b>${e.doc_number||'—'}</b></div>
+    </div>`;
+    const items = e.line_items || [];
+    if (items.length) {
+      html += '<h4 style="margin:12px 0 8px;font-size:0.9rem">Line Items</h4>';
+      html += '<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="background:var(--surface-2);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase"><th style="padding:8px 10px;text-align:left">Item</th><th style="padding:8px 10px;text-align:center">Qty</th><th style="padding:8px 10px;text-align:right">Rate</th><th style="padding:8px 10px;text-align:right">Amount</th></tr></thead><tbody>';
+      items.forEach((it,i) => {
+        const bg = i%2 ? 'background:var(--surface-2)' : '';
+        html += `<tr style="${bg};border-bottom:1px solid var(--border)"><td style="padding:7px 10px">${it.item||it.description||'—'}</td><td style="padding:7px 10px;text-align:center">${it.qty||1}</td><td style="padding:7px 10px;text-align:right">${fmt(it.rate||0)}</td><td style="padding:7px 10px;text-align:right;font-weight:600">${fmt(it.amount||0)}</td></tr>`;
+      });
+      html += '</tbody></table>';
+    }
+    document.getElementById('qbFinModalBody').innerHTML = html;
+  } catch(e) { document.getElementById('qbFinModalBody').innerHTML = '<div style="color:#ef4444">❌ '+e.message+'</div>'; }
+}
 
 // ── ZONE3 CUSTOMER DISCOUNTS ──────────────────────────────────
 function renderZone3Discounts() {
