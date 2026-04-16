@@ -15661,7 +15661,7 @@ async function loadPOsTab() {
       const bg = i%2 ? 'background:var(--surface-2)' : '';
       const d = p.txn_date ? new Date(p.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
       const stHtml = p.status==='open' ? '<span style="background:#eff6ff;color:#2563eb;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">Open</span>' : '<span style="background:#f0fdf4;color:#16a34a;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:600">Closed</span>';
-      html += `<tr style="${bg};border-bottom:1px solid var(--border);cursor:pointer" onclick="showPODetail('${p.doc_number||''}','${(p.vendor_name||'').replace(/'/g,"\\'")}')" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2?'var(--surface-2)':''}'"><td style="padding:7px 10px;font-family:monospace;font-size:0.82rem">${p.doc_number||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${d}</td><td style="padding:7px 10px;font-weight:600">${p.vendor_name||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:700">${fmt(p.total_amount)}</td><td style="padding:7px 10px;text-align:center">${stHtml}</td></tr>`;
+      html += `<tr style="${bg};border-bottom:1px solid var(--border);cursor:pointer" onclick="showPODetail('${p.id}')" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='${i%2?'var(--surface-2)':''}'"><td style="padding:7px 10px;font-family:monospace;font-size:0.82rem">${p.doc_number||'—'}</td><td style="padding:7px 10px;font-size:0.82rem">${d}</td><td style="padding:7px 10px;font-weight:600">${p.vendor_name||'—'}</td><td style="padding:7px 10px;text-align:right;font-weight:700">${fmt(p.total_amount)}</td><td style="padding:7px 10px;text-align:center">${stHtml}</td></tr>`;
     });
     html += '</tbody></table>';
     wrap.innerHTML = html;
@@ -15769,12 +15769,13 @@ async function showVendorBills(vendorName) {
   } catch(e) { document.getElementById('qbFinModalBody').innerHTML = '<div style="color:#ef4444">❌ '+e.message+'</div>'; }
 }
 
-async function showPODetail(docNum, vendorName) {
-  openQBFinModal('PO #' + docNum + ' — ' + vendorName, '<div style="text-align:center;padding:20px;color:var(--text-muted)">⏳ Loading...</div>');
+async function showPODetail(poId) {
+  openQBFinModal('Purchase Order', '<div style="text-align:center;padding:20px;color:var(--text-muted)">⏳ Loading...</div>');
   try {
-    const pos = await supaGet('purchase_orders', `?select=*&doc_number=eq.${encodeURIComponent(docNum)}&limit=1`);
+    const pos = await supaGet('purchase_orders', `?select=*&id=eq.${poId}&limit=1`);
     const po = (pos||[])[0];
     if (!po) { document.getElementById('qbFinModalBody').innerHTML = '<div>PO not found</div>'; return; }
+    document.getElementById('qbFinModalTitle').textContent = 'PO #' + (po.doc_number||po.id.substring(0,8)) + ' — ' + (po.vendor_name||'');
     const fmt = v => '€'+Number(v).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2});
     const d = po.txn_date ? new Date(po.txn_date).toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'}) : '—';
     let html = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;font-size:0.88rem">
