@@ -4659,7 +4659,7 @@ Loading items...
 <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center">
 <button class="btn btn-outline" style="border-color:#f59e0b;color:#f59e0b;margin-right:auto" id="btnEditItems" onclick="toggleOrderEditMode()">✏️ Edit Items</button>
 <button class="btn btn-primary" id="btnSaveItemEdits" style="display:none;background:#f59e0b;border-color:#f59e0b;color:#000" onclick="saveOrderItemEdits().catch(e => alert('ERROR: ' + e.message))">💾 Save Changes</button>
-<button class="btn btn-outline" style="border-color:var(--border)" id="btnGlsShip" onclick="shipViaGLS()">📦 Ship via GLS</button>
+<button class="btn btn-outline" style="border-color:var(--border)" id="btnGlsShip" onclick="openGLSShipModal()">📦 Ship via GLS</button>
 <button class="btn btn-outline" style="border-color:var(--border);display:none" id="btnGlsLabel" onclick="downloadGLSLabel()">🏷️ Print Label</button>
 <button class="btn btn-primary" onclick="generateInvoicePDFFromModal().catch(e => alert('ERROR: ' + e.message))">Generate Invoice</button>
 <button class="btn btn-outline" style="border-color:#2D6A4F;color:#2D6A4F" onclick="sendInvoiceByEmail().catch(e => alert('ERROR: ' + e.message))">📧 Send Invoice</button>
@@ -13894,114 +13894,178 @@ window._sfiLogoB64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAM
 // ============================================================
 var _glsLabelBase64 = null;
 
-window.shipViaGLS = async function shipViaGLS() {
-  const order = window._currentModalOrder;
+window.openGLSShipModal = function openGLSShipModal() {
+  var order = window._currentModalOrder;
   if (!order) { toast('No order open', 'error'); return; }
 
-  const btn = document.getElementById('btnGlsShip');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Creating shipment...'; }
+  var ship = (order.shipping_address && typeof order.shipping_address === 'object') ? order.shipping_address : {};
+  var bill = (order.billing_address && typeof order.billing_address === 'object') ? order.billing_address : {};
+  var addr = (ship.address_1 || ship.address1 || ship.addr1 || ship.address) ? ship : bill;
 
-  // Build recipient address from shipping_address (fall back to billing_address)
-  const ship = (order.shipping_address && typeof order.shipping_address === 'object') ? order.shipping_address : {};
-  const bill = (order.billing_address  && typeof order.billing_address  === 'object') ? order.billing_address  : {};
-  const addr = (ship.address_1 || ship.address1 || ship.addr1 || ship.address) ? ship : bill;
-
-  // Default name from address
-  let recipientName = [addr.first_name, addr.last_name].filter(Boolean).join(' ')
-    || order.customer_name || order.billing_name || 'Customer';
-
-  // B2B: use company name if available
+  var recipientName = order.customer_name || [addr.first_name, addr.last_name].filter(Boolean).join(' ') || 'Customer';
   if (order.customer_id) {
-    const cust = (allCustomers || []).find(c => String(c.id) === String(order.customer_id));
-    if (cust && cust.customer_type === 'b2b' && cust.b2b_company_name) {
-      recipientName = cust.b2b_company_name;
-    }
+    var cust = (allCustomers || []).find(function(c) { return String(c.id) === String(order.customer_id); });
+    if (cust && cust.customer_type === 'b2b' && cust.b2b_company_name) recipientName = cust.b2b_company_name;
   }
 
-  const street  = addr.address_1 || addr.address1 || addr.addr1 || addr.address || addr.street || '';
-  const city    = addr.city || '';
-  const zipCode = addr.postcode || addr.postal_code || addr.zip || '';
-  const country = addr.country_code || addr.country || 'IE';
-  const phone   = addr.phone || bill.phone || order.customer_phone || '';
-  let email     = order.customer_email || bill.email || ship.email || addr.email || '';
+  var street1 = addr.address_1 || addr.address1 || addr.addr1 || addr.address || addr.street || '';
+  var street2 = addr.address_2 || addr.address2 || addr.addr2 || '';
+  var city    = addr.city || '';
+  var zipCode = addr.postcode || addr.postal_code || addr.zip || '';
+  var country = addr.country_code || addr.country || 'IE';
+  var phone   = addr.phone || bill.phone || order.customer_phone || '';
+  var email   = order.customer_email || bill.email || ship.email || addr.email || '';
   if (!email && order.customer_id) {
-    const cust = (allCustomers || []).find(c => c.id === order.customer_id);
-    if (cust && cust.email) email = cust.email;
+    var c2 = (allCustomers || []).find(function(c) { return c.id === order.customer_id; });
+    if (c2 && c2.email) email = c2.email;
   }
 
-  if (!street || !city || !zipCode) {
-    if (btn) { btn.disabled = false; btn.textContent = '📦 Ship via GLS'; }
-    toast('Missing shipping address (street, city or postcode)', 'error');
-    return;
+  var modal = document.getElementById('glsShipModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'glsShipModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div style="background:var(--card-bg,#1e293b);border-radius:16px;padding:28px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;position:relative">' +
+      '<button onclick="document.getElementById(\'glsShipModal\').style.display=\'none\'" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer">&times;</button>' +
+      '<div id="glsShipModalContent"></div></div>';
+    document.body.appendChild(modal);
+  }
+
+  var orderNum = order.order_number || order.id || '';
+  document.getElementById('glsShipModalContent').innerHTML =
+    '<h3 style="margin:0 0 4px;color:var(--text)">📦 Ship via GLS</h3>' +
+    '<p style="margin:0 0 18px;color:var(--text-muted);font-size:0.85rem">Order <strong>' + esc(orderNum) + '</strong> — Review details before creating shipment</p>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
+      '<div style="grid-column:1/-1"><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Recipient / Company Name</label>' +
+        '<input type="text" id="glsName" value="' + esc(recipientName) + '" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem"></div>' +
+      '<div style="grid-column:1/-1"><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Address Line 1</label>' +
+        '<input type="text" id="glsStreet1" value="' + esc(street1) + '" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem"></div>' +
+      '<div style="grid-column:1/-1"><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Address Line 2</label>' +
+        '<input type="text" id="glsStreet2" value="' + esc(street2) + '" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem"></div>' +
+      '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">City</label>' +
+        '<input type="text" id="glsCity" value="' + esc(city) + '" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem"></div>' +
+      '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Eircode / Postcode</label>' +
+        '<input type="text" id="glsZip" value="' + esc(zipCode) + '" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem"></div>' +
+      '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Country</label>' +
+        '<select id="glsCountry" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem">' +
+          '<option value="IE"' + (country === 'IE' ? ' selected' : '') + '>Ireland</option>' +
+          '<option value="GB"' + (country === 'GB' ? ' selected' : '') + '>United Kingdom</option>' +
+          '<option value="NI"' + (country === 'NI' ? ' selected' : '') + '>Northern Ireland</option>' +
+        '</select></div>' +
+      '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Phone</label>' +
+        '<input type="text" id="glsPhone" value="' + esc(phone) + '" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem"></div>' +
+      '<div style="grid-column:1/-1"><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Email (for GLS FlexDelivery notifications)</label>' +
+        '<input type="email" id="glsEmail" value="' + esc(email) + '" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem"></div>' +
+    '</div>' +
+
+    '<div style="margin-top:18px;padding:16px;border:2px solid #f59e0b;border-radius:10px;background:rgba(245,158,11,0.06)">' +
+      '<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">' +
+        '<div style="flex:1;min-width:140px"><label style="font-size:0.78rem;font-weight:700;color:#f59e0b;display:block;margin-bottom:4px">📦 Number of Parcels/Boxes</label>' +
+          '<input type="number" id="glsParcelCount" value="1" min="1" max="20" style="width:100%;padding:10px 12px;border:2px solid #f59e0b;border-radius:8px;background:var(--bg);color:var(--text);font-size:1.1rem;font-weight:700;text-align:center"></div>' +
+        '<div style="flex:1;min-width:140px"><label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:4px">⚖️ Weight per parcel (kg)</label>' +
+          '<input type="number" id="glsWeight" value="1.0" min="0.1" max="50" step="0.1" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:1.1rem;text-align:center"></div>' +
+      '</div>' +
+      '<p style="margin:8px 0 0;font-size:0.78rem;color:var(--text-muted)">Each box gets its own parcel number and label. Multiple labels will be generated.</p>' +
+    '</div>' +
+
+    '<div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end">' +
+      '<button onclick="document.getElementById(\'glsShipModal\').style.display=\'none\'" class="btn btn-outline" style="padding:10px 20px">Cancel</button>' +
+      '<button id="glsConfirmBtn" onclick="confirmGLSShip()" class="btn btn-primary" style="padding:10px 24px;background:#f59e0b;border-color:#f59e0b;color:#000;font-weight:700">🚚 Create Shipment</button>' +
+    '</div>';
+
+  modal.style.display = 'flex';
+};
+
+window.confirmGLSShip = async function confirmGLSShip() {
+  var order = window._currentModalOrder;
+  if (!order) return;
+
+  var btn = document.getElementById('glsConfirmBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Creating...'; }
+
+  var recipientName = document.getElementById('glsName').value.trim();
+  var street1       = document.getElementById('glsStreet1').value.trim();
+  var street2       = document.getElementById('glsStreet2').value.trim();
+  var city          = document.getElementById('glsCity').value.trim();
+  var zipCode       = document.getElementById('glsZip').value.trim();
+  var country       = document.getElementById('glsCountry').value;
+  var phone         = document.getElementById('glsPhone').value.trim();
+  var email         = document.getElementById('glsEmail').value.trim();
+  var parcelCount   = parseInt(document.getElementById('glsParcelCount').value) || 1;
+  var weight        = parseFloat(document.getElementById('glsWeight').value) || 1.0;
+
+  if (!street1 || !city || !zipCode) {
+    if (btn) { btn.disabled = false; btn.textContent = '🚚 Create Shipment'; }
+    toast('Missing address (street, city or postcode)', 'error'); return;
   }
 
   try {
-    const resp = await fetch(SUPA_URL + '/functions/v1/gls-create-shipment', {
+    var resp = await fetch(SUPA_URL + '/functions/v1/gls-create-shipment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         order_number:   order.order_number || order.id,
         recipient_name: recipientName,
-        street:         street,
+        street:         street1,
+        street2:        street2,
         city:           city,
         zip_code:       zipCode,
         country_code:   country,
         contact_phone:  phone,
         contact_email:  email,
-        weight:         1.0,
+        weight:         weight,
+        parcel_count:   parcelCount,
         references:     order.order_number || order.id
       })
     });
-
-    const result = await resp.json();
-
+    var result = await resp.json();
     if (!resp.ok || result.error) {
-      const glsMsg = result.error || ('GLS error ' + resp.status);
-      const glsRaw = result.gls_raw ? (' | Raw: ' + result.gls_raw.substring(0, 200)) : '';
-      throw new Error(glsMsg + glsRaw);
+      throw new Error(result.error + (result.gls_raw ? ' | ' + result.gls_raw.substring(0, 200) : ''));
     }
 
-    // Parcel number = barcode on label (primary tracking reference)
-    const parcelNum = result.parcel_number || result.track_id || '';
+    // All parcel numbers
+    var allParcels = result.all_parcel_numbers || [result.parcel_number];
+    var trackingStr = allParcels.join(', ');
 
-    // Save tracking number to order
-    if (parcelNum) {
-      try {
-        var updateData = {
-          tracking_number: parcelNum,
-          fulfillment_status: 'fulfilled',
-          updated_at: new Date().toISOString()
-        };
-        if (result.label_pdf_base64) updateData.gls_label_base64 = result.label_pdf_base64;
-        await supaUpdate('orders', order.id, updateData);
-        const idx = allOrders.findIndex(function(o) { return o.id === order.id; });
-        if (idx >= 0) {
-          allOrders[idx].tracking_number = parcelNum;
-          allOrders[idx].fulfillment_status = 'fulfilled';
-          if (result.label_pdf_base64) allOrders[idx].gls_label_base64 = result.label_pdf_base64;
-        }
-        window._currentModalOrder.tracking_number = parcelNum;
-        if (result.label_pdf_base64) window._currentModalOrder.gls_label_base64 = result.label_pdf_base64;
-        const trackInput = document.getElementById('omTrackingNumber');
-        if (trackInput) trackInput.value = parcelNum;
-      } catch(e) {
-        console.error('[GLS] Failed to save tracking number:', e);
-      }
+    // Save to order
+    var updateData = {
+      tracking_number: trackingStr,
+      fulfillment_status: 'fulfilled',
+      updated_at: new Date().toISOString()
+    };
+    if (result.label_pdf_base64) updateData.gls_label_base64 = result.label_pdf_base64;
+    if (result.all_labels_base64 && result.all_labels_base64.length > 1) {
+      updateData.gls_all_labels = JSON.stringify(result.all_labels_base64);
     }
+    await supaUpdate('orders', order.id, updateData);
+
+    var idx = allOrders.findIndex(function(o) { return o.id === order.id; });
+    if (idx >= 0) {
+      allOrders[idx].tracking_number = trackingStr;
+      allOrders[idx].fulfillment_status = 'fulfilled';
+    }
+    window._currentModalOrder.tracking_number = trackingStr;
+    var trackInput = document.getElementById('omTrackingNumber');
+    if (trackInput) trackInput.value = trackingStr;
 
     if (result.label_pdf_base64) {
       _glsLabelBase64 = result.label_pdf_base64;
-      const lblBtn = document.getElementById('btnGlsLabel');
+      window._glsAllLabels = result.all_labels_base64 || [result.label_pdf_base64];
+      var lblBtn = document.getElementById('btnGlsLabel');
       if (lblBtn) lblBtn.style.display = 'inline-block';
     }
 
-    if (btn) { btn.textContent = '✅ Shipped: ' + (parcelNum || 'OK'); btn.disabled = true; }
-    toast('✅ GLS shipment created! Parcel: ' + (parcelNum || 'N/A'), 'success');
+    var shipBtn = document.getElementById('btnGlsShip');
+    if (shipBtn) { shipBtn.textContent = '✅ Shipped (' + parcelCount + ' parcel' + (parcelCount > 1 ? 's' : '') + ')'; shipBtn.disabled = true; }
+
+    document.getElementById('glsShipModal').style.display = 'none';
+    toast('✅ GLS shipment created! ' + parcelCount + ' parcel(s): ' + trackingStr, 'success');
 
   } catch(e) {
-    if (btn) { btn.disabled = false; btn.textContent = '📦 Ship via GLS'; }
+    if (btn) { btn.disabled = false; btn.textContent = '🚚 Create Shipment'; }
     toast('GLS error: ' + e.message, 'error');
-    console.error('[GLS] shipViaGLS error:', e);
+    console.error('[GLS] confirmGLSShip error:', e);
   }
 };
 
