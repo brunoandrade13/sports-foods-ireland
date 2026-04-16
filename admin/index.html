@@ -14493,12 +14493,17 @@ function renderOrderItemsTable(items, order, editMode) {
             oninput="omRecalcRow(${idx})">
         </td>
         <td style="padding:6px 6px;text-align:center;">
-          <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:2px;">Total: ${qty}</div>
-          <div style="display:flex;align-items:center;gap:4px;">
+          <div style="display:flex;align-items:center;gap:4px;justify-content:center;margin-bottom:3px;">
+            <span style="font-size:0.75rem;color:var(--text-muted);">Qty:</span>
+            <input type="number" class="om-edit-qty" data-idx="${idx}" value="${qty}" min="1" step="1"
+              style="width:52px;padding:4px 6px;border:1px solid var(--primary-color);border-radius:6px;background:var(--bg);color:var(--text);font-size:0.85rem;text-align:center;"
+              oninput="omRecalcRow(${idx})" title="Total quantity for this item">
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;justify-content:center;">
             <span style="font-size:0.75rem;color:var(--text-muted);">BO:</span>
             <input type="number" class="om-edit-boqty" data-idx="${idx}" value="${boQty}" min="0" max="${qty}" step="1"
               style="width:52px;padding:4px 6px;border:1px solid #a855f7;border-radius:6px;background:var(--bg);color:#e9d5ff;font-size:0.85rem;text-align:center;"
-              oninput="omRecalcRow(${idx})" title="Quantity for backorder (0 = none, ${qty} = all)">
+              oninput="omRecalcRow(${idx})" title="Quantity for backorder (0 = none)">
           </div>
           <div style="font-size:0.75rem;color:#4ade80;margin-top:2px;">Send: <span id="om-send-qty-${idx}">${sendQty}</span></div>
         </td>
@@ -14542,18 +14547,49 @@ function renderOrderItemsTable(items, order, editMode) {
       <tr><td colspan="6" style="text-align:right;padding:4px 10px 8px;font-size:0.8rem;color:var(--text-muted);">💳 ${esc(pm)}</td></tr>
     </tfoot>
   </table>
-  ${editMode ? '<p style="font-size:0.78rem;color:var(--text-muted);padding:6px 4px 0;">💡 <strong>BO</strong> = backorder qty. Ex: ordered 6, BO=2 → envia 4 agora, 2 ficam em backorder.</p>' : ''}`;
+  ${editMode ? `<p style="font-size:0.78rem;color:var(--text-muted);padding:6px 4px 0;">💡 Edit qty, price, or backorder qty. Use <strong>Add Product</strong> below to insert new items.</p>
+  <div id="omNewItemsList"></div>
+  <div style="margin-top:12px;padding:14px;border:2px dashed var(--primary-color);border-radius:10px;background:rgba(22,163,98,0.05);">
+    <h4 style="margin:0 0 10px;font-size:0.85rem;color:var(--primary-color);">➕ Add Product to Order</h4>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <input type="text" id="omEditProductSearch" placeholder="Search by name or SKU…" oninput="omEditSearchProducts()"
+        style="flex:1;min-width:200px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
+      <select id="omEditBrandFilter" onchange="omEditSearchProducts()"
+        style="padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
+        <option value="">All brands</option>
+      </select>
+    </div>
+    <div style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;">
+      <table style="width:100%;font-size:0.83rem;border-collapse:collapse">
+        <thead style="position:sticky;top:0;z-index:1">
+          <tr>
+            <th style="padding:7px 10px;text-align:left;background:var(--surface-2)">Product</th>
+            <th style="padding:7px 10px;text-align:left;background:var(--surface-2)">SKU</th>
+            <th style="padding:7px 10px;text-align:right;background:var(--surface-2)">Price €</th>
+            <th style="padding:7px 10px;text-align:right;width:80px;background:var(--surface-2)">Qty</th>
+            <th style="padding:7px 10px;width:60px;background:var(--surface-2)"></th>
+          </tr>
+        </thead>
+        <tbody id="omEditProductPickerBody">
+          <tr><td colspan="5" style="padding:14px;color:var(--text-muted);font-size:0.83rem;text-align:center">Type to search products…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>` : ''}`;
 }
 
 function omRecalcRow(idx) {
   const items = window._currentModalItems;
   if (!items || !items[idx]) return;
   const item  = items[idx];
-  const qty   = item.quantity || 1;
+  const qtyInput   = document.querySelector(`.om-edit-qty[data-idx="${idx}"]`);
+  const qty   = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : (item.quantity || 1);
   const priceInput = document.querySelector(`.om-edit-price[data-idx="${idx}"]`);
   const boInput    = document.querySelector(`.om-edit-boqty[data-idx="${idx}"]`);
   const price  = priceInput ? (parseFloat(priceInput.value) || 0) : (parseFloat(item.unit_price) || 0);
   let   boQty  = boInput    ? (parseInt(boInput.value) || 0)   : 0;
+  // Update BO max to match new qty
+  if (boInput) boInput.max = qty;
   boQty = Math.min(Math.max(0, boQty), qty);
   if (boInput) boInput.value = boQty;
   const sendQty = qty - boQty;
@@ -14574,10 +14610,112 @@ function omRecalcRow(idx) {
 
 function toggleOrderEditMode() {
   window._orderEditMode = !window._orderEditMode;
+  window._editNewItems = window._editNewItems || [];
+  if (!window._orderEditMode) window._editNewItems = [];
   const items = window._currentModalItems;
   const order = window._currentModalOrder;
   if (!items || !order) return;
   renderOrderItemsTable(items, order, window._orderEditMode);
+  // Populate brand filter for product picker
+  if (window._orderEditMode) {
+    setTimeout(function() {
+      const brandSel = document.getElementById('omEditBrandFilter');
+      if (brandSel && brandSel.options.length <= 1) {
+        brandSel.innerHTML = '<option value="">All brands</option>' +
+          (brands || []).map(b => '<option value="' + b.id + '">' + esc(b.name || '') + '</option>').join('');
+      }
+    }, 100);
+  }
+}
+
+function omEditSearchProducts() {
+  const body = document.getElementById('omEditProductPickerBody');
+  if (!body) return;
+  const search = (document.getElementById('omEditProductSearch')?.value || '').toLowerCase().trim();
+  const brandId = document.getElementById('omEditBrandFilter')?.value || '';
+  if (!search && !brandId) {
+    body.innerHTML = '<tr><td colspan="5" style="padding:14px;color:var(--text-muted);font-size:0.83rem;text-align:center">Type to search products…</td></tr>';
+    return;
+  }
+  let list = (allProducts || []).filter(function(p) {
+    if (p.is_active === false) return false;
+    if (brandId && (!p.brands || String(p.brands.id || '') !== brandId && p.brands.name !== brandId)) return false;
+    if (search) {
+      const txt = ((p.name||'') + ' ' + (p.sku||'')).toLowerCase();
+      if (!txt.includes(search)) return false;
+    }
+    return true;
+  }).slice(0, 50);
+  if (!list.length) {
+    body.innerHTML = '<tr><td colspan="5" style="padding:14px;color:var(--text-muted);font-size:0.83rem;text-align:center">No products found.</td></tr>';
+    return;
+  }
+  body.innerHTML = list.map(function(p) {
+    const brand = (p.brands && p.brands.name) || '';
+    const price = parseFloat(p.b2b_price || p.price || 0);
+    return '<tr>' +
+      '<td style="padding:6px 10px">' + esc(p.name||'') + '<div style="font-size:0.72rem;color:var(--text-muted)">' + esc(brand) + '</div></td>' +
+      '<td style="padding:6px 10px;font-family:monospace;font-size:0.8rem">' + esc(p.sku||'') + '</td>' +
+      '<td style="padding:6px 10px;text-align:right">€' + price.toFixed(2) + '</td>' +
+      '<td style="padding:6px 10px;text-align:right"><input type="number" min="1" value="1" class="om-edit-newqty" data-pid="' + p.id + '" style="width:60px;padding:4px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:center"></td>' +
+      '<td style="padding:6px 10px;text-align:center"><button class="btn-sm btn-primary" style="font-size:0.78rem;padding:4px 10px" onclick="omEditAddToOrder(\'' + p.id + '\',this)">+ Add</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function omEditAddToOrder(productId, btn) {
+  const prod = (allProducts || []).find(p => p.id === productId);
+  if (!prod) return;
+  const qtyInput = btn?.closest('tr')?.querySelector('.om-edit-newqty');
+  const qty = Math.max(1, parseInt(qtyInput?.value || '1'));
+  const price = parseFloat(prod.b2b_price || prod.price || 0);
+  if (!window._editNewItems) window._editNewItems = [];
+  const existing = window._editNewItems.find(i => i.product_id === productId && !i.variant_id);
+  if (existing) {
+    existing.qty += qty;
+  } else {
+    window._editNewItems.push({
+      product_id: productId,
+      name: prod.name || '',
+      sku: prod.sku || '',
+      unit_price: price,
+      qty: qty,
+      image: prod.image_url || null
+    });
+  }
+  omRenderNewItems();
+  if (btn) {
+    btn.textContent = '✓ Added';
+    btn.style.background = '#16a34a';
+    setTimeout(() => { btn.textContent = '+ Add'; btn.style.background = ''; }, 1200);
+  }
+}
+
+function omEditRemoveNewItem(idx) {
+  if (!window._editNewItems) return;
+  window._editNewItems.splice(idx, 1);
+  omRenderNewItems();
+}
+
+function omRenderNewItems() {
+  const container = document.getElementById('omNewItemsList');
+  if (!container) return;
+  const items = window._editNewItems || [];
+  if (!items.length) { container.innerHTML = ''; return; }
+  let html = '<div style="margin-top:10px;padding:12px;border:1px solid #16a34a;border-radius:8px;background:rgba(22,163,98,0.08)">';
+  html += '<h4 style="margin:0 0 8px;font-size:0.82rem;color:#16a34a">🆕 New Items to Add (' + items.length + ')</h4>';
+  html += '<table style="width:100%;font-size:0.83rem;border-collapse:collapse">';
+  items.forEach(function(ni, idx) {
+    html += '<tr style="border-bottom:1px solid rgba(22,163,98,0.2)">' +
+      '<td style="padding:6px 8px">' + esc(ni.name) + '<span style="font-size:0.75rem;color:var(--text-muted);margin-left:6px">' + esc(ni.sku) + '</span></td>' +
+      '<td style="padding:6px 8px;text-align:right"><input type="number" min="0.01" step="0.01" value="' + ni.unit_price.toFixed(2) + '" style="width:70px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:right;font-size:0.83rem" onchange="window._editNewItems[' + idx + '].unit_price=parseFloat(this.value)||0;omRenderNewItems()">€</td>' +
+      '<td style="padding:6px 8px;text-align:center"><input type="number" min="1" value="' + ni.qty + '" style="width:50px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:center;font-size:0.83rem" onchange="window._editNewItems[' + idx + '].qty=parseInt(this.value)||1;omRenderNewItems()"></td>' +
+      '<td style="padding:6px 8px;text-align:right;font-weight:bold">€' + (ni.unit_price * ni.qty).toFixed(2) + '</td>' +
+      '<td style="padding:6px 4px;text-align:center"><button onclick="omEditRemoveNewItem(' + idx + ')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:1.1rem" title="Remove">✕</button></td>' +
+      '</tr>';
+  });
+  html += '</table></div>';
+  container.innerHTML = html;
 }
 
 async function saveOrderItemEdits() {
@@ -14592,19 +14730,20 @@ async function saveOrderItemEdits() {
       const item = items[idx];
       const priceInput = document.querySelector(`.om-edit-price[data-idx="${idx}"]`);
       const boInput    = document.querySelector(`.om-edit-boqty[data-idx="${idx}"]`);
+      const qtyInput   = document.querySelector(`.om-edit-qty[data-idx="${idx}"]`);
       const newPrice   = priceInput ? (parseFloat(priceInput.value) || 0) : (parseFloat(item.unit_price) || 0);
-      const origQty    = item.quantity || 1;
+      const origQty    = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : (item.quantity || 1);
       const boQty      = boInput ? Math.min(Math.max(0, parseInt(boInput.value) || 0), origQty) : 0;
       const sendQty    = origQty - boQty;
 
       if (boQty === 0) {
-        // Normal item — update price only
+        // Normal item — update price and quantity
         const newTotal = parseFloat((newPrice * origQty).toFixed(2));
         await supaUpdate('order_items', item.id, {
-          unit_price: newPrice, total_price: newTotal, total: newTotal,
+          unit_price: newPrice, quantity: origQty, total_price: newTotal, total: newTotal,
           is_backorder: false, backorder_status: null, fulfillment_status: item.fulfillment_status === 'backorder' ? 'unfulfilled' : item.fulfillment_status
         });
-        item.unit_price = newPrice; item.total_price = newTotal; item.total = newTotal;
+        item.unit_price = newPrice; item.quantity = origQty; item.total_price = newTotal; item.total = newTotal;
         item.is_backorder = false; item._boQty = 0;
       } else if (boQty >= origQty) {
         // Fully in backorder
@@ -14638,9 +14777,32 @@ async function saveOrderItemEdits() {
         });
       }
     }
-    // Recalculate order totals (only non-backorder items)
+    // Insert new items added via product picker
+    const newItems = window._editNewItems || [];
+    for (const ni of newItems) {
+      const niTotal = parseFloat((ni.unit_price * ni.qty).toFixed(2));
+      await supaInsert('order_items', {
+        order_id: order.id,
+        product_id: ni.product_id || null,
+        product_name: ni.name,
+        product_sku: ni.sku || null,
+        variant_id: ni.variant_id || null,
+        variant_label: ni.variant_label || null,
+        quantity: ni.qty,
+        unit_price: ni.unit_price,
+        total_price: niTotal,
+        total: niTotal,
+        is_backorder: false,
+        fulfillment_status: 'unfulfilled',
+        product_image: ni.image || null
+      });
+    }
+    window._editNewItems = [];
+    // Recalculate order totals (only non-backorder items + new items)
     const activeItems = items.filter(i => !i.is_backorder);
-    const newSubtotal = parseFloat(activeItems.reduce((s, i) => s + (parseFloat(i.total_price) || 0), 0).toFixed(2));
+    const existingSubtotal = activeItems.reduce((s, i) => s + (parseFloat(i.total_price) || 0), 0);
+    const newItemsSubtotal = newItems.reduce((s, ni) => s + (ni.unit_price * ni.qty), 0);
+    const newSubtotal = parseFloat((existingSubtotal + newItemsSubtotal).toFixed(2));
     const shipping    = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
     const newVat      = Math.round((newSubtotal + shipping) * 23) / 100;
     const newTotal    = parseFloat((newSubtotal + shipping + newVat).toFixed(2));
@@ -14657,7 +14819,8 @@ async function saveOrderItemEdits() {
     window._currentOrderItemsForInvoice = (freshItems || items).filter(i => !i.is_backorder);
     window._orderEditMode = false;
     renderOrderItemsTable(freshItems || items, order, false);
-    toast('✅ Saved. Sending now: ' + (activeItems.reduce((s,i)=>s+(i.quantity||1),0)) + ' unit(s). Backorder: ' + totalBackorderCount + ' unit(s).');
+    const totalSendUnits = activeItems.reduce((s,i)=>s+(i.quantity||1),0) + newItems.reduce((s,ni)=>s+ni.qty,0);
+    toast('✅ Saved. Sending: ' + totalSendUnits + ' unit(s). Backorder: ' + totalBackorderCount + ' unit(s).' + (newItems.length ? ' New items added: ' + newItems.length : ''));
   } catch (err) {
     console.error('saveOrderItemEdits error:', err);
     alert('Error saving: ' + err.message);
