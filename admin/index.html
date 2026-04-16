@@ -4620,8 +4620,25 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 </div>
 <div style="flex: 1; min-width: 200px;">
 <p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Status</p>
-<div id="omPaymentStatus" style="margin-bottom: 3px;"></div>
-<div id="omFulfillmentStatus" style="margin-bottom: 5px;"></div>
+<div style="margin-bottom:5px;display:flex;align-items:center;gap:6px">
+  <label style="font-size:0.72rem;color:var(--text-muted);white-space:nowrap">Order:</label>
+  <select id="omOrderStatus" onchange="updateOrderStatus()" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.8rem;cursor:pointer">
+    <option value="pending">Pending</option>
+    <option value="processing">Processing</option>
+    <option value="confirmed">Confirmed</option>
+    <option value="delivered">Delivered</option>
+    <option value="cancelled">Cancelled</option>
+    <option value="refunded">Refunded</option>
+  </select>
+</div>
+<div style="margin-bottom:5px;display:flex;align-items:center;gap:6px">
+  <label style="font-size:0.72rem;color:var(--text-muted);white-space:nowrap">Fulfillment:</label>
+  <select id="omFulfillmentSelect" onchange="updateOrderStatus()" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.8rem;cursor:pointer">
+    <option value="unfulfilled">Unfulfilled</option>
+    <option value="fulfilled">Fulfilled</option>
+  </select>
+</div>
+<div id="omStatusMsg" style="font-size:0.72rem;color:#16a34a;display:none"></div>
 </div>
 <div style="flex: 1; min-width: 150px;">
 <p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Source</p>
@@ -12005,8 +12022,13 @@ Loading items...
 
       const fin = order.financial_status || 'pending';
       const ful = order.fulfillment_status || 'unfulfilled';
-      document.getElementById('omPaymentStatus').innerHTML = `<span class="stock-badge ${fin === 'paid' ? 'in' : 'low'}">${fin}</span>`;
-      document.getElementById('omFulfillmentStatus').innerHTML = `<span class="stock-badge ${ful === 'fulfilled' ? 'in' : 'low'}">${ful}</span>`;
+      const ordStatus = order.status || 'pending';
+      var omOrdSel = document.getElementById('omOrderStatus');
+      if (omOrdSel) omOrdSel.value = ordStatus;
+      var omFulSel = document.getElementById('omFulfillmentSelect');
+      if (omFulSel) omFulSel.value = ful;
+      var omStatusMsg = document.getElementById('omStatusMsg');
+      if (omStatusMsg) omStatusMsg.style.display = 'none';
 
       // Source attribution
       const srcType = order.attribution_source_type || '';
@@ -14083,6 +14105,36 @@ window.confirmGLSShip = async function confirmGLSShip() {
     if (btn) { btn.disabled = false; btn.textContent = '🚚 Create Shipment'; }
     toast('GLS error: ' + e.message, 'error');
     console.error('[GLS] confirmGLSShip error:', e);
+  }
+};
+
+window.updateOrderStatus = async function updateOrderStatus() {
+  var order = window._currentModalOrder;
+  if (!order) return;
+  var newStatus = document.getElementById('omOrderStatus').value;
+  var newFulfillment = document.getElementById('omFulfillmentSelect').value;
+  var msg = document.getElementById('omStatusMsg');
+  if (msg) { msg.textContent = '⏳ Saving...'; msg.style.display = 'block'; msg.style.color = 'var(--text-muted)'; }
+  try {
+    var updateData = { updated_at: new Date().toISOString() };
+    if (newStatus !== (order.status || 'pending')) updateData.status = newStatus;
+    if (newFulfillment !== (order.fulfillment_status || 'unfulfilled')) updateData.fulfillment_status = newFulfillment;
+    if (!updateData.status && !updateData.fulfillment_status) {
+      if (msg) msg.style.display = 'none';
+      return;
+    }
+    await supaUpdate('orders', order.id, updateData);
+    if (updateData.status) order.status = newStatus;
+    if (updateData.fulfillment_status) order.fulfillment_status = newFulfillment;
+    var idx = allOrders.findIndex(function(o) { return o.id === order.id; });
+    if (idx >= 0) {
+      if (updateData.status) allOrders[idx].status = newStatus;
+      if (updateData.fulfillment_status) allOrders[idx].fulfillment_status = newFulfillment;
+    }
+    if (msg) { msg.textContent = '✅ Status updated'; msg.style.color = '#16a34a'; msg.style.display = 'block'; setTimeout(function() { msg.style.display = 'none'; }, 2000); }
+  } catch(e) {
+    if (msg) { msg.textContent = '❌ Error: ' + e.message; msg.style.color = '#ef4444'; msg.style.display = 'block'; }
+    console.error('[updateOrderStatus]', e);
   }
 };
 
