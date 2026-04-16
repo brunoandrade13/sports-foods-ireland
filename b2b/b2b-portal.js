@@ -443,7 +443,7 @@ const B2B = (function() {
         var totalSpent = Number(stats.total_spent||0);
         var totalOrders = Number(stats.total_orders||0);
         var yearSpent = Number(stats.month_spent||0);
-        var outstanding = Number(stats.outstanding||0);
+        var outstanding = 0; // TEMP: hidden until system is fully reconciled
         var avg = totalOrders > 0 ? totalSpent / totalOrders : 0;
         document.getElementById('finOpenBalance').textContent = FMT(outstanding);
         document.getElementById('finOverdue').textContent = FMT(0);
@@ -471,7 +471,7 @@ const B2B = (function() {
         });
       } else {
         window._b2bFinInvoices = invoices.map(function(inv) {
-          return { id: inv.id, number: inv.doc_number||inv.number||'INV-'+inv.id, date: inv.txn_date||inv.created_at, total: inv.total_amount||inv.total, balance: inv.balance||0, status: inv.balance > 0 ? 'Unpaid' : 'Paid', type: 'invoice', customer_id: inv.customer_id || '' };
+          return { id: inv.id, number: inv.doc_number||inv.number||'INV-'+inv.id, date: inv.txn_date||inv.created_at, total: inv.total_amount||inv.total, balance: 0, status: 'Paid', type: 'invoice', customer_id: inv.customer_id || '' }; // TEMP: balance hidden
         });
       }
       renderFinInvoices(window._b2bFinInvoices);
@@ -660,7 +660,7 @@ const B2B = (function() {
       if (stats) {
         document.getElementById('statSpendYear').textContent = FMT(Number(stats.month_spent||0));
         document.getElementById('statOrdersYear').textContent = stats.month_orders || 0;
-        document.getElementById('statPending').textContent = FMT(Number(stats.outstanding||0));
+        document.getElementById('statPending').textContent = FMT(0); // TEMP: hidden until reconciled
         document.getElementById('statInProgress').textContent = stats.pending_orders || 0;
       }
 
@@ -854,7 +854,7 @@ const B2B = (function() {
             <div class="invoice-icon">📄</div>
             <div><strong style="color:#1e293b;font-size:0.9rem;">${inv.doc_number||inv.number||'INV-'+inv.id}</strong><br><span style="color:#636E72;font-size:0.8rem;">${d}</span></div>
           </div>
-          <div style="text-align:right;"><strong style="color:#1e293b;">${FMT(inv.total_amount||inv.total)}</strong><br><span style="color:#636E72;font-size:0.75rem;">${inv.balance > 0 ? 'Due: '+FMT(inv.balance) : 'Paid'}</span></div>
+          <div style="text-align:right;"><strong style="color:#1e293b;">${FMT(inv.total_amount||inv.total)}</strong><br><span style="color:#636E72;font-size:0.75rem;">Paid</span></div>
         </div>`;
       }).join('');
     } catch(e) { console.error('Invoices error:', e); }
@@ -1228,8 +1228,8 @@ const B2B = (function() {
       subtotal: Number(inv.total_amount||inv.total) - Number(inv.tax_amount||0),
       tax: Number(inv.tax_amount||0),
       total: Number(inv.total_amount||inv.total),
-      balance: Number(inv.balance||0),
-      isPaid: !inv.balance || Number(inv.balance) === 0,
+      balance: 0, // TEMP: hidden until reconciled
+      isPaid: true, // TEMP: show all as paid
       note: inv.private_note || ''
     });
   }
