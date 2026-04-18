@@ -994,6 +994,25 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
   gtag('js', new Date());
   gtag('config', 'G-LBJ386JQHB');
 </script>
+<script>
+// Early SEO: set title from URL before full JS loads (prevents Google seeing generic title)
+(function(){
+  try {
+    var id = new URLSearchParams(window.location.search).get('id');
+    if (!id) return;
+    // Try sessionStorage cache first
+    var cached = sessionStorage.getItem('sfi_prod_' + id);
+    if (cached) {
+      var p = JSON.parse(cached);
+      if (p && p.nome) {
+        document.title = p.nome + ' | ' + (p.marca||'Sports Foods Ireland') + ' | Sports Foods Ireland';
+        var md = document.querySelector('meta[name="description"]');
+        if (md && p.descricao) md.content = p.descricao.substring(0,160);
+      }
+    }
+  } catch(e) {}
+})();
+</script>
 </head>
 <body>
 <a href="#main-content" class="skip-to-content">Skip to main content</a>    <header>
