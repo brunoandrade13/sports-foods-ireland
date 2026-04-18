@@ -305,15 +305,19 @@
     
     // updateCartModalContent() removed — using canonical version from cart.js (window.updateCartModalContent)
     
-    window.updateCartItemQty = function(productId, change) {
+    window.updateCartItemQty = function(productId, change, variantId) {
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        // Garantir comparação robusta entre IDs numéricos e strings
-        const item = cart.find(i => String(i.id) === String(productId));
+        // Garantir comparação robusta entre IDs numéricos e strings + variant support
+        const item = variantId
+            ? cart.find(i => String(i.id) === String(productId) && i.variant_id === variantId)
+            : cart.find(i => String(i.id) === String(productId) && !i.variant_id);
         
         if (item) {
             item.quantidade = (item.quantidade || 0) + change;
             if (item.quantidade <= 0) {
-                cart = cart.filter(i => String(i.id) !== String(productId));
+                cart = variantId
+                    ? cart.filter(i => !(String(i.id) === String(productId) && i.variant_id === variantId))
+                    : cart.filter(i => !(String(i.id) === String(productId) && !i.variant_id));
             }
             localStorage.setItem('cart', JSON.stringify(cart));
             if (typeof window.updateCartModalContent === 'function') window.updateCartModalContent();
@@ -321,10 +325,12 @@
         }
     };
     
-    window.removeCartItem = function(productId) {
+    window.removeCartItem = function(productId, variantId) {
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        // Remover por ID independentemente de ser número ou string
-        cart = cart.filter(i => String(i.id) !== String(productId));
+        // Remover por ID + variant_id
+        cart = variantId
+            ? cart.filter(i => !(String(i.id) === String(productId) && i.variant_id === variantId))
+            : cart.filter(i => !(String(i.id) === String(productId) && !i.variant_id));
         localStorage.setItem('cart', JSON.stringify(cart));
         if (typeof window.updateCartModalContent === 'function') window.updateCartModalContent();
         updateCartCountGlobal();

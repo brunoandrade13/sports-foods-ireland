@@ -2791,19 +2791,20 @@ html[data-theme="dark"] .category-product-card {
 .btn-basket {
   width: 100%;
   height: 50px;
-  background: var(--color-secondary);
+  background: #FF883E;
   color: #fff;
   border: none;
   font-family: var(--font-title);
   font-weight: var(--weight-bold);
-  font-size: 14px;
+  font-size: 16px;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   cursor: pointer;
-  transition: background var(--transition), transform var(--transition);
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   margin-top: auto;
+  box-shadow: 0 2px 8px rgba(255,136,62,0.3);
 }
 
 /* Smaller button in carousel */
@@ -2816,7 +2817,8 @@ html[data-theme="dark"] .category-product-card {
 
 .btn-basket:hover,
 .btn-basket:focus {
-  background: #e55a2b;
+  background: #e87030;
+  box-shadow: 0 4px 16px rgba(255,136,62,0.5);
   transform: translateY(-1px);
 }
 
@@ -17074,6 +17076,64 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
 .ck-coupon-form button { padding: 8px 16px; background: var(--color-bg, #fff); border: 1px solid var(--color-border, #e5e7eb); border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
 .ck-coupon-form button:hover { background: var(--color-border, #e5e7eb); }
 .ck-coupon-applied { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #d1fae5; color: #166534; border-radius: 8px; font-size: 0.85rem; font-weight: 600; }
+
+/* ===== MOBILE CHECKOUT IMPROVEMENTS (Apr 2026) ===== */
+@media (max-width: 767px) {
+  .checkout-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .checkout-sidebar {
+    order: -1; /* Show order summary first on mobile */
+  }
+  .ck-payment-option {
+    padding: 14px 12px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ck-payment-option > div:first-of-type {
+    flex: 1 1 auto;
+    min-width: 120px;
+  }
+  .ck-payment-option img {
+    max-height: 20px;
+  }
+  .ck-nav {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+  .ck-nav .btn-account-primary,
+  .ck-nav .btn-account-outline {
+    width: 100%;
+    text-align: center;
+    padding: 16px;
+    font-size: 16px;
+  }
+  .ck-nav .continue-link {
+    text-align: center;
+    display: block;
+    padding: 10px;
+  }
+  .ck-step {
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+  .ck-step-num {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
+  }
+  .ck-step-line {
+    width: 20px;
+  }
+  /* Place order button — big and visible on mobile */
+  #placeOrderBtn, .place-order-btn {
+    min-height: 56px;
+    font-size: 17px;
+    letter-spacing: 0.5px;
+  }
+}
+
 .ck-coupon-applied button { background: none; border: none; cursor: pointer; font-size: 1rem; color: #166534; padding: 0 4px; }
 
 

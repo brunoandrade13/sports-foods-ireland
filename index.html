@@ -190,6 +190,14 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
     s.parentNode.insertBefore(n, s);
   })();
 </script>
+<!-- Google tag (gtag.js) - GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LBJ386JQHB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-LBJ386JQHB');
+</script>
 </head>
 
 <body>
@@ -606,8 +614,16 @@ role="tab" aria-selected="false" tabindex="-1"></button>
 <button class="indicator" data-slide="6" aria-label="Go to slide 7 - High5" type="button" role="tab"
 aria-selected="false" tabindex="-1"></button>
 </div>
+  <!-- Scroll Indicator -->
+  <div class="scroll-indicator" id="scrollIndicator" aria-hidden="true">
+    <span class="scroll-indicator-text">Scroll to explore</span>
+    <div class="scroll-indicator-arrow">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </div>
+  </div>
 </div>
 </section>
+
 
 <section class="categorias" id="categories">
 <div class="container">
@@ -3331,6 +3347,27 @@ if('serviceWorker' in navigator){
   if (h && h.indexOf('type=recovery') !== -1) {
     window.location.href = '/update-password.html' + h;
   }
+})();
+</script>
+<style>
+.scroll-indicator{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;z-index:10;color:rgba(255,255,255,0.9);animation:scrollBounce 2s ease-in-out infinite;transition:opacity 0.5s ease;}
+.scroll-indicator-text{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,0.6);}
+.scroll-indicator-arrow{width:36px;height:36px;border:2px solid rgba(255,255,255,0.75);border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);backdrop-filter:blur(4px);}
+@keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(9px)}}
+.scroll-indicator.hidden{opacity:0;pointer-events:none;}
+@media(max-width:767px){.scroll-indicator{bottom:14px;}}
+</style>
+<script>
+(function(){
+  var el=document.getElementById('scrollIndicator');
+  if(!el)return;
+  el.addEventListener('click',function(){
+    var t=document.getElementById('categories')||document.querySelector('main');
+    if(t)t.scrollIntoView({behavior:'smooth'});
+  });
+  window.addEventListener('scroll',function(){
+    el.classList.toggle('hidden',window.scrollY>80);
+  },{passive:true});
 })();
 </script>
 </body>

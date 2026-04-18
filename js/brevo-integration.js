@@ -16,6 +16,18 @@ const SFI_BREVO = {
     B2B_WELCOME: 6
   },
 
+
+  // UTM helper — appends UTM params to SFI URLs for email tracking
+  _utm(url, campaign, medium = 'email', source = 'brevo') {
+    try {
+      const u = new URL(url, 'https://sportsfoodsireland.ie');
+      u.searchParams.set('utm_source', source);
+      u.searchParams.set('utm_medium', medium);
+      u.searchParams.set('utm_campaign', campaign);
+      return u.toString();
+    } catch(e) { return url; }
+  },
+
   // Identify user for Brevo tracker (client-side, no API key needed)
   identifyUser(email, firstName, lastName) {
     if (!email || !window.sendinblue) return;
@@ -44,7 +56,8 @@ const SFI_BREVO = {
   async subscribeNewsletter(email, firstName = '') {
     return await this._callBrevoProxy('subscribe_newsletter', {
       email, firstName, listId: this.LISTS.NEWSLETTER,
-      templateId: this.TEMPLATES.WELCOME_NEWSLETTER
+      templateId: this.TEMPLATES.WELCOME_NEWSLETTER,
+      params: { SHOP_URL: this._utm('https://sportsfoodsireland.ie/shop.html', 'newsletter_welcome'), SITE_URL: this._utm('https://sportsfoodsireland.ie/', 'newsletter_welcome') }
     });
   },
 
@@ -60,7 +73,10 @@ const SFI_BREVO = {
         ORDER_TOTAL: order.total,
         PAYMENT_METHOD: order.paymentMethod || 'Card',
         ORDER_ITEMS: (order.items || []).map(i => `${i.name} x${i.quantity} - €${i.total}`).join('<br>'),
-        SHIPPING_ADDRESS: order.shippingAddress || ''
+        SHIPPING_ADDRESS: order.shippingAddress || '',
+        SHOP_URL: this._utm('https://sportsfoodsireland.ie/shop.html', 'order_confirmation'),
+        ACCOUNT_URL: this._utm('https://sportsfoodsireland.ie/account.html', 'order_confirmation'),
+        SITE_URL: this._utm('https://sportsfoodsireland.ie/', 'order_confirmation')
       },
       listId: this.LISTS.CUSTOMERS,
       attributes: {
@@ -82,7 +98,8 @@ const SFI_BREVO = {
         TRACKING_NUMBER: order.trackingNumber || '',
         CARRIER: order.carrier || 'An Post / DPD',
         ESTIMATED_DELIVERY: order.estimatedDelivery || '2-5 business days',
-        TRACKING_URL: order.trackingUrl || 'https://sportsfoodsireland.ie/tracking.html'
+        TRACKING_URL: this._utm(order.trackingUrl || 'https://sportsfoodsireland.ie/tracking.html', 'shipping_confirmation'),
+        SHOP_URL: this._utm('https://sportsfoodsireland.ie/shop.html', 'shipping_confirmation')
       }
     });
   },
@@ -91,7 +108,7 @@ const SFI_BREVO = {
   async sendReviewRequest(email, firstName) {
     return await this._callBrevoProxy('send_template', {
       email, templateId: this.TEMPLATES.POST_PURCHASE_REVIEW,
-      params: { FIRSTNAME: firstName || 'Customer' }
+      params: { FIRSTNAME: firstName || 'Customer', REVIEW_URL: this._utm('https://sportsfoodsireland.ie/shop.html', 'review_request'), SHOP_URL: this._utm('https://sportsfoodsireland.ie/shop.html', 'review_request') }
     });
   },
 
