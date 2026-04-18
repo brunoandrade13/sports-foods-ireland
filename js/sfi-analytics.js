@@ -1,12 +1,28 @@
 // ============================================================
-// SFI Analytics Tracker v1.0
+// SFI Analytics Tracker v1.1
 // Tracks: page views, product events, funnel steps
+// Supports internal user exclusion via ?sfi_internal=1
 // ============================================================
 (function() {
   'use strict';
 
   const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
   const SUPA_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
+
+  // ---- Internal User Detection ----
+  // Visit any page with ?sfi_internal=1 to mark this browser as internal (persists)
+  // Visit with ?sfi_internal=0 to remove the flag
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('sfi_internal') === '1') {
+      localStorage.setItem('sfi_internal_user', '1');
+      console.log('[SFI Analytics] This browser is now marked as INTERNAL — analytics will be flagged.');
+    } else if (params.get('sfi_internal') === '0') {
+      localStorage.removeItem('sfi_internal_user');
+      console.log('[SFI Analytics] Internal flag removed — analytics will track normally.');
+    }
+  })();
+  var IS_INTERNAL = localStorage.getItem('sfi_internal_user') === '1';
 
   // ---- Session Management ----
   function getSessionId() {
@@ -163,6 +179,7 @@
       screen_width: window.innerWidth,
       time_on_page_seconds: timeOnPage,
       scroll_depth_percent: maxScroll,
+      is_internal: IS_INTERNAL,
       country: null, city: null
     };
     sendToSupa('page_views', data);
