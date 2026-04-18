@@ -718,4 +718,4 @@ if (savedToken) {
 // Make available globally for non-module scripts
 window.sfi = sfi;
 
-// console.log(`[SFI] API ready | Currency: ${currency} | Auth: ${sfi.auth.isLoggedIn() ? 'yes' : 'no'}`);
+//

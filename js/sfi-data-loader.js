@@ -292,7 +292,6 @@
     if (_isB2BCustomer) {
       PRICE_FIELD = 'wholesale_price_eur';
       window._sfiCustomerIsB2B = true;
-      console.log('[SFI] B2B customer detected — showing wholesale prices');
     }
 
     try {
@@ -337,8 +336,7 @@
     window._sfiCurrencySymbol = '€';
     window._sfiDataReady = true;
 
-    // console.log(`[SFI] ${products.length} products loaded from ${source} | Currency: ${CURRENCY}`);
-
+    //
     // Dispatch event so other scripts know data is ready
     window.dispatchEvent(new CustomEvent('sfi:products-loaded', {
       detail: { count: products.length, source, currency: CURRENCY, isB2B: _isB2BCustomer }

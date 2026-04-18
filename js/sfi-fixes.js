@@ -16,22 +16,7 @@
     
     // Debug do modal do carrinho: ativar com ?debug=1 na URL ou window.SFI_DEBUG_CART = true
     const DEBUG_CART = !!(window.SFI_DEBUG_CART || (typeof URLSearchParams !== 'undefined' && new URLSearchParams(location.search).get('debug') === '1'));
-    function debugLog(...args) { if (DEBUG_CART) console.log(...args); }
-    function debugWarn(...args) { if (DEBUG_CART) console.warn(...args); }
-    
-    if (typeof URLSearchParams !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1') {
-    }
-    
-    // Flag to prevent immediate closing after opening
-    let modalJustOpened = false;
-    
-    // ============================================
-    // 1. GARANTIR QUE PRODUTOS CARREGAM
-    // ============================================
-    
-    window.ensureProductsLoad = async function() {
-        const grid = document.getElementById('productsGrid');
-        if (!grid) return;
+    function debugLog(...args) { if (DEBUG_CART)        if (!grid) return;
         
         // Na página shop.html, esperar mais tempo pois shop.js cuida do carregamento
         if (window.location.pathname.includes('shop.html')) {
@@ -418,8 +403,7 @@
     // ============================================
     
     document.addEventListener('DOMContentLoaded', function() {
-        if (DEBUG_CART) console.log('🚀 Sports Foods Ireland - Global Fixes Initializing...');
-        
+        if (DEBUG_CART)        
         // Atualizar contador do carrinho
         updateCartCountGlobal();
         

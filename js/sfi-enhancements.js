@@ -43,8 +43,7 @@
     // 2. DARK MODE TOGGLE - CORRIGIDO
     // ===========================================
     function initDarkMode() {
-        if (DEBUG) console.log('🌙 Inicializando dark mode...');
-        
+        if (DEBUG)        
         // Verificar preferência salva
         const savedTheme = localStorage.getItem('sfi-theme');
         
@@ -56,13 +55,11 @@
         if (!document.querySelector('.theme-toggle')) {
             createThemeToggle();
         } else {
-            if (DEBUG) console.log('🌙 Botão dark mode já existe');
-        }
+            if (DEBUG)        }
         
         updateToggleIcon();
         
-        if (DEBUG) console.log('✅ Dark mode inicializado');
-    }
+        if (DEBUG)    }
 
     function createThemeToggle() {
         // Verificar se já existe
@@ -87,8 +84,7 @@
         
         document.body.appendChild(toggle);
         
-        if (DEBUG) console.log('✅ Dark mode toggle button created');
-    }
+        if (DEBUG)    }
 
     function toggleDarkMode() {
         const html = document.documentElement;
@@ -325,8 +321,7 @@
                 }, 250);
             });
             
-            if (DEBUG) console.log('✅ Modern Enhancements loaded');
-        } catch (error) {
+            if (DEBUG)        } catch (error) {
             console.error('Error initializing enhancements:', error);
         }
     }
@@ -338,8 +333,7 @@
     window.addEventListener('load', function() {
         setTimeout(function() {
             if (!document.querySelector('.theme-toggle')) {
-                if (DEBUG) console.log('🌙 Criando botão dark mode após window.load');
-                createThemeToggle();
+                if (DEBUG)                createThemeToggle();
                 updateToggleIcon();
             }
         }, 500);
@@ -921,8 +915,7 @@ window.throttle = function(func, limit) {
     };
 };
 
-(function(){ const d = typeof location !== 'undefined' && /[?&]debug=1/.test(location.search); if (d) console.log('✅ All Modern Enhancements Loaded Successfully!'); })();
-
+(function(){ const d = typeof location !== 'undefined' && /[?&]debug=1/.test(location.search); if (d)
 /* ====== 2/2: payment-engagement.js ====== */
 /* ===========================================
    PAYMENT & ENGAGEMENT COMPONENTS JS

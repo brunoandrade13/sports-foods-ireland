@@ -88,8 +88,7 @@ async function carregarProdutos() {
             const response = await fetch('js/dados.json');
             data = await response.json();
         } catch (fetchError) {
-            if (_dbg()) console.log('⚠️ Main: fetch failed, trying XMLHttpRequest...', fetchError.message);
-            // Fallback to XMLHttpRequest for local files
+            if (_dbg())            // Fallback to XMLHttpRequest for local files
             data = await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.open('GET', 'js/dados.json', true);
@@ -729,18 +728,10 @@ function initHeroCarousel() {
     carouselContainer = document.querySelector('.hero-carousel');
 
     if (carouselSlides.length === 0) {
-        if (_dbg()) console.log('Hero carousel slides not found');
-        return;
+        if (_dbg())        return;
     }
 
-    if (_dbg()) console.log('Hero carousel initialized:', {
-        slides: carouselSlides.length,
-        indicators: indicators.length,
-        prevBtn: !!prevBtn,
-        nextBtn: !!nextBtn,
-        container: !!carouselContainer
-    });
-
+    if (_dbg())
     // Ensure first slide is active
     showSlide(0);
 
@@ -1360,8 +1351,7 @@ if (backToTopButton) {
 
 // Add to basket functionality
 function initAddToBasketAndUI() {
-    if (_dbg()) console.log('Setting up add to basket buttons...');
-
+    if (_dbg())
     // Função auxiliar para aplicar links/add-to-basket usando dados já carregados
     function processProductsData(data) {
         const productCards = document.querySelectorAll('.product-card:not([data-linked])');
@@ -1494,13 +1484,11 @@ function initAddToBasketAndUI() {
     const isOffersPage = window.location.pathname.includes('offers.html');
 
     if (isShopPage || isOffersPage) {
-        if (_dbg()) console.log('Shop/Offers page detected, skipping main.js cart listeners');
-        return; // Let shop.js/offers.js handle their own buttons
+        if (_dbg())        return; // Let shop.js/offers.js handle their own buttons
     }
 
     const addToBasketButtons = document.querySelectorAll('.btn-basket');
-    if (_dbg()) console.log('Found', addToBasketButtons.length, 'add to basket buttons');
-
+    if (_dbg())
     addToBasketButtons.forEach(button => {
         // Skip if button already has a listener (from shop.js or offers.js)
         if (button.hasAttribute('data-listener-attached')) {
@@ -1604,10 +1592,8 @@ function initAddToBasketAndUI() {
             e.stopPropagation();
             this.classList.toggle('active');
             if (this.classList.contains('active')) {
-                if (_dbg()) console.log('Added to wishlist');
-            } else {
-                if (_dbg()) console.log('Removed from wishlist');
-            }
+                if (_dbg())            } else {
+                if (_dbg())            }
         });
     });
 
@@ -1620,8 +1606,7 @@ function initAddToBasketAndUI() {
             const email = emailInput.value;
 
             if (email) {
-                if (_dbg()) console.log('Newsletter subscription:', email);
-
+                if (_dbg())
                 // Visual feedback
                 const submitButton = this.querySelector('button[type="submit"]');
                 const originalText = submitButton.textContent;
@@ -1665,12 +1650,10 @@ function initProductCarousels() {
     const carousels = document.querySelectorAll('.product-carousel-wrapper');
 
     if (carousels.length === 0) {
-        if (_dbg()) console.log('No carousels found');
-        return;
+        if (_dbg())        return;
     }
 
-    if (_dbg()) console.log(`Found ${carousels.length} carousels`);
-
+    if (_dbg())
     const isMobile = window.innerWidth <= 767;
 
     // On mobile, skip JS carousel completely - use pure CSS scroll (like category grids)
@@ -1692,8 +1675,7 @@ function initProductCarousels() {
                 });
             }
         });
-        if (_dbg()) console.log('Mobile: skipping JS carousels, using CSS scroll');
-        return;
+        if (_dbg())        return;
     }
 
     carousels.forEach((wrapper, wrapperIndex) => {
@@ -1703,14 +1685,7 @@ function initProductCarousels() {
         let nextBtn = wrapper.querySelector('.product-carousel-next');
         const cards = track ? track.querySelectorAll('.product-card') : [];
 
-        if (_dbg()) console.log(`Carousel ${wrapperIndex} (${carouselId}):`, {
-            hasTrack: !!track,
-            hasPrevBtn: !!prevBtn,
-            hasNextBtn: !!nextBtn,
-            cardsCount: cards.length,
-            wrapperElement: wrapper
-        });
-
+        if (_dbg())
         if (!track || !cards.length) {
             if (_dbg()) console.warn(`Carousel ${wrapperIndex} (${carouselId}) missing track or cards`, { track, cardsCount: cards.length });
             return;
@@ -1884,11 +1859,9 @@ function initProductCarousels() {
             nextBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (_dbg()) console.log(`Next button clicked for carousel ${carouselId}`);
-                nextSlide();
+                if (_dbg())                nextSlide();
             });
-            if (_dbg()) console.log(`Next button listener attached for ${carouselId}`, nextBtn);
-        } else {
+            if (_dbg())        } else {
             if (_dbg()) console.warn(`Next button not found in carousel ${carouselId}`, wrapperIndex);
         }
 
@@ -1896,11 +1869,9 @@ function initProductCarousels() {
             prevBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (_dbg()) console.log(`Prev button clicked for carousel ${carouselId}`);
-                prevSlide();
+                if (_dbg())                prevSlide();
             });
-            if (_dbg()) console.log(`Prev button listener attached for ${carouselId}`, prevBtn);
-        } else {
+            if (_dbg())        } else {
             if (_dbg()) console.warn(`Prev button not found in carousel ${carouselId}`, wrapperIndex);
         }
 
@@ -1933,8 +1904,7 @@ function initProductCarousels() {
         // Initial update - wait for images to load
         const initCarousel = () => {
             setTimeout(() => {
-                if (_dbg()) console.log(`Initializing carousel ${carouselId}`);
-                const isMobileDevice = window.innerWidth <= 767;
+                if (_dbg())                const isMobileDevice = window.innerWidth <= 767;
                 updateCarousel();
                 // Only show buttons on desktop
                 if (!isMobileDevice) {
@@ -1973,8 +1943,7 @@ function initProductCarousels() {
         // Also try to initialize on window load as a fallback
         window.addEventListener('load', () => {
             setTimeout(() => {
-                if (_dbg()) console.log(`Window load - reinitializing carousel ${carouselId}`);
-                updateCarousel();
+                if (_dbg())                updateCarousel();
             }, 200);
         });
     });
@@ -3299,8 +3268,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!window.location.hash) window.scrollTo(0, 0);
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
-    if (_dbg()) console.log('🚀 Unified DOMContentLoaded — initializing all modules...');
-
+    if (_dbg())
     // 0. Detect B2B customer (global flag for shipping rules)
     window._sfiCustomerIsB2B = false;
     if (window.sfi?.b2b?.checkAccess) {
@@ -3349,5 +3317,4 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(initStaticProductButtons, 300);
     }
 
-    if (_dbg()) console.log('✅ Unified DOMContentLoaded — all modules initialized');
-});
+    if (_dbg())});

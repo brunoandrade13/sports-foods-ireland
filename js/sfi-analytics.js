@@ -16,10 +16,8 @@
     var params = new URLSearchParams(window.location.search);
     if (params.get('sfi_internal') === '1') {
       localStorage.setItem('sfi_internal_user', '1');
-      console.log('[SFI Analytics] This browser is now marked as INTERNAL — analytics will be flagged.');
     } else if (params.get('sfi_internal') === '0') {
       localStorage.removeItem('sfi_internal_user');
-      console.log('[SFI Analytics] Internal flag removed — analytics will track normally.');
     }
   })();
   var IS_INTERNAL = localStorage.getItem('sfi_internal_user') === '1';

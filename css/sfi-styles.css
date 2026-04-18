@@ -17478,3 +17478,12 @@ html[data-theme="dark"] .product-card .btn-basket:hover {
   border-radius: 8px 8px 0 0;
   display: block;
 }
+
+/* ===== Inline style extractions (index.html Apr 2026) ===== */
+.tag-pill { background:#fff; border:1px solid #b7e4c7; color:#2D6A4F; padding:6px 14px; border-radius:20px; font-size:0.85rem; font-weight:600; }
+.feature-desc { color:#2D3436; font-size:0.95rem; line-height:1.75; margin-bottom:16px; }
+.feature-title { font-size:1.4rem; font-weight:700; color:#1B4332; margin-bottom:16px; }
+.link-primary { color:#2D6A4F; font-weight:600; }
+.text-muted-sm { color:#636E72; font-size:0.875rem; line-height:1.7; }
+.tags-flex { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
+.link-inherit { color:inherit; text-decoration:none; }

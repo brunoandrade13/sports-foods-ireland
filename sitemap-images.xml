@@ -1,851 +1,2101 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=001-beet-it-regen-cherry-shot-15-x-70ml.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/001-beet-it-regen-cherry-shot-15-x-70ml.webp</image:loc>
-    <image:title>Beet It Regen Cherry Shot 15 X 70Ml - Sports Foods Ireland</image:title>
-    <image:caption>Buy Beet It Regen Cherry Shot 15 X 70Ml online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=002-beet-it-sport-nitrate-400-70ml-shots-x-15.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/002-beet-it-sport-nitrate-400-70ml-shots-x-15.webp</image:loc>
-    <image:title>Beet It Sport Nitrate 400 70Ml Shots X 15 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Beet It Sport Nitrate 400 70Ml Shots X 15 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=003-beet-it-sport-nitrate-energy-gel-top-up-100-12-x-4.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/003-beet-it-sport-nitrate-energy-gel-top-up-100-12-x-4.webp</image:loc>
-    <image:title>Beet It Sport Nitrate Energy Gel Top Up 100 12 X 4 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Beet It Sport Nitrate Energy Gel Top Up 100 12 X 4 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=004-black-line-90g-carbs-fuel-sports-drink-sachet-10-x.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/004-black-line-90g-carbs-fuel-sports-drink-sachet-10-x.webp</image:loc>
-    <image:title>Black Line 90G Carbs Fuel Sports Drink Sachet 10 X - Sports Foods Ireland</image:title>
-    <image:caption>Buy Black Line 90G Carbs Fuel Sports Drink Sachet 10 X online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=005-black-line-90g-carbs-fuel-sports-drink-sachet-10-x.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/005-black-line-90g-carbs-fuel-sports-drink-sachet-10-x.webp</image:loc>
-    <image:title>Black Line 90G Carbs Fuel Sports Drink Sachet 10 X - Sports Foods Ireland</image:title>
-    <image:caption>Buy Black Line 90G Carbs Fuel Sports Drink Sachet 10 X online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=006-black-line-amino-mega-liquid-20-x-25ml.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/006-black-line-amino-mega-liquid-20-x-25ml.webp</image:loc>
-    <image:title>Black Line Amino Mega Liquid 20 X 25Ml - Sports Foods Ireland</image:title>
-    <image:caption>Buy Black Line Amino Mega Liquid 20 X 25Ml online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=007-black-line-caffeine-boost-20-x-25ml.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/007-black-line-caffeine-boost-20-x-25ml.webp</image:loc>
-    <image:title>Black Line Caffeine Boost 20 X 25Ml - Sports Foods Ireland</image:title>
-    <image:caption>Buy Black Line Caffeine Boost 20 X 25Ml online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=008-black-line-hydro-fuel-gel-30grams-12-x-50ml.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/008-black-line-hydro-fuel-gel-30grams-12-x-50ml.webp</image:loc>
-    <image:title>Black Line Hydro Fuel Gel 30Grams 12 X 50Ml - Sports Foods Ireland</image:title>
-    <image:caption>Buy Black Line Hydro Fuel Gel 30Grams 12 X 50Ml online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=009-black-line-isotonic-sports-drink-30-608g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/009-black-line-isotonic-sports-drink-30-608g.webp</image:loc>
-    <image:title>Black Line Isotonic Sports Drink 30 608G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Black Line Isotonic Sports Drink 30 608G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=010-black-line-l-carnitin-liquid-20-x-25ml.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/010-black-line-l-carnitin-liquid-20-x-25ml.webp</image:loc>
-    <image:title>Black Line L Carnitin Liquid 20 X 25Ml - Sports Foods Ireland</image:title>
-    <image:caption>Buy Black Line L Carnitin Liquid 20 X 25Ml online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=011-black-line-magnesium-liquid-25ml-x-20.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/011-black-line-magnesium-liquid-25ml-x-20.webp</image:loc>
-    <image:title>Black Line Magnesium Liquid 25Ml X 20 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Black Line Magnesium Liquid 25Ml X 20 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=012-black-line-waterbottle-500ml.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/012-black-line-waterbottle-500ml.webp</image:loc>
-    <image:title>Black Line Waterbottle 500Ml - Sports Foods Ireland</image:title>
-    <image:caption>Buy Black Line Waterbottle 500Ml online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=013-clif-bar-12-x-65g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/013-clif-bar-12-x-65g.webp</image:loc>
-    <image:title>Clif Bar 12 X 65G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Clif Bar 12 X 65G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=014-clif-bar-minis-10-x-28g-pack.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/014-clif-bar-minis-10-x-28g-pack.webp</image:loc>
-    <image:title>Clif Bar Minis 10 X 28G Pack - Sports Foods Ireland</image:title>
-    <image:caption>Buy Clif Bar Minis 10 X 28G Pack online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=015-clif-bar-nut-butter-12-x-50g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/015-clif-bar-nut-butter-12-x-50g.webp</image:loc>
-    <image:title>Clif Bar Nut Butter 12 X 50G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Clif Bar Nut Butter 12 X 50G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=016-clif-shot-bloks-energy-chews-18-x-60g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/016-clif-shot-bloks-energy-chews-18-x-60g.webp</image:loc>
-    <image:title>Clif Shot Bloks Energy Chews 18 X 60G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Clif Shot Bloks Energy Chews 18 X 60G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=017-creatine-monohydrate-powder-300g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/017-creatine-monohydrate-powder-300g.webp</image:loc>
-    <image:title>Creatine Monohydrate Powder 300G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Creatine Monohydrate Powder 300G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=018-energy-drink-caffeine-hit-sachet-12-x-47g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/018-energy-drink-caffeine-hit-sachet-12-x-47g.webp</image:loc>
-    <image:title>Energy Drink Caffeine Hit Sachet 12 X 47G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Energy Drink Caffeine Hit Sachet 12 X 47G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=019-energy-drink-with-protein-sachet-12-x-47g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/019-energy-drink-with-protein-sachet-12-x-47g.webp</image:loc>
-    <image:title>Energy Drink With Protein Sachet 12 X 47G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Energy Drink With Protein Sachet 12 X 47G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=020-high-5-energy-drink-22kg.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/020-high-5-energy-drink-22kg.webp</image:loc>
-    <image:title>High 5 Energy Drink 22Kg - Sports Foods Ireland</image:title>
-    <image:caption>Buy High 5 Energy Drink 22Kg online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=021-high-5-energy-drink-with-protein-16kg.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/021-high-5-energy-drink-with-protein-16kg.webp</image:loc>
-    <image:title>High 5 Energy Drink With Protein 16Kg - Sports Foods Ireland</image:title>
-    <image:caption>Buy High 5 Energy Drink With Protein 16Kg online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=022-high-5-energy-gel-20-pack.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/022-high-5-energy-gel-20-pack.webp</image:loc>
-    <image:title>High 5 Energy Gel 20 Pack - Sports Foods Ireland</image:title>
-    <image:caption>Buy High 5 Energy Gel 20 Pack online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=023-high-5-energy-gel-20-pack-caffeine.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/023-high-5-energy-gel-20-pack-caffeine.webp</image:loc>
-    <image:title>High 5 Energy Gel 20 Pack Caffeine - Sports Foods Ireland</image:title>
-    <image:caption>Buy High 5 Energy Gel 20 Pack Caffeine online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=024-high-5-energy-gel-aqua-x-20.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/024-high-5-energy-gel-aqua-x-20.webp</image:loc>
-    <image:title>High 5 Energy Gel Aqua X 20 - Sports Foods Ireland</image:title>
-    <image:caption>Buy High 5 Energy Gel Aqua X 20 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=025-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/025-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs.webp</image:loc>
-    <image:title>High5 Zero Electrolyte Tablets Box Of 8 X 20 Tabs - Sports Foods Ireland</image:title>
-    <image:caption>Buy High5 Zero Electrolyte Tablets Box Of 8 X 20 Tabs online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=026-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs-.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/026-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs-.webp</image:loc>
-    <image:title>High5 Zero Electrolyte Tablets Box Of 8 X 20 Tabs  - Sports Foods Ireland</image:title>
-    <image:caption>Buy High5 Zero Electrolyte Tablets Box Of 8 X 20 Tabs  online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=027-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs-.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/027-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs-.webp</image:loc>
-    <image:title>High5 Zero Electrolyte Tablets Box Of 8 X 20 Tabs  - Sports Foods Ireland</image:title>
-    <image:caption>Buy High5 Zero Electrolyte Tablets Box Of 8 X 20 Tabs  online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=028-micro-shaker-500-ml.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/028-micro-shaker-500-ml.webp</image:loc>
-    <image:title>Micro Shaker 500 Ml - Sports Foods Ireland</image:title>
-    <image:caption>Buy Micro Shaker 500 Ml online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=029-nuun-sport-electrolyte-drink-8-x-10-tablet-tubes.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/029-nuun-sport-electrolyte-drink-8-x-10-tablet-tubes.webp</image:loc>
-    <image:title>Nuun Sport Electrolyte Drink 8 X 10 Tablet Tubes - Sports Foods Ireland</image:title>
-    <image:caption>Buy Nuun Sport Electrolyte Drink 8 X 10 Tablet Tubes online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=030-power-bar-hydro-gel-box-67ml-x-24.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/030-power-bar-hydro-gel-box-67ml-x-24.webp</image:loc>
-    <image:title>Power Bar Hydro Gel Box 67Ml X 24 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Power Bar Hydro Gel Box 67Ml X 24 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=031-powerbar-5-electrolytes-10-tabs-x-12-tubes.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/031-powerbar-5-electrolytes-10-tabs-x-12-tubes.webp</image:loc>
-    <image:title>Powerbar 5 Electrolytes 10 Tabs X 12 Tubes - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar 5 Electrolytes 10 Tabs X 12 Tubes online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=032-powerbar-build-whey-protein-isolate-hydroisolate-5.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/032-powerbar-build-whey-protein-isolate-hydroisolate-5.webp</image:loc>
-    <image:title>Powerbar Build Whey Protein Isolate Hydroisolate 5 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar Build Whey Protein Isolate Hydroisolate 5 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=033-powerbar-energize-original-bar-15-x-55g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/033-powerbar-energize-original-bar-15-x-55g.webp</image:loc>
-    <image:title>Powerbar Energize Original Bar 15 X 55G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar Energize Original Bar 15 X 55G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=034-powerbar-isoactive-drink-mix-132kg.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/034-powerbar-isoactive-drink-mix-132kg.webp</image:loc>
-    <image:title>Powerbar Isoactive Drink Mix 132Kg - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar Isoactive Drink Mix 132Kg online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=035-powerbar-isoactive-drink-mix-600g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/035-powerbar-isoactive-drink-mix-600g.webp</image:loc>
-    <image:title>Powerbar Isoactive Drink Mix 600G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar Isoactive Drink Mix 600G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=036-powerbar-powergel-original-24-x-41g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/036-powerbar-powergel-original-24-x-41g.webp</image:loc>
-    <image:title>Powerbar Powergel Original 24 X 41G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar Powergel Original 24 X 41G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=037-powerbar-powergel-sports-shots-60g-x-24.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/037-powerbar-powergel-sports-shots-60g-x-24.webp</image:loc>
-    <image:title>Powerbar Powergel Sports Shots 60G X 24 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar Powergel Sports Shots 60G X 24 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=038-powerbar-protein-soft-layer-12x40g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/038-powerbar-protein-soft-layer-12x40g.webp</image:loc>
-    <image:title>Powerbar Protein Soft Layer 12X40G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar Protein Soft Layer 12X40G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=039-powerbar-recover-active-choc-1210g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/039-powerbar-recover-active-choc-1210g.webp</image:loc>
-    <image:title>Powerbar Recover Active Choc 1210G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar Recover Active Choc 1210G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=040-powerbar-recovery-max-protein-114kg.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/040-powerbar-recovery-max-protein-114kg.webp</image:loc>
-    <image:title>Powerbar Recovery Max Protein 114Kg - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar Recovery Max Protein 114Kg online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=041-powerbar-ride-bar-box-of-18-x-55g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/041-powerbar-ride-bar-box-of-18-x-55g.webp</image:loc>
-    <image:title>Powerbar Ride Bar Box Of 18 X 55G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Powerbar Ride Bar Box Of 18 X 55G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=042-saltstick-capsules.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/042-saltstick-capsules.webp</image:loc>
-    <image:title>Saltstick Capsules - Sports Foods Ireland</image:title>
-    <image:caption>Buy Saltstick Capsules online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=043-saltstick-fastchews-10-chew-pack-box-of-12.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/043-saltstick-fastchews-10-chew-pack-box-of-12.webp</image:loc>
-    <image:title>Saltstick Fastchews 10 Chew Pack Box Of 12 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Saltstick Fastchews 10 Chew Pack Box Of 12 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=044-saltstick-fastchews-60-tables.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/044-saltstick-fastchews-60-tables.webp</image:loc>
-    <image:title>Saltstick Fastchews 60 Tables - Sports Foods Ireland</image:title>
-    <image:caption>Buy Saltstick Fastchews 60 Tables online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=045-sports-beans-x-24-x-28g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/045-sports-beans-x-24-x-28g.webp</image:loc>
-    <image:title>Sports Beans X 24 X 28G - Sports Foods Ireland</image:title>
-    <image:caption>Buy Sports Beans X 24 X 28G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=046-tailwind-endurance-fuel-berry-flavour.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/046-tailwind-endurance-fuel-berry-flavour.webp</image:loc>
-    <image:title>Tailwind Endurance Fuel Berry Flavour - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Endurance Fuel Berry Flavour online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=047-tailwind-endurance-fuel-cola-caffeinated.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/047-tailwind-endurance-fuel-cola-caffeinated.webp</image:loc>
-    <image:title>Tailwind Endurance Fuel Cola Caffeinated - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Endurance Fuel Cola Caffeinated online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=048-tailwind-endurance-fuel-dauwatermelon-flavour.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/048-tailwind-endurance-fuel-dauwatermelon-flavour.webp</image:loc>
-    <image:title>Tailwind Endurance Fuel Dauwatermelon Flavour - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Endurance Fuel Dauwatermelon Flavour online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=049-tailwind-endurance-fuel-lemon-flavour.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/049-tailwind-endurance-fuel-lemon-flavour.webp</image:loc>
-    <image:title>Tailwind Endurance Fuel Lemon Flavour - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Endurance Fuel Lemon Flavour online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=050-tailwind-endurance-fuel-mandarin-flavour.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/050-tailwind-endurance-fuel-mandarin-flavour.webp</image:loc>
-    <image:title>Tailwind Endurance Fuel Mandarin Flavour - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Endurance Fuel Mandarin Flavour online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=051-tailwind-endurance-fuel-naked-flavour.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/051-tailwind-endurance-fuel-naked-flavour.webp</image:loc>
-    <image:title>Tailwind Endurance Fuel Naked Flavour - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Endurance Fuel Naked Flavour online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=052-tailwind-endurance-fuel-raspberry-caffeinated.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/052-tailwind-endurance-fuel-raspberry-caffeinated.webp</image:loc>
-    <image:title>Tailwind Endurance Fuel Raspberry Caffeinated - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Endurance Fuel Raspberry Caffeinated online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=053-tailwind-endurance-fuel-tropical-caffeinated.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/053-tailwind-endurance-fuel-tropical-caffeinated.webp</image:loc>
-    <image:title>Tailwind Endurance Fuel Tropical Caffeinated - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Endurance Fuel Tropical Caffeinated online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=054-tailwind-endurance-matchagreen-tea-flavour.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/054-tailwind-endurance-matchagreen-tea-flavour.webp</image:loc>
-    <image:title>Tailwind Endurance Matchagreen Tea Flavour - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Endurance Matchagreen Tea Flavour online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=055-tailwind-high-carb-fuel-6-servings.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/055-tailwind-high-carb-fuel-6-servings.webp</image:loc>
-    <image:title>Tailwind High Carb Fuel 6 Servings - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind High Carb Fuel 6 Servings online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=056-tailwind-new-recovery-mix-20-serv.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/056-tailwind-new-recovery-mix-20-serv.webp</image:loc>
-    <image:title>Tailwind New Recovery Mix 20 Serv - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind New Recovery Mix 20 Serv online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=057-tailwind-recovery-mix-vanilla.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/057-tailwind-recovery-mix-vanilla.webp</image:loc>
-    <image:title>Tailwind Recovery Mix Vanilla - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Recovery Mix Vanilla online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=058-tailwind-recovery-new-mix-strawberry.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/058-tailwind-recovery-new-mix-strawberry.webp</image:loc>
-    <image:title>Tailwind Recovery New Mix Strawberry - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Recovery New Mix Strawberry online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=059-tailwind-recovery-new-mix-chocolate.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/059-tailwind-recovery-new-mix-chocolate.webp</image:loc>
-    <image:title>Tailwind Recovery New Mix Chocolate - Sports Foods Ireland</image:title>
-    <image:caption>Buy Tailwind Recovery New Mix Chocolate online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=060-armband-heart-rate-monitor-hr70.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/060-armband-heart-rate-monitor-hr70.webp</image:loc>
-    <image:title>Armband Heart Rate Monitor Hr70 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Armband Heart Rate Monitor Hr70 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=061-bsc100s-gps-bike-computer.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/061-bsc100s-gps-bike-computer.webp</image:loc>
-    <image:title>Bsc100S Gps Bike Computer - Sports Foods Ireland</image:title>
-    <image:caption>Buy Bsc100S Gps Bike Computer online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=062-bsc200s-bike-computer.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/062-bsc200s-bike-computer.webp</image:loc>
-    <image:title>Bsc200S Bike Computer - Sports Foods Ireland</image:title>
-    <image:caption>Buy Bsc200S Bike Computer online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=063-computer-protective-case-for-bsc100s-bsc200.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/063-computer-protective-case-for-bsc100s-bsc200.webp</image:loc>
-    <image:title>Computer Protective Case For Bsc100S Bsc200 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Computer Protective Case For Bsc100S Bsc200 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=064-heart-rate-monitor-hr50.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/064-heart-rate-monitor-hr50.webp</image:loc>
-    <image:title>Heart Rate Monitor Hr50 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Heart Rate Monitor Hr50 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=065-igpsport-m80-s82-adapter.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/065-igpsport-m80-s82-adapter.webp</image:loc>
-    <image:title>Igpsport M80 S82 Adapter - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igpsport M80 S82 Adapter online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=066-igpsport-sr-mini-radar-rear-light.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/066-igpsport-sr-mini-radar-rear-light.webp</image:loc>
-    <image:title>Igpsport Sr Mini Radar Rear Light - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igpsport Sr Mini Radar Rear Light online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=067-igpsport-vs1200s-front-light.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/067-igpsport-vs1200s-front-light.webp</image:loc>
-    <image:title>Igpsport Vs1200S Front Light - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igpsport Vs1200S Front Light online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=068-igs630-gps-cycling-computer.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/068-igs630-gps-cycling-computer.webp</image:loc>
-    <image:title>Igs630 Gps Cycling Computer - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igs630 Gps Cycling Computer online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=069-igs800-bike-computer.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/069-igs800-bike-computer.webp</image:loc>
-    <image:title>Igs800 Bike Computer - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igs800 Bike Computer online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=070-igsport-cadence-sensor.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/070-igsport-cadence-sensor.webp</image:loc>
-    <image:title>Igsport Cadence Sensor - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igsport Cadence Sensor online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=071-igsport-lw10-smart-watch.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/071-igsport-lw10-smart-watch.webp</image:loc>
-    <image:title>Igsport Lw10 Smart Watch - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igsport Lw10 Smart Watch online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=072-igsport-out-front-mount.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/072-igsport-out-front-mount.webp</image:loc>
-    <image:title>Igsport Out Front Mount - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igsport Out Front Mount online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=073-igsport-tl50-rear-light.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/073-igsport-tl50-rear-light.webp</image:loc>
-    <image:title>Igsport Tl50 Rear Light - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igsport Tl50 Rear Light online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=074-igsport-vs800s-front-light.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/074-igsport-vs800s-front-light.webp</image:loc>
-    <image:title>Igsport Vs800S Front Light - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igsport Vs800S Front Light online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=075-spd70-speed-sensor.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/075-spd70-speed-sensor.webp</image:loc>
-    <image:title>Spd70 Speed Sensor - Sports Foods Ireland</image:title>
-    <image:caption>Buy Spd70 Speed Sensor online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=076-original-lock-laces-no-tie-shoelaces.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/076-original-lock-laces-no-tie-shoelaces.webp</image:loc>
-    <image:title>Original Lock Laces No Tie Shoelaces - Sports Foods Ireland</image:title>
-    <image:caption>Buy Original Lock Laces No Tie Shoelaces online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=077-chamois-buttr-10-pack-x-9ml-sachet.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/077-chamois-buttr-10-pack-x-9ml-sachet.webp</image:loc>
-    <image:title>Chamois Buttr 10 Pack X 9Ml Sachet - Sports Foods Ireland</image:title>
-    <image:caption>Buy Chamois Buttr 10 Pack X 9Ml Sachet online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=078-chamois-buttr-eurostyle-235ml-tube-x-12.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/078-chamois-buttr-eurostyle-235ml-tube-x-12.webp</image:loc>
-    <image:title>Chamois Buttr Eurostyle 235Ml Tube X 12 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Chamois Buttr Eurostyle 235Ml Tube X 12 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=079-chamois-buttr-for-her-235ml-tube-x-12.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/079-chamois-buttr-for-her-235ml-tube-x-12.webp</image:loc>
-    <image:title>Chamois Buttr For Her 235Ml Tube X 12 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Chamois Buttr For Her 235Ml Tube X 12 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=080-chamois-buttr-original-235ml-tube-x-12.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/080-chamois-buttr-original-235ml-tube-x-12.webp</image:loc>
-    <image:title>Chamois Buttr Original 235Ml Tube X 12 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Chamois Buttr Original 235Ml Tube X 12 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=081-100-natural-glide-anti-chafing-balm-18-x-60g.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/081-100-natural-glide-anti-chafing-balm-18-x-60g.webp</image:loc>
-    <image:title>100 Natural Glide Anti Chafing Balm 18 X 60G - Sports Foods Ireland</image:title>
-    <image:caption>Buy 100 Natural Glide Anti Chafing Balm 18 X 60G online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=082-armband-heart-rate-monitor-hr70.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/082-armband-heart-rate-monitor-hr70.webp</image:loc>
-    <image:title>Armband Heart Rate Monitor Hr70 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Armband Heart Rate Monitor Hr70 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=083-bsc100s-gps-bike-computer.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/083-bsc100s-gps-bike-computer.webp</image:loc>
-    <image:title>Bsc100S Gps Bike Computer - Sports Foods Ireland</image:title>
-    <image:caption>Buy Bsc100S Gps Bike Computer online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=084-bsc200s-bike-computer.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/084-bsc200s-bike-computer.webp</image:loc>
-    <image:title>Bsc200S Bike Computer - Sports Foods Ireland</image:title>
-    <image:caption>Buy Bsc200S Bike Computer online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=085-computer-protective-case-for-bsc100s-bsc200.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/085-computer-protective-case-for-bsc100s-bsc200.webp</image:loc>
-    <image:title>Computer Protective Case For Bsc100S Bsc200 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Computer Protective Case For Bsc100S Bsc200 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=086-heart-rate-monitor-hr50.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/086-heart-rate-monitor-hr50.webp</image:loc>
-    <image:title>Heart Rate Monitor Hr50 - Sports Foods Ireland</image:title>
-    <image:caption>Buy Heart Rate Monitor Hr50 online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=087-igpsport-m80-s82-adapter.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/087-igpsport-m80-s82-adapter.webp</image:loc>
-    <image:title>Igpsport M80 S82 Adapter - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igpsport M80 S82 Adapter online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=088-igpsport-sr-mini-radar-rear-light.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/088-igpsport-sr-mini-radar-rear-light.webp</image:loc>
-    <image:title>Igpsport Sr Mini Radar Rear Light - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igpsport Sr Mini Radar Rear Light online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=089-igpsport-vs1200s-front-light.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/089-igpsport-vs1200s-front-light.webp</image:loc>
-    <image:title>Igpsport Vs1200S Front Light - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igpsport Vs1200S Front Light online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=090-igs630-gps-cycling-computer.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/090-igs630-gps-cycling-computer.webp</image:loc>
-    <image:title>Igs630 Gps Cycling Computer - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igs630 Gps Cycling Computer online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=091-igs800-bike-computer.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/091-igs800-bike-computer.webp</image:loc>
-    <image:title>Igs800 Bike Computer - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igs800 Bike Computer online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=092-igsport-cadence-sensor.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/092-igsport-cadence-sensor.webp</image:loc>
-    <image:title>Igsport Cadence Sensor - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igsport Cadence Sensor online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=093-igsport-lw10-smart-watch.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/093-igsport-lw10-smart-watch.webp</image:loc>
-    <image:title>Igsport Lw10 Smart Watch - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igsport Lw10 Smart Watch online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=094-igsport-out-front-mount.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/094-igsport-out-front-mount.webp</image:loc>
-    <image:title>Igsport Out Front Mount - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igsport Out Front Mount online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=095-igsport-tl50-rear-light.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/095-igsport-tl50-rear-light.webp</image:loc>
-    <image:title>Igsport Tl50 Rear Light - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igsport Tl50 Rear Light online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=096-igsport-vs800s-front-light.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/096-igsport-vs800s-front-light.webp</image:loc>
-    <image:title>Igsport Vs800S Front Light - Sports Foods Ireland</image:title>
-    <image:caption>Buy Igsport Vs800S Front Light online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=097-safety-skin-spread-42gr.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/097-safety-skin-spread-42gr.webp</image:loc>
-    <image:title>Safety Skin Spread 42Gr - Sports Foods Ireland</image:title>
-    <image:caption>Buy Safety Skin Spread 42Gr online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=098-spd70-speed-sensor.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/098-spd70-speed-sensor.webp</image:loc>
-    <image:title>Spd70 Speed Sensor - Sports Foods Ireland</image:title>
-    <image:caption>Buy Spd70 Speed Sensor online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=099-the-icebein-recovery-system.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/099-the-icebein-recovery-system.webp</image:loc>
-    <image:title>The Icebein Recovery System - Sports Foods Ireland</image:title>
-    <image:caption>Buy The Icebein Recovery System online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/produto.html?img=100-fasta-lite-uci-legal-race-overshoes.webp</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/100-fasta-lite-uci-legal-race-overshoes.webp</image:loc>
-    <image:title>Fasta Lite Uci Legal Race Overshoes - Sports Foods Ireland</image:title>
-    <image:caption>Buy Fasta Lite Uci Legal Race Overshoes online at Sports Foods Ireland. Fast delivery across Ireland.</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/shop.html?brand=tailwind</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/hero-tailwind.webp</image:loc>
-    <image:title>Tailwind Nutrition Endurance Fuel</image:title>
-    <image:caption>Buy Tailwind Nutrition in Ireland at Sports Foods Ireland</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/shop.html?brand=clif</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/hero-clif-new.webp</image:loc>
-    <image:title>Clif Bar Energy Bars Ireland</image:title>
-    <image:caption>Buy Clif Bar energy bars and gels in Ireland</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/shop.html?brand=zone3</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/hero-zone3.webp</image:loc>
-    <image:title>Zone3 Wetsuits Ireland</image:title>
-    <image:caption>Buy Zone3 wetsuits and swim gear in Ireland</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/shop.html?brand=powerbar</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/hero-powerbar-new.webp</image:loc>
-    <image:title>PowerBar Sports Nutrition Ireland</image:title>
-    <image:caption>Buy PowerBar gels and bars in Ireland</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/shop.html?brand=saltstick</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/hero-saltstick.webp</image:loc>
-    <image:title>SaltStick Electrolytes Ireland</image:title>
-    <image:caption>Buy SaltStick electrolyte capsules in Ireland</image:caption>
-  </image:image>
-</url>
-<url>
-  <loc>https://www.sportsfoodsireland.ie/shop.html?brand=igpsport</loc>
-  <image:image>
-    <image:loc>https://www.sportsfoodsireland.ie/img/hero-igpsport.webp</image:loc>
-    <image:title>iGPSPORT Cycling Computers Ireland</image:title>
-    <image:caption>Buy iGPSPORT cycling computers in Ireland</image:caption>
-  </image:image>
-</url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=1</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/001-beet-it-regen-cherry-shot-15-x-70ml.webp</image:loc>
+      <image:title>Beet It Regen Cherry+ Shot 15 x 70ml</image:title>
+      <image:caption>Beet It Regen Cherry+ Shot 15 x 70ml — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=2</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/002-beet-it-sport-nitrate-400-70ml-shots-x-15.webp</image:loc>
+      <image:title>Beet It Sport Nitrate 400 70ml Shots x 15</image:title>
+      <image:caption>Beet It Sport Nitrate 400 70ml Shots x 15 — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=3</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/003-beet-it-sport-nitrate-energy-gel-top-up-100-12-x-4.webp</image:loc>
+      <image:title>Beet It Sport Nitrate Energy Gel Top Up 100 (12 X 43g)</image:title>
+      <image:caption>Beet It Sport Nitrate Energy Gel Top Up 100 (12 X 43g) — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=4</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/004-black-line-90g-carbs-fuel-sports-drink-sachet-10-x.webp</image:loc>
+      <image:title>Black Line 90g Carbs Fuel Sports Drink Sachet 10 X 94g</image:title>
+      <image:caption>Black Line 90g Carbs Fuel Sports Drink Sachet 10 X 94g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=6</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/006-black-line-amino-mega-liquid-20-x-25ml.webp</image:loc>
+      <image:title>Black Line Amino Mega Liquid 20 X 25ml</image:title>
+      <image:caption>Black Line Amino Mega Liquid 20 X 25ml — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=7</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/007-black-line-caffeine-boost-20-x-25ml.webp</image:loc>
+      <image:title>Black Line Caffeine Boost 20 x 25ml</image:title>
+      <image:caption>Black Line Caffeine Boost 20 x 25ml — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=8</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/008-black-line-hydro-fuel-gel-30grams-12-x-50ml.webp</image:loc>
+      <image:title>Black Line Hydro Fuel Gel 30grams 12 X 50ml</image:title>
+      <image:caption>Black Line Hydro Fuel Gel 30grams 12 X 50ml — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=9</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/009-black-line-isotonic-sports-drink-30-608g.webp</image:loc>
+      <image:title>Black Line Isotonic Sports Drink 30 608g</image:title>
+      <image:caption>Black Line Isotonic Sports Drink 30 608g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=10</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/010-black-line-l-carnitin-liquid-20-x-25ml.webp</image:loc>
+      <image:title>Black Line L-Carnitin Liquid 20 X 25ml</image:title>
+      <image:caption>Black Line L-Carnitin Liquid 20 X 25ml — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=11</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/011-black-line-magnesium-liquid-25ml-x-20.webp</image:loc>
+      <image:title>Black Line Magnesium Liquid 25ml X 20</image:title>
+      <image:caption>Black Line Magnesium Liquid 25ml X 20 — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=12</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/012-black-line-waterbottle-500ml.webp</image:loc>
+      <image:title>Black Line Waterbottle 500ml</image:title>
+      <image:caption>Black Line Waterbottle 500ml — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=13</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/013-clif-bar-12-x-65g.webp</image:loc>
+      <image:title>Clif Bar 12 x 65g</image:title>
+      <image:caption>Clif Bar 12 x 65g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=14</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/014-clif-bar-minis-10-x-28g-pack.webp</image:loc>
+      <image:title>Clif Bar Minis 10 x 28g Pack</image:title>
+      <image:caption>Clif Bar Minis 10 x 28g Pack — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=15</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/015-clif-bar-nut-butter-12-x-50g.webp</image:loc>
+      <image:title>Clif Bar Nut Butter 12 x 50g</image:title>
+      <image:caption>Clif Bar Nut Butter 12 x 50g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=16</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/016-clif-shot-bloks-energy-chews-18-x-60g.webp</image:loc>
+      <image:title>Clif Shot Bloks Energy Chews 18 x 60g</image:title>
+      <image:caption>Clif Shot Bloks Energy Chews 18 x 60g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=17</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/017-creatine-monohydrate-powder-300g.webp</image:loc>
+      <image:title>CREATINE MONOHYDRATE POWDER 300g</image:title>
+      <image:caption>CREATINE MONOHYDRATE POWDER 300g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=18</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/018-energy-drink-caffeine-hit-sachet-12-x-47g.webp</image:loc>
+      <image:title>Energy Drink Caffeine Hit Sachet 12 X 47g</image:title>
+      <image:caption>Energy Drink Caffeine Hit Sachet 12 X 47g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=19</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/019-energy-drink-with-protein-sachet-12-x-47g.webp</image:loc>
+      <image:title>Energy Drink with Protein Sachet 12 X 47g</image:title>
+      <image:caption>Energy Drink with Protein Sachet 12 X 47g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=20</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/020-high-5-energy-drink-22kg.webp</image:loc>
+      <image:title>High 5 Energy Drink 2.2kg</image:title>
+      <image:caption>High 5 Energy Drink 2.2kg — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=21</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/021-high-5-energy-drink-with-protein-16kg.webp</image:loc>
+      <image:title>High 5 Energy Drink with Protein 1.6kg</image:title>
+      <image:caption>High 5 Energy Drink with Protein 1.6kg — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=22</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/022-high-5-energy-gel-20-pack.webp</image:loc>
+      <image:title>High 5 Energy Gel 20 Pack</image:title>
+      <image:caption>High 5 Energy Gel 20 Pack — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=23</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/023-high-5-energy-gel-20-pack-caffeine.webp</image:loc>
+      <image:title>High 5 Energy Gel 20 Pack Caffeine</image:title>
+      <image:caption>High 5 Energy Gel 20 Pack Caffeine — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=24</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/024-high-5-energy-gel-aqua-x-20.webp</image:loc>
+      <image:title>High 5 Energy Gel Aqua X 20</image:title>
+      <image:caption>High 5 Energy Gel Aqua X 20 — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=25</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/025-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs.webp</image:loc>
+      <image:title>High5 Zero Electrolyte Tablets Box of 8 x 20 Tabs</image:title>
+      <image:caption>High5 Zero Electrolyte Tablets Box of 8 x 20 Tabs — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=26</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/026-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs-.webp</image:loc>
+      <image:title>High5 Zero Electrolyte Tablets Box of 8 x 20 Tabs Caffeine Hit</image:title>
+      <image:caption>High5 Zero Electrolyte Tablets Box of 8 x 20 Tabs Caffeine Hit — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=27</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/027-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs-.webp</image:loc>
+      <image:title>High5 Zero Electrolyte Tablets Box of 8 x 20 Tabs Protect</image:title>
+      <image:caption>High5 Zero Electrolyte Tablets Box of 8 x 20 Tabs Protect — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=28</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/028-micro-shaker-500-ml.webp</image:loc>
+      <image:title>MICRO SHAKER – 500 ML</image:title>
+      <image:caption>MICRO SHAKER – 500 ML — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=29</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/029-nuun-sport-electrolyte-drink-8-x-10-tablet-tubes.webp</image:loc>
+      <image:title>Nuun Sport Electrolyte Drink, 8 x 10 tablet tubes</image:title>
+      <image:caption>Nuun Sport Electrolyte Drink, 8 x 10 tablet tubes — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=30</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/030-power-bar-hydro-gel-box-67ml-x-24.webp</image:loc>
+      <image:title>Power Bar Hydro Gel Box 67ml x 24</image:title>
+      <image:caption>Power Bar Hydro Gel Box 67ml x 24 — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=31</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/031-powerbar-5-electrolytes-10-tabs-x-12-tubes.webp</image:loc>
+      <image:title>PowerBar 5 Electrolytes 10 Tabs x 12 Tubes</image:title>
+      <image:caption>PowerBar 5 Electrolytes 10 Tabs x 12 Tubes — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=32</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/032-powerbar-build-whey-protein-isolate-hydroisolate-5.webp</image:loc>
+      <image:title>Powerbar Build Whey Protein Isolate &amp; Hydroisolate 550g Powder</image:title>
+      <image:caption>Powerbar Build Whey Protein Isolate &amp; Hydroisolate 550g Powder — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=33</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/033-powerbar-energize-original-bar-15-x-55g.webp</image:loc>
+      <image:title>PowerBar Energize Original Bar 15 X 55g</image:title>
+      <image:caption>PowerBar Energize Original Bar 15 X 55g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=34</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/034-powerbar-isoactive-drink-mix-132kg.webp</image:loc>
+      <image:title>PowerBar Isoactive Drink Mix 1.32kg</image:title>
+      <image:caption>PowerBar Isoactive Drink Mix 1.32kg — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=35</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/035-powerbar-isoactive-drink-mix-600g.webp</image:loc>
+      <image:title>PowerBar Isoactive Drink Mix 600g</image:title>
+      <image:caption>PowerBar Isoactive Drink Mix 600g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=36</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/036-powerbar-powergel-original-24-x-41g.webp</image:loc>
+      <image:title>PowerBar PowerGel Original 24 x 41g</image:title>
+      <image:caption>PowerBar PowerGel Original 24 x 41g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=37</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/037-powerbar-powergel-sports-shots-60g-x-24.webp</image:loc>
+      <image:title>PowerBar PowerGel Sports Shots 60g x 24</image:title>
+      <image:caption>PowerBar PowerGel Sports Shots 60g x 24 — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=38</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/038-powerbar-protein-soft-layer-12x40g.webp</image:loc>
+      <image:title>PowerBar Protein Soft Layer 12x40g</image:title>
+      <image:caption>PowerBar Protein Soft Layer 12x40g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=39</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/039-powerbar-recover-active-choc-1210g.webp</image:loc>
+      <image:title>PowerBar Recover Active Choc 1.210g</image:title>
+      <image:caption>PowerBar Recover Active Choc 1.210g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=40</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/040-powerbar-recovery-max-protein-114kg.webp</image:loc>
+      <image:title>PowerBar Recovery Max Protein 1.14kg</image:title>
+      <image:caption>PowerBar Recovery Max Protein 1.14kg — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=41</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/041-powerbar-ride-bar-box-of-18-x-55g.webp</image:loc>
+      <image:title>Powerbar Ride Bar Box of 18 X 55g</image:title>
+      <image:caption>Powerbar Ride Bar Box of 18 X 55g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=42</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/042-saltstick-capsules.webp</image:loc>
+      <image:title>Saltstick Capsules</image:title>
+      <image:caption>Saltstick Capsules — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=43</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/043-saltstick-fastchews-10-chew-pack-box-of-12.webp</image:loc>
+      <image:title>Saltstick Fastchews 10 Chew Pack Box of 12</image:title>
+      <image:caption>Saltstick Fastchews 10 Chew Pack Box of 12 — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=44</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/044-saltstick-fastchews-60-tables.webp</image:loc>
+      <image:title>SaltStick FastChews 60 Tables</image:title>
+      <image:caption>SaltStick FastChews 60 Tables — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=45</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/045-sports-beans-x-24-x-28g.webp</image:loc>
+      <image:title>Sports Beans x 24 x 28g</image:title>
+      <image:caption>Sports Beans x 24 x 28g — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=46</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/046-tailwind-endurance-fuel-berry-flavour.webp</image:loc>
+      <image:title>Tailwind Endurance Fuel Berry Flavour</image:title>
+      <image:caption>Tailwind Endurance Fuel Berry Flavour — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=47</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/047-tailwind-endurance-fuel-cola-caffeinated.webp</image:loc>
+      <image:title>Tailwind Endurance Fuel Cola (Caffeinated)</image:title>
+      <image:caption>Tailwind Endurance Fuel Cola (Caffeinated) — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=48</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/048-tailwind-endurance-fuel-dauwatermelon-flavour.webp</image:loc>
+      <image:title>Tailwind Endurance Fuel Dauwatermelon Flavour</image:title>
+      <image:caption>Tailwind Endurance Fuel Dauwatermelon Flavour — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=49</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/049-tailwind-endurance-fuel-lemon-flavour.webp</image:loc>
+      <image:title>Tailwind Endurance Fuel Lemon Flavour</image:title>
+      <image:caption>Tailwind Endurance Fuel Lemon Flavour — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=50</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/050-tailwind-endurance-fuel-mandarin-flavour.webp</image:loc>
+      <image:title>Tailwind Endurance Fuel Mandarin Flavour</image:title>
+      <image:caption>Tailwind Endurance Fuel Mandarin Flavour — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=51</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/051-tailwind-endurance-fuel-naked-flavour.webp</image:loc>
+      <image:title>Tailwind Endurance Fuel Naked Flavour</image:title>
+      <image:caption>Tailwind Endurance Fuel Naked Flavour — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=52</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/052-tailwind-endurance-fuel-raspberry-caffeinated.webp</image:loc>
+      <image:title>Tailwind Endurance Fuel Raspberry Caffeinated</image:title>
+      <image:caption>Tailwind Endurance Fuel Raspberry Caffeinated — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=53</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/053-tailwind-endurance-fuel-tropical-caffeinated.webp</image:loc>
+      <image:title>Tailwind Endurance Fuel Tropical (Caffeinated)</image:title>
+      <image:caption>Tailwind Endurance Fuel Tropical (Caffeinated) — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=54</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/054-tailwind-endurance-matchagreen-tea-flavour.webp</image:loc>
+      <image:title>Tailwind Endurance Matcha/Green Tea Flavour</image:title>
+      <image:caption>Tailwind Endurance Matcha/Green Tea Flavour — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=55</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/055-tailwind-high-carb-fuel-6-servings.webp</image:loc>
+      <image:title>Tailwind High Carb Fuel 6 Servings</image:title>
+      <image:caption>Tailwind High Carb Fuel 6 Servings — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=56</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/056-tailwind-new-recovery-mix-20-serv.webp</image:loc>
+      <image:title>Tailwind New Recovery Mix 20 Serv</image:title>
+      <image:caption>Tailwind New Recovery Mix 20 Serv — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=57</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/057-tailwind-recovery-mix-vanilla.webp</image:loc>
+      <image:title>Tailwind Recovery Mix Vanilla</image:title>
+      <image:caption>Tailwind Recovery Mix Vanilla — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=58</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/058-tailwind-recovery-new-mix-strawberry.webp</image:loc>
+      <image:title>Tailwind Recovery New Mix  Strawberry</image:title>
+      <image:caption>Tailwind Recovery New Mix  Strawberry — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=59</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/059-tailwind-recovery-new-mix-chocolate.webp</image:loc>
+      <image:title>Tailwind Recovery New Mix Chocolate</image:title>
+      <image:caption>Tailwind Recovery New Mix Chocolate — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=60</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/060-armband-heart-rate-monitor-hr70.webp</image:loc>
+      <image:title>Armband Heart Rate Monitor HR70</image:title>
+      <image:caption>Armband Heart Rate Monitor HR70 — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=61</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/061-bsc100s-gps-bike-computer.webp</image:loc>
+      <image:title>BSC100S GPS Bike Computer</image:title>
+      <image:caption>BSC100S GPS Bike Computer — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=62</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/062-bsc200s-bike-computer.webp</image:loc>
+      <image:title>BSC200S Bike Computer</image:title>
+      <image:caption>BSC200S Bike Computer — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=63</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/063-computer-protective-case-for-bsc100s-bsc200.webp</image:loc>
+      <image:title>Computer Protective Case for BSC100S &amp; BSC200</image:title>
+      <image:caption>Computer Protective Case for BSC100S &amp; BSC200 — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=64</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/064-heart-rate-monitor-hr50.webp</image:loc>
+      <image:title>Heart Rate Monitor HR50</image:title>
+      <image:caption>Heart Rate Monitor HR50 — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=65</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/065-igpsport-m80-s82-adapter.webp</image:loc>
+      <image:title>Igpsport M80 S82 Adapter</image:title>
+      <image:caption>Igpsport M80 S82 Adapter — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=66</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/066-igpsport-sr-mini-radar-rear-light.webp</image:loc>
+      <image:title>Igpsport SR Mini Radar Rear light</image:title>
+      <image:caption>Igpsport SR Mini Radar Rear light — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=67</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/067-igpsport-vs1200s-front-light.webp</image:loc>
+      <image:title>IGPSport VS1200S Front light</image:title>
+      <image:caption>IGPSport VS1200S Front light — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=68</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/068-igs630-gps-cycling-computer.webp</image:loc>
+      <image:title>IGS630 GPS Cycling Computer</image:title>
+      <image:caption>IGS630 GPS Cycling Computer — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=69</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/069-igs800-bike-computer.webp</image:loc>
+      <image:title>iGS800 Bike Computer</image:title>
+      <image:caption>iGS800 Bike Computer — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=70</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/070-igsport-cadence-sensor.webp</image:loc>
+      <image:title>Igsport Cadence Sensor</image:title>
+      <image:caption>Igsport Cadence Sensor — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=71</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/071-igsport-lw10-smart-watch.webp</image:loc>
+      <image:title>Igsport LW10 Smart Watch</image:title>
+      <image:caption>Igsport LW10 Smart Watch — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=72</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/072-igsport-out-front-mount.webp</image:loc>
+      <image:title>Igsport Out Front Mount</image:title>
+      <image:caption>Igsport Out Front Mount — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=73</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/073-igsport-tl50-rear-light.webp</image:loc>
+      <image:title>IGSPORT TL50 Rear Light</image:title>
+      <image:caption>IGSPORT TL50 Rear Light — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=74</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/074-igsport-vs800s-front-light.webp</image:loc>
+      <image:title>IGSport VS800S Front Light</image:title>
+      <image:caption>IGSport VS800S Front Light — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=75</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/075-spd70-speed-sensor.webp</image:loc>
+      <image:title>SPD70 Speed Sensor</image:title>
+      <image:caption>SPD70 Speed Sensor — Electronics — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=76</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/076-original-lock-laces-no-tie-shoelaces.webp</image:loc>
+      <image:title>Original Lock Laces No-Tie Shoelaces</image:title>
+      <image:caption>Original Lock Laces No-Tie Shoelaces — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=77</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/077-chamois-buttr-10-pack-x-9ml-sachet.webp</image:loc>
+      <image:title>Chamois Butt&#x27;r 10 Pack x 9ml Sachet</image:title>
+      <image:caption>Chamois Butt&#x27;r 10 Pack x 9ml Sachet — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=78</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/078-chamois-buttr-eurostyle-235ml-tube-x-12.webp</image:loc>
+      <image:title>Chamois Butt&#x27;r Eurostyle 235ml Tube X 12</image:title>
+      <image:caption>Chamois Butt&#x27;r Eurostyle 235ml Tube X 12 — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=79</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/079-chamois-buttr-for-her-235ml-tube-x-12.webp</image:loc>
+      <image:title>Chamois Butt&#x27;r for Her 235ml Tube X 12</image:title>
+      <image:caption>Chamois Butt&#x27;r for Her 235ml Tube X 12 — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=80</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/080-chamois-buttr-original-235ml-tube-x-12.webp</image:loc>
+      <image:title>Chamois Butt&#x27;r Original 235ml Tube X 12</image:title>
+      <image:caption>Chamois Butt&#x27;r Original 235ml Tube X 12 — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=97</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/097-safety-skin-spread-42gr.webp</image:loc>
+      <image:title>Safety Skin Spread 42gr</image:title>
+      <image:caption>Safety Skin Spread 42gr — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=99</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/099-the-icebein-recovery-system.webp</image:loc>
+      <image:title>The Icebein Recovery System</image:title>
+      <image:caption>The Icebein Recovery System — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=100</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/100-fasta-lite-uci-legal-race-overshoes.webp</image:loc>
+      <image:title>Fasta Lite UCI Legal Race Overshoes</image:title>
+      <image:caption>Fasta Lite UCI Legal Race Overshoes — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=101</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/101-heat-tech-neoprene-swim-socks.webp</image:loc>
+      <image:title>Heat-Tech Neoprene Swim Socks</image:title>
+      <image:caption>Heat-Tech Neoprene Swim Socks — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=102</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/102-pro-stealth-overshoe-system-with-protoez-toe-warme.webp</image:loc>
+      <image:title>Pro Stealth Overshoe System (with Protoez toe warmers)</image:title>
+      <image:caption>Pro Stealth Overshoe System (with Protoez toe warmers) — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=103</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/103-sokz-2-one-size.webp</image:loc>
+      <image:title>Sokz 2 (one size)</image:title>
+      <image:caption>Sokz 2 (one size) — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=104</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/104-spatz-armz-rain-specific-arm-warmers.webp</image:loc>
+      <image:title>SPATZ &quot;ARMZ&quot; Rain Specific Arm Warmers</image:title>
+      <image:caption>SPATZ &quot;ARMZ&quot; Rain Specific Arm Warmers — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=105</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/105-spatz-burnr-4-season-arm-warmers.webp</image:loc>
+      <image:title>SPATZ &quot;BURNR&quot; 4 season Arm Warmers</image:title>
+      <image:caption>SPATZ &quot;BURNR&quot; 4 season Arm Warmers — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=106</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/106-spatz-burnr-4-season-leg-warmers.webp</image:loc>
+      <image:title>SPATZ &quot;BURNR&quot; 4 season Leg Warmers</image:title>
+      <image:caption>SPATZ &quot;BURNR&quot; 4 season Leg Warmers — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=107</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/107-spatz-quadz-thigh-warmers.webp</image:loc>
+      <image:title>SPATZ &quot;QUADZ&quot; Thigh Warmers</image:title>
+      <image:caption>SPATZ &quot;QUADZ&quot; Thigh Warmers — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=108</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/108-spatz-aero-race-glovz-long-finger.webp</image:loc>
+      <image:title>SPATZ AERO RACE GLOVZ LONG FINGER</image:title>
+      <image:caption>SPATZ AERO RACE GLOVZ LONG FINGER — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=109</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/109-spatz-aero-race-glovz-short-finger.webp</image:loc>
+      <image:title>SPATZ AERO RACE GLOVZ SHORT FINGER</image:title>
+      <image:caption>SPATZ AERO RACE GLOVZ SHORT FINGER — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=110</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/110-spatz-basez-2-baselayer-black.webp</image:loc>
+      <image:title>Spatz Basez 2 Baselayer Black</image:title>
+      <image:caption>Spatz Basez 2 Baselayer Black — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=111</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/111-spatz-burnr-light.webp</image:loc>
+      <image:title>Spatz Burnr Light</image:title>
+      <image:caption>Spatz Burnr Light — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=112</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/112-spatz-fasta-lite-long-overshoes.webp</image:loc>
+      <image:title>Spatz Fasta Lite Long Overshoes</image:title>
+      <image:caption>Spatz Fasta Lite Long Overshoes — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=113</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/113-spatz-heatr-head-warmerbalaclava.webp</image:loc>
+      <image:title>Spatz Heatr Head Warmer/Balaclava</image:title>
+      <image:caption>Spatz Heatr Head Warmer/Balaclava — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=114</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/114-spatz-neotoez-neoprene-toe-warmers-one-size.webp</image:loc>
+      <image:title>Spatz Neotoez Neoprene Toe Warmers (one size)</image:title>
+      <image:caption>Spatz Neotoez Neoprene Toe Warmers (one size) — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=115</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/115-spatz-neoz-thermal-neoprene-rain-gloves.webp</image:loc>
+      <image:title>SPATZ NEOZ Thermal Neoprene Rain Gloves</image:title>
+      <image:caption>SPATZ NEOZ Thermal Neoprene Rain Gloves — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=116</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/116-spatz-thrmoz-deep-winter-gloves-with-fold-out-wind.webp</image:loc>
+      <image:title>SPATZ THRMOZ Deep Winter Gloves with fold-out wind blocking shell</image:title>
+      <image:caption>SPATZ THRMOZ Deep Winter Gloves with fold-out wind blocking shell — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=117</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/117-spatzwear-burnr-gilet.webp</image:loc>
+      <image:title>SPATZWEAR BurnR  Gilet</image:title>
+      <image:caption>SPATZWEAR BurnR  Gilet — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=118</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/118-spatzwear-convoy-cargo-bib-shorts.webp</image:loc>
+      <image:title>SPATZWEAR CONVOY Cargo Bib Shorts.</image:title>
+      <image:caption>SPATZWEAR CONVOY Cargo Bib Shorts. — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=119</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/119-spatzwear-coolr-summer-indoor-baselayer-white.webp</image:loc>
+      <image:title>SPATZWEAR CoolR Summer / Indoor Baselayer White</image:title>
+      <image:caption>SPATZWEAR CoolR Summer / Indoor Baselayer White — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=120</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/120-spatzwear-heatr-4-season-long-sleeve-jersey.webp</image:loc>
+      <image:title>SPATZWEAR HEATR 4-Season Long Sleeve Jersey</image:title>
+      <image:caption>SPATZWEAR HEATR 4-Season Long Sleeve Jersey — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=121</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/121-spatzwear-race-layer-short-sleeve-baselayer.webp</image:loc>
+      <image:title>SPATZWEAR RACE LAYER Short Sleeve Baselayer</image:title>
+      <image:caption>SPATZWEAR RACE LAYER Short Sleeve Baselayer — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=122</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/122-spatzwear-squadron-ss-cargo-jersey-black-or-khaki.webp</image:loc>
+      <image:title>SPATZWEAR SQUADRON SS Cargo Jersey, Black or Khaki</image:title>
+      <image:caption>SPATZWEAR SQUADRON SS Cargo Jersey, Black or Khaki — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=123</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/123-toez-silicone-toe-warmers.webp</image:loc>
+      <image:title>Toez Silicone Toe Warmers</image:title>
+      <image:caption>Toez Silicone Toe Warmers — Cycling — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=124</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/124-adventure-lights.webp</image:loc>
+      <image:title>Adventure Lights</image:title>
+      <image:caption>Adventure Lights — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=125</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/125-aspect-goggles.webp</image:loc>
+      <image:title>Aspect Goggles</image:title>
+      <image:caption>Aspect Goggles — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=126</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/126-attack-goggles.webp</image:loc>
+      <image:title>Attack Goggles</image:title>
+      <image:caption>Attack Goggles — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=127</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/127-bubble-swim-hat.webp</image:loc>
+      <image:title>Bubble Swim Hat</image:title>
+      <image:caption>Bubble Swim Hat — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=128</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/128-kids-aquahero-goggle-bluered.webp</image:loc>
+      <image:title>Kids Aquahero Goggle Blue/Red</image:title>
+      <image:caption>Kids Aquahero Goggle Blue/Red — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=129</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/129-kids-aquahero-goggles-blackgreen.webp</image:loc>
+      <image:title>Kids Aquahero Goggles Black/Green</image:title>
+      <image:caption>Kids Aquahero Goggles Black/Green — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=130</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/130-protective-swim-goggle-case.webp</image:loc>
+      <image:title>Protective Swim Goggle Case</image:title>
+      <image:caption>Protective Swim Goggle Case — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=131</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/131-replacement-waist-belt-leash-set.webp</image:loc>
+      <image:title>Replacement Waist Belt &amp; Leash Set</image:title>
+      <image:caption>Replacement Waist Belt &amp; Leash Set — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=132</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/132-shell-ear-plugs-x-12.webp</image:loc>
+      <image:title>Shell Ear Plugs X 12</image:title>
+      <image:caption>Shell Ear Plugs X 12 — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=133</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/133-vacuum-insulated-flask.webp</image:loc>
+      <image:title>Vacuum Insulated Flask</image:title>
+      <image:caption>Vacuum Insulated Flask — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=134</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/134-vapour-goggles.webp</image:loc>
+      <image:title>Vapour Goggles</image:title>
+      <image:caption>Vapour Goggles — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=135</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/135-venator-x-goggles.webp</image:loc>
+      <image:title>Venator-X Goggles</image:title>
+      <image:caption>Venator-X Goggles — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=136</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/136-viper-speed-swim-goggles.webp</image:loc>
+      <image:title>VIPER-SPEED SWIM GOGGLES</image:title>
+      <image:caption>VIPER-SPEED SWIM GOGGLES — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=137</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/137-vision-clear-swim-mask.webp</image:loc>
+      <image:title>Vision Clear Swim Mask</image:title>
+      <image:caption>Vision Clear Swim Mask — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=138</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/138-ows-renew-classic-costume.webp</image:loc>
+      <image:title>&#x27;OWS Renew&#x27; Classic Costume</image:title>
+      <image:caption>&#x27;OWS Renew&#x27; Classic Costume — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=140</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/140-2-led-light-28l-backpack-swim-safety-buoydry-bag.webp</image:loc>
+      <image:title>2 LED Light 28L Backpack Swim Safety Buoy/Dry Bag</image:title>
+      <image:caption>2 LED Light 28L Backpack Swim Safety Buoy/Dry Bag — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=141</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/141-2-led-light-swim-safety-buoydry-bag-28l-waterproof.webp</image:loc>
+      <image:title>2 Led Light Swim Safety Buoy/Dry Bag 28L Waterproof Phone Pouch Inc</image:title>
+      <image:caption>2 Led Light Swim Safety Buoy/Dry Bag 28L Waterproof Phone Pouch Inc — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=142</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/142-active-flex-buoyancy-jammer-32mm-blackorange.webp</image:loc>
+      <image:title>Active-Flex Buoyancy Jammer 3/2mm Black/Orange</image:title>
+      <image:caption>Active-Flex Buoyancy Jammer 3/2mm Black/Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=143</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/143-active-flex-swim-beanie-greyorange.webp</image:loc>
+      <image:title>Active-Flex Swim Beanie Grey/Orange</image:title>
+      <image:caption>Active-Flex Swim Beanie Grey/Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=144</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/144-active-flex-swim-cap-greyorange.webp</image:loc>
+      <image:title>Active-Flex Swim Cap Grey/Orange</image:title>
+      <image:caption>Active-Flex Swim Cap Grey/Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=145</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/145-active-flex-swim-glove-greyorange.webp</image:loc>
+      <image:title>Active-Flex Swim Glove Grey/Orange</image:title>
+      <image:caption>Active-Flex Swim Glove Grey/Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=146</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/146-active-flex-swim-sock-greyorange.webp</image:loc>
+      <image:title>Active-Flex Swim Sock Grey/Orange</image:title>
+      <image:caption>Active-Flex Swim Sock Grey/Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=147</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/147-adult-towelling-changing-robe.webp</image:loc>
+      <image:title>Adult Towelling Changing Robe</image:title>
+      <image:caption>Adult Towelling Changing Robe — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=148</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/148-aero-top-tube-cycling-triathlon-bento-box-bag.webp</image:loc>
+      <image:title>Aero Top Tube Cycling / Triathlon &#x27;Bento Box&#x27; Bag</image:title>
+      <image:caption>Aero Top Tube Cycling / Triathlon &#x27;Bento Box&#x27; Bag — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=151</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/151-award-winning-transition-back-pack.webp</image:loc>
+      <image:title>Award Winning Transition Back Pack</image:title>
+      <image:caption>Award Winning Transition Back Pack — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=152</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/152-buoyancy-shorts-the-originals-53mm.webp</image:loc>
+      <image:title>Buoyancy Shorts – The Originals  5/3mm</image:title>
+      <image:caption>Buoyancy Shorts – The Originals  5/3mm — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=153</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/153-buoyancy-shorts-next-step-32mm.webp</image:loc>
+      <image:title>Buoyancy Shorts Next Step 3/2mm</image:title>
+      <image:caption>Buoyancy Shorts Next Step 3/2mm — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=154</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/154-buoyancy-waterproof-phone-pouch.webp</image:loc>
+      <image:title>Buoyancy Waterproof Phone Pouch</image:title>
+      <image:caption>Buoyancy Waterproof Phone Pouch — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=155</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/155-elastic-shoe-laces.webp</image:loc>
+      <image:title>Elastic Shoe Laces</image:title>
+      <image:caption>Elastic Shoe Laces — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=156</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/156-endurance-number-belt-with-lycra-fuel-pouch-and-en.webp</image:loc>
+      <image:title>Endurance Number Belt with Lycra Fuel Pouch and Energy Gel Storage</image:title>
+      <image:caption>Endurance Number Belt with Lycra Fuel Pouch and Energy Gel Storage — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=157</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/157-endurance-number-belt-with-neoprene-fuel-pouch-and.webp</image:loc>
+      <image:title>Endurance Number Belt with Neoprene Fuel Pouch and Energy Gel Storage</image:title>
+      <image:caption>Endurance Number Belt with Neoprene Fuel Pouch and Energy Gel Storage — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=158</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/158-ergo-swim-training-hand-paddles.webp</image:loc>
+      <image:title>Ergo Swim Training Hand Paddles</image:title>
+      <image:caption>Ergo Swim Training Hand Paddles — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=159</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/159-extra-long-hair-silicone-swim-cap.webp</image:loc>
+      <image:title>Extra Long Hair Silicone Swim Cap</image:title>
+      <image:caption>Extra Long Hair Silicone Swim Cap — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=160</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/160-front-facing-swim-drill-snorkel.webp</image:loc>
+      <image:title>Front Facing Swim Drill Snorkel</image:title>
+      <image:caption>Front Facing Swim Drill Snorkel — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=161</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/161-girls-high-jazz-20-strap-back-costume.webp</image:loc>
+      <image:title>Girls High Jazz 2.0 Strap Back Costume</image:title>
+      <image:caption>Girls High Jazz 2.0 Strap Back Costume — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=162</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/162-heat-tech-neoprene-swim-balaclava.webp</image:loc>
+      <image:title>Heat-Tech Neoprene Swim Balaclava</image:title>
+      <image:caption>Heat-Tech Neoprene Swim Balaclava — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=163</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/163-heat-tech-neoprene-swim-cap.webp</image:loc>
+      <image:title>Heat-Tech Neoprene Swim Cap</image:title>
+      <image:caption>Heat-Tech Neoprene Swim Cap — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=164</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/164-heat-tech-neoprene-swim-gloves.webp</image:loc>
+      <image:title>Heat-Tech Neoprene Swim Gloves</image:title>
+      <image:caption>Heat-Tech Neoprene Swim Gloves — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=166</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/166-junior-towelling-robe.webp</image:loc>
+      <image:title>Junior Towelling Robe</image:title>
+      <image:caption>Junior Towelling Robe — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=167</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/167-kids-adventure-wetsuit.webp</image:loc>
+      <image:title>KIDS ADVENTURE WETSUIT</image:title>
+      <image:caption>KIDS ADVENTURE WETSUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=170</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/170-kids-aspect-wetsuit.webp</image:loc>
+      <image:title>KIDS ASPECT WETSUIT</image:title>
+      <image:caption>KIDS ASPECT WETSUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=171</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/171-large-mesh-training-backpack-navyorange.webp</image:loc>
+      <image:title>Large Mesh Training Backpack Navy/Orange</image:title>
+      <image:caption>Large Mesh Training Backpack Navy/Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=172</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/172-large-micro-fibre-towel-navy.webp</image:loc>
+      <image:title>Large Micro Fibre Towel Navy</image:title>
+      <image:caption>Large Micro Fibre Towel Navy — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=173</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/173-long-hair-swim-silicone-cap.webp</image:loc>
+      <image:title>Long Hair Swim Silicone Cap</image:title>
+      <image:caption>Long Hair Swim Silicone Cap — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=174</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/174-mens-activate-tri-shorts-blackred.webp</image:loc>
+      <image:title>Men&#x27;s Activate Tri Shorts Black/Red</image:title>
+      <image:caption>Men&#x27;s Activate Tri Shorts Black/Red — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=175</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/175-mens-active-flex-wetsuit.webp</image:loc>
+      <image:title>Men&#x27;s Active-Flex Wetsuit</image:title>
+      <image:caption>Men&#x27;s Active-Flex Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=176</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/176-mens-advance-wetsuit.webp</image:loc>
+      <image:title>MEN&#x27;S ADVANCE WETSUIT</image:title>
+      <image:caption>MEN&#x27;S ADVANCE WETSUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=177</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/177-mens-agile-wetsuit.webp</image:loc>
+      <image:title>MEN&#x27;S AGILE WETSUIT</image:title>
+      <image:caption>MEN&#x27;S AGILE WETSUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=178</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/178-mens-aspect-wetsuit.webp</image:loc>
+      <image:title>MEN&#x27;S ASPECT WETSUIT</image:title>
+      <image:caption>MEN&#x27;S ASPECT WETSUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=179</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/179-mens-aspire-wetsuit-new-2025.webp</image:loc>
+      <image:title>Men&#x27;s Aspire Wetsuit New 2025</image:title>
+      <image:caption>Men&#x27;s Aspire Wetsuit New 2025 — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=180</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/180-mens-prism-30-jammers.webp</image:loc>
+      <image:title>MEN&#x27;S PRISM 3.0 JAMMERS</image:title>
+      <image:caption>MEN&#x27;S PRISM 3.0 JAMMERS — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=181</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/181-mens-terraprene-vision-wetsuit.webp</image:loc>
+      <image:title>Men&#x27;s Terraprene®  Vision Wetsuit</image:title>
+      <image:caption>Men&#x27;s Terraprene®  Vision Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=182</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/182-mens-venture-wetsuit-blackorange.webp</image:loc>
+      <image:title>Men&#x27;s Venture Wetsuit Black/Orange</image:title>
+      <image:caption>Men&#x27;s Venture Wetsuit Black/Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=183</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/183-mens-versa-multi-sport-wetsuit.webp</image:loc>
+      <image:title>MEN&#x27;S VERSA MULTI SPORT WETSUIT</image:title>
+      <image:caption>MEN&#x27;S VERSA MULTI SPORT WETSUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=184</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/184-mens-yulex-jammers.webp</image:loc>
+      <image:title>Men&#x27;s Yulex Jammers</image:title>
+      <image:caption>Men&#x27;s Yulex Jammers — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=185</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/185-mens-yulex-switch-wetsuit-blackorange.webp</image:loc>
+      <image:title>Men&#x27;s YULEX®  Switch Wetsuit Black/Orange</image:title>
+      <image:caption>Men&#x27;s YULEX®  Switch Wetsuit Black/Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=186</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/186-mens-yulex-kneeskin.webp</image:loc>
+      <image:title>Men&#x27;s Yulex® Kneeskin</image:title>
+      <image:caption>Men&#x27;s Yulex® Kneeskin — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=187</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/187-mens-yulex-top.webp</image:loc>
+      <image:title>Men&#x27;s Yulex® Top</image:title>
+      <image:caption>Men&#x27;s Yulex® Top — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=188</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/188-mens-yulex-vest-black-grey.webp</image:loc>
+      <image:title>Men&#x27;s Yulex® Vest Black &amp; Grey</image:title>
+      <image:caption>Men&#x27;s Yulex® Vest Black &amp; Grey — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=189</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/189-mens-activate-kona-speed-short-sleeve-full-zip-tri.webp</image:loc>
+      <image:title>Mens Activate+ Kona Speed Short Sleeve Full Zip Tri Suit Black/White/Neon Orange</image:title>
+      <image:caption>Mens Activate+ Kona Speed Short Sleeve Full Zip Tri Suit Black/White/Neon Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=190</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/190-mens-active-short-sleeve-full-zip-trisuit-blackred.webp</image:loc>
+      <image:title>Mens Active Short Sleeve Full Zip Trisuit Black/Red</image:title>
+      <image:caption>Mens Active Short Sleeve Full Zip Trisuit Black/Red — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=191</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/191-mens-active-tri-top-blackred.webp</image:loc>
+      <image:title>Mens Active Tri Top Black/Red</image:title>
+      <image:caption>Mens Active Tri Top Black/Red — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=192</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/192-mens-agile-thermal-wetsuit.webp</image:loc>
+      <image:title>Mens Agile Thermal Wetsuit</image:title>
+      <image:caption>Mens Agile Thermal Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=193</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/193-mens-aspire-wetsuit.webp</image:loc>
+      <image:title>Mens Aspire Wetsuit</image:title>
+      <image:caption>Mens Aspire Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=194</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/194-mens-azure-20-wetsuit.webp</image:loc>
+      <image:title>MENS AZURE 2.0 WETSUIT</image:title>
+      <image:caption>MENS AZURE 2.0 WETSUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=195</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/195-mens-cosmic-30-aqua-shorts.webp</image:loc>
+      <image:title>Mens Cosmic 3.0 Aqua Shorts</image:title>
+      <image:caption>Mens Cosmic 3.0 Aqua Shorts — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=196</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/196-mens-iconic-jammers-blackgold.webp</image:loc>
+      <image:title>Mens Iconic Jammers Black/Gold</image:title>
+      <image:caption>Mens Iconic Jammers Black/Gold — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=197</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/197-mens-kona-speed-jammers.webp</image:loc>
+      <image:title>Mens Kona Speed Jammers</image:title>
+      <image:caption>Mens Kona Speed Jammers — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=198</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/198-mens-prism-30-aqua-shorts.webp</image:loc>
+      <image:title>Mens Prism 3.0 Aqua Shorts</image:title>
+      <image:caption>Mens Prism 3.0 Aqua Shorts — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=199</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/199-mens-thermal-aspire-wetsuit.webp</image:loc>
+      <image:title>Mens Thermal Aspire Wetsuit</image:title>
+      <image:caption>Mens Thermal Aspire Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=200</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/200-mens-vanquish-x-wetsuit.webp</image:loc>
+      <image:title>Mens Vanquish-X Wetsuit</image:title>
+      <image:caption>Mens Vanquish-X Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=201</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/201-mens-vision-sleeveless-wetsuit.webp</image:loc>
+      <image:title>Mens Vision Sleeveless Wetsuit</image:title>
+      <image:caption>Mens Vision Sleeveless Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=202</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/202-mens-vision-wetsuit.webp</image:loc>
+      <image:title>Mens Vision Wetsuit</image:title>
+      <image:caption>Mens Vision Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=203</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/203-mesh-training-bagswim-training-aids-bag.webp</image:loc>
+      <image:title>Mesh Training Bag/Swim Training Aids Bag</image:title>
+      <image:caption>Mesh Training Bag/Swim Training Aids Bag — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=204</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/204-microfibre-changing-robeponcho.webp</image:loc>
+      <image:title>Microfibre Changing Robe/Poncho</image:title>
+      <image:caption>Microfibre Changing Robe/Poncho — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=205</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/205-neoprene-headband.webp</image:loc>
+      <image:title>Neoprene Headband</image:title>
+      <image:caption>Neoprene Headband — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=206</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/206-neoprene-swim-cap-vi-vis-orange.webp</image:loc>
+      <image:title>Neoprene Swim Cap Vi-Vis Orange</image:title>
+      <image:caption>Neoprene Swim Cap Vi-Vis Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=207</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/207-neoprene-swim-caps.webp</image:loc>
+      <image:title>Neoprene Swim Caps</image:title>
+      <image:caption>Neoprene Swim Caps — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=208</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/208-neoprene-timing-chip-strap.webp</image:loc>
+      <image:title>Neoprene Timing Chip Strap</image:title>
+      <image:caption>Neoprene Timing Chip Strap — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=209</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/209-neoprene-warmth-vest-baselayer.webp</image:loc>
+      <image:title>Neoprene Warmth Vest Baselayer</image:title>
+      <image:caption>Neoprene Warmth Vest Baselayer — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=210</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/210-neoprene-womens-kneeskin.webp</image:loc>
+      <image:title>Neoprene Women&#x27;s Kneeskin</image:title>
+      <image:caption>Neoprene Women&#x27;s Kneeskin — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=211</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/211-oversize-heat-tech-polar-fleece-parka-robe.webp</image:loc>
+      <image:title>OVERSIZE HEAT-TECH POLAR FLEECE PARKA ROBE</image:title>
+      <image:caption>OVERSIZE HEAT-TECH POLAR FLEECE PARKA ROBE — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=212</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/212-power-stroke-paddles.webp</image:loc>
+      <image:title>Power Stroke Paddles</image:title>
+      <image:caption>Power Stroke Paddles — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=214</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/214-recycled-on-the-go-swim-buoy-donut.webp</image:loc>
+      <image:title>Recycled On The Go Swim Buoy (Donut)</image:title>
+      <image:caption>Recycled On The Go Swim Buoy (Donut) — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=215</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/215-recycled-swim-safety-buoydry-bag-28l.webp</image:loc>
+      <image:title>Recycled Swim Safety Buoy/Dry Bag 28L</image:title>
+      <image:caption>Recycled Swim Safety Buoy/Dry Bag 28L — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=216</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/216-recycled-swim-safety-buoytow-float.webp</image:loc>
+      <image:title>Recycled Swim Safety Buoy/Tow Float</image:title>
+      <image:caption>Recycled Swim Safety Buoy/Tow Float — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=217</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/217-silicone-swim-cap-48g.webp</image:loc>
+      <image:title>Silicone Swim Cap 48g</image:title>
+      <image:caption>Silicone Swim Cap 48g — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=218</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/218-silicone-v-flex-fins.webp</image:loc>
+      <image:title>Silicone V-Flex Fins</image:title>
+      <image:caption>Silicone V-Flex Fins — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=219</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/219-strapless-neoprene-swim-cap.webp</image:loc>
+      <image:title>Strapless Neoprene Swim Cap</image:title>
+      <image:caption>Strapless Neoprene Swim Cap — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=220</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/220-thermo-tech-swim-mitts.webp</image:loc>
+      <image:title>Thermo -Tech Swim Mitts</image:title>
+      <image:caption>Thermo -Tech Swim Mitts — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=221</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/221-transition-backpack-with-cycle-helmet-compartment-.webp</image:loc>
+      <image:title>Transition Backpack with Cycle Helmet Compartment Black/Grey</image:title>
+      <image:caption>Transition Backpack with Cycle Helmet Compartment Black/Grey — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=222</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/222-ultimate-race-number-belt-with-gel-loops.webp</image:loc>
+      <image:title>Ultimate Race Number Belt With Gel Loops</image:title>
+      <image:caption>Ultimate Race Number Belt With Gel Loops — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=227</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/227-waterproof-dry-bag-10-l.webp</image:loc>
+      <image:title>Waterproof Dry Bag 10 L</image:title>
+      <image:caption>Waterproof Dry Bag 10 L — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=228</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/228-wetsuit-changing-mat.webp</image:loc>
+      <image:title>Wetsuit Changing Mat</image:title>
+      <image:caption>Wetsuit Changing Mat — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=229</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/229-womens-activate-plus-short-sleeve-full-zip-trisuit.webp</image:loc>
+      <image:title>WOMEN&#x27;S ACTIVATE PLUS SHORT SLEEVE FULL ZIP TRISUIT</image:title>
+      <image:caption>WOMEN&#x27;S ACTIVATE PLUS SHORT SLEEVE FULL ZIP TRISUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=230</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/230-womens-activate-short-sleeve-full-zip-trisuit-blac.webp</image:loc>
+      <image:title>Women&#x27;s Activate Short Sleeve Full Zip Trisuit Black/Turquoise</image:title>
+      <image:caption>Women&#x27;s Activate Short Sleeve Full Zip Trisuit Black/Turquoise — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=231</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/231-womens-activate-tri-shorts-blackturquoise.webp</image:loc>
+      <image:title>Women&#x27;s Activate Tri Shorts Black/Turquoise</image:title>
+      <image:caption>Women&#x27;s Activate Tri Shorts Black/Turquoise — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=232</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/232-womens-activate-tri-top-blackturquoise.webp</image:loc>
+      <image:title>Women&#x27;s Activate Tri Top Black/Turquoise</image:title>
+      <image:caption>Women&#x27;s Activate Tri Top Black/Turquoise — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=233</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/233-womens-activate-trisuit-blackturquoise.webp</image:loc>
+      <image:title>Women&#x27;s Activate Trisuit Black/Turquoise</image:title>
+      <image:caption>Women&#x27;s Activate Trisuit Black/Turquoise — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=234</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/234-womens-active-flex-wetsuit.webp</image:loc>
+      <image:title>Women&#x27;s Active-Flex Wetsuit</image:title>
+      <image:caption>Women&#x27;s Active-Flex Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=235</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/235-womens-agile-wetsuit.webp</image:loc>
+      <image:title>WOMEN&#x27;S AGILE WETSUIT</image:title>
+      <image:caption>WOMEN&#x27;S AGILE WETSUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=236</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/236-womens-aspect-wetsuit.webp</image:loc>
+      <image:title>WOMEN&#x27;S ASPECT WETSUIT</image:title>
+      <image:caption>WOMEN&#x27;S ASPECT WETSUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=237</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/237-womens-aspire-wetsuit-new-2025.webp</image:loc>
+      <image:title>Women&#x27;s Aspire Wetsuit New 2025</image:title>
+      <image:caption>Women&#x27;s Aspire Wetsuit New 2025 — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=238</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/238-womens-terraprene-vision-wetsuit.webp</image:loc>
+      <image:title>Women&#x27;s Terraprene®  Vision Wetsuit</image:title>
+      <image:caption>Women&#x27;s Terraprene®  Vision Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=239</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/239-womens-venture-wetsuit-blackorange.webp</image:loc>
+      <image:title>Women&#x27;s Venture Wetsuit Black/Orange</image:title>
+      <image:caption>Women&#x27;s Venture Wetsuit Black/Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=240</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/240-womens-versa-multi-sport-wetsuit.webp</image:loc>
+      <image:title>WOMEN&#x27;S VERSA MULTI SPORT WETSUIT</image:title>
+      <image:caption>WOMEN&#x27;S VERSA MULTI SPORT WETSUIT — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=241</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/241-womens-yulex-long-sleeve-swimsuit-black.webp</image:loc>
+      <image:title>Women&#x27;s Yulex®  Long Sleeve Swimsuit Black</image:title>
+      <image:caption>Women&#x27;s Yulex®  Long Sleeve Swimsuit Black — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=242</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/242-womens-yulex-long-sleeve-top.webp</image:loc>
+      <image:title>Women&#x27;s Yulex®  Long Sleeve Top</image:title>
+      <image:caption>Women&#x27;s Yulex®  Long Sleeve Top — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=243</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/243-womens-yulex-switch-wetsuit-blackorange.webp</image:loc>
+      <image:title>Women&#x27;s YULEX®  Switch Wetsuit Black/Orange</image:title>
+      <image:caption>Women&#x27;s YULEX®  Switch Wetsuit Black/Orange — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=244</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/244-womens-yulex-kneesk-multi-bluewhite.webp</image:loc>
+      <image:title>Women&#x27;s Yulex® Kneesk Multi Blue/White</image:title>
+      <image:caption>Women&#x27;s Yulex® Kneesk Multi Blue/White — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=245</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/245-womens-yulex-legging-multi-bluewhite.webp</image:loc>
+      <image:title>Women&#x27;s Yulex® Legging Multi Blue/White</image:title>
+      <image:caption>Women&#x27;s Yulex® Legging Multi Blue/White — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=246</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/246-womens-yulex-long-sleeve-swimsuit-multi-bluewhite.webp</image:loc>
+      <image:title>Women&#x27;s Yulex® Long Sleeve Swimsuit Multi Blue/White</image:title>
+      <image:caption>Women&#x27;s Yulex® Long Sleeve Swimsuit Multi Blue/White — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=247</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/247-womens-yulex-long-sleeve-swimsuit-navy.webp</image:loc>
+      <image:title>Women&#x27;s Yulex® Long Sleeve Swimsuit Navy</image:title>
+      <image:caption>Women&#x27;s Yulex® Long Sleeve Swimsuit Navy — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=248</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/248-womens-yulex-sleeveless-swimsuit.webp</image:loc>
+      <image:title>Women&#x27;s Yulex® Sleeveless Swimsuit</image:title>
+      <image:caption>Women&#x27;s Yulex® Sleeveless Swimsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=249</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/249-womens-yulex-sleeveless-swimsuit-blackgrey.webp</image:loc>
+      <image:title>Women&#x27;s Yulex® Sleeveless Swimsuit Black/Grey</image:title>
+      <image:caption>Women&#x27;s Yulex® Sleeveless Swimsuit Black/Grey — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=250</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/250-womens-yulex-sleeveless-swimsuit-multi-bluewhite.webp</image:loc>
+      <image:title>Women&#x27;s Yulex® Sleeveless Swimsuit Multi Blue/White</image:title>
+      <image:caption>Women&#x27;s Yulex® Sleeveless Swimsuit Multi Blue/White — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=251</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/251-womens-yulex-vest-multi-bluewhite.webp</image:loc>
+      <image:title>Women&#x27;s Yulex® Vest Multi Blue/White</image:title>
+      <image:caption>Women&#x27;s Yulex® Vest Multi Blue/White — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=252</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/252-womens-yulex-shorts.webp</image:loc>
+      <image:title>Women&#x27;s Yulex® Shorts</image:title>
+      <image:caption>Women&#x27;s Yulex® Shorts — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=253</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/253-womens-advance-wetsuit.webp</image:loc>
+      <image:title>Womens Advance Wetsuit</image:title>
+      <image:caption>Womens Advance Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=254</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/254-womens-agile-thermal-wetsuit.webp</image:loc>
+      <image:title>Womens Agile Thermal Wetsuit</image:title>
+      <image:caption>Womens Agile Thermal Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=255</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/255-womens-aspire-thermal-wetsuit.webp</image:loc>
+      <image:title>Womens Aspire Thermal Wetsuit</image:title>
+      <image:caption>Womens Aspire Thermal Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=256</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/256-womens-aspire-wetsuit.webp</image:loc>
+      <image:title>Womens Aspire Wetsuit</image:title>
+      <image:caption>Womens Aspire Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=257</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/257-womens-cosmic-20-back-costume.webp</image:loc>
+      <image:title>Womens Cosmic 2.0 Back Costume</image:title>
+      <image:caption>Womens Cosmic 2.0 Back Costume — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=258</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/258-womens-cosmic-30-strap-back-costume.webp</image:loc>
+      <image:title>Womens Cosmic 3.0 Strap Back Costume</image:title>
+      <image:caption>Womens Cosmic 3.0 Strap Back Costume — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=259</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/259-womens-cosmic-two-piece-bikini.webp</image:loc>
+      <image:title>Womens Cosmic Two-Piece Bikini</image:title>
+      <image:caption>Womens Cosmic Two-Piece Bikini — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=260</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/260-womens-kona-speed-strap-back-costume.webp</image:loc>
+      <image:title>Womens Kona Speed Strap Back Costume</image:title>
+      <image:caption>Womens Kona Speed Strap Back Costume — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=261</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/261-womens-ows-renew-classic-costume-cosmic-20.webp</image:loc>
+      <image:title>Womens OWS Renew Classic Costume-Cosmic 2.0</image:title>
+      <image:caption>Womens OWS Renew Classic Costume-Cosmic 2.0 — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=262</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/262-womens-ows-renew-high-neck-costume-black.webp</image:loc>
+      <image:title>Womens OWS Renew High Neck Costume-Black</image:title>
+      <image:caption>Womens OWS Renew High Neck Costume-Black — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=263</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/263-womens-ows-renew-high-neck-cosmic-20.webp</image:loc>
+      <image:title>Womens OWS Renew High Neck-Cosmic 2.0</image:title>
+      <image:caption>Womens OWS Renew High Neck-Cosmic 2.0 — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=264</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/264-womens-vanquish-x-wetsuit.webp</image:loc>
+      <image:title>Womens Vanquish-X Wetsuit</image:title>
+      <image:caption>Womens Vanquish-X Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=265</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/265-womens-vision-wetsuit.webp</image:loc>
+      <image:title>Womens Vision Wetsuit</image:title>
+      <image:caption>Womens Vision Wetsuit — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=266</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/266-yulex-swim-gloves-navy.webp</image:loc>
+      <image:title>Yulex®  Swim Gloves Navy</image:title>
+      <image:caption>Yulex®  Swim Gloves Navy — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=267</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/267-yulex-swim-socks-navy.webp</image:loc>
+      <image:title>Yulex®  Swim Socks Navy</image:title>
+      <image:caption>Yulex®  Swim Socks Navy — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=268</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/268-yulex-swim-beanie-navy.webp</image:loc>
+      <image:title>Yulex® Swim Beanie Navy</image:title>
+      <image:caption>Yulex® Swim Beanie Navy — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=269</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/269-100-natural-glide-anti-chafing-balm-18-x-60g.webp</image:loc>
+      <image:title>100% Natural Glide Anti-Chafing Balm 18 X 60g</image:title>
+      <image:caption>100% Natural Glide Anti-Chafing Balm 18 X 60g — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=270</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/270-mcnett-black-witch-quick-drying-neoprene-adhesive-.webp</image:loc>
+      <image:title>McNett Black Witch Quick Drying Neoprene Adhesive x 24</image:title>
+      <image:caption>McNett Black Witch Quick Drying Neoprene Adhesive x 24 — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=271</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/271-mcnett-neo-slix-wetsuit-lubricant-250ml-x-12.webp</image:loc>
+      <image:title>McNett Neo Slix Wetsuit Lubricant 250ml x 12</image:title>
+      <image:caption>McNett Neo Slix Wetsuit Lubricant 250ml x 12 — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=273</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/273-hydration-float.webp</image:loc>
+      <image:title>Hydration Float</image:title>
+      <image:caption>Hydration Float — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=278</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/278-tow-woggle.webp</image:loc>
+      <image:title>Tow Woggle</image:title>
+      <image:caption>Tow Woggle — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=279</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/279-wild-swim-bag.webp</image:loc>
+      <image:title>Wild Swim Bag</image:title>
+      <image:caption>Wild Swim Bag — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=280</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/280-fitletic-360-plus-belt.webp</image:loc>
+      <image:title>Fitletic 360 Plus Belt</image:title>
+      <image:caption>Fitletic 360 Plus Belt — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=281</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/281-fitletic-hydra-16-hydration-belt.webp</image:loc>
+      <image:title>Fitletic Hydra 16 Hydration Belt</image:title>
+      <image:caption>Fitletic Hydra 16 Hydration Belt — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=282</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/282-fitletic-mini-sports-belt.webp</image:loc>
+      <image:title>Fitletic Mini Sports Belt</image:title>
+      <image:caption>Fitletic Mini Sports Belt — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=283</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/283-fitletic-trail-25-hydra-vest.webp</image:loc>
+      <image:title>Fitletic Trail 2.5 Hydra Vest</image:title>
+      <image:caption>Fitletic Trail 2.5 Hydra Vest — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=284</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/284-trainer-armour-big-toe-hole-preventer.webp</image:loc>
+      <image:title>Trainer Armour – Big Toe Hole Preventer x 1</image:title>
+      <image:caption>Trainer Armour – Big Toe Hole Preventer x 1 — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=285</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/285-trainer-armour-heel-hole-preventer.webp</image:loc>
+      <image:title>Trainer Armour – Heel Hole Preventer x 1</image:title>
+      <image:caption>Trainer Armour – Heel Hole Preventer x 1 — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=286</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/286-butt-napkins-box-of-30.webp</image:loc>
+      <image:title>Butt Napkins Box of 30</image:title>
+      <image:caption>Butt Napkins Box of 30 — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=287</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/287-high-5-energy-gel-aqua-caffeine-x-20.webp</image:loc>
+      <image:title>High 5 Energy Gel Aqua Caffeine X 20</image:title>
+      <image:caption>High 5 Energy Gel Aqua Caffeine X 20 — Nutrition — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=288</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/288-longsleeve-neoprene-baselayer.webp</image:loc>
+      <image:title>LongSleeve Neoprene Baselayer</image:title>
+      <image:caption>LongSleeve Neoprene Baselayer — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=289</loc>
+    <image:image>
+      <image:loc>https://www.sportsfoodsireland.ie/img/produtos-279/289-sporttape-x-k-tape.webp</image:loc>
+      <image:title>SPORTTAPE X K Tape</image:title>
+      <image:caption>SPORTTAPE X K Tape — Running — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=309</loc>
+    <image:image>
+      <image:loc>https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-ascend-sleeveless-wetsuit-ss26-1774974242972-0.webp</image:loc>
+      <image:title>Women&#x27;s Ascend Sleeveless Wetsuit SS26</image:title>
+      <image:caption>Women&#x27;s Ascend Sleeveless Wetsuit SS26 — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=310</loc>
+    <image:image>
+      <image:loc>https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/mens-aspire-wetsuit-new-2026-1774953467554-0.webp</image:loc>
+      <image:title>Mens Aspire Wetsuit New 2026</image:title>
+      <image:caption>Mens Aspire Wetsuit New 2026 — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=311</loc>
+    <image:image>
+      <image:loc>https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/womens-aspire-wetsuit-new-2025-1774950386034-0.webp</image:loc>
+      <image:title>Womens Aspire Wetsuit New 2026</image:title>
+      <image:caption>Womens Aspire Wetsuit New 2026 — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=312</loc>
+    <image:image>
+      <image:loc>https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-classic-swimsuit-ss26-teal-1775037742564-0.webp</image:loc>
+      <image:title>Women&#x27;s Classic Swimsuit SS26 - Teal</image:title>
+      <image:caption>Women&#x27;s Classic Swimsuit SS26 - Teal — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=313</loc>
+    <image:image>
+      <image:loc>https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-classic-swimsuit-ss26-black-1775036632197-0.webp</image:loc>
+      <image:title>Women&#x27;s Classic Swimsuit SS26 - Black</image:title>
+      <image:caption>Women&#x27;s Classic Swimsuit SS26 - Black — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=314</loc>
+    <image:image>
+      <image:loc>https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/heat-tech-dura-swim-boot-ss26-1775033618970-0.webp</image:loc>
+      <image:title>Heat-Tech Dura Swim Boot SS26</image:title>
+      <image:caption>Heat-Tech Dura Swim Boot SS26 — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.sportsfoodsireland.ie/produto.html?id=315</loc>
+    <image:image>
+      <image:loc>https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/men-s-ascend-sleeveless-wetsuit-ss26-1775039607388-0.webp</image:loc>
+      <image:title>Men&#x27;s Ascend Sleeveless Wetsuit SS26</image:title>
+      <image:caption>Men&#x27;s Ascend Sleeveless Wetsuit SS26 — Swimming — Sports Foods Ireland</image:caption>
+    </image:image>
+  </url>
 </urlset>
