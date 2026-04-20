@@ -4083,7 +4083,7 @@ id="editBackorder" style="width:18px;height:18px;accent-color:#f59e0b"> 📋 Bac
 <span>B2B €</span>
 <span>Cost €</span>
 <span>Stock</span>
-<span></span>
+<span style="font-size:0.7rem;color:#4ade80;">Active</span>
 <span></span>
 </div>
 <div id="variantRows"></div>
@@ -8586,6 +8586,7 @@ Loading items...
       row.dataset.existingId = existing?.id || '';
       row.dataset.parentRowIdx = parentRowIdx || '';
       row.dataset.parentVariantId = existing?.parent_variant_id || '';
+      if (existing?.is_active === false) row.style.opacity = '0.45';
 
       const label = existing?.label || existing?.value || '';
       const existingSku = existing?.sku || existing?.variant_sku || '';
@@ -8600,7 +8601,10 @@ Loading items...
     <input type="number" id="vb2b-${idx}" step="0.01" min="0" placeholder="B2B" value="${existing?.wholesale_price || ''}">
     <input type="number" id="vcost-${idx}" step="0.01" min="0" placeholder="Cost" value="${existing?.cost_price || ''}">
     <input type="number" id="vstock-${idx}" min="0" placeholder="0" value="${existing?.stock || 0}">
-    <span></span>
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;font-size:0.75rem;" title="Active on site">
+      <input type="checkbox" id="vactive-${idx}" ${(existing?.is_active !== false) ? 'checked' : ''} style="accent-color:#4ade80;width:15px;height:15px;cursor:pointer;">
+      <span style="color:var(--text-muted)">Active</span>
+    </label>
     <button class="remove-btn" onclick="removeVariantRow(${idx})">✕</button>`;
       } else {
         row.classList.add('parent-variant');
@@ -8611,6 +8615,10 @@ Loading items...
     <input type="number" id="vb2b-${idx}" step="0.01" min="0" placeholder="B2B" value="${existing?.wholesale_price || ''}">
     <input type="number" id="vcost-${idx}" step="0.01" min="0" placeholder="Cost" value="${existing?.cost_price || ''}">
     <input type="number" id="vstock-${idx}" min="0" placeholder="0" value="${existing?.stock || 0}">
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;font-size:0.75rem;" title="Active on site">
+      <input type="checkbox" id="vactive-${idx}" ${(existing?.is_active !== false) ? 'checked' : ''} style="accent-color:#4ade80;width:15px;height:15px;cursor:pointer;">
+      <span style="color:var(--text-muted)">Active</span>
+    </label>
     <button class="remove-btn" style="font-size:0.7rem;color:var(--info);width:auto;padding:2px 6px" onclick="addChildVariant(${idx})" title="Add sub-variant (size/pack)">+Sub</button>
     <button class="remove-btn" onclick="removeVariantRow(${idx})">✕</button>`;
       }
@@ -8750,6 +8758,7 @@ Loading items...
           wholesale_price: parseFloat(document.getElementById(`vb2b-${idx}`)?.value) || null,
           cost_price: parseFloat(document.getElementById(`vcost-${idx}`)?.value) || null,
           stock_quantity: parseInt(document.getElementById(`vstock-${idx}`)?.value) || 0,
+          is_active: document.getElementById(`vactive-${idx}`) ? document.getElementById(`vactive-${idx}`).checked : true,
           is_default: false,
           is_child: isChild,
           parent_row_idx: parentRowIdx,
@@ -8779,7 +8788,7 @@ Loading items...
       for (let i = 0; i < variants.length; i++) {
         const v = variants[i];
         if (v.is_child) continue;
-        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, wholesale_price: v.wholesale_price, cost_price: v.cost_price, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: null, image_url: v.image_url || null };
+        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, wholesale_price: v.wholesale_price, cost_price: v.cost_price, stock: v.stock_quantity, is_default: v.is_default, is_active: v.is_active !== false, sort_order: i, parent_variant_id: null, image_url: v.image_url || null };
         try {
           if (v.existingId) {
             await supaUpdate('product_variants', v.existingId, data);
@@ -8796,7 +8805,7 @@ Loading items...
         const v = variants[i];
         if (!v.is_child) continue;
         const parentUUID = parentIdMap[v.parent_row_idx] || v.existingId ? (existing.find(e => e.id === v.existingId)?.parent_variant_id || null) : null;
-        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, wholesale_price: v.wholesale_price, cost_price: v.cost_price, stock: v.stock_quantity, is_default: v.is_default, is_active: true, sort_order: i, parent_variant_id: parentUUID, image_url: v.image_url || null };
+        const data = { product_id: productId, variant_type_id: v.variant_type_id, label: v.value, sku: v.sku || null, price: v.price_eur, wholesale_price: v.wholesale_price, cost_price: v.cost_price, stock: v.stock_quantity, is_default: v.is_default, is_active: v.is_active !== false, sort_order: i, parent_variant_id: parentUUID, image_url: v.image_url || null };
         try {
           if (v.existingId) await supaUpdate('product_variants', v.existingId, data);
           else await supaInsert('product_variants', data);
