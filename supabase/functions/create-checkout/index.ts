@@ -20,6 +20,10 @@ if (!STRIPE_SECRET_KEY) {
 const ALLOWED_ORIGINS = [
   "https://sportsfoodsireland.ie",
   "https://www.sportsfoodsireland.ie",
+  "http://localhost:8080",
+  "http://localhost:3000",
+  "http://127.0.0.1:8080",
+  "http://localhost:5500",
 ];
 
 function getCorsHeaders(req: Request): HeadersInit {
@@ -184,7 +188,7 @@ Deno.serve(async (req: Request) => {
     );
 
     const siteUrl =
-      Deno.env.get("SITE_URL") || "https://sportsfoodsireland.com";
+      Deno.env.get("SITE_URL") || "https://sportsfoodsireland.ie";
 
     // Determine the base URL for the success/cancel redirects based on the request's origin.
     // If the request comes from localhost:8000, it stays on localhost.
