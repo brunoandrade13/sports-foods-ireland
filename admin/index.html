@@ -14466,24 +14466,41 @@ drawItemHeaders();
 var subtotal = 0, FS = 7.5, LS = 9.5, RPT = 3, RPB = 2;
 items.forEach(function(item) {
 var qty = parseInt(item.quantity) || 1, sku = item.sku || item.product_sku || '';
-    // Strip variant from product_name if already embedded, then append cleanly
-    var rawName = item.product_name || '';
-    if (item.variant_label && rawName.includes(item.variant_label)) {
-      rawName = rawName.replace(' — ' + item.variant_label, '').replace(' - ' + item.variant_label, '').trim();
-    }
-    // Also strip double-variant pattern (e.g. "Fuel — Mandarin — Mandarin / 30 Serv Bag" → "Fuel — Mandarin / 30 Serv Bag")
-    if (item.variant_label) {
-      var parts = item.variant_label.split(' — ');
-      if (parts.length > 1 && rawName.includes(parts[0])) {
-        var dupPat = ' — ' + parts[0] + ' — ';
-        if (rawName.includes(dupPat)) rawName = rawName.replace(dupPat, ' — ');
+    // --- cleanVariantLabel: removes self-duplication like "Lemon — Lemon / 30 Serv Bag" → "Lemon / 30 Serv Bag"
+    function cleanVariantLabel(vl) {
+      if (!vl) return vl;
+      var sep = ' — ';
+      var idx = vl.indexOf(sep);
+      if (idx < 0) return vl;
+      var before = vl.substring(0, idx);       // "Lemon"
+      var after  = vl.substring(idx + sep.length); // "Lemon / 30 Serv Bag"
+      // If after starts with before (exact or as prefix of a word), remove the duplication
+      if (after.startsWith(before + ' ') || after === before) {
+        return after;  // keep only "Lemon / 30 Serv Bag"
       }
+      return vl;
     }
-    var desc = rawName + (item.variant_label ? ' — ' + item.variant_label : '');
-    // Final dedup: if variant appears twice, keep only one
-    if (item.variant_label && desc.split(item.variant_label).length > 2) {
-      desc = rawName + ' — ' + item.variant_label;
+    // --- cleanProductName: strips variant suffix from product_name
+    function cleanProductName(pn, vl) {
+      if (!pn) return pn;
+      // Remove exact variant_label suffix
+      if (vl && pn.includes(' — ' + vl)) return pn.replace(' — ' + vl, '').trim();
+      if (vl && pn.includes(' - '  + vl)) return pn.replace(' - '  + vl, '').trim();
+      // Remove double-variant suffix e.g. "Fuel — Lemon — Lemon / 30 Serv Bag"
+      // Find last " — " and check if what follows is a variant-like string
+      var lastDash = pn.lastIndexOf(' — ');
+      if (lastDash > 0) {
+        var suffix = pn.substring(lastDash + 3);
+        // If suffix contains " / " or " — " it's likely an embedded variant — strip it
+        if (suffix.includes(' / ') || suffix.includes(' — ')) {
+          return pn.substring(0, lastDash).trim();
+        }
+      }
+      return pn;
     }
+    var cleanedVariant = cleanVariantLabel(item.variant_label || '');
+    var baseName = cleanProductName(item.product_name || '', cleanedVariant);
+    var desc = baseName + (cleanedVariant ? ' — ' + cleanedVariant : '');
     var rate = parseFloat(item.unit_price) || 0, amount = qty * rate;
 subtotal += amount;
 
