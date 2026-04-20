@@ -12458,7 +12458,8 @@ Loading items...
         manualOrderItems.push({
           product_id: prodId,
           variant_id: variantId,
-          name: prodName + ' — ' + variantLabel,
+          name: prodName,
+          variant_label: variantLabel,
           sku: variantSku || '',
           unit_price: price,
           qty: qty
@@ -12629,7 +12630,7 @@ Loading items...
               order_id: ord.id,
               product_id: i.product_id,
               variant_id: i.variant_id || null,
-              variant_label: i.variant_id ? i.name.split(' — ').slice(1).join(' — ') : null,
+              variant_label: i.variant_label || (i.variant_id ? i.name.split(' — ').slice(1).join(' — ') : null),
               quantity: i.qty,
               unit_price: i.unit_price,
               total: lineTotal,
@@ -14464,7 +14465,26 @@ drawItemHeaders();
 
 var subtotal = 0, FS = 7.5, LS = 9.5, RPT = 3, RPB = 2;
 items.forEach(function(item) {
-var qty = parseInt(item.quantity) || 1, sku = item.sku || item.product_sku || '', desc = (item.product_name || '') + (item.variant_label ? ' — ' + item.variant_label : ''), rate = parseFloat(item.unit_price) || 0, amount = qty * rate;
+var qty = parseInt(item.quantity) || 1, sku = item.sku || item.product_sku || '';
+    // Strip variant from product_name if already embedded, then append cleanly
+    var rawName = item.product_name || '';
+    if (item.variant_label && rawName.includes(item.variant_label)) {
+      rawName = rawName.replace(' — ' + item.variant_label, '').replace(' - ' + item.variant_label, '').trim();
+    }
+    // Also strip double-variant pattern (e.g. "Fuel — Mandarin — Mandarin / 30 Serv Bag" → "Fuel — Mandarin / 30 Serv Bag")
+    if (item.variant_label) {
+      var parts = item.variant_label.split(' — ');
+      if (parts.length > 1 && rawName.includes(parts[0])) {
+        var dupPat = ' — ' + parts[0] + ' — ';
+        if (rawName.includes(dupPat)) rawName = rawName.replace(dupPat, ' — ');
+      }
+    }
+    var desc = rawName + (item.variant_label ? ' — ' + item.variant_label : '');
+    // Final dedup: if variant appears twice, keep only one
+    if (item.variant_label && desc.split(item.variant_label).length > 2) {
+      desc = rawName + ' — ' + item.variant_label;
+    }
+    var rate = parseFloat(item.unit_price) || 0, amount = qty * rate;
 subtotal += amount;
 
 // Word wrap description
@@ -14695,6 +14715,18 @@ function renderOrderItemsTable(items, order, editMode) {
       let m = i.product_id ? allProducts.find(p => p.id === i.product_id) : null;
       if (!m && i.product_sku) m = allProducts.find(p => p.sku === i.product_sku);
       if (m && m.name) name = m.name;
+    }
+    // If product_name already contains the variant_label, strip it to avoid duplication
+    if (i.variant_label && name.includes(i.variant_label)) {
+      name = name.replace(' — ' + i.variant_label, '').replace(' - ' + i.variant_label, '').trim();
+      // Also handle double-encoded variants like "Mandarin — Mandarin / 30 Serv Bag"
+      const dashIdx = name.lastIndexOf(' — ');
+      if (dashIdx > 0) {
+        const afterDash = name.substring(dashIdx + 3);
+        if (i.variant_label.startsWith(afterDash) || afterDash.length > 3) {
+          name = name.substring(0, dashIdx).trim();
+        }
+      }
     }
     return name;
   }
