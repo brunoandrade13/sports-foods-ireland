@@ -133,7 +133,7 @@
         <h3>Order Summary</h3>
         ${cart.map(i => `
             <div class="ck-item">
-                <img src="${(function(item){ if(item.variant_id && Array.isArray(window.PRODUTOS)){ var p=window.PRODUTOS.find(function(x){return x.id===item.id||x.id==item.id||x._supabase_id===item.id;}); if(p&&p.variantes){ for(var g of p.variantes){ for(var o of(g.options||[])){ if(o.id===item.variant_id&&o.image_url) return o.image_url; }}} } return item.imagem||'img/placeholder.jpg'; })(i)}" alt="${i.nome}">
+                <img src="${i.imagem || 'img/placeholder.jpg'}" alt="${i.nome}" data-vid="${i.variant_id || ''}" data-pid="${i.id || ''}">
                 <div><span class="ck-item-name">${i.nome}</span>
                 ${(i.variant_label||i.variante) ? `<small>${i.variant_label||i.variante}</small>` : ''}
                 <span class="ck-item-qty">Qty: ${i.quantidade || 1}</span></div>
@@ -667,5 +667,40 @@
     const stripeReturn = handleStripeReturn();
     if (!stripeReturn) {
         renderCheckout();
+    }
+
+    // After PRODUTOS loads, update variant images in the Order Summary
+    function updateCheckoutVariantImages() {
+        if (!Array.isArray(window.PRODUTOS) || !window.PRODUTOS.length) return;
+        document.querySelectorAll('.ck-item img[data-vid]').forEach(function(img) {
+            var vid = img.dataset.vid;
+            var pid = img.dataset.pid;
+            if (!vid) return;
+            var prod = window.PRODUTOS.find(function(p) { return String(p.id) === String(pid) || p._supabase_id === pid; });
+            if (!prod || !prod.variantes) return;
+            for (var g of prod.variantes) {
+                for (var o of (g.options || [])) {
+                    if (String(o.id) === String(vid) && o.image_url) {
+                        img.src = o.image_url;
+                        return;
+                    }
+                }
+            }
+        });
+    }
+
+    // Try immediately (if PRODUTOS already loaded) then watch promise
+    updateCheckoutVariantImages();
+    if (window._sfiProductsPromise) {
+        window._sfiProductsPromise.then(function() { updateCheckoutVariantImages(); }).catch(function(){});
+    } else {
+        var _ckImgAttempts = 0;
+        var _ckImgInterval = setInterval(function() {
+            if (Array.isArray(window.PRODUTOS) && window.PRODUTOS.length > 0) {
+                clearInterval(_ckImgInterval);
+                updateCheckoutVariantImages();
+            }
+            if (++_ckImgAttempts > 20) clearInterval(_ckImgInterval);
+        }, 300);
     }
 })();
