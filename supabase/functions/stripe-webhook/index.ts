@@ -91,7 +91,30 @@ async function handleCheckoutComplete(
   }
 
   const metadata = session.metadata || {};
-  const items = safeJson(metadata.items_json, []);
+  // items_json is now array of [id, qty, price] arrays (compact to avoid Stripe 500-char limit)
+  const rawItems = safeJson(metadata.items_json, []);
+  const variantIds: Record<string, string> = safeJson(metadata.variant_ids, {});
+  const itemNames: string[] = safeJson(metadata.item_names, []);
+
+  // Reconstruct items from compact format
+  const items = Array.isArray(rawItems)
+    ? rawItems.map((item: unknown, idx: number) => {
+        if (Array.isArray(item)) {
+          // New compact format: [id, qty, price]
+          return {
+            id: item[0],
+            qty: item[1],
+            quantity: item[1],
+            price: item[2],
+            name: itemNames[idx] || String(item[0]),
+            variant_id: variantIds[String(idx)] || undefined,
+          };
+        }
+        // Legacy format (object) — backwards compatibility
+        const it = item as Record<string, unknown>;
+        return { ...it, variant_id: it.vid || it.variant_id || variantIds[String(idx)] };
+      })
+    : [];
   const shipping = safeJson(metadata.shipping_json, {});
 
   // Generate a readable order ID

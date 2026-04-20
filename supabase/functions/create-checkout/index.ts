@@ -285,25 +285,29 @@ Deno.serve(async (req: Request) => {
       success_url: `${originUrl}/checkout.html?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${originUrl}/checkout.html?canceled=true`,
       metadata: {
+        // Compact format to stay under Stripe's 500-char metadata value limit
+        // Array of [id, qty, price] — names/variants looked up from DB in stripe-webhook
         items_json: JSON.stringify(
           validatedItems.map(
-            (i: {
-              id?: string | number;
-              name: string;
-              price: number;
-              quantity: number;
-              variant_id?: string;
-              variant_label?: string;
-              image?: string;
-            }) => ({
-              id: i.id,
-              name: i.name,
-              price: i.price,
-              qty: i.quantity || 1,
-              ...(i.variant_id ? { vid: i.variant_id } : {}),
-              ...(i.variant_label ? { vlb: i.variant_label } : {}),
-            }),
-          ),
+            (i: { id?: string | number; price: number; quantity: number; variant_id?: string; name?: string; }) =>
+              [i.id, i.quantity || 1, i.price]
+          )
+        ),
+        // Variant IDs indexed by position: {"0":"uuid","2":"uuid"}
+        variant_ids: JSON.stringify(
+          validatedItems.reduce(
+            (acc: Record<string, string>, i: { variant_id?: string }, idx: number) => {
+              if (i.variant_id) acc[String(idx)] = i.variant_id;
+              return acc;
+            },
+            {}
+          )
+        ),
+        // Item names for display (abbreviated to 40 chars to save space)
+        item_names: JSON.stringify(
+          validatedItems.map(
+            (i: { name?: string }) => (i.name || "").substring(0, 40)
+          )
         ),
         shipping_json: JSON.stringify(shippingAddress || {}),
         coupon_code: coupon?.code || "",
