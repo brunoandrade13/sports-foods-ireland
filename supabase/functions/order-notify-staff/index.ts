@@ -238,8 +238,19 @@ Deno.serve(async (req: Request) => {
     const { data: orderRow, error } = await sb.from("orders").select("*").eq("id", body.order_id).single();
     if (error || !orderRow) return new Response(JSON.stringify({ error: "Order not found" }), { status: 404, headers: { ...cors, "Content-Type": "application/json" } });
     order = orderRow as Record<string, unknown>;
-    const { data: itemRows } = await sb.from("order_items").select("*, products(image_url, sku)").eq("order_id", body.order_id);
-    items = (itemRows || []).map((i: Record<string, unknown> & { products?: Record<string, unknown> }) => ({ ...i, sku: i.products?.sku || i.product_sku || "", image_url: i.products?.image_url || i.product_image_url || "" }));
+    const { data: itemRows } = await sb
+      .from("order_items")
+      .select("*, products(image_url, sku), product_variants(image_url)")
+      .eq("order_id", body.order_id);
+    items = (itemRows || []).map((i: Record<string, unknown> & { products?: Record<string, unknown>; product_variants?: Record<string, unknown> }) => ({
+      ...i,
+      sku: (i.products as Record<string,unknown>)?.sku || i.product_sku || "",
+      // Use variant image first, then product_image_url stored on order_item, then product main image
+      image_url: (i.product_variants as Record<string,unknown>)?.image_url
+        || i.product_image_url
+        || (i.products as Record<string,unknown>)?.image_url
+        || ""
+    }));
   } else if (body.order && body.items) {
     order = body.order as Record<string, unknown>;
     items = body.items as Record<string, unknown>[];

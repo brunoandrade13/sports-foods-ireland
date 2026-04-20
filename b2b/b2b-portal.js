@@ -1715,7 +1715,7 @@ const B2B = (function() {
               this.style.borderColor = '#2D6A4F'; this.style.background = '#e8f5ee'; this.style.fontWeight = '600';
               var vb2b = parseFloat(this.dataset.b2bpr); var vpr = parseFloat(this.dataset.pr);
               var displayP = (vb2b > 0) ? vb2b : vpr;
-              _pmSelVar = { id: this.dataset.vid, label: this.dataset.lbl, price: displayP || b2bPrice, sku: this.dataset.sku };
+              _pmSelVar = { id: this.dataset.vid, label: this.dataset.lbl, price: displayP || b2bPrice, sku: this.dataset.sku, image_url: this.dataset.imgurl || '' };
               var pe = document.getElementById('pmPrice');
               if (pe && displayP) pe.textContent = currency + Number(displayP).toFixed(2);
               var skuRow = document.getElementById('pmSkuRow'); var skuVal = document.getElementById('pmSkuVal');
@@ -1747,7 +1747,7 @@ const B2B = (function() {
           allBtns[0].style.background = '#e8f5ee';
           allBtns[0].style.fontWeight = '600';
           var fb2b = parseFloat(allBtns[0].dataset.b2bpr); var fpr = parseFloat(allBtns[0].dataset.pr);
-          _pmSelVar = { id: allBtns[0].dataset.vid, label: allBtns[0].dataset.lbl, price: (fb2b > 0 ? fb2b : fpr) || b2bPrice, sku: allBtns[0].dataset.sku || '' };
+          _pmSelVar = { id: allBtns[0].dataset.vid, label: allBtns[0].dataset.lbl, price: (fb2b > 0 ? fb2b : fpr) || b2bPrice, sku: allBtns[0].dataset.sku || '', image_url: allBtns[0].dataset.imgurl || '' };
           if (fb2b > 0 || fpr) { var fpe = document.getElementById('pmPrice'); if (fpe) fpe.textContent = currency + Number(fb2b > 0 ? fb2b : fpr).toFixed(2); }
           var firstImgUrl = allBtns[0].dataset.imgurl;
           if (firstImgUrl) { var pmImg0 = document.getElementById('pmMainImg'); if (pmImg0) { pmImg0.src = firstImgUrl.startsWith('http') ? firstImgUrl : '../' + firstImgUrl; } }
@@ -1780,7 +1780,7 @@ const B2B = (function() {
             var vp = parseFloat(this.dataset.pr);
             var vb2b = parseFloat(this.dataset.b2bpr);
             var displayP = (vb2b > 0) ? vb2b : vp;
-            _pmSelVar = { id: this.dataset.vid, label: this.dataset.lbl, price: displayP || b2bPrice, sku: this.dataset.sku || '' };
+            _pmSelVar = { id: this.dataset.vid, label: this.dataset.lbl, price: displayP || b2bPrice, sku: this.dataset.sku || '', image_url: this.dataset.imgurl || '' };
             // Update price
             var pe = document.getElementById('pmPrice');
             if (pe && displayP) pe.textContent = currency + Number(displayP).toFixed(2);
@@ -1828,7 +1828,7 @@ const B2B = (function() {
             // Variante seleccionada — adiciona normalmente
             var finalPrice = Number(_pmSelVar.price) || Number(b2bPrice);
             if (typeof addToCart === 'function') {
-              addToCart(legacyId, qty, { nome: name + ' \u2014 ' + _pmSelVar.label, preco: finalPrice, imagem: rawImg, variant: _pmSelVar.label, variantId: _pmSelVar.id });
+              addToCart(legacyId, qty, { nome: name + ' \u2014 ' + _pmSelVar.label, preco: finalPrice, imagem: (_pmSelVar.image_url || rawImg), variant: _pmSelVar.label, variant_label: _pmSelVar.label, variant_id: _pmSelVar.id, variantId: _pmSelVar.id });
               toast('Added ' + qty + 'x to cart');
             }
             closeProductModal();

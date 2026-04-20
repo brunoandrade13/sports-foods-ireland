@@ -135,9 +135,11 @@ async function handleCheckoutComplete(
     `[stripe-webhook] Saving order ${orderId} for ${orderData.customer_email}`,
   );
 
-  const { error } = await supabase
+  const { data: insertedOrder, error } = await supabase
     .from("orders")
-    .insert({ ...orderData, order_number: orderId });
+    .insert({ ...orderData, order_number: orderId })
+    .select("id")
+    .single();
 
   if (error) {
     console.error("[stripe-webhook] Failed to save order:", error);
@@ -150,12 +152,91 @@ async function handleCheckoutComplete(
     event_type: "checkout.session.completed",
   });
 
-  console.log(`[stripe-webhook] Order ${orderId} saved successfully`);
+  // ---- Create order_items from metadata.items_json ----
+  if (insertedOrder?.id && items.length > 0) {
+    await insertOrderItems(supabase, insertedOrder.id, items);
+  }
+
+  console.log(`[stripe-webhook] Order ${orderId} saved with ${items.length} items`);
+
+  // Trigger staff notification email (fire-and-forget)
+  supabase.functions.invoke("order-notify-staff", {
+    body: { order_id: insertedOrder?.id },
+  }).catch((e: unknown) => console.warn("[stripe-webhook] Staff notify failed:", e));
 
   // Optionally trigger QB sync (fire-and-forget, don't block webhook response)
   triggerQBSync(supabase, orderId).catch((e) =>
     console.warn("[stripe-webhook] QB sync failed (non-critical):", e),
   );
+}
+
+// ---- Insert order items with variant image lookup ----
+async function insertOrderItems(
+  supabase: ReturnType<typeof createClient>,
+  orderId: string,
+  items: Array<Record<string, unknown>>,
+) {
+  // Lookup variant images from product_variants in one query
+  const variantIds = items
+    .map((i) => i.variant_id)
+    .filter((v): v is string => !!v && typeof v === "string");
+
+  const variantImageMap = new Map<string, string>();
+
+  if (variantIds.length > 0) {
+    const { data: variants } = await supabase
+      .from("product_variants")
+      .select("id, image_url")
+      .in("id", variantIds);
+
+    for (const v of variants || []) {
+      if (v.image_url) variantImageMap.set(v.id, v.image_url);
+    }
+  }
+
+  // Build order_items rows
+  const rows = items.map((item) => {
+    const variantId = item.variant_id as string | undefined;
+    const variantImage = variantId ? variantImageMap.get(variantId) || null : null;
+    // Use variant image if available, else product image from item
+    const imageUrl = variantImage || (item.image as string | undefined) || null;
+
+    // Clean product name: extract base name (before " — variantLabel")
+    const rawName = String(item.name || "Product");
+    const variantLabel = String(item.variant_label || "");
+    let productName = rawName;
+    if (variantLabel && rawName.includes(" — " + variantLabel)) {
+      productName = rawName.replace(" — " + variantLabel, "").trim();
+    } else if (variantLabel && rawName.endsWith(" — " + variantLabel.split(" — ")[0])) {
+      // Partial match — strip last " — X"
+      const lastDash = rawName.lastIndexOf(" — ");
+      if (lastDash > 0) productName = rawName.substring(0, lastDash).trim();
+    }
+
+    const qty = Number(item.qty || item.quantity || 1);
+    const price = Number(item.price || 0);
+
+    return {
+      order_id: orderId,
+      product_id: typeof item.id === "string" && item.id.includes("-") ? item.id : null,
+      variant_id: variantId || null,
+      product_name: productName,
+      variant_label: variantLabel || null,
+      quantity: qty,
+      unit_price: price,
+      total_price: price * qty,
+      product_image_url: imageUrl,
+      requires_shipping: true,
+      fulfillment_status: "unfulfilled",
+    };
+  });
+
+  const { error } = await supabase.from("order_items").insert(rows);
+  if (error) {
+    console.error("[stripe-webhook] Failed to insert order_items:", error);
+  } else {
+    console.log(`[stripe-webhook] Inserted ${rows.length} order_items for order ${orderId}`);
+  }
 }
 
 async function handlePaymentFailed(
