@@ -653,7 +653,7 @@ const sfi = {
       if (sort === 'category') order = 'name.asc';
 
       // Include default variant to get wholesale_price when product-level wholesale_price_eur is missing
-      const variantsJoin = 'product_variants(wholesale_price,price,is_default,is_active)';
+      const variantsJoin = 'product_variants(id,label,wholesale_price,price,is_default,is_active,image_url,sku,sort_order,parent_variant_id,variant_type_id)';
       const selectStr = encodeURIComponent(`*,${brandsJoin},${catsJoin},${subsJoin},${variantsJoin}`);
       const url = `${SUPABASE_URL}/rest/v1/products?select=${selectStr}&is_active=eq.true${extraFilters}&order=${order}&limit=${perPage}&offset=${(page - 1) * perPage}`;
       

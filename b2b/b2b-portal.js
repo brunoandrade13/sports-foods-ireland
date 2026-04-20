@@ -2140,13 +2140,15 @@ const B2B = (function() {
             wholesale_price: child.wholesale_price || parent.wholesale_price || 0,
             price: child.price || parent.price || 0,
             stock: child.stock,
-            _primaryStock: parent.stock
+            _primaryStock: parent.stock,
+            // Use child image if available, otherwise fallback to parent image
+            image_url: child.image_url || parent.image_url || null
           }));
         });
         // Also include parents that have NO children as standalone options
         var childParentIds = new Set(children.map(function(c) { return c.parent_variant_id; }));
         parents.forEach(function(p) {
-          if (!childParentIds.has(p.id)) compoundOpts.push(Object.assign({}, p, { l1: p.label, l2: '' }));
+          if (!childParentIds.has(p.id)) compoundOpts.push(Object.assign({}, p, { l1: p.label, l2: '', image_url: p.image_url || null }));
         });
         if (compoundOpts.length > 0) {
           var primaryType = parents[0] && parents[0].variant_types ? (parents[0].variant_types.name || 'Flavor') : 'Flavor';
