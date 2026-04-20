@@ -150,7 +150,8 @@ async function handleCheckoutComplete(
     },
     coupon_code: metadata.coupon_code || null,
     source: "website_direct",
-    order_source: "website",
+    order_source: metadata.is_b2b === "1" ? "b2b_portal" : "website",
+    is_b2b: metadata.is_b2b === "1",
     payment_method: "stripe",
   };
 

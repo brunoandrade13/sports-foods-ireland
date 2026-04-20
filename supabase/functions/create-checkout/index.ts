@@ -315,6 +315,7 @@ Deno.serve(async (req: Request) => {
         ),
         shipping_json: JSON.stringify(shippingAddress || {}),
         coupon_code: coupon?.code || "",
+        is_b2b: is_b2b ? "1" : "0",
       },
       payment_method_types: ["card"],
     });
