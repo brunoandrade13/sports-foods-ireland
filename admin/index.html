@@ -14318,6 +14318,19 @@ function updateDiscountPreview() {
   previewEl.style.color = '#4ade80';
 }
 
+// Global helper: removes self-duplication in variant labels
+// e.g. "Lemon — Lemon / 30 Serv Bag" → "Lemon / 30 Serv Bag"
+function sfiCleanVariant(vl) {
+  if (!vl) return '';
+  var sep = ' — ';
+  var idx = vl.indexOf(sep);
+  if (idx < 0) return vl;
+  var before = vl.substring(0, idx);
+  var after  = vl.substring(idx + sep.length);
+  if (after === before || after.startsWith(before + ' ') || after.startsWith(before + '/')) return after;
+  return vl;
+}
+
 async function generateInvoicePDFFromModal(options) {
 try {
 const titleEl = document.getElementById('omTitle');
@@ -14469,7 +14482,7 @@ var qty = parseInt(item.quantity) || 1, sku = item.sku || item.product_sku || ''
     // Use the global sfiCleanVariant function (defined in renderOrderItemsTable)
     // and build clean desc for invoice line
     var dirtyVariant = item.variant_label || '';
-    var cleanedVariant = (typeof sfiCleanVariant === 'function') ? sfiCleanVariant(dirtyVariant) : dirtyVariant;
+    var cleanedVariant = sfiCleanVariant(dirtyVariant);
     // Strip dirty variant from product_name
     var baseName = item.product_name || '';
     if (dirtyVariant && baseName.includes(' — ' + dirtyVariant)) {
@@ -14710,19 +14723,6 @@ function renderOrderItemsTable(items, order, editMode) {
   const saveBtn = document.getElementById('btnSaveItemEdits');
   if (editBtn) editBtn.textContent = editMode ? '✕ Cancel Edit' : '✏️ Edit Items';
   if (saveBtn) saveBtn.style.display = editMode ? 'inline-flex' : 'none';
-
-  // Removes self-duplication in variant: "Lemon — Lemon / 30 Serv Bag" → "Lemon / 30 Serv Bag"
-  function sfiCleanVariant(vl) {
-    if (!vl) return '';
-    var sep = ' — ';
-    var idx = vl.indexOf(sep);
-    if (idx < 0) return vl;
-    var before = vl.substring(0, idx);
-    var after  = vl.substring(idx + sep.length);
-    // If after starts with the same text as before, drop the before portion
-    if (after === before || after.startsWith(before + ' ') || after.startsWith(before + '/')) return after;
-    return vl;
-  }
 
   // Returns clean base product name (no variant suffix)
   function getProductName(i) {
@@ -15151,7 +15151,7 @@ function omRenderNewItems() {
   html += '<table style="width:100%;font-size:0.83rem;border-collapse:collapse">';
   items.forEach(function(ni, idx) {
     html += '<tr style="border-bottom:1px solid rgba(22,163,98,0.2)">' +
-      '<td style="padding:6px 8px">' + esc(ni.name) + (ni.variant_label ? '<span style="color:var(--text-muted)"> - ' + esc(typeof sfiCleanVariant === 'function' ? sfiCleanVariant(ni.variant_label) : ni.variant_label) + '</span>' : '') + '<span style="font-size:0.75rem;color:var(--text-muted);margin-left:6px">' + esc(ni.sku) + '</span></td>' +
+      '<td style="padding:6px 8px">' + esc(ni.name) + (ni.variant_label ? '<span style="color:var(--text-muted)"> - ' + esc(sfiCleanVariant(ni.variant_label || '')) + '</span>' : '') + '<span style="font-size:0.75rem;color:var(--text-muted);margin-left:6px">' + esc(ni.sku) + '</span></td>' +
       '<td style="padding:6px 8px;text-align:right"><input type="number" min="0.01" step="0.01" value="' + ni.unit_price.toFixed(2) + '" style="width:70px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:right;font-size:0.83rem" onchange="window._editNewItems[' + idx + '].unit_price=parseFloat(this.value)||0;omRenderNewItems()">€</td>' +
       '<td style="padding:6px 8px;text-align:center"><input type="number" min="1" value="' + ni.qty + '" style="width:50px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:center;font-size:0.83rem" onchange="window._editNewItems[' + idx + '].qty=parseInt(this.value)||1;omRenderNewItems()"></td>' +
       '<td style="padding:6px 8px;text-align:right;font-weight:bold">€' + (ni.unit_price * ni.qty).toFixed(2) + '</td>' +
