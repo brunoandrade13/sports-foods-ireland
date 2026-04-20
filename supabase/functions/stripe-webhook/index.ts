@@ -227,18 +227,20 @@ async function sendCustomerConfirmation(p: {
   const brevoKey = BREVO_KEY();
   if (!brevoKey) return;
 
-  // Build variant image map from product_variants
+  // Build variant image + label map from product_variants
   const variantIds = p.items
     .map(i => i.variant_id)
     .filter((v): v is string => !!v && typeof v === "string");
   const variantImageMap = new Map<string, string>();
+  const variantLabelMap = new Map<string, string>();
   if (variantIds.length > 0) {
     const { data: variants } = await p.supabase
       .from("product_variants")
-      .select("id, image_url")
+      .select("id, image_url, label")
       .in("id", variantIds);
     for (const v of variants || []) {
       if (v.image_url) variantImageMap.set(v.id, v.image_url);
+      if (v.label) variantLabelMap.set(v.id, v.label);
     }
   }
 
@@ -262,6 +264,9 @@ async function sendCustomerConfirmation(p: {
   const itemRows = p.items.map(item => {
     // metadata uses compact keys vid/vlb
     const variantId = (String(item.vid||item.variant_id||"")) || undefined;
+    if (!item.variant_label && !item.vlb && variantId && variantLabelMap.has(variantId)) {
+      (item as Record<string,unknown>).variant_label = variantLabelMap.get(variantId);
+    }
     if (!item.variant_label && item.vlb) (item as Record<string,unknown>).variant_label = item.vlb;
     const imgUrl = (variantId && variantImageMap.get(variantId))
       || productImageMap.get(String(item.id))
@@ -342,15 +347,17 @@ async function insertOrderItems(
     .filter((v): v is string => !!v && typeof v === "string");
 
   const variantImageMap = new Map<string, string>();
+  const variantLabelMap = new Map<string, string>();
 
   if (variantIds.length > 0) {
     const { data: variants } = await supabase
       .from("product_variants")
-      .select("id, image_url")
+      .select("id, image_url, label")
       .in("id", variantIds);
 
     for (const v of variants || []) {
       if (v.image_url) variantImageMap.set(v.id, v.image_url);
+      if (v.label) variantLabelMap.set(v.id, v.label);
     }
   }
 
@@ -358,6 +365,10 @@ async function insertOrderItems(
   const rows = items.map((item) => {
     // metadata uses compact keys vid/vlb
     const variantId = (String(item.vid||item.variant_id||"")) || undefined;
+    // Enrich variant_label from DB if not in metadata (compact format omits it)
+    if (!item.variant_label && !item.vlb && variantId && variantLabelMap.has(variantId)) {
+      (item as Record<string,unknown>).variant_label = variantLabelMap.get(variantId);
+    }
     if (!item.variant_label && item.vlb) (item as Record<string,unknown>).variant_label = item.vlb;
     const variantImage = variantId ? variantImageMap.get(variantId) || null : null;
     // Use variant image if available, else product image from item
