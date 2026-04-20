@@ -14466,40 +14466,25 @@ drawItemHeaders();
 var subtotal = 0, FS = 7.5, LS = 9.5, RPT = 3, RPB = 2;
 items.forEach(function(item) {
 var qty = parseInt(item.quantity) || 1, sku = item.sku || item.product_sku || '';
-    // --- cleanVariantLabel: removes self-duplication like "Lemon — Lemon / 30 Serv Bag" → "Lemon / 30 Serv Bag"
-    function cleanVariantLabel(vl) {
-      if (!vl) return vl;
-      var sep = ' — ';
-      var idx = vl.indexOf(sep);
-      if (idx < 0) return vl;
-      var before = vl.substring(0, idx);       // "Lemon"
-      var after  = vl.substring(idx + sep.length); // "Lemon / 30 Serv Bag"
-      // If after starts with before (exact or as prefix of a word), remove the duplication
-      if (after.startsWith(before + ' ') || after === before) {
-        return after;  // keep only "Lemon / 30 Serv Bag"
-      }
-      return vl;
+    // Use the global sfiCleanVariant function (defined in renderOrderItemsTable)
+    // and build clean desc for invoice line
+    var dirtyVariant = item.variant_label || '';
+    var cleanedVariant = (typeof sfiCleanVariant === 'function') ? sfiCleanVariant(dirtyVariant) : dirtyVariant;
+    // Strip dirty variant from product_name
+    var baseName = item.product_name || '';
+    if (dirtyVariant && baseName.includes(' — ' + dirtyVariant)) {
+      baseName = baseName.replace(' — ' + dirtyVariant, '').trim();
+    } else if (dirtyVariant && baseName.includes(' - ' + dirtyVariant)) {
+      baseName = baseName.replace(' - ' + dirtyVariant, '').trim();
     }
-    // --- cleanProductName: strips variant suffix from product_name
-    function cleanProductName(pn, vl) {
-      if (!pn) return pn;
-      // Remove exact variant_label suffix
-      if (vl && pn.includes(' — ' + vl)) return pn.replace(' — ' + vl, '').trim();
-      if (vl && pn.includes(' - '  + vl)) return pn.replace(' - '  + vl, '').trim();
-      // Remove double-variant suffix e.g. "Fuel — Lemon — Lemon / 30 Serv Bag"
-      // Find last " — " and check if what follows is a variant-like string
-      var lastDash = pn.lastIndexOf(' — ');
-      if (lastDash > 0) {
-        var suffix = pn.substring(lastDash + 3);
-        // If suffix contains " / " or " — " it's likely an embedded variant — strip it
-        if (suffix.includes(' / ') || suffix.includes(' — ')) {
-          return pn.substring(0, lastDash).trim();
-        }
+    // Final safety strip: if name still ends with an embedded variant pattern
+    var lastDash = baseName.lastIndexOf(' — ');
+    if (lastDash > 0) {
+      var sfx = baseName.substring(lastDash + 3);
+      if (sfx.includes('/') || (sfx.includes(' ') && sfx.length > 8)) {
+        baseName = baseName.substring(0, lastDash).trim();
       }
-      return pn;
     }
-    var cleanedVariant = cleanVariantLabel(item.variant_label || '');
-    var baseName = cleanProductName(item.product_name || '', cleanedVariant);
     var desc = baseName + (cleanedVariant ? ' — ' + cleanedVariant : '');
     var rate = parseFloat(item.unit_price) || 0, amount = qty * rate;
 subtotal += amount;
@@ -14726,6 +14711,20 @@ function renderOrderItemsTable(items, order, editMode) {
   if (editBtn) editBtn.textContent = editMode ? '✕ Cancel Edit' : '✏️ Edit Items';
   if (saveBtn) saveBtn.style.display = editMode ? 'inline-flex' : 'none';
 
+  // Removes self-duplication in variant: "Lemon — Lemon / 30 Serv Bag" → "Lemon / 30 Serv Bag"
+  function sfiCleanVariant(vl) {
+    if (!vl) return '';
+    var sep = ' — ';
+    var idx = vl.indexOf(sep);
+    if (idx < 0) return vl;
+    var before = vl.substring(0, idx);
+    var after  = vl.substring(idx + sep.length);
+    // If after starts with the same text as before, drop the before portion
+    if (after === before || after.startsWith(before + ' ') || after.startsWith(before + '/')) return after;
+    return vl;
+  }
+
+  // Returns clean base product name (no variant suffix)
   function getProductName(i) {
     let name = i.product_name || 'Unknown';
     if (typeof allProducts !== 'undefined' && allProducts.length > 0) {
@@ -14733,16 +14732,24 @@ function renderOrderItemsTable(items, order, editMode) {
       if (!m && i.product_sku) m = allProducts.find(p => p.sku === i.product_sku);
       if (m && m.name) name = m.name;
     }
-    // If product_name already contains the variant_label, strip it to avoid duplication
-    if (i.variant_label && name.includes(i.variant_label)) {
-      name = name.replace(' — ' + i.variant_label, '').replace(' - ' + i.variant_label, '').trim();
-      // Also handle double-encoded variants like "Mandarin — Mandarin / 30 Serv Bag"
-      const dashIdx = name.lastIndexOf(' — ');
-      if (dashIdx > 0) {
-        const afterDash = name.substring(dashIdx + 3);
-        if (i.variant_label.startsWith(afterDash) || afterDash.length > 3) {
-          name = name.substring(0, dashIdx).trim();
-        }
+    // Strip variant suffix from product_name using the DIRTY variant (before cleaning)
+    // This handles cases where product_name = "Fuel — Lemon — Lemon / 30 Serv Bag"
+    const dirtyVariant = i.variant_label || '';
+    if (dirtyVariant) {
+      // Remove " — <dirty_variant>" or " - <dirty_variant>" from end of name
+      if (name.includes(' — ' + dirtyVariant)) {
+        name = name.replace(' — ' + dirtyVariant, '').trim();
+      } else if (name.includes(' - ' + dirtyVariant)) {
+        name = name.replace(' - ' + dirtyVariant, '').trim();
+      }
+    }
+    // Final safety: if name still ends with " — something/something", strip it
+    // (catches partial duplicates not caught above)
+    var last = name.lastIndexOf(' — ');
+    if (last > 0) {
+      var suffix = name.substring(last + 3);
+      if (suffix.includes('/') || (suffix.includes(' ') && suffix.length > 8)) {
+        name = name.substring(0, last).trim();
       }
     }
     return name;
@@ -14769,7 +14776,8 @@ function renderOrderItemsTable(items, order, editMode) {
     const sendQty = Math.max(0, qty - boQty);
     const rowTotal = price * sendQty;
     const name    = getProductName(i);
-    const sub     = (i.variant_label ? ' - ' + esc(i.variant_label) : '');
+    const cleanedVariant = sfiCleanVariant(i.variant_label || '');
+    const sub     = (cleanedVariant ? ' - ' + esc(cleanedVariant) : '');
     const fullyBO = boQty >= qty;
 
     if (editMode) {
@@ -15143,7 +15151,7 @@ function omRenderNewItems() {
   html += '<table style="width:100%;font-size:0.83rem;border-collapse:collapse">';
   items.forEach(function(ni, idx) {
     html += '<tr style="border-bottom:1px solid rgba(22,163,98,0.2)">' +
-      '<td style="padding:6px 8px">' + esc(ni.name) + (ni.variant_label ? '<span style="color:var(--text-muted)"> - ' + esc(ni.variant_label) + '</span>' : '') + '<span style="font-size:0.75rem;color:var(--text-muted);margin-left:6px">' + esc(ni.sku) + '</span></td>' +
+      '<td style="padding:6px 8px">' + esc(ni.name) + (ni.variant_label ? '<span style="color:var(--text-muted)"> - ' + esc(typeof sfiCleanVariant === 'function' ? sfiCleanVariant(ni.variant_label) : ni.variant_label) + '</span>' : '') + '<span style="font-size:0.75rem;color:var(--text-muted);margin-left:6px">' + esc(ni.sku) + '</span></td>' +
       '<td style="padding:6px 8px;text-align:right"><input type="number" min="0.01" step="0.01" value="' + ni.unit_price.toFixed(2) + '" style="width:70px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:right;font-size:0.83rem" onchange="window._editNewItems[' + idx + '].unit_price=parseFloat(this.value)||0;omRenderNewItems()">€</td>' +
       '<td style="padding:6px 8px;text-align:center"><input type="number" min="1" value="' + ni.qty + '" style="width:50px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);text-align:center;font-size:0.83rem" onchange="window._editNewItems[' + idx + '].qty=parseInt(this.value)||1;omRenderNewItems()"></td>' +
       '<td style="padding:6px 8px;text-align:right;font-weight:bold">€' + (ni.unit_price * ni.qty).toFixed(2) + '</td>' +
