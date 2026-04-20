@@ -290,11 +290,17 @@ Deno.serve(async (req: Request) => {
               name: string;
               price: number;
               quantity: number;
+              variant_id?: string;
+              variant_label?: string;
+              image?: string;
             }) => ({
               id: i.id,
               name: i.name,
               price: i.price,
               qty: i.quantity || 1,
+              ...(i.variant_id ? { variant_id: i.variant_id } : {}),
+              ...(i.variant_label ? { variant_label: i.variant_label } : {}),
+              ...(i.image ? { image: i.image } : {}),
             }),
           ),
         ),

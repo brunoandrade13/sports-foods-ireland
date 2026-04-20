@@ -164,10 +164,145 @@ async function handleCheckoutComplete(
     body: { order_id: insertedOrder?.id },
   }).catch((e: unknown) => console.warn("[stripe-webhook] Staff notify failed:", e));
 
+  // Send customer confirmation email (fire-and-forget)
+  if (orderData.customer_email && insertedOrder?.id) {
+    sendCustomerConfirmation({
+      orderId,
+      dbOrderId: insertedOrder.id,
+      customerEmail: orderData.customer_email,
+      customerName: orderData.customer_name,
+      items,
+      total: totalEur,
+      shippingCost: shippingEur,
+      paymentMethod: "Card / PayPal",
+      supabase,
+    }).catch((e: unknown) => console.warn("[stripe-webhook] Customer email failed:", e));
+  }
+
   // Optionally trigger QB sync (fire-and-forget, don't block webhook response)
   triggerQBSync(supabase, orderId).catch((e) =>
     console.warn("[stripe-webhook] QB sync failed (non-critical):", e),
   );
+}
+
+// ---- Customer Confirmation Email ----
+const SITE_URL = "https://sportsfoodsireland.ie";
+const LOGO = `${SITE_URL}/img/logo.png`;
+const BREVO_KEY = () => Deno.env.get("BREVO_API_KEY") ?? "";
+
+async function sendCustomerConfirmation(p: {
+  orderId: string;
+  dbOrderId: string;
+  customerEmail: string;
+  customerName: string;
+  items: Array<Record<string, unknown>>;
+  total: number;
+  shippingCost: number;
+  paymentMethod: string;
+  supabase: ReturnType<typeof createClient>;
+}) {
+  const brevoKey = BREVO_KEY();
+  if (!brevoKey) return;
+
+  // Build variant image map from product_variants
+  const variantIds = p.items
+    .map(i => i.variant_id)
+    .filter((v): v is string => !!v && typeof v === "string");
+  const variantImageMap = new Map<string, string>();
+  if (variantIds.length > 0) {
+    const { data: variants } = await p.supabase
+      .from("product_variants")
+      .select("id, image_url")
+      .in("id", variantIds);
+    for (const v of variants || []) {
+      if (v.image_url) variantImageMap.set(v.id, v.image_url);
+    }
+  }
+
+  // Build product image map (fallback)
+  const productImageMap = new Map<string, string>();
+  const numIds = p.items.map(i => i.id).filter((id): id is string | number => id != null && !isNaN(Number(id)) && !String(id).includes('-')).map(Number);
+  const uuidIds = p.items.map(i => String(i.id)).filter(id => id.includes('-'));
+  if (numIds.length) {
+    const { data } = await p.supabase.from("products").select("legacy_id,image_url").in("legacy_id", numIds);
+    for (const r of data || []) if (r.image_url) productImageMap.set(String(r.legacy_id), toAbsImg(r.image_url));
+  }
+  if (uuidIds.length) {
+    const { data } = await p.supabase.from("products").select("id,image_url").in("id", uuidIds);
+    for (const r of data || []) if (r.image_url) productImageMap.set(r.id, toAbsImg(r.image_url));
+  }
+
+  const firstName = p.customerName?.split(" ")[0] || "Customer";
+  const date = new Date().toLocaleDateString("en-IE", { day: "numeric", month: "long", year: "numeric" });
+  const subtotal = p.total - p.shippingCost;
+
+  const itemRows = p.items.map(item => {
+    const variantId = item.variant_id as string | undefined;
+    const imgUrl = (variantId && variantImageMap.get(variantId))
+      || productImageMap.get(String(item.id))
+      || (item.image as string | undefined)
+      || "";
+    const absImg = imgUrl && !imgUrl.startsWith("http") ? `${SITE_URL}/${imgUrl.replace(/^\//,"")}` : imgUrl;
+    const imgHtml = absImg
+      ? `<td style="width:72px;padding:10px;vertical-align:middle"><img src="${absImg}" width="56" height="56" style="width:56px;height:56px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0" alt=""></td>`
+      : `<td style="width:72px;padding:10px"><div style="width:56px;height:56px;background:#f1f5f9;border-radius:8px"></div></td>`;
+    const rawName = String(item.name || "Product");
+    const variantLabel = String(item.variant_label || "");
+    let cleanName = rawName;
+    if (variantLabel && cleanName.includes(" — " + variantLabel)) cleanName = cleanName.replace(" — " + variantLabel, "").trim();
+    const variantHtml = variantLabel ? `<div style="color:#94a3b8;font-size:12px;margin-top:2px">${variantLabel}</div>` : "";
+    const lineTotal = (Number(item.price) || 0) * (Number(item.qty || item.quantity) || 1);
+    return `<tr style="border-bottom:1px solid #f1f5f9">${imgHtml}<td style="padding:10px;vertical-align:middle"><div style="font-weight:600;color:#1e293b;font-size:14px">${cleanName}</div>${variantHtml}<div style="color:#94a3b8;font-size:12px;margin-top:2px">Qty: ${item.qty || item.quantity || 1}</div></td><td style="padding:10px;text-align:right;vertical-align:middle;font-weight:700;color:#1e293b;font-size:14px">€${lineTotal.toFixed(2)}</td></tr>`;
+  }).join("");
+
+  const shippingLine = p.shippingCost > 0
+    ? `<tr><td style="padding:5px 0;color:#64748b;font-size:13px">Shipping</td><td style="padding:5px 0;color:#1e293b;font-size:13px;text-align:right">€${p.shippingCost.toFixed(2)}</td></tr>`
+    : `<tr><td style="padding:5px 0;color:#64748b;font-size:13px">Shipping</td><td style="padding:5px 0;color:#16a34a;font-size:13px;font-weight:600;text-align:right">Free</td></tr>`;
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;background:#f0f2f5;font-family:'Helvetica Neue',Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f2f5;padding:20px 0"><tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fff;border-radius:12px;overflow:hidden">
+<tr><td style="background:linear-gradient(135deg,#1B4332,#2D6A4F);padding:28px 40px;text-align:center"><img src="${LOGO}" alt="Sports Foods Ireland" width="180"></td></tr>
+<tr><td style="background:#169B62;padding:14px 40px;text-align:center"><span style="color:#fff;font-size:20px;font-weight:700">✓ Order Confirmed</span></td></tr>
+<tr><td style="padding:28px 40px 16px"><p style="margin:0;color:#1e293b;font-size:18px;font-weight:600">Hi ${firstName},</p><p style="margin:10px 0 0;color:#64748b;font-size:15px">Thank you for your order! We’re preparing it for dispatch and will send you a shipping confirmation soon.</p></td></tr>
+<tr><td style="padding:0 40px 20px">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f8faf9;border:2px solid #d1fae5;border-radius:10px;overflow:hidden">
+<tr><td style="background:#169B62;padding:10px 20px"><span style="color:#fff;font-size:12px;font-weight:700;text-transform:uppercase">Order Details</span></td></tr>
+<tr><td style="padding:16px 20px">
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:4px 0;color:#64748b;font-size:13px;width:120px">Order number</td><td style="padding:4px 0;color:#1e293b;font-size:13px;font-weight:700">#${p.orderId}</td></tr>
+<tr><td style="padding:4px 0;color:#64748b;font-size:13px">Date</td><td style="padding:4px 0;color:#1e293b;font-size:13px">${date}</td></tr>
+<tr><td style="padding:4px 0;color:#64748b;font-size:13px">Payment</td><td style="padding:4px 0;color:#1e293b;font-size:13px">${p.paymentMethod}</td></tr>
+<tr><td colspan="2" style="padding:10px 0 0;border-top:1px solid #d1fae5"></td></tr>
+<tr><td style="padding:4px 0;color:#1e293b;font-size:15px;font-weight:700">Total</td><td style="padding:4px 0;color:#169B62;font-size:20px;font-weight:800">€${p.total.toFixed(2)}</td></tr>
+</table></td></tr></table></td></tr>
+<tr><td style="padding:0 40px 24px"><p style="margin:0 0 12px;color:#1e293b;font-size:15px;font-weight:700">Items Ordered</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">${itemRows}</table>
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px">${shippingLine}
+<tr style="border-top:2px solid #e2e8f0"><td style="padding:8px 0;font-weight:700;color:#1e293b;font-size:15px">Total</td><td style="padding:8px 0;font-weight:700;color:#1e293b;font-size:15px;text-align:right">€${p.total.toFixed(2)}</td></tr>
+</table></td></tr>
+<tr><td style="padding:0 40px 28px;text-align:center"><p style="color:#64748b;font-size:13px;margin:0 0 16px">Questions? Contact us at <a href="mailto:info@sportsfoodsireland.ie" style="color:#169B62">info@sportsfoodsireland.ie</a> or call +353 1 840 0403</p>
+<a href="${SITE_URL}/shop.html" style="display:inline-block;background:#169B62;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:600;font-size:14px">Continue Shopping</a></td></tr>
+<tr><td style="background:#1B4332;padding:20px 40px;text-align:center"><img src="${LOGO}" alt="SFI" width="80" style="opacity:.8;margin-bottom:8px"><p style="margin:0;color:#6b9e87;font-size:11px">Sports Foods Ireland · <a href="${SITE_URL}" style="color:#4ade80">sportsfoodsireland.ie</a></p></td></tr>
+</table></td></tr></table></body></html>`;
+
+  await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: { "api-key": brevoKey, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sender: { name: "Sports Foods Ireland", email: "stores@sportsfoodsireland.ie" },
+      to: [{ email: p.customerEmail, name: p.customerName || "Customer" }],
+      subject: `Order Confirmed #${p.orderId} ✅`,
+      htmlContent: html,
+    }),
+  });
+  console.log(`[stripe-webhook] Customer confirmation email sent to ${p.customerEmail}`);
+}
+
+function toAbsImg(url: string): string {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  return `${SITE_URL}/${url.replace(/^\//, "")}`;
 }
 
 // ---- Insert order items with variant image lookup ----

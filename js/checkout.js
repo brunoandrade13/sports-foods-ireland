@@ -135,7 +135,7 @@
             <div class="ck-item">
                 <img src="${i.imagem || 'img/placeholder.jpg'}" alt="${i.nome}">
                 <div><span class="ck-item-name">${i.nome}</span>
-                ${i.variante ? `<small>${i.variante}</small>` : ''}
+                ${(i.variant_label||i.variante) ? `<small>${i.variant_label||i.variante}</small>` : ''}
                 <span class="ck-item-qty">Qty: ${i.quantidade || 1}</span></div>
                 <span class="ck-item-price">${fmt(i.preco * (i.quantidade || 1))}</span>
             </div>`).join('')}
@@ -224,7 +224,7 @@
 
             // Klarna: only for B2C customers with orders >= €100
             const isB2B = window._sfiCustomerIsB2B || false;
-            const showKlarna = !isB2B && total >= 100;
+            const showKlarna = false; // Klarna not yet integrated with Stripe — hide until ready
             const klarnaInstalment = (total / 3).toFixed(2);
 
             const c = checkoutData.contact || {};
@@ -652,7 +652,7 @@
             ? '<p style="color:#2563eb;font-size:14px;margin-bottom:24px">An invoice will be sent to your email. Payment is due within 30 days.</p>'
             : '<p style="color:#059669;font-size:14px;margin-bottom:24px">Payment will be collected upon delivery of your order.</p>';
 
-        document.getElementById('checkoutContainer').innerHTML =
+        (document.getElementById('checkoutContent') || document.getElementById('checkoutContainer')).innerHTML =
             '<div style="text-align:center;padding:60px 20px">' +
             '<div style="font-size:64px;margin-bottom:20px">\u2705</div>' +
             '<h2 style="color:#1e293b;margin-bottom:12px">Order Placed Successfully!</h2>' +
