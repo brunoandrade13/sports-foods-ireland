@@ -83,7 +83,7 @@ Deno.serve(async (req: Request) => {
       else if (coupon.type === "shipping") shipCost = 0;
       if (coupon.freeShipping) shipCost = 0;
     }
-    const total = subtotal - discount + shipCost;
+    const total = parseFloat((subtotal - discount + shipCost).toFixed(2));
     const methodLabel = payment_method === "net30" ? "Net 30 (Invoice)" : "Cash on Delivery";
     const customerName = contact ? `${contact.firstName || ""} ${contact.lastName || ""}`.trim() : "";
 
