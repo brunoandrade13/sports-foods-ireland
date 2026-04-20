@@ -292,7 +292,7 @@ function populateHomeCarousels() {
                 if (_hasSV && typeof window.showSupabaseVariantModal === 'function') {
                     const btn = this;
                     window.showSupabaseVariantModal(fullProd, function(selected) {
-                        window.addToCart(id, 1, { nome: (fullProd.nome || 'Product') + ' \u2014 ' + selected.label, preco: selected.price || fullProd.preco, imagem: fullProd.imagem, variant: selected.label, variantId: selected.id });
+                        window.addToCart(id, 1, { nome: (fullProd.nome || 'Product') + ' \u2014 ' + selected.label, preco: selected.price || fullProd.preco, imagem: selected.image_url || fullProd.imagem, variant: selected.label, variant_label: selected.label, variantId: selected.id, variant_id: selected.id });
                         btn.textContent = '\u2713 ADDED'; btn.style.background = '#00A651';
                         setTimeout(() => { btn.textContent = 'ADD TO BASKET'; btn.style.background = ''; }, 2000);
                     });
@@ -371,7 +371,7 @@ function renderProductGrid(produtos, container) {
                 const _hsv = _fp && _fp.variantes && _fp.variantes.length > 0 && _fp.variantes.some(g => g.options && g.options.length > 0);
                 if (_hsv && typeof window.showSupabaseVariantModal === 'function') {
                     window.showSupabaseVariantModal(_fp, function(sel) {
-                        window.addToCart(id, 1, { nome: (_fp.nome || 'Product') + ' \u2014 ' + sel.label, preco: sel.price || _fp.preco, imagem: _fp.imagem, variant: sel.label, variantId: sel.id });
+                        window.addToCart(id, 1, { nome: (_fp.nome || 'Product') + ' \u2014 ' + sel.label, preco: sel.price || _fp.preco, imagem: sel.image_url || _fp.imagem, variant: sel.label, variant_label: sel.label, variantId: sel.id, variant_id: sel.id });
                     });
                     return;
                 }
@@ -1507,7 +1507,7 @@ function initAddToBasketAndUI() {
                 const _hasSV2 = _prod && _prod.variantes && _prod.variantes.length > 0 && _prod.variantes.some(g => g.options && g.options.length > 0);
                 if (_hasSV2 && typeof window.showSupabaseVariantModal === 'function') {
                     window.showSupabaseVariantModal(_prod, function(selected) {
-                        window.addToCart(_id, 1, { nome: (_prod.nome || 'Product') + ' \u2014 ' + selected.label, preco: selected.price || _prod.preco, imagem: _prod.imagem, variant: selected.label, variantId: selected.id });
+                        window.addToCart(_id, 1, { nome: (_prod.nome || 'Product') + ' \u2014 ' + selected.label, preco: selected.price || _prod.preco, imagem: selected.image_url || _prod.imagem, variant: selected.label, variant_label: selected.label, variantId: selected.id, variant_id: selected.id });
                     });
                     return;
                 }
@@ -1563,7 +1563,7 @@ function initAddToBasketAndUI() {
                 const _hasSV3 = _prod2 && _prod2.variantes && _prod2.variantes.length > 0 && _prod2.variantes.some(g => g.options && g.options.length > 0);
                 if (_hasSV3 && typeof window.showSupabaseVariantModal === 'function') {
                     window.showSupabaseVariantModal(_prod2, function(selected) {
-                        window.addToCart(_id2, 1, { nome: (_prod2.nome || 'Product') + ' \u2014 ' + selected.label, preco: selected.price || _prod2.preco, imagem: _prod2.imagem, variant: selected.label, variantId: selected.id });
+                        window.addToCart(_id2, 1, { nome: (_prod2.nome || 'Product') + ' \u2014 ' + selected.label, preco: selected.price || _prod2.preco, imagem: selected.image_url || _prod2.imagem, variant: selected.label, variant_label: selected.label, variantId: selected.id, variant_id: selected.id });
                     });
                     return;
                 }

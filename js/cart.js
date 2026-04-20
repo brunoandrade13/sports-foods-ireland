@@ -388,7 +388,25 @@ function updateCartModalContent() {
         const priceDisplay = item.subscription?.active && item.precoOriginal
             ? `<span style="text-decoration:line-through;color:#94a3b8;font-size:12px;margin-right:4px">€${(item.precoOriginal * (item.quantidade || 1)).toFixed(2)}</span>€${((item.preco || 0) * (item.quantidade || 1)).toFixed(2)}`
             : `€${((item.preco || 0) * (item.quantidade || 1)).toFixed(2)}`;
-            const itemImg = (item.imagem || 'img/produto1.jpg');
+            // Resolve variant-specific image at render time
+            // This also fixes items added before the variant image fix was deployed
+            let itemImg = item.imagem || 'img/produto1.jpg';
+            if (item.variant_id && Array.isArray(window.PRODUTOS)) {
+                const prod = window.PRODUTOS.find(p => p.id === item.id || p.id == item.id || p._supabase_id === item.id);
+                if (prod && prod.variantes) {
+                    let variantImg = null;
+                    for (const group of prod.variantes) {
+                        for (const opt of (group.options || [])) {
+                            if (opt.id === item.variant_id && opt.image_url) {
+                                variantImg = opt.image_url;
+                                break;
+                            }
+                        }
+                        if (variantImg) break;
+                    }
+                    if (variantImg) itemImg = variantImg;
+                }
+            }
             const itemImgSrc = itemImg.startsWith('http') ? itemImg : imgPrefix + itemImg;
             const itemImgFallback = imgPrefix + 'img/produto1.jpg';
             // Escape variant_id for safe use in onclick handlers

@@ -133,7 +133,7 @@
         <h3>Order Summary</h3>
         ${cart.map(i => `
             <div class="ck-item">
-                <img src="${i.imagem || 'img/placeholder.jpg'}" alt="${i.nome}">
+                <img src="${(function(item){ if(item.variant_id && Array.isArray(window.PRODUTOS)){ var p=window.PRODUTOS.find(function(x){return x.id===item.id||x.id==item.id||x._supabase_id===item.id;}); if(p&&p.variantes){ for(var g of p.variantes){ for(var o of(g.options||[])){ if(o.id===item.variant_id&&o.image_url) return o.image_url; }}} } return item.imagem||'img/placeholder.jpg'; })(i)}" alt="${i.nome}">
                 <div><span class="ck-item-name">${i.nome}</span>
                 ${(i.variant_label||i.variante) ? `<small>${i.variant_label||i.variante}</small>` : ''}
                 <span class="ck-item-qty">Qty: ${i.quantidade || 1}</span></div>

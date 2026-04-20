@@ -731,7 +731,7 @@ function showSupabaseVariantModal(product, onConfirm) {
                 if (outOfStock && !backorderAllowed) return '';
                 return `<button class="variant-option${outOfStock ? ' backorder-variant' : ''}" type="button"
                     data-variant-id="${opt.id}" data-label="${opt.label.replace(/"/g, '&quot;')}"
-                    data-price="${opt.price || ''}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.l2}${outOfStock ? ' (Backorder)' : ''}</button>`;
+                    data-price="${opt.price || ''}" data-image="${opt.image_url || ''}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.l2}${outOfStock ? ' (Backorder)' : ''}</button>`;
             }).join('\n');
             level2Wrap.style.display = '';
             level2Wrap.style.animation = 'fadeSlideIn 0.3s ease';
@@ -743,7 +743,7 @@ function showSupabaseVariantModal(product, onConfirm) {
             if (!btn || btn.disabled) return;
             this.querySelectorAll('.variant-option').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            selectedVariant = { id: btn.dataset.variantId, label: btn.dataset.label, price: parseFloat(btn.dataset.price) || null };
+            selectedVariant = { id: btn.dataset.variantId, label: btn.dataset.label, price: parseFloat(btn.dataset.price) || null, image_url: btn.dataset.image || null };
             addBtn.classList.add('active');
             if (selectedVariant.price) priceDisplay.textContent = currency + selectedVariant.price.toFixed(2);
         });
@@ -758,7 +758,7 @@ function showSupabaseVariantModal(product, onConfirm) {
                 if (outOfStock && !backorderAllowed) return '';
                 return `<button class="variant-option${outOfStock ? ' backorder-variant' : ''}" type="button"
                     data-variant-id="${opt.id}" data-label="${(opt.label || '').replace(/"/g, '&quot;')}"
-                    data-price="${opt.price || ''}" data-group="${gi}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.label}${outOfStock ? ' (Backorder)' : ''}</button>`;
+                    data-price="${opt.price || ''}" data-image="${opt.image_url || ''}" data-group="${gi}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.label}${outOfStock ? ' (Backorder)' : ''}</button>`;
             }).join('\n');
             return `<div class="vm-group" data-group-index="${gi}" ${hidden}>
                 <div class="vm-label">${group.type}</div>
@@ -825,7 +825,8 @@ function showSupabaseVariantModal(product, onConfirm) {
                 selectedVariant = {
                     id: lastSelected.dataset.variantId,
                     label: labels.join(' / '),
-                    price: parseFloat(lastSelected.dataset.price) || null
+                    price: parseFloat(lastSelected.dataset.price) || null,
+                    image_url: lastSelected.dataset.image || null
                 };
                 addBtn.classList.add('active');
                 if (selectedVariant.price) priceDisplay.textContent = currency + selectedVariant.price.toFixed(2);

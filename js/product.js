@@ -897,6 +897,8 @@ function productPageAddToCart(productId) {
         variant_id: selectedVariantId,
         variant_label: selectedVariantLabel,
         preco: selectedVariantPrice ?? currentProduct.preco ?? currentProduct.price,
+        // Use variant-specific image if available
+        imagem: window._selectedVariantImageUrl || currentProduct.imagem,
     } : currentProduct;
     // ──────────────────────────────────────────────────────────────────────
 
@@ -924,7 +926,7 @@ function productPageAddToCart(productId) {
                 id: productId,
                 nome: productWithVariant.nome || currentProduct.nome,
                 preco: productWithVariant.preco || currentProduct.preco,
-                imagem: currentProduct.imagem,
+                imagem: productWithVariant.imagem || currentProduct.imagem,
                 quantidade: currentQuantity,
                 variant_id: productWithVariant.variant_id || undefined,
                 variant_label: productWithVariant.variant_label || undefined
@@ -1031,12 +1033,15 @@ function renderSimpleVariants(container, variants, product) {
         // Swap image on variant click
         const vImgSimple = btn.dataset.imageUrl;
         if (vImgSimple) {
+            window._selectedVariantImageUrl = vImgSimple; // store for addToCart
             const mainImg = document.querySelector('#productMainImage, .product-main-image img, .product-gallery img');
             if (mainImg) {
                 mainImg.style.transition = 'opacity 0.25s ease';
                 mainImg.style.opacity = '0';
                 setTimeout(() => { mainImg.src = vImgSimple; mainImg.style.opacity = '1'; }, 150);
             }
+        } else {
+            window._selectedVariantImageUrl = null;
         }
         const allGroups = container.querySelectorAll('.variant-group');
         if (groupIdx + 1 < allGroups.length) {
@@ -1130,6 +1135,7 @@ function renderCompoundVariants(container, variants, product) {
         // Swap image on level 1 click (e.g. color selection)
         const vImg = btn.dataset.imageUrl;
         if (vImg) {
+            window._selectedVariantImageUrl = vImg; // store for addToCart
             const mainImg = document.querySelector('#productMainImage, .product-main-image img, .product-gallery img');
             if (mainImg) {
                 mainImg.style.transition = 'opacity 0.25s ease';
@@ -1174,6 +1180,7 @@ function updateVariantPrice(btn, product) {
     // Swap main product image if variant has its own image
     const vImgUrl = btn.dataset.imageUrl;
     if (vImgUrl) {
+        window._selectedVariantImageUrl = vImgUrl; // store for addToCart
         const mainImg = document.querySelector('#productMainImage, .product-main-image img, .product-gallery img');
         if (mainImg) {
             mainImg.style.transition = 'opacity 0.25s ease';

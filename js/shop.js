@@ -781,8 +781,11 @@ function renderProducts() {
                             const cartData = Object.assign({}, shopProductData);
                             cartData.nome = cartData.nome + ' — ' + selected.label;
                             cartData.variant = selected.label;
+                            cartData.variant_label = selected.label;
                             cartData.variantId = selected.id;
+                            cartData.variant_id = selected.id;
                             cartData.preco = selected.price || cartData.preco;
+                            cartData.imagem = selected.image_url || cartData.imagem;
                             window.addToCart(productId, 1, cartData);
                         });
                         return;
