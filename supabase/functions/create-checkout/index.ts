@@ -162,6 +162,8 @@ Deno.serve(async (req: Request) => {
         price: number;
         quantity: number;
         image?: string;
+        variant_id?: string;
+        variant_label?: string;
       }) => {
         if (item.id !== undefined && productPrices.has(item.id)) {
           const serverPrice = productPrices.get(item.id)!;
@@ -298,9 +300,8 @@ Deno.serve(async (req: Request) => {
               name: i.name,
               price: i.price,
               qty: i.quantity || 1,
-              ...(i.variant_id ? { variant_id: i.variant_id } : {}),
-              ...(i.variant_label ? { variant_label: i.variant_label } : {}),
-              ...(i.image ? { image: i.image } : {}),
+              ...(i.variant_id ? { vid: i.variant_id } : {}),
+              ...(i.variant_label ? { vlb: i.variant_label } : {}),
             }),
           ),
         ),

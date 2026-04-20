@@ -237,7 +237,9 @@ async function sendCustomerConfirmation(p: {
   const subtotal = p.total - p.shippingCost;
 
   const itemRows = p.items.map(item => {
-    const variantId = item.variant_id as string | undefined;
+    // metadata uses compact keys vid/vlb
+    const variantId = (String(item.vid||item.variant_id||"")) || undefined;
+    if (!item.variant_label && item.vlb) (item as Record<string,unknown>).variant_label = item.vlb;
     const imgUrl = (variantId && variantImageMap.get(variantId))
       || productImageMap.get(String(item.id))
       || (item.image as string | undefined)
@@ -331,7 +333,9 @@ async function insertOrderItems(
 
   // Build order_items rows
   const rows = items.map((item) => {
-    const variantId = item.variant_id as string | undefined;
+    // metadata uses compact keys vid/vlb
+    const variantId = (String(item.vid||item.variant_id||"")) || undefined;
+    if (!item.variant_label && item.vlb) (item as Record<string,unknown>).variant_label = item.vlb;
     const variantImage = variantId ? variantImageMap.get(variantId) || null : null;
     // Use variant image if available, else product image from item
     const imageUrl = variantImage || (item.image as string | undefined) || null;
