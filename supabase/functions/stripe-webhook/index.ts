@@ -97,14 +97,25 @@ async function handleCheckoutComplete(
   // Generate a readable order ID
   const orderId = `SFI-${Date.now().toString(36).toUpperCase()}`;
 
+  // Calculate correct financial values from Stripe session
+  const totalEur = (session.amount_total ?? 0) / 100;
+  const shippingEur = (session.shipping_cost?.amount_total ?? 0) / 100;
+  const subtotalEur = totalEur - shippingEur;
+  // VAT is included in prices (Irish VAT 23%) — extract it
+  const taxEur = parseFloat((subtotalEur - subtotalEur / 1.23).toFixed(2));
+
   const orderData = {
     stripe_checkout_session_id: session.id,
     stripe_payment_intent_id: session.payment_intent ?? null,
-    status: "processing", // order fulfillment status
-    payment_status: "paid", // enum value in DB
+    status: "processing",
+    payment_status: "paid",
     financial_status: "paid",
-    total: (session.amount_total ?? 0) / 100,
-    subtotal: (session.amount_total ?? 0) / 100, // webhook total includes shipping; close enough
+    total: totalEur,
+    subtotal: subtotalEur,
+    shipping_cost: shippingEur,
+    shipping_total: shippingEur,
+    tax_amount: taxEur,
+    tax_total: taxEur,
     currency: (session.currency ?? "eur").toUpperCase(),
     customer_email:
       session.customer_details?.email ?? session.customer_email ?? "",

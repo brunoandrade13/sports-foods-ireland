@@ -8,7 +8,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
-const STANDARD_SHIPPING_CENTS = 499; // €4.99 / £4.99
+const STANDARD_SHIPPING_CENTS = 904; // €9.04
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
 if (!STRIPE_SECRET_KEY) {
@@ -85,6 +85,7 @@ Deno.serve(async (req: Request) => {
       currency = "EUR",
       shippingAddress,
       coupon,
+      is_b2b = false,
     } = await req.json();
 
     if (!items?.length) {
@@ -105,25 +106,51 @@ Deno.serve(async (req: Request) => {
     const productPrices = new Map<string | number, number>();
 
     if (itemIds.length > 0) {
-      const { data: products, error: dbError } = await supabase
-        .from("products")
-        .select(`id, ${priceField}`)
-        .in("id", itemIds);
+      // Separate UUID ids from legacy numeric ids
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const uuidIds = itemIds.filter((id: string | number) => uuidRegex.test(String(id)));
+      const legacyIds = itemIds.filter((id: string | number) => !uuidRegex.test(String(id)));
 
-      if (dbError) {
-        console.error("[create-checkout] DB price lookup error:", dbError);
-        return new Response(
-          JSON.stringify({ error: "Failed to validate product prices" }),
-          {
-            status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
+      // Lookup by UUID
+      if (uuidIds.length > 0) {
+        const { data: products, error: dbError } = await supabase
+          .from("products")
+          .select(`id, ${priceField}`)
+          .in("id", uuidIds);
+        if (!dbError) {
+          for (const p of products || []) {
+            const price = Number(p[priceField as keyof typeof p]);
+            if (price > 0) productPrices.set(p.id, price);
+          }
+        } else {
+          console.error("[create-checkout] UUID lookup error:", dbError);
+        }
       }
 
-      for (const p of products || []) {
-        const price = Number(p[priceField as keyof typeof p]);
-        if (price > 0) productPrices.set(p.id, price);
+      // Lookup by legacy_id or woo_product_id for numeric IDs
+      if (legacyIds.length > 0) {
+        const numericIds = legacyIds.map((id: string | number) => Number(id)).filter((n: number) => !isNaN(n));
+        if (numericIds.length > 0) {
+          const { data: legacyProducts, error: legacyError } = await supabase
+            .from("products")
+            .select(`id, legacy_id, woo_product_id, ${priceField}`)
+            .or(`legacy_id.in.(${numericIds.join(",")}),woo_product_id.in.(${numericIds.join(",")})`);
+          if (!legacyError) {
+            for (const p of legacyProducts || []) {
+              const price = Number(p[priceField as keyof typeof p]);
+              if (price > 0) {
+                for (const origId of legacyIds) {
+                  const n = Number(origId);
+                  if ((p as any).legacy_id === n || (p as any).woo_product_id === n) {
+                    productPrices.set(origId, price);
+                  }
+                }
+              }
+            }
+          } else {
+            console.error("[create-checkout] Legacy lookup error:", legacyError);
+          }
+        }
       }
     }
 
@@ -199,7 +226,8 @@ Deno.serve(async (req: Request) => {
       0,
     );
 
-    let shippingCost = subtotal >= 50 ? 0 : 4.99;
+    const freeShipMin = is_b2b ? 150 : 60;
+    let shippingCost = subtotal >= freeShipMin ? 0 : 9.04;
     let discountAmount = 0;
 
     if (coupon) {
@@ -225,7 +253,7 @@ Deno.serve(async (req: Request) => {
               shipping_rate_data: {
                 type: "fixed_amount",
                 fixed_amount: { amount: STANDARD_SHIPPING_CENTS, currency: currency.toLowerCase() },
-                display_name: "Standard Shipping (3-5 days)",
+                display_name: "Standard Shipping Ireland (3-5 days)",
               },
             },
           ];

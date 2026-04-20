@@ -125,7 +125,10 @@
             if (appliedCoupon.freeShipping) shipCost = 0;
         }
         const total = subtotal - discount + shipCost;
-        const taxIncluded = total - (total / 1.23);
+        const isB2BUser = window._sfiCustomerIsB2B || false;
+        // B2C: prices include VAT 23% — show VAT breakdown
+        // B2B: prices are ex-VAT — no VAT line shown
+        const taxIncluded = isB2BUser ? 0 : parseFloat((total - total / 1.23).toFixed(2));
         return `
         <h3>Order Summary</h3>
         ${cart.map(i => `
@@ -148,7 +151,7 @@
             <span>Total</span>
             <span style="text-align:right">
                 ${fmt(total)}<br>
-                <small style="font-size:12px;color:var(--color-text-muted);font-weight:normal">(includes €${taxIncluded.toFixed(2)} Tax)</small>
+                ${!isB2BUser ? `<small style="font-size:12px;color:var(--color-text-muted);font-weight:normal">(includes €${taxIncluded.toFixed(2)} VAT)</small>` : ''}
             </span>
         </div>`;
     }
