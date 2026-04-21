@@ -37,8 +37,16 @@ async function resolveB2BPrice(item: Record<string, unknown>, sb: ReturnType<typ
   }
   if (rawId) {
     const isUuid = /^[0-9a-f]{8}-/.test(rawId);
-    const filter = isUuid ? `id=eq.${rawId}` : `legacy_id=eq.${rawId}`;
-    const { data: pRows } = await sb.from("products").select("wholesale_price_eur, price_eur").or(filter);
+    // Fix: use .eq() not .or() — .or() requires PostgREST dot syntax (legacy_id.eq.200)
+    // Using = syntax caused silent query failure and fallback to client price
+    let query = sb.from("products").select("wholesale_price_eur, price_eur");
+    const numericId = !isNaN(Number(rawId)) ? Number(rawId) : null;
+    if (isUuid) {
+      query = query.eq("id", rawId);
+    } else if (numericId !== null) {
+      query = query.or(`legacy_id.eq.${numericId},woo_product_id.eq.${numericId}`);
+    }
+    const { data: pRows } = await query.limit(1);
     const p = pRows?.[0];
     if (p) {
       const ws = Number(p.wholesale_price_eur); const rt = Number(p.price_eur);
