@@ -8413,7 +8413,7 @@ Loading items...
           const email = c.email ? '<span style="color:var(--text-muted);font-size:0.78rem;margin-left:6px">' + esc(c.email) + '</span>' : '';
           const badge = c.customer_type === 'b2b'
             ? '<span style="background:#1d4ed8;color:#fff;font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:6px">B2B</span>' : '';
-          return '<div onclick="selectSpCustomer('' + esc(c.id) + '','' + esc(name).replace(/'/g,"&#39;") + '')" '
+          return '<div onclick="selectSpCustomer(\'' + esc(c.id) + '\',\'' + esc(name).replace(/'/g,\"&#39;\") + '\')" '
             + 'style="padding:9px 14px;cursor:pointer;font-size:0.88rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:4px;flex-wrap:wrap">'
             + '<span style="font-weight:600;color:var(--text)">' + esc(name) + '</span>' + badge + email + '</div>';
         }).join('');
@@ -8485,7 +8485,14 @@ Loading items...
       if (!row) return;
       const customerId = row.getAttribute('data-customer-id');
       const price = parseFloat(row.getAttribute('data-price-eur') || '0');
-      if (customerId) select.value = customerId;
+      if (customerId) {
+        select.value = customerId;
+        // Also populate the search text field with the customer name
+        const cust = (allCustomers || []).find(function(c) { return c.id === customerId; }) || {};
+        const custName = cust.display_name || [cust.first_name, cust.last_name].filter(Boolean).join(' ') || cust.company || cust.email || '';
+        const searchEl = document.getElementById('spCustomerSearch');
+        if (searchEl) { searchEl.value = custName; searchEl.style.borderColor = '#169B62'; }
+      }
       if (price > 0) priceInput.value = price.toFixed(2);
     }
 
