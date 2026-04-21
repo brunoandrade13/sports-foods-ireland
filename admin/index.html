@@ -14671,13 +14671,16 @@ y += rH;
 doc.setDrawColor(204,204,204); doc.line(ML, y, ML + CW, y); y += 12;
 
 // ---- DISCOUNT ----
-var discountVal = parseFloat((document.getElementById('omDiscountValue') || {}).value) || 0;
-var discountType = (document.getElementById('omDiscountType') || {}).value || 'percent';
-var discountAmount = 0;
-if (discountVal > 0) {
-  discountAmount = discountType === 'percent' ? subtotal * discountVal / 100 : discountVal;
-  discountAmount = Math.min(discountAmount, subtotal);
+// Priority: use order.discount_amount from DB (most reliable), fallback to form field
+var discountAmount = parseFloat(order.discount_amount) || parseFloat(order.discount_total) || 0;
+if (!discountAmount) {
+  var _dvVal = parseFloat((document.getElementById('omDiscountValue') || {}).value) || 0;
+  var _dtVal = (document.getElementById('omDiscountType') || {}).value || 'percent';
+  if (_dvVal > 0) {
+    discountAmount = _dtVal === 'percent' ? subtotal * _dvVal / 100 : _dvVal;
+  }
 }
+discountAmount = Math.min(discountAmount, subtotal);
 var discountedSubtotal = subtotal - discountAmount;
 
 // ---- TOTALS ----
@@ -14687,7 +14690,13 @@ checkPage(100);
 var tx = ML + CW - 200;
 var totalsRows = [['SUBTOTAL', fmtM(subtotal)]];
 if (discountAmount > 0) {
-  var discLabel = discountType === 'percent' ? 'DISCOUNT (' + discountVal + '%)' : 'DISCOUNT';
+  // Build label: if coupon_code has ZONE3 with %, show that; else compute %
+  var _coupon = order.coupon_code || order.discount_code || '';
+  var _z3match = _coupon.match(/ZONE3[^\d]*(\d+\.?\d*)/i);
+  var _pct = subtotal > 0 ? (discountAmount / subtotal * 100).toFixed(2).replace(/\.00$/, '') : null;
+  var discLabel = _z3match
+    ? 'ZONE3 DISCOUNT (' + _z3match[1] + '%)'
+    : (_pct ? 'DISCOUNT (' + _pct + '%)' : 'DISCOUNT');
   totalsRows.push([discLabel, '-' + fmtM(discountAmount)]);
   totalsRows.push(['NET TOTAL', fmtM(discountedSubtotal)]);
 }
