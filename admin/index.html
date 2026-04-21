@@ -2247,12 +2247,17 @@ style="cursor:help;font-size:0.85rem">ℹ️</span></th>
     <div class="detail-panel">
       <h3 style="margin:0 0 14px;font-size:0.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)">Customer</h3>
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <select id="moCustomer" onchange="renderManualOrderProductPicker()"
-          style="flex:1;min-width:260px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem">
-          <option value="">Select customer…</option>
-        </select>
+        <div style="flex:1;min-width:260px;position:relative" id="moCustomerWrap">
+          <input type="text" id="moCustomerSearch" placeholder="Search customer by name or email…"
+            autocomplete="off"
+            oninput="filterMoCustomers()"
+            onfocus="showMoDropdown()"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.9rem;box-sizing:border-box">
+          <input type="hidden" id="moCustomer">
+          <div id="moCustomerDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;margin-top:4px;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.25)"></div>
+        </div>
         <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--text-muted);cursor:pointer;white-space:nowrap">
-          <input type="checkbox" id="moOnlyB2B" checked style="width:15px;height:15px"> B2B only
+          <input type="checkbox" id="moOnlyB2B" checked onchange="clearMoCustomer()" style="width:15px;height:15px"> B2B only
         </label>
       </div>
     </div>
@@ -12231,22 +12236,73 @@ Loading items...
       return parseFloat(product.price_eur) || 0;
     }
 
+    // ── Manual Order customer search helpers ──────────────────────────────────
+    function getMoCustomerList() {
+      const onlyB2B = document.getElementById('moOnlyB2B');
+      const onlyB2BVal = !onlyB2B || onlyB2B.checked;
+      return (allCustomers || []).filter(function(c) {
+        return !onlyB2BVal || c.customer_type === 'b2b';
+      });
+    }
+    function showMoDropdown() { filterMoCustomers(); }
+    function filterMoCustomers() {
+      const q = (document.getElementById('moCustomerSearch').value || '').toLowerCase().trim();
+      const dd = document.getElementById('moCustomerDropdown');
+      const list = getMoCustomerList();
+      const filtered = q.length < 1
+        ? list.slice(0, 80)
+        : list.filter(function(c) {
+            const name = (c.display_name || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.company || '').toLowerCase();
+            const email = (c.email || '').toLowerCase();
+            return name.includes(q) || email.includes(q);
+          }).slice(0, 80);
+      if (filtered.length === 0) {
+        dd.innerHTML = '<div style="padding:10px 14px;color:var(--text-muted);font-size:0.85rem">No customers found</div>';
+      } else {
+        dd.innerHTML = filtered.map(function(c) {
+          const name = c.display_name || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.company || c.email || '—';
+          const email = c.email ? '<span style="color:var(--text-muted);font-size:0.78rem;margin-left:6px">' + esc(c.email) + '</span>' : '';
+          const badge = c.customer_type === 'b2b' ? '<span style="background:#1d4ed8;color:#fff;font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:6px">B2B</span>' : '';
+          return '<div class="mo-cust-opt" data-id="' + esc(c.id) + '" data-name="' + esc(name) + '" onclick="selectMoCustomer(this)" style="padding:9px 14px;cursor:pointer;font-size:0.88rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:4px;flex-wrap:wrap">'
+            + '<span style="font-weight:600;color:var(--text)">' + esc(name) + '</span>' + badge + email + '</div>';
+        }).join('');
+      }
+      dd.style.display = 'block';
+      if (!dd._outsideHandler) {
+        dd._outsideHandler = function(e) {
+          if (!document.getElementById('moCustomerWrap').contains(e.target)) {
+            dd.style.display = 'none';
+          }
+        };
+        document.addEventListener('mousedown', dd._outsideHandler);
+      }
+    }
+    function selectMoCustomer(el) {
+      const id   = el.dataset.id;
+      const name = el.dataset.name;
+      document.getElementById('moCustomer').value       = id;
+      document.getElementById('moCustomerSearch').value = name;
+      document.getElementById('moCustomerSearch').style.borderColor = '#169B62';
+      document.getElementById('moCustomerDropdown').style.display   = 'none';
+      renderManualOrderProductPicker();
+    }
+    function clearMoCustomer() {
+      document.getElementById('moCustomer').value = '';
+      document.getElementById('moCustomerSearch').value = '';
+      document.getElementById('moCustomerSearch').style.borderColor = '';
+      document.getElementById('moCustomerDropdown').style.display = 'none';
+      renderManualOrderProductPicker();
+    }
+    // ────────────────────────────────────────────────────────────────────────
     function openManualOrderModal() {
       const modal = document.getElementById('manualOrderModal'); // legacy — kept for compat
-      // Reset fields
-      const sel = document.getElementById('moCustomer');
-      const onlyB2B = document.getElementById('moOnlyB2B');
-      if (sel) {
-        const onlyB2BVal = !onlyB2B || onlyB2B.checked;
-        const list = (allCustomers || []).filter(function (c) {
-          return !onlyB2BVal || c.customer_type === 'b2b';
-        }).slice(0, 500);
-        sel.innerHTML = '<option value="">Select customer…</option>' +
-          list.map(function (c) {
-            const name = c.display_name || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.company || c.email || '—';
-            return `<option value="${c.id}">${esc(name)}${c.email ? ' — ' + esc(c.email) : ''}</option>`;
-          }).join('');
-      }
+      // Reset customer search
+      const searchEl = document.getElementById('moCustomerSearch');
+      const hiddenEl = document.getElementById('moCustomer');
+      if (searchEl) { searchEl.value = ''; searchEl.style.borderColor = ''; }
+      if (hiddenEl)  { hiddenEl.value  = ''; }
+      const dd = document.getElementById('moCustomerDropdown');
+      if (dd) { dd.style.display = 'none'; dd.innerHTML = ''; }
       const brandSel = document.getElementById('moBrandFilter');
       const catSel = document.getElementById('moCategoryFilter');
       if (brandSel) {
