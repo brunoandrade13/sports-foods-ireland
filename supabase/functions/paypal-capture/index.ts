@@ -124,15 +124,13 @@ Deno.serve(async (req: Request) => {
     const { data: dup } = await sb.from("orders").select("id").eq("stripe_payment_intent_id", `paypal_${order_id}`).maybeSingle();
     if (dup) return new Response(JSON.stringify({ status: "COMPLETED", capture_id: captureId, amount: capturedAmt, payer_email: payerEmail, order_id: capture.id }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
-    const { data: oidData } = await sb.rpc("generate_sfi_order_number");
-    const oid = (oidData as string) || "SFI-" + Date.now().toString().slice(-8);
     const itemCount    = cartItems.reduce((s: number, i: Record<string,unknown>) => s + (Number(i.quantity||i.qty)||1), 0);
     const contactName  = contact ? `${contact.firstName||""} ${contact.lastName||""}`.trim() : payerName;
     const contactEmail = contact?.email || payerEmail;
     const attr = attribution || {};
 
     const { data: orderRow, error: orderErr } = await sb.from("orders").insert({
-      order_number: oid, stripe_payment_intent_id: `paypal_${order_id}`,
+      stripe_payment_intent_id: `paypal_${order_id}`,
       status: "processing", payment_status: "paid", financial_status: "paid",
       total,
       subtotal: parseFloat(itemsSubtotal.toFixed(2)),
@@ -146,11 +144,12 @@ Deno.serve(async (req: Request) => {
       shipping_address: shippingAddress || capture.purchase_units?.[0]?.shipping || {}, billing_address: {},
       coupon_code: coupon?.code||null, source: "web", order_source: "website", payment_method: "paypal", item_count: itemCount,
       attribution_source_type: attr.attribution_source_type||null, attribution_utm_source: attr.attribution_utm_source||null, attribution_device_type: attr.attribution_device_type||null,
-    }).select("id").single();
+    }).select("id, order_number").single();
 
     if (orderErr) {
       console.error("[paypal-capture] Order insert error:", JSON.stringify(orderErr));
     } else {
+      const oid = orderRow?.order_number || `SFI-${orderRow?.id?.slice(0,8)}`;
       if (cartItems.length && orderRow?.id) {
         // Pre-fetch variant images
         const vids = cartItems.map((i: Record<string,unknown>) => i.variant_id).filter((v): v is string => typeof v === "string" && !!v);

@@ -91,16 +91,14 @@ async function handleCheckoutComplete(
   }
 
   const metadata = session.metadata || {};
-  // items_json is now array of [id, qty, price] arrays (compact to avoid Stripe 500-char limit)
   const rawItems = safeJson(metadata.items_json, []);
   const variantIds: Record<string, string> = safeJson(metadata.variant_ids, {});
   const itemNames: string[] = safeJson(metadata.item_names, []);
+  const variantLabels: Record<string, string> = safeJson(metadata.variant_labels, {});
 
-  // Reconstruct items from compact format
   const items = Array.isArray(rawItems)
     ? rawItems.map((item: unknown, idx: number) => {
         if (Array.isArray(item)) {
-          // New compact format: [id, qty, price]
           return {
             id: item[0],
             qty: item[1],
@@ -108,17 +106,17 @@ async function handleCheckoutComplete(
             price: item[2],
             name: itemNames[idx] || String(item[0]),
             variant_id: variantIds[String(idx)] || undefined,
+            variant_label: variantLabels[String(idx)] || undefined,
           };
         }
-        // Legacy format (object) — backwards compatibility
         const it = item as Record<string, unknown>;
-        return { ...it, variant_id: it.vid || it.variant_id || variantIds[String(idx)] };
+        return { ...it, variant_id: it.vid || it.variant_id || variantIds[String(idx)], variant_label: it.vlb || it.variant_label || variantLabels[String(idx)] };
       })
     : [];
   const shipping = safeJson(metadata.shipping_json, {});
 
-  // Generate a readable order ID
-  const orderId = `SFI-${Date.now().toString(36).toUpperCase()}`;
+  // order_number será gerado automaticamente pelo trigger trg_generate_order_number
+  // Não passamos order_number no insert para garantir numeração sequencial correcta
 
   // Calculate correct financial values from Stripe session
   const totalEur = (session.amount_total ?? 0) / 100;
@@ -149,20 +147,20 @@ async function handleCheckoutComplete(
       stripe_shipping: session.shipping_details ?? null,
     },
     coupon_code: metadata.coupon_code || null,
-    source: "website_direct",
+    source: "web",
     order_source: metadata.is_b2b === "1" ? "b2b_portal" : "website",
     is_b2b: metadata.is_b2b === "1",
     payment_method: "stripe",
   };
 
   console.log(
-    `[stripe-webhook] Saving order ${orderId} for ${orderData.customer_email}`,
+    `[stripe-webhook] Saving order for ${orderData.customer_email}`,
   );
 
   const { data: insertedOrder, error } = await supabase
     .from("orders")
-    .insert({ ...orderData, order_number: orderId })
-    .select("id")
+    .insert(orderData)
+    .select("id, order_number")
     .single();
 
   if (error) {
@@ -181,7 +179,8 @@ async function handleCheckoutComplete(
     await insertOrderItems(supabase, insertedOrder.id, items);
   }
 
-  console.log(`[stripe-webhook] Order ${orderId} saved with ${items.length} items`);
+  const finalOrderNumber = insertedOrder?.order_number ?? `SFI-${insertedOrder?.id?.slice(0,8)}`;
+  console.log(`[stripe-webhook] Order ${finalOrderNumber} saved with ${items.length} items`);
 
   // Trigger staff notification email (fire-and-forget)
   supabase.functions.invoke("order-notify-staff", {
@@ -191,7 +190,7 @@ async function handleCheckoutComplete(
   // Send customer confirmation email (fire-and-forget)
   if (orderData.customer_email && insertedOrder?.id) {
     sendCustomerConfirmation({
-      orderId,
+      orderId: finalOrderNumber,
       dbOrderId: insertedOrder.id,
       customerEmail: orderData.customer_email,
       customerName: orderData.customer_name,
@@ -204,7 +203,7 @@ async function handleCheckoutComplete(
   }
 
   // Optionally trigger QB sync (fire-and-forget, don't block webhook response)
-  triggerQBSync(supabase, orderId).catch((e) =>
+  triggerQBSync(supabase, finalOrderNumber).catch((e) =>
     console.warn("[stripe-webhook] QB sync failed (non-critical):", e),
   );
 }
@@ -342,64 +341,100 @@ async function insertOrderItems(
   orderId: string,
   items: Array<Record<string, unknown>>,
 ) {
-  // Lookup variant images from product_variants in one query
+  // --- Lookup variants from DB (source of truth for label + image) ---
   const variantIds = items
     .map((i) => i.variant_id)
-    .filter((v): v is string => !!v && typeof v === "string");
+    .filter((v): v is string => !!v && typeof v === "string" && v.includes("-"));
 
-  const variantImageMap = new Map<string, string>();
-  const variantLabelMap = new Map<string, string>();
+  const variantMap = new Map<string, { label: string; image_url: string; product_id: string }>();
 
   if (variantIds.length > 0) {
     const { data: variants } = await supabase
       .from("product_variants")
-      .select("id, image_url, label")
+      .select("id, label, image_url, product_id")
       .in("id", variantIds);
-
     for (const v of variants || []) {
-      if (v.image_url) variantImageMap.set(v.id, v.image_url);
-      if (v.label) variantLabelMap.set(v.id, v.label);
+      variantMap.set(v.id, { label: v.label || "", image_url: v.image_url || "", product_id: v.product_id });
     }
   }
 
-  // Build order_items rows
-  const rows = items.map((item) => {
-    // metadata uses compact keys vid/vlb
-    const variantId = (String(item.vid||item.variant_id||"")) || undefined;
-    // Enrich variant_label from DB if not in metadata (compact format omits it)
-    if (!item.variant_label && !item.vlb && variantId && variantLabelMap.has(variantId)) {
-      (item as Record<string,unknown>).variant_label = variantLabelMap.get(variantId);
-    }
-    if (!item.variant_label && item.vlb) (item as Record<string,unknown>).variant_label = item.vlb;
-    const variantImage = variantId ? variantImageMap.get(variantId) || null : null;
-    // Use variant image if available, else product image from item
-    const imageUrl = variantImage || (item.image as string | undefined) || null;
+  // --- Lookup product names + images from DB ---
+  const allProductIds = [
+    ...items.filter(i => typeof i.id === "string" && (i.id as string).includes("-")).map(i => i.id as string),
+    ...[...variantMap.values()].map(v => v.product_id),
+  ].filter(Boolean);
+  const uniqueProductIds = [...new Set(allProductIds)];
 
-    // Clean product name: extract base name (before " — variantLabel")
-    const rawName = String(item.name || "Product");
-    const variantLabel = String(item.variant_label || "");
-    let productName = rawName;
-    if (variantLabel && rawName.includes(" — " + variantLabel)) {
-      productName = rawName.replace(" — " + variantLabel, "").trim();
-    } else if (variantLabel && rawName.endsWith(" — " + variantLabel.split(" — ")[0])) {
-      // Partial match — strip last " — X"
-      const lastDash = rawName.lastIndexOf(" — ");
-      if (lastDash > 0) productName = rawName.substring(0, lastDash).trim();
+  const productMap = new Map<string, { name: string; image_url: string }>();
+  if (uniqueProductIds.length > 0) {
+    const { data: products } = await supabase
+      .from("products")
+      .select("id, name, image_url")
+      .in("id", uniqueProductIds);
+    for (const p of products || []) {
+      productMap.set(p.id, { name: p.name || "", image_url: p.image_url || "" });
     }
+  }
+
+  // --- Lookup by legacy_id for numeric product IDs ---
+  const numericIds = items
+    .map(i => i.id)
+    .filter(id => id != null && !isNaN(Number(id)) && !String(id).includes("-"))
+    .map(id => Number(id));
+  const legacyMap = new Map<number, { id: string; name: string; image_url: string }>();
+  if (numericIds.length > 0) {
+    const { data: legacyProducts } = await supabase
+      .from("products")
+      .select("id, legacy_id, name, image_url")
+      .in("legacy_id", numericIds);
+    for (const p of legacyProducts || []) {
+      legacyMap.set(p.legacy_id, { id: p.id, name: p.name || "", image_url: p.image_url || "" });
+    }
+  }
+
+  const rows = items.map((item) => {
+    const variantId = typeof item.variant_id === "string" && item.variant_id.includes("-")
+      ? item.variant_id : null;
+    const variantData = variantId ? variantMap.get(variantId) : null;
+
+    // Product ID resolution: UUID → direct, numeric → via legacyMap, variant → via variantData
+    let resolvedProductId: string | null = null;
+    if (typeof item.id === "string" && item.id.includes("-")) {
+      resolvedProductId = item.id;
+    } else if (item.id != null && !isNaN(Number(item.id))) {
+      const legacy = legacyMap.get(Number(item.id));
+      if (legacy) resolvedProductId = legacy.id;
+    }
+    if (!resolvedProductId && variantData?.product_id) {
+      resolvedProductId = variantData.product_id;
+    }
+
+    // Product name: from DB first, fallback to metadata
+    const dbProduct = resolvedProductId ? productMap.get(resolvedProductId) : null;
+    const productName = dbProduct?.name || String(item.name || "Product");
+
+    // Variant label: from DB first (authoritative), fallback to metadata
+    const variantLabel = variantData?.label || String(item.variant_label || item.vlb || "");
+
+    // Image: variant image first, then product image
+    const imageUrl = variantData?.image_url || dbProduct?.image_url
+      || (item.image as string | undefined) || null;
+    const absImageUrl = imageUrl && !imageUrl.startsWith("http")
+      ? `https://sportsfoodsireland.ie/${imageUrl.replace(/^\//, "")}` : imageUrl;
 
     const qty = Number(item.qty || item.quantity || 1);
     const price = Number(item.price || 0);
 
     return {
       order_id: orderId,
-      product_id: typeof item.id === "string" && item.id.includes("-") ? item.id : null,
-      variant_id: variantId || null,
+      product_id: resolvedProductId,
+      variant_id: variantId,
       product_name: productName,
       variant_label: variantLabel || null,
       quantity: qty,
       unit_price: price,
       total_price: price * qty,
-      product_image_url: imageUrl,
+      product_image_url: absImageUrl,
       requires_shipping: true,
       fulfillment_status: "unfulfilled",
     };
@@ -408,8 +443,9 @@ async function insertOrderItems(
   const { error } = await supabase.from("order_items").insert(rows);
   if (error) {
     console.error("[stripe-webhook] Failed to insert order_items:", error);
+    throw new Error(`order_items insert failed: ${error.message}`);
   } else {
-    console.log(`[stripe-webhook] Inserted ${rows.length} order_items for order ${orderId}`);
+    console.log(`[stripe-webhook] Inserted ${rows.length} order_items`);
   }
 }
 

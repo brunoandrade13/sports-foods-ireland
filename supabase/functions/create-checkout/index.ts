@@ -307,10 +307,20 @@ Deno.serve(async (req: Request) => {
             {}
           )
         ),
-        // Item names for display (abbreviated to 40 chars to save space)
+        // Item names for display (100 chars — suficiente para nomes longos)
         item_names: JSON.stringify(
           validatedItems.map(
-            (i: { name?: string }) => (i.name || "").substring(0, 40)
+            (i: { name?: string }) => (i.name || "").substring(0, 100)
+          )
+        ),
+        // Variant labels indexed by position (para lookup correcto no webhook)
+        variant_labels: JSON.stringify(
+          validatedItems.reduce(
+            (acc: Record<string, string>, i: { variant_label?: string }, idx: number) => {
+              if (i.variant_label) acc[String(idx)] = i.variant_label;
+              return acc;
+            },
+            {}
           )
         ),
         shipping_json: JSON.stringify(shippingAddress || {}),
