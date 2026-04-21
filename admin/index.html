@@ -12248,37 +12248,38 @@ Loading items...
         wrapper.innerHTML = '<div style="color:#d32f2f">Failed to load order items.</div>';
       }
 
-      // ---- AUTO-APPLY Zone3 customer discount ----
+      // ---- DISCOUNT: load from order DB first, then auto-apply Zone3 if none ----
       try {
-        // Reset discount fields first
         const dvEl = document.getElementById('omDiscountValue');
         const dtEl = document.getElementById('omDiscountType');
         if (dvEl) dvEl.value = '';
         if (dtEl) dtEl.value = 'percent';
         if (typeof updateDiscountPreview === 'function') updateDiscountPreview();
 
-        // Only apply for B2B customers
-        const custForDisc = matchedCust || null;
-        if (custForDisc && custForDisc.customer_type === 'b2b' && allZone3Discounts.length > 0) {
-          const z3rule = allZone3Discounts.find(r => r.customer_id === custForDisc.id && r.is_active !== false);
-          if (z3rule) {
-            // Check if order has any Zone3 products
-            const orderItems = window._currentOrderItemsForInvoice || [];
-            const hasZone3 = orderItems.some(function(it) {
-              const name = (it.product_name || '').toLowerCase();
-              const sku  = (it.product_sku || it.sku || '').toLowerCase();
-              return name.includes('zone3') || name.includes('zone 3') || sku.startsWith('z3') || sku.includes('zone3');
-            });
-            if (hasZone3) {
+        const existingDiscount = parseFloat(order.discount_amount) || parseFloat(order.discount_total) || 0;
+        const existingCoupon   = order.coupon_code || order.discount_code || '';
+
+        if (existingDiscount > 0) {
+          // Order already has a discount saved — restore it
+          if (dvEl) dvEl.value = existingDiscount.toFixed(2);
+          if (dtEl) dtEl.value = 'fixed';
+          if (typeof updateDiscountPreview === 'function') updateDiscountPreview();
+          const prevEl = document.getElementById('omDiscountPreview');
+          const badge = existingCoupon && existingCoupon.includes('ZONE3')
+            ? ' <span style="color:#fbbf24;font-size:0.75rem">⚡ Zone3</span>'
+            : (existingCoupon ? ' <span style="color:#60a5fa;font-size:0.75rem">' + existingCoupon + '</span>' : '');
+          if (prevEl) prevEl.innerHTML = (prevEl.innerHTML || '') + badge;
+        } else {
+          // No discount yet — auto-apply Zone3 rule if customer has one
+          const custForDisc = matchedCust || null;
+          if (custForDisc && custForDisc.customer_type === 'b2b' && allZone3Discounts.length > 0) {
+            const z3rule = allZone3Discounts.find(r => r.customer_id === custForDisc.id && r.is_active !== false);
+            if (z3rule) {
               if (dvEl) dvEl.value = z3rule.discount_value;
               if (dtEl) dtEl.value = z3rule.discount_type;
               if (typeof updateDiscountPreview === 'function') updateDiscountPreview();
-              // Show a small notification
               const prevEl = document.getElementById('omDiscountPreview');
-              if (prevEl) {
-                const custName = [custForDisc.first_name, custForDisc.last_name].filter(Boolean).join(' ') || custForDisc.email || '';
-                prevEl.innerHTML = (prevEl.textContent || '') + ' <span style="color:#fbbf24;font-size:0.75rem">⚡ Zone3 auto</span>';
-              }
+              if (prevEl) prevEl.innerHTML = (prevEl.innerHTML || '') + ' <span style="color:#fbbf24;font-size:0.75rem">⚡ Zone3 auto</span>';
             }
           }
         }

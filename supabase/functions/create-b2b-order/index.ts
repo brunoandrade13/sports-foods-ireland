@@ -115,11 +115,29 @@ Deno.serve(async (req: Request) => {
     const subtotal = resolvedItems.reduce((s: number, i: Record<string, unknown>) => s + Number(i.price) * (Number(i.quantity) || 1), 0);
     let shipCost = subtotal >= 150 ? 0 : 9.04;
     let discount = 0;
+    let zone3DiscountApplied = false;
     if (coupon) {
       if (coupon.type === "percent") discount = subtotal * coupon.value / 100;
       else if (coupon.type === "fixed") discount = coupon.value;
       else if (coupon.type === "shipping") shipCost = 0;
       if (coupon.freeShipping) shipCost = 0;
+    }
+    // Auto-apply Zone3 customer discount if no other coupon is active
+    if (!coupon && customerId) {
+      const { data: z3rule } = await sb.from("zone3_customer_discounts")
+        .select("discount_type, discount_value")
+        .eq("customer_id", customerId)
+        .eq("is_active", true)
+        .maybeSingle();
+      if (z3rule && Number(z3rule.discount_value) > 0) {
+        if (z3rule.discount_type === "percent") {
+          discount = parseFloat((subtotal * Number(z3rule.discount_value) / 100).toFixed(2));
+        } else if (z3rule.discount_type === "fixed") {
+          discount = Number(z3rule.discount_value);
+        }
+        zone3DiscountApplied = true;
+        console.log(`[b2b] Zone3 discount applied: ${z3rule.discount_type} ${z3rule.discount_value} → -€${discount}`);
+      }
     }
     const total = parseFloat((subtotal - discount + shipCost).toFixed(2));
     const methodLabel = payment_method === "net30" ? "Net 30 (Invoice)" : "Cash on Delivery";
@@ -131,7 +149,7 @@ Deno.serve(async (req: Request) => {
       customer_email: email || "", customer_name: customerName, customer_phone: contact?.phone || "",
       customer_id: customerId,
       shipping_address: shippingAddress || {}, billing_address: shippingAddress || {},
-      coupon_code: coupon?.code || null, source: "web", order_source: "b2b_portal", payment_method: methodLabel,
+      coupon_code: coupon?.code || (zone3DiscountApplied ? 'ZONE3-AUTO' : null), source: "web", order_source: "b2b_portal", payment_method: methodLabel,
       item_count: resolvedItems.reduce((s: number, i: Record<string, unknown>) => s + (Number(i.quantity) || 1), 0),
       notes: payment_method === "net30" ? "Payment due within 30 days" : "Cash on delivery",
     }).select("id").single();
