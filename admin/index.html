@@ -7528,7 +7528,7 @@ Loading items...
           supaGetAll('purchase_orders', '?order=txn_date.desc').catch(() => []),
           Promise.resolve([]),
           supaGet('v_all_sales', '?order=txn_date.desc&limit=1000').catch(() => []),
-          Promise.resolve([])
+          supaGet('customer_product_prices', '?is_active=eq.true&select=id,product_id,customer_id,price_eur').catch(() => [])
         ]);
 
         allReviews = revs || []; filteredReviews = [...allReviews];
@@ -8599,9 +8599,14 @@ Loading items...
           tr.removeAttribute('data-cpp-pending');
         } catch (e) {
           console.error('Error saving special price', e);
-          toast('Error saving special price', 'error');
+          toast('Error saving special price: ' + (e.message || ''), 'error');
         }
       }
+      // Refresh cache for this product
+      try {
+        const fresh = await supaGet('customer_product_prices', `?is_active=eq.true&product_id=eq.${productId}&select=id,product_id,customer_id,price_eur`);
+        if (window.customerProductPricesCache) window.customerProductPricesCache[productId] = fresh || [];
+      } catch(e) {}
     }
 
     async function deleteProduct(id, name) {
