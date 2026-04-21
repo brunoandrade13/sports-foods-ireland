@@ -27,9 +27,39 @@ function toAbsImg(url: string) {
   return `${SITE_URL}${url.startsWith("/") ? url : "/" + url}`;
 }
 
-async function resolveB2BPrice(item: Record<string, unknown>, sb: ReturnType<typeof createClient>): Promise<number> {
+async function resolveB2BPrice(item: Record<string, unknown>, sb: ReturnType<typeof createClient>, customerId?: string | null): Promise<number> {
   const rawId = item.id ? String(item.id) : null;
   const variantId = item.variant_id ? String(item.variant_id) : null;
+
+  // ── 1. Customer special price takes HIGHEST priority ──────────────────────
+  if (customerId && rawId) {
+    // Resolve product UUID first
+    let productUuid: string | null = null;
+    const isUuid = /^[0-9a-f]{8}-/.test(rawId);
+    if (isUuid) {
+      productUuid = rawId;
+    } else {
+      const numId = !isNaN(Number(rawId)) ? Number(rawId) : null;
+      if (numId !== null) {
+        const { data: pRow } = await sb.from("products").select("id").or(`legacy_id.eq.${numId},woo_product_id.eq.${numId}`).limit(1);
+        productUuid = pRow?.[0]?.id || null;
+      }
+    }
+    if (productUuid) {
+      const { data: cpp } = await sb.from("customer_product_prices")
+        .select("price_eur")
+        .eq("product_id", productUuid)
+        .eq("customer_id", customerId)
+        .eq("is_active", true)
+        .maybeSingle();
+      if (cpp && Number(cpp.price_eur) > 0) {
+        console.log(`[b2b] SPECIAL PRICE for customer ${customerId} product ${productUuid}: €${cpp.price_eur}`);
+        return Number(cpp.price_eur);
+      }
+    }
+  }
+
+  // ── 2. Variant wholesale price ─────────────────────────────────────────────
   if (variantId) {
     const { data: vRow } = await sb.from("product_variants").select("wholesale_price, price").eq("id", variantId).single();
     if (vRow && vRow.wholesale_price > 0) return Number(vRow.wholesale_price);
@@ -74,7 +104,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const resolvedItems = await Promise.all(items.map(async (it: Record<string, unknown>) => {
-      const serverPrice = await resolveB2BPrice(it, sb);
+      const serverPrice = await resolveB2BPrice(it, sb, customerId);
       const clientPrice = Number(it.price) || 0;
       if (Math.abs(serverPrice - clientPrice) > 0.01) console.warn(`[b2b] PRICE OVERRIDE: client sent ${clientPrice}, using DB price ${serverPrice} for "${it.name}"`);
       return { ...it, price: serverPrice };

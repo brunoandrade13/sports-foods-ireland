@@ -184,7 +184,9 @@ window.addEventListener('DOMContentLoaded', async function() {
   try {
     var U = 'https://styynhgzrkyoioqjssuw.supabase.co';
     var K = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
-    var h = { 'apikey': K, 'Authorization': 'Bearer ' + K };
+    // Use customer JWT if available so special prices RLS works
+    var authToken = localStorage.getItem('sfi_token') || localStorage.getItem('b2b_token') || K;
+    var h = { 'apikey': K, 'Authorization': 'Bearer ' + authToken };
 
     // Fetch product with relations (including variant SKU when existir)
     var res = await fetch(U + '/rest/v1/products?legacy_id=eq.' + legacyId + '&select=*,brands(name,slug),categories(name,slug),subcategories(name,slug),product_variants(id,label,price,wholesale_price,compare_at_price,stock,is_default,sort_order,sku,variant_types(name,slug))&product_variants.is_active=eq.true&product_variants.order=sort_order.asc', { headers: h });
@@ -198,6 +200,21 @@ window.addEventListener('DOMContentLoaded', async function() {
     var retailPrice = Number(p.price_eur) || 0;
     var b2bPrice = (wsPrice > 0 && wsPrice < retailPrice) ? wsPrice : retailPrice;
     var hasDiscount = wsPrice > 0 && wsPrice < retailPrice;
+
+    // Fetch customer special price (overrides all other prices if set)
+    window._specialPrice = null;
+    try {
+      if (authToken !== K && p.id) {
+        var cppRes = await fetch(U + '/rest/v1/customer_product_prices?product_id=eq.' + p.id + '&is_active=eq.true&select=price_eur', { headers: h });
+        var cppArr = await cppRes.json();
+        if (Array.isArray(cppArr) && cppArr[0] && cppArr[0].price_eur > 0) {
+          window._specialPrice = Number(cppArr[0].price_eur);
+          b2bPrice = window._specialPrice;
+          hasDiscount = (b2bPrice < retailPrice);
+          console.log('[B2B] Special price applied:', b2bPrice);
+        }
+      }
+    } catch(e) { console.warn('[B2B] Special price fetch failed:', e); }
     
     var img = p.image_url || '';
     if (img && !img.startsWith('http')) img = '../' + img;
@@ -284,6 +301,8 @@ function renderVariants(p) {
     if (ls) {
       var selB2bPr = parseFloat(ls.dataset.b2bpr); var selRtPr = parseFloat(ls.dataset.pr);
       var selPrice = (selB2bPr > 0) ? selB2bPr : selRtPr;
+      // Special customer price overrides variant price
+      if (window._specialPrice > 0) selPrice = window._specialPrice;
       _selectedVariant = { id: ls.dataset.vid, label: ls.dataset.lbl, price: selPrice || null, sku: (ls.dataset.sku || '') || null };
       var cur = '\u20ac';
       if (_selectedVariant.price) document.getElementById('prodPrice').textContent = cur + EXVAT(_selectedVariant.price).toFixed(2);
@@ -305,6 +324,8 @@ function addProductToCart() {
   if (_selectedVariant) {
     name = name + ' \u2014 ' + _selectedVariant.label;
     if (_selectedVariant.price) price = EXVAT(_selectedVariant.price);
+  // Special customer price always wins
+  if (window._specialPrice > 0) price = EXVAT(window._specialPrice);
   }
 
   if (typeof addToCart === 'function') {
