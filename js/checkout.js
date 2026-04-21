@@ -610,10 +610,13 @@
                 city: a.city || '', postcode: a.postcode || '', country: a.country || 'IE'
             };
         }
-        // Check B2B status (async, updates flag for Klarna visibility)
+        // Check B2B status — wait for result so Net30/COD options appear correctly
         if (sfi.b2b?.checkAccess) {
             sfi.b2b.checkAccess().then(isB2B => {
+                const wasB2B = window._sfiCustomerIsB2B;
                 window._sfiCustomerIsB2B = !!isB2B;
+                // If status changed, re-render checkout to show/hide B2B payment options
+                if (wasB2B !== window._sfiCustomerIsB2B && step === 3) renderCheckout();
             }).catch(() => {});
         }
     }
@@ -639,6 +642,7 @@
                 items, email: checkoutData.contact.email, currency,
                 shippingAddress: checkoutData.shipping, contact: checkoutData.contact,
                 coupon: appliedCoupon || null, payment_method: method,
+                attribution: typeof sfiGetAttribution === 'function' ? sfiGetAttribution() : {},
             })
         });
         const data = await res.json();
