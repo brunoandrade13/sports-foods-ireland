@@ -12554,7 +12554,11 @@ Loading items...
         document.body.appendChild(modal);
       }
       const unit = getB2BPriceForProduct(prod, custId);
+      // Check if customer has a special price for this product (overrides all variant prices)
+      const hasSpecialPrice = !!(window.customerProductPricesCache && custId && prod.id &&
+        (window.customerProductPricesCache[prod.id] || []).some(function(r) { return r.customer_id === custId && r.is_active !== false; }));
       let html = '<h3 style="margin:0 0 4px">' + esc(prod.name) + '</h3>';
+      if (hasSpecialPrice) html += '<p style="color:#22c55e;margin:0 0 4px;font-size:0.8rem;font-weight:600">⭐ Special price applied for this customer</p>';
       html += '<p style="color:var(--text-muted);margin:0 0 16px;font-size:0.85rem">Select a variant:</p>';
       html += '<table class="data-table"><thead><tr><th>Variant</th><th>SKU</th><th style="text-align:right">Price</th><th style="text-align:right">Stock</th><th></th></tr></thead><tbody>';
       variants.forEach(function (v) {
@@ -12562,7 +12566,8 @@ Loading items...
         // Build full label: if this variant has a parent, prepend parent label (e.g. "Mandarin — 30 Serv Bag")
         const parentVariant = v.parent_variant_id ? variants.find(function(pv) { return pv.id === v.parent_variant_id; }) : null;
         const label = parentVariant ? (parentVariant.label + ' — ' + v.label) : (v.label || '—');
-        const vPrice = parseFloat(v.wholesale_price) || parseFloat(v.price) || unit;
+        // Special price overrides variant wholesale price
+        const vPrice = hasSpecialPrice ? unit : (parseFloat(v.wholesale_price) || parseFloat(v.price) || unit);
         const stock = v.stock != null ? v.stock : '—';
         const stockColor = v.stock != null && v.stock <= 0 ? 'color:#ef4444' : '';
         html += '<tr>';
