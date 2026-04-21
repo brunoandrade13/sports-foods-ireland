@@ -46,9 +46,9 @@ async function resolveB2BPrice(item: Record<string, unknown>, sb: ReturnType<typ
       if (rt > 0) return rt;
     }
   }
-  const clientPrice = Number(item.price) || 0;
-  console.warn(`[b2b] FALLBACK to client price ${clientPrice} for item id=${rawId} variant=${variantId}`);
-  return clientPrice;
+  // No DB price found — reject the order rather than trust client price
+  console.error(`[b2b] NO DB PRICE found for item id=${rawId} variant=${variantId} — rejecting`);
+  throw new Error(`No server price found for product "${item.name || rawId}". Cannot process order.`);
 }
 
 Deno.serve(async (req: Request) => {
