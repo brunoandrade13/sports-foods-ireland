@@ -4100,9 +4100,13 @@ id="editBackorder" style="width:18px;height:18px;accent-color:#f59e0b"> 📋 Bac
 <span class="hint" style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">Negotiate custom prices for specific customers</span>
 </h4>
 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-<select id="spCustomerSelect" style="min-width:220px">
-<option value="">Select customer…</option>
-</select>
+<div style="position:relative;min-width:220px" id="spCustomerWrap">
+  <input type="text" id="spCustomerSearch" placeholder="Search customer…"
+    autocomplete="off" oninput="filterSpCustomers()" onfocus="showSpDropdown()"
+    style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:0.88rem;box-sizing:border-box">
+  <input type="hidden" id="spCustomerSelect">
+  <div id="spCustomerDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:300;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;margin-top:4px;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.25)"></div>
+</div>
 <input type="number" id="spPriceEur" step="0.01" min="0" placeholder="Price €" style="width:130px">
 <button class="btn-sm btn-primary" type="button" onclick="addOrUpdateSpecialPrice()">Save Price</button>
 </div>
@@ -7967,13 +7971,14 @@ Loading items...
       const spSelect = document.getElementById('spCustomerSelect');
       const spBody = document.getElementById('spListBody');
       const spPrice = document.getElementById('spPriceEur');
-      if (spSelect) {
-        spSelect.innerHTML = '<option value="">Select customer…</option>' +
-          (allCustomers || []).slice(0, 200).map(function(c) {
-            const name = c.display_name || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.company || c.email || '—';
-            return `<option value="${c.id}">${esc(name)}${c.email ? ' — ' + esc(c.email) : ''}</option>`;
-          }).join('');
+      // Reset customer search field (now a text input + hidden)
+      if (document.getElementById('spCustomerSearch')) {
+        document.getElementById('spCustomerSearch').value = '';
+        document.getElementById('spCustomerSearch').style.borderColor = '';
       }
+      if (spSelect) spSelect.value = '';
+      const spDd = document.getElementById('spCustomerDropdown');
+      if (spDd) { spDd.style.display = 'none'; spDd.innerHTML = ''; }
       if (spBody) spBody.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted);font-size:0.85rem;">No special prices yet.</td></tr>';
       if (spPrice) spPrice.value = '';
 
@@ -8386,12 +8391,56 @@ Loading items...
       }
     }
 
-    function addOrUpdateSpecialPrice() {
+    // ── Special Prices customer search helpers ─────────────────────────────────
+    function showSpDropdown() { filterSpCustomers(); }
+    function filterSpCustomers() {
+      const q = (document.getElementById('spCustomerSearch').value || '').toLowerCase().trim();
+      const dd = document.getElementById('spCustomerDropdown');
+      if (!dd) return;
+      const list = allCustomers || [];
+      const filtered = q.length < 1
+        ? list.slice(0, 80)
+        : list.filter(function(c) {
+            const name = (c.display_name || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.company || '').toLowerCase();
+            const email = (c.email || '').toLowerCase();
+            return name.includes(q) || email.includes(q);
+          }).slice(0, 80);
+      if (filtered.length === 0) {
+        dd.innerHTML = '<div style="padding:10px 14px;color:var(--text-muted);font-size:0.85rem">No customers found</div>';
+      } else {
+        dd.innerHTML = filtered.map(function(c) {
+          const name = c.display_name || [c.first_name, c.last_name].filter(Boolean).join(' ') || c.company || c.email || '—';
+          const email = c.email ? '<span style="color:var(--text-muted);font-size:0.78rem;margin-left:6px">' + esc(c.email) + '</span>' : '';
+          const badge = c.customer_type === 'b2b'
+            ? '<span style="background:#1d4ed8;color:#fff;font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:6px">B2B</span>' : '';
+          return '<div onclick="selectSpCustomer('' + esc(c.id) + '','' + esc(name).replace(/'/g,"&#39;") + '')" '
+            + 'style="padding:9px 14px;cursor:pointer;font-size:0.88rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:4px;flex-wrap:wrap">'
+            + '<span style="font-weight:600;color:var(--text)">' + esc(name) + '</span>' + badge + email + '</div>';
+        }).join('');
+      }
+      dd.style.display = 'block';
+      if (!dd._outsideHandler) {
+        dd._outsideHandler = function(e) {
+          const wrap = document.getElementById('spCustomerWrap');
+          if (wrap && !wrap.contains(e.target)) dd.style.display = 'none';
+        };
+        document.addEventListener('mousedown', dd._outsideHandler);
+      }
+    }
+    function selectSpCustomer(id, name) {
+      document.getElementById('spCustomerSelect').value = id;
+      document.getElementById('spCustomerSearch').value = name;
+      document.getElementById('spCustomerSearch').style.borderColor = '#169B62';
+      document.getElementById('spCustomerDropdown').style.display = 'none';
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
+        function addOrUpdateSpecialPrice() {
       const select = document.getElementById('spCustomerSelect');
       const priceInput = document.getElementById('spPriceEur');
       const body = document.getElementById('spListBody');
       if (!select || !priceInput || !body) return;
-      const customerId = select.value;
+      const customerId = document.getElementById('spCustomerSelect').value;
       const price = parseFloat(priceInput.value || '0');
       if (!customerId) { toast('Select a customer', 'error'); return; }
       if (!(price > 0)) { toast('Enter a valid price', 'error'); return; }
