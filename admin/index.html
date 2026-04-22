@@ -1045,7 +1045,7 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 
     .variant-row {
       display: grid;
-      grid-template-columns: 32px 80px 1fr 80px 75px 68px 68px 62px 50px 44px 26px;
+      grid-template-columns: 32px 80px 180px 1fr 75px 68px 68px 62px 50px 44px 26px;
       gap: 4px;
       align-items: center;
       padding: 6px 0;
@@ -1053,7 +1053,7 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
       min-width: 0;
     }
     .variant-row.child-variant {
-      grid-template-columns: 32px 80px 1fr 80px 75px 68px 68px 62px 50px 44px 26px;
+      grid-template-columns: 32px 80px 180px 1fr 75px 68px 68px 62px 50px 44px 26px;
       padding-left: 4px;
       background: var(--surface-2);
       border-radius: 4px;
@@ -3897,7 +3897,7 @@ id="settCustomerCount">—</span>
 <div class="form-grid">
 <div class="form-group full"><label>Product Name *</label><input type="text" id="editName"
 placeholder="Product name"></div>
-<div class="form-group"><label>SKU</label><input type="text" id="editSku" placeholder="ABC-001"></div>
+<div class="form-group full"><label>SKU</label><input type="text" id="editSku" placeholder="ABC-001"></div>
 <div class="form-group"><label>Slug</label><input type="text" id="editSlug" placeholder="auto-generated">
 </div>
 <div class="form-group"><label>Brand</label><select id="editBrand">
@@ -3910,7 +3910,7 @@ placeholder="Product name"></div>
 <option value="">Select subcategory...</option>
 </select></div>
 <div class="form-group"><label>Barcode</label><input type="text" id="editBarcode" placeholder="EAN / UPC code"></div>
-<div class="form-group"><label>Price EUR *</label><input type="number" step="0.01" id="editPriceEur"
+<div class="form-group" style="max-width:160px"><label>Price EUR *</label><input type="number" step="0.01" id="editPriceEur"
 placeholder="0.00"></div>
 <input type="hidden" id="editCompareEur" value="0">
 <input type="hidden" id="editPriceGbp" value="0">
@@ -4079,7 +4079,7 @@ id="editBackorder" style="width:18px;height:18px;accent-color:#f59e0b"> 📋 Bac
 <h4>Variants <span class="count" id="variantCountLabel">No variants</span></h4>
 <div class="variant-type-tabs" id="variantTypeTabs"></div>
 <div style="overflow-x:auto;">
-<div class="variant-row header">
+<div class="variant-row header" style="grid-template-columns:32px 80px 180px 1fr 75px 68px 68px 62px 50px 44px 26px">
 <span></span>
 <span>Type</span>
 <span>Value</span>
@@ -8650,6 +8650,7 @@ Loading items...
       const isChild = parentRowIdx !== null || (existing && existing.parent_variant_id);
       const row = document.createElement('div');
       row.className = 'variant-row' + (isChild ? ' child-variant' : '');
+      row.style.gridTemplateColumns = '32px 80px 180px 1fr 75px 68px 68px 62px 50px 44px 26px';
       row.id = `vrow-${idx}`;
       row.dataset.existingId = existing?.id || '';
       row.dataset.parentRowIdx = parentRowIdx || '';
@@ -12265,7 +12266,9 @@ Loading items...
           if (dtEl) dtEl.value = 'fixed';
           if (typeof updateDiscountPreview === 'function') updateDiscountPreview();
           const prevEl = document.getElementById('omDiscountPreview');
-          const badge = existingCoupon && existingCoupon.includes('ZONE3')
+          // Bug #18: suportar zone3_discount_applied OU coupon_code legacy 'ZONE3'
+          const isZone3 = order.zone3_discount_applied === true || (existingCoupon && existingCoupon.includes('ZONE3'));
+          const badge = isZone3
             ? ' <span style="color:#fbbf24;font-size:0.75rem">⚡ Zone3</span>'
             : (existingCoupon ? ' <span style="color:#60a5fa;font-size:0.75rem">' + existingCoupon + '</span>' : '');
           if (prevEl) prevEl.innerHTML = (prevEl.innerHTML || '') + badge;
@@ -14690,12 +14693,14 @@ checkPage(100);
 var tx = ML + CW - 200;
 var totalsRows = [['SUBTOTAL', fmtM(subtotal)]];
 if (discountAmount > 0) {
-  // Build label: if coupon_code has ZONE3 with %, show that; else compute %
+  // Bug #18: suportar zone3_discount_applied OU legacy coupon_code
   var _coupon = order.coupon_code || order.discount_code || '';
   var _z3match = _coupon.match(/ZONE3[^\d]*(\d+\.?\d*)/i);
   var _pct = subtotal > 0 ? (discountAmount / subtotal * 100).toFixed(2).replace(/\.00$/, '') : null;
-  var discLabel = _z3match
-    ? 'ZONE3 DISCOUNT (' + _z3match[1] + '%)'
+  var _isZone3 = order.zone3_discount_applied === true || !!_z3match;
+  var _z3pct = order.zone3_discount_type === 'percent' ? order.zone3_discount_value : (_z3match ? _z3match[1] : _pct);
+  var discLabel = _isZone3
+    ? 'ZONE3 DISCOUNT (' + _z3pct + '%)'
     : (_pct ? 'DISCOUNT (' + _pct + '%)' : 'DISCOUNT');
   totalsRows.push([discLabel, '-' + fmtM(discountAmount)]);
   totalsRows.push(['NET TOTAL', fmtM(discountedSubtotal)]);
