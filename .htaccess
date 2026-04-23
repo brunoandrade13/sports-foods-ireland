@@ -362,6 +362,44 @@
     Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://*.supabase.co https://js.stripe.com https://js.paypal.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://fonts.googleapis.com https://api.brevo.com https://in-automate.brevo.com https://api.stripe.com https://api.paypal.com https://*.paypal.com; frame-src 'self' https://js.stripe.com https://www.paypal.com; frame-ancestors 'self'; form-action 'self'; base-uri 'self'"
 </IfModule>
 
+# ============================================================
+# BOT & SCRAPER BLOCKING
+# ============================================================
+
+# --- Block common vulnerability scanners & bad bots by User-Agent ---
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Generic scanners / exploit tools
+    RewriteCond %{HTTP_USER_AGENT} (acunetix|nikto|sqlmap|nmap|masscan|zgrab|nuclei|dirbuster|gobuster|wfuzz|hydra|metasploit|havij|openvas|nessus|w3af|skipfish) [NC,OR]
+    # Scrapers / price bots
+    RewriteCond %{HTTP_USER_AGENT} (AhrefsBot|SemrushBot|MJ12bot|DotBot|BLEXBot|DataForSeoBot|PetalBot|AspiegelBot|YandexBot|Baiduspider|SeznamBot|MegaIndex) [NC,OR]
+    # Generic crawlers & headless browsers used by scrapers
+    RewriteCond %{HTTP_USER_AGENT} (python-requests|python-urllib|Go-http-client|curl\/|wget\/|libwww-perl|Java\/|Jakarta|scrapy|PhantomJS|HeadlessChrome|Googlebot-Image) [NC,OR]
+    # Empty / missing user agent (bots often send nothing)
+    RewriteCond %{HTTP_USER_AGENT} ^-?$
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# --- Block WordPress probe URLs (common scanner targets) ---
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^wp-login\.php - [F,L]
+    RewriteRule ^wp-admin - [F,L]
+    RewriteRule ^xmlrpc\.php - [F,L]
+    RewriteRule ^wp-config\.php - [F,L]
+    RewriteRule ^wp-includes - [F,L]
+    RewriteRule ^wp-content - [F,L]
+    RewriteRule ^\.well-known/acme - [F,L]
+</IfModule>
+
+# --- Rate limit: block IPs that hit 404 repeatedly (needs mod_evasive or similar) ---
+# Fallback: return 403 on common scan paths
+<FilesMatch "(phpinfo\.php|shell\.php|c99\.php|r57\.php|alfa\.php|config\.php|setup\.php|install\.php|backup\.php|test\.php|admin\.php)$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
 # === HTTPS ENFORCEMENT ===
 <IfModule mod_rewrite.c>
     RewriteEngine On
