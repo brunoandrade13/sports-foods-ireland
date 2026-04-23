@@ -114,8 +114,41 @@ function addToCart(productId, quantity = 1, productData = null, subscriptionData
         return;
     }
 
-    let cart = getCart();
+    // ============================================================
+    // Bug #6 fix: produto com variantes OBRIGA selecionar variante
+    // Se productData nao trouxer variant_id E o produto tiver variantes,
+    // rejeita e redireciona para a pagina do produto.
+    // ============================================================
     const incomingVariantId = productData?.variant_id || productData?.variantId || undefined;
+    if (!incomingVariantId) {
+        const productCheck = product || resolveProduct(id);
+        const hasVariants =
+            (productCheck && Array.isArray(productCheck.variantes) && productCheck.variantes.length > 0) ||
+            (productCheck && Array.isArray(productCheck.variants) && productCheck.variants.length > 0) ||
+            (productData && Array.isArray(productData.variantes) && productData.variantes.length > 0);
+
+        // Extra safety: if PRODUTOS not yet loaded but product name suggests variants
+        // (i.e., productCheck is null and we can't verify), block and redirect
+        const productsLoaded = Array.isArray(window.PRODUTOS) && window.PRODUTOS.length > 0;
+        const cannotVerify = !productCheck && !productsLoaded;
+
+        if (hasVariants || cannotVerify) {
+            if (cannotVerify) {
+                console.warn('addToCart blocked: products not loaded yet, cannot verify variants for', id);
+            } else {
+                console.warn('addToCart blocked: product has variants, variant_id is required', id);
+            }
+            if (typeof showCartNotification === 'function') {
+                showCartNotification('Please select a size/flavor first.');
+            }
+            setTimeout(() => {
+                window.location.href = `produto.html?id=${encodeURIComponent(id)}`;
+            }, 700);
+            return;
+        }
+    }
+
+    let cart = getCart();
     const existingItem = findCartItem(cart, id, incomingVariantId);
 
     if (existingItem) {
