@@ -346,15 +346,15 @@ async function insertOrderItems(
     .map((i) => i.variant_id)
     .filter((v): v is string => !!v && typeof v === "string" && v.includes("-"));
 
-  const variantMap = new Map<string, { label: string; image_url: string; product_id: string }>();
+  const variantMap = new Map<string, { label: string; image_url: string; product_id: string; sku: string }>();
 
   if (variantIds.length > 0) {
     const { data: variants } = await supabase
       .from("product_variants")
-      .select("id, label, image_url, product_id")
+      .select("id, label, image_url, product_id, sku")
       .in("id", variantIds);
     for (const v of variants || []) {
-      variantMap.set(v.id, { label: v.label || "", image_url: v.image_url || "", product_id: v.product_id });
+      variantMap.set(v.id, { label: v.label || "", image_url: v.image_url || "", product_id: v.product_id, sku: v.sku || "" });
     }
   }
 
@@ -365,14 +365,14 @@ async function insertOrderItems(
   ].filter(Boolean);
   const uniqueProductIds = [...new Set(allProductIds)];
 
-  const productMap = new Map<string, { name: string; image_url: string }>();
+  const productMap = new Map<string, { name: string; image_url: string; sku: string }>();
   if (uniqueProductIds.length > 0) {
     const { data: products } = await supabase
       .from("products")
-      .select("id, name, image_url")
+      .select("id, name, image_url, sku")
       .in("id", uniqueProductIds);
     for (const p of products || []) {
-      productMap.set(p.id, { name: p.name || "", image_url: p.image_url || "" });
+      productMap.set(p.id, { name: p.name || "", image_url: p.image_url || "", sku: p.sku || "" });
     }
   }
 
@@ -431,6 +431,8 @@ async function insertOrderItems(
       variant_id: variantId,
       product_name: productName,
       variant_label: variantLabel || null,
+      sku: variantData?.sku || dbProduct?.sku || null,
+      product_sku: variantData?.sku || dbProduct?.sku || null,
       quantity: qty,
       unit_price: price,
       total_price: price * qty,

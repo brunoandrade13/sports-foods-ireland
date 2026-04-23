@@ -162,25 +162,60 @@ Deno.serve(async (req: Request) => {
         const { data: pRows } = await sb.from("products").select("id,legacy_id").in("legacy_id", numericIds);
         if (pRows) for (const p of pRows) legacyMap[p.legacy_id] = p.id;
       }
+
+      // Build variant → product_id + sku map (source of truth — SKU-linked via product_variants)
       const variantIds = resolvedItems.map((it: Record<string, unknown>) => it.variant_id || it.variantId).filter((v): v is string => !!v && typeof v === "string");
+      const variantProductMap: Record<string, string> = {};  // variant_id → product_id
+      const variantSkuMap: Record<string, string> = {};      // variant_id → sku
       const variantImgMap: Record<string, string> = {};
       if (variantIds.length) {
-        const { data: vRows } = await sb.from("product_variants").select("id, image_url").in("id", variantIds);
-        if (vRows) for (const v of vRows) if (v.image_url) variantImgMap[v.id] = v.image_url;
-      }
-      for (const it of resolvedItems) {
-        const rawId = it.id ? String(it.id) : null;
-        let productId: string | null = null;
-        if (rawId) {
-          if (/^[0-9a-f]{8}-/.test(rawId)) productId = rawId;
-          else if (!isNaN(Number(rawId))) productId = legacyMap[Number(rawId)] || null;
+        const { data: vRows } = await sb.from("product_variants").select("id, product_id, sku, image_url").in("id", variantIds);
+        if (vRows) for (const v of vRows) {
+          if (v.product_id) variantProductMap[v.id] = v.product_id;
+          if (v.sku) variantSkuMap[v.id] = v.sku;
+          if (v.image_url) variantImgMap[v.id] = v.image_url;
         }
+      }
+
+      // Build product → sku map for products without variants
+      const allProductIds = resolvedItems
+        .map((it: Record<string, unknown>) => {
+          const rawId = it.id ? String(it.id) : null;
+          if (rawId && /^[0-9a-f]{8}-/i.test(rawId)) return rawId;
+          return null;
+        })
+        .filter((id): id is string => !!id);
+      const productSkuMap: Record<string, string> = {};
+      if (allProductIds.length) {
+        const { data: pSkuRows } = await sb.from("products").select("id, sku").in("id", allProductIds);
+        if (pSkuRows) for (const p of pSkuRows) if (p.sku) productSkuMap[p.id] = p.sku;
+      }
+
+      for (const it of resolvedItems) {
         const variantId = String(it.variantId || it.variant_id || "");
+
+        // Resolve product_id: 1) from variant (most reliable), 2) UUID, 3) legacy int
+        let productId: string | null = variantId ? (variantProductMap[variantId] || null) : null;
+        if (!productId) {
+          const rawId = it.id ? String(it.id) : null;
+          if (rawId) {
+            if (/^[0-9a-f]{8}-/i.test(rawId)) productId = rawId;
+            else if (!isNaN(Number(rawId))) productId = legacyMap[Number(rawId)] || null;
+          }
+        }
+
         const variantImg = variantId ? variantImgMap[variantId] : null;
+
+        // Resolve SKU: 1) from variant, 2) from product
+        const resolvedSku = (variantId ? variantSkuMap[variantId] : null)
+          || (productId ? productSkuMap[productId] : null)
+          || null;
         await sb.from("order_items").insert({
           order_id: orderRow.id,
           product_id: productId,
           product_name: String(it.name || "Product"),
+          sku: resolvedSku,
+          product_sku: resolvedSku,
           quantity: Number(it.quantity) || 1,
           unit_price: Number(it.price) || 0,
           total_price: (Number(it.price) || 0) * (Number(it.quantity) || 1),
