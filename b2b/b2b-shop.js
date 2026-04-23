@@ -460,10 +460,26 @@
 
     grid.innerHTML = products.map(p => {
       const imgSrc    = p.imagem ? (p.imagem.startsWith('http') ? p.imagem : '../' + p.imagem) : '../img/placeholder.webp';
-      const b2bPrice  = p.b2b_price != null ? '\u20ac' + Number(p.b2b_price).toFixed(2) : 'N/A';
       const brandName = p.brands?.name || p.marca || '';
       const variants  = (p.variantes || p.variants || []).flatMap(g => g.options || g.opcoes || []);
       const hasVar    = variants.length > 0;
+
+      // Price display: show max variant price as "from €X" when prices differ, else show fixed price
+      let b2bPrice = 'N/A';
+      if (p.b2b_price != null && Number(p.b2b_price) > 0) {
+        if (hasVar) {
+          const varPrices = variants.map(o => Number(o.price || 0)).filter(v => v > 0);
+          const minVarPrice = varPrices.length ? Math.min(...varPrices) : 0;
+          const maxVarPrice = varPrices.length ? Math.max(...varPrices) : 0;
+          if (varPrices.length > 1 && maxVarPrice > minVarPrice) {
+            b2bPrice = 'from \u20ac' + minVarPrice.toFixed(2);
+          } else {
+            b2bPrice = '\u20ac' + Number(p.b2b_price).toFixed(2);
+          }
+        } else {
+          b2bPrice = '\u20ac' + Number(p.b2b_price).toFixed(2);
+        }
+      }
       const anyOk     = hasVar
         ? variants.some(o => o.stock == null || Number(o.stock) > 0)
         : (p.em_stock !== false && p.em_stock !== 0);

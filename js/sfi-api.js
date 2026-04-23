@@ -689,14 +689,15 @@ const sfi = {
       return products.map(p => {
         // 1. Try product-level wholesale_price_eur first
         let wsEur = p.wholesale_price_eur && p.wholesale_price_eur > 0 ? Number(p.wholesale_price_eur) : null;
-        // 2. Fallback: use min wholesale_price from active variants (default variant preferred)
+        // 2. Fallback: use MAX wholesale_price from active variants (so card always shows a real price)
         if (!wsEur && p.product_variants && p.product_variants.length > 0) {
-          const activeVars = p.product_variants.filter(v => v.is_active !== false && v.wholesale_price > 0);
-          const defaultVar = activeVars.find(v => v.is_default) || activeVars[0];
-          if (defaultVar && defaultVar.wholesale_price > 0) wsEur = Number(defaultVar.wholesale_price);
+          const activeVars = p.product_variants.filter(v => v.is_active !== false && Number(v.wholesale_price) > 0);
+          const maxVar = activeVars.reduce((best, v) => (!best || Number(v.wholesale_price) > Number(best.wholesale_price)) ? v : best, null);
+          if (maxVar) wsEur = Number(maxVar.wholesale_price);
         }
         const retailEur = Number(p[priceField]) || 0;
-        const b2bEur = (wsEur && wsEur < retailEur) ? wsEur : retailEur;
+        // Use wsEur if available; if retail > 0, never exceed retail price
+        const b2bEur = (wsEur && wsEur > 0) ? (retailEur > 0 && wsEur > retailEur ? retailEur : wsEur) : retailEur;
 
         return {
           id: p.legacy_id || p.id,
