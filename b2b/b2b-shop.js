@@ -123,9 +123,23 @@
     document.body.style.overflow = 'hidden';
 
     try {
-      // Use cache only — sfi.b2b.getProducts() now includes full variant data
-      // Do NOT call sfi.products.get() as it doesn't include variant data and would overwrite the cache
-      const p = allProductsCache.find(x => String(x.id) === String(id)) || null;
+      // Try cache first
+      let p = allProductsCache.find(x => String(x.id) === String(id)) || null;
+
+      // If not in cache or cache has no variant data, fetch from Supabase directly
+      const cachedVariants = (p?.variantes || p?.variants || []).flatMap(g => g.options || g.opcoes || []);
+      if (!p || cachedVariants.length === 0) {
+        try {
+          const rows = await sfi.b2b.getProducts({ perPage: 500 });
+          // Refresh entire cache
+          rows.forEach(r => {
+            const idx = allProductsCache.findIndex(x => String(x.id) === String(r.id));
+            if (idx >= 0) allProductsCache[idx] = r; else allProductsCache.push(r);
+          });
+          p = allProductsCache.find(x => String(x.id) === String(id)) || p;
+        } catch(e2) { /* use whatever we have */ }
+      }
+
       if (!p) { body.innerHTML = '<div class="spm-loading">Product not found.</div>'; return; }
       renderShopModal(p);
     } catch (e) {
@@ -410,6 +424,13 @@
       const showOOS = document.getElementById('showOutOfStock')?.checked !== false;
       if (!showOOS) products = products.filter(p => productInStock(p));
       allProducts = products;
+
+      // Keep cache updated — merge into allProductsCache by id so modal can always find the product
+      products.forEach(p => {
+        const idx = allProductsCache.findIndex(x => String(x.id) === String(p.id));
+        if (idx >= 0) allProductsCache[idx] = p;
+        else allProductsCache.push(p);
+      });
 
       products.sort((a, b) => {
         const aS = productInStock(a) ? 0 : 1, bS = productInStock(b) ? 0 : 1;
