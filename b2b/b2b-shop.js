@@ -9,6 +9,16 @@
   let currentPage = 1;
   const perPage = 500;
 
+  // Helper: true se produto ou pelo menos uma variante tiver stock
+  function productInStock(p) {
+    const variants = p.variantes || p.variants || [];
+    const allOptions = variants.flatMap(g => g.options || g.opcoes || []);
+    if (allOptions.length > 0) {
+      return allOptions.some(o => o.stock == null || Number(o.stock) > 0);
+    }
+    return p.em_stock !== false && p.em_stock !== 0;
+  }
+
   // --- Access check ---
   async function checkB2BAccess() {
     try {
@@ -67,15 +77,15 @@
       // Filter out of stock if toggle is unchecked
       const showOOS = document.getElementById('showOutOfStock')?.checked !== false;
       if (!showOOS) {
-        products = products.filter(p => p.em_stock !== false);
+        products = products.filter(p => productInStock(p));
       }
 
       allProducts = products;
 
       // Sort client-side (in-stock first, then by selected sort)
       products.sort((a, b) => {
-        const aInStock = a.em_stock !== false ? 0 : 1;
-        const bInStock = b.em_stock !== false ? 0 : 1;
+        const aInStock = productInStock(a) ? 0 : 1;
+        const bInStock = productInStock(b) ? 0 : 1;
         if (aInStock !== bInStock) return aInStock - bInStock;
         if (sort === 'name_asc') return (a.nome || '').localeCompare(b.nome || '');
         if (sort === 'name_desc') return (b.nome || '').localeCompare(a.nome || '');
@@ -84,7 +94,7 @@
         return 0;
       });
 
-      const inStockCount = products.filter(p => p.em_stock !== false).length;
+      const inStockCount = products.filter(p => productInStock(p)).length;
       const oosCount = products.length - inStockCount;
       document.getElementById('productCount').textContent = products.length + ' products' + (oosCount > 0 ? ` (${oosCount} backorder)` : '');
       renderProducts(products);
@@ -106,13 +116,23 @@
       const imgSrc = p.imagem ? (p.imagem.startsWith('http') ? p.imagem : '../' + p.imagem) : '../img/placeholder.webp';
       const b2bPrice = p.b2b_price != null ? currency + Number(p.b2b_price).toFixed(2) : 'N/A';
       const brandName = p.brands?.name || p.marca || '';
-      const inStock = p.em_stock !== false;
-      const stockQty = p._stock_qty;
+      // Check variants: only show backorder if ALL variants are out of stock
+      const variants = p.variantes || p.variants || [];
+      const allOptions = variants.flatMap(g => g.options || g.opcoes || []);
+      const anyVariantInStock = allOptions.length > 0
+        ? allOptions.some(o => o.stock == null || Number(o.stock) > 0)
+        : null;
+      const inStock = anyVariantInStock !== null
+        ? anyVariantInStock
+        : (p.em_stock !== false && p.em_stock !== 0);
+      const stockQty = allOptions.length > 0
+        ? allOptions.reduce((sum, o) => sum + (Number(o.stock) || 0), 0)
+        : p._stock_qty;
 
       let stockBadge = '';
       let actionBtn = '';
-      if (inStock && (stockQty === null || stockQty === undefined || stockQty > 0)) {
-        stockBadge = stockQty != null && stockQty <= 5
+      if (inStock) {
+        stockBadge = stockQty != null && stockQty > 0 && stockQty <= 5
           ? `<div class="b2b-stock-badge low">Only ${stockQty} left</div>`
           : '<div class="b2b-stock-badge in">In Stock</div>';
         actionBtn = `<button class="btn-add" onclick="addB2BToCart(${p.id}, '${(p.nome||'').replace(/'/g,"\\'")}', ${p.b2b_price || 0}, false)">Add to Cart</button>`;

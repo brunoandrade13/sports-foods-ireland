@@ -135,10 +135,20 @@ function createProductCardHTML(rawProd, opts = {}) {
                     ${oldPrice}
                     <span class="new-price">€${prod.price.toFixed(2)}</span>
                 </div>
-                ${(prod.em_stock === false || prod.em_stock === 0)
-                    ? `<button class="btn-basket btn-out-of-stock" data-product-id="${prodId}" disabled style="background:#94a3b8;cursor:not-allowed;opacity:0.7;">Out of Stock</button>`
-                    : `<button class="btn-basket" data-product-id="${prodId}">ADD TO BASKET</button>`
-                }
+                ${(() => {
+                    // Se tem variantes, verificar se ALGUMA tem stock > 0
+                    const variants = rawProd.variantes || rawProd.variants || [];
+                    const allOptions = variants.flatMap(g => g.options || g.opcoes || []);
+                    const anyVariantInStock = allOptions.length > 0
+                        ? allOptions.some(o => o.stock == null || Number(o.stock) > 0)
+                        : null;
+                    const isInStock = anyVariantInStock !== null
+                        ? anyVariantInStock
+                        : (prod.em_stock !== false && prod.em_stock !== 0);
+                    return isInStock
+                        ? `<button class="btn-basket" data-product-id="${prodId}">ADD TO BASKET</button>`
+                        : `<button class="btn-basket btn-out-of-stock" data-product-id="${prodId}" disabled style="background:#94a3b8;cursor:not-allowed;opacity:0.7;">Out of Stock</button>`;
+                })()}
             </article>`;
 }
 
