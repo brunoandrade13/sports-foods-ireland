@@ -248,6 +248,21 @@
 
   // --- Add to cart (B2B) — uses main cart.js addToCart for correct checkout flow ---
   window.addB2BToCart = function(id, name, price, isBackorder) {
+    // Check if product has variants — if so, open modal to force selection
+    const cachedProduct = allProductsCache.find(p => p.id === id || p.id == id);
+    if (cachedProduct) {
+      const variants = cachedProduct.variantes || cachedProduct.variants || [];
+      const allOptions = variants.flatMap(g => g.options || g.opcoes || []);
+      if (allOptions.length > 0) {
+        // Has variants — open product modal instead of adding directly
+        if (typeof window.addShopToCart === 'function') {
+          window.addShopToCart(id, name, price, '', isBackorder);
+        } else if (typeof window.showProductModal === 'function') {
+          window.showProductModal(id);
+        }
+        return;
+      }
+    }
     if (typeof window.addToCart === 'function') {
       window.addToCart(id, 1, {
         nome: name,
