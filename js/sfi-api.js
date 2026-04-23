@@ -260,6 +260,16 @@ const sfi = {
 
   // ---- AUTH ----
   auth: {
+    // Bug #19: PII minimization — only store fields the app actually reads
+    _sanitizeUserForStorage(user) {
+      if (!user || typeof user !== 'object') return null;
+      return {
+        id: user.id,
+        email: user.email,
+        user_metadata: user.user_metadata || {}
+      };
+    },
+
     async signUp(email, password, { firstName, lastName } = {}) {
       const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
         method: 'POST',
@@ -284,7 +294,7 @@ const sfi = {
       if (data.access_token) {
         db.token = data.access_token;
         localStorage.setItem('sfi_token', data.access_token);
-        localStorage.setItem('sfi_user', JSON.stringify(data.user));
+        localStorage.setItem('sfi_user', JSON.stringify(sfi.auth._sanitizeUserForStorage(data.user)));
         if (data.refresh_token) localStorage.setItem('sfi_refresh', data.refresh_token);
         if (data.expires_in) localStorage.setItem('sfi_token_exp', String(Date.now() + data.expires_in * 1000));
       }
@@ -301,7 +311,7 @@ const sfi = {
       if (data.access_token) {
         db.token = data.access_token;
         localStorage.setItem('sfi_token', data.access_token);
-        localStorage.setItem('sfi_user', JSON.stringify(data.user));
+        localStorage.setItem('sfi_user', JSON.stringify(sfi.auth._sanitizeUserForStorage(data.user)));
         if (data.refresh_token) localStorage.setItem('sfi_refresh', data.refresh_token);
         if (data.expires_in) localStorage.setItem('sfi_token_exp', String(Date.now() + data.expires_in * 1000));
       }
@@ -310,10 +320,9 @@ const sfi = {
 
     signOut() {
       db.token = null;
-      localStorage.removeItem('sfi_token');
-      localStorage.removeItem('sfi_user');
-      localStorage.removeItem('sfi_refresh');
-      localStorage.removeItem('sfi_token_exp');
+      // Bug #19: sweep all sfi_* auth-related keys on logout
+      const authKeys = ['sfi_token','sfi_user','sfi_refresh','sfi_token_exp','sfi_user_email','sfi_b2b_email','sfi_reset_token'];
+      for (const k of authKeys) try { localStorage.removeItem(k); } catch(e) {}
     },
 
     /** Sign in with OAuth provider (Google, Facebook) */
@@ -346,7 +355,7 @@ const sfi = {
       fetch(`${SUPABASE_URL}/auth/v1/user`, {
         headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${accessToken}` }
       }).then(r => r.json()).then(user => {
-        if (user && user.id) localStorage.setItem('sfi_user', JSON.stringify(user));
+        if (user && user.id) localStorage.setItem('sfi_user', JSON.stringify(sfi.auth._sanitizeUserForStorage(user)));
       }).catch(() => {});
       // Clean URL hash
       history.replaceState(null, '', window.location.pathname + window.location.search);
@@ -368,7 +377,7 @@ const sfi = {
         if (data.access_token) {
           db.token = data.access_token;
           localStorage.setItem('sfi_token', data.access_token);
-          if (data.user) localStorage.setItem('sfi_user', JSON.stringify(data.user));
+          if (data.user) localStorage.setItem('sfi_user', JSON.stringify(sfi.auth._sanitizeUserForStorage(data.user)));
           if (data.refresh_token) localStorage.setItem('sfi_refresh', data.refresh_token);
           if (data.expires_in) localStorage.setItem('sfi_token_exp', String(Date.now() + data.expires_in * 1000));
           return true;
@@ -495,11 +504,20 @@ const sfi = {
       if (!user) return null;
       await sfi.auth.ensureAuth();
       try {
-        const rows = await db.query('customers', {
+        // Try user_id first
+        let rows = await db.query('customers', {
           select: '*',
           filters: { user_id: user.id },
           limit: 1
         });
+        // Fallback: match by email (handles multiple auth accounts for same customer)
+        if (!rows || !rows[0]) {
+          rows = await db.query('customers', {
+            select: '*',
+            filters: { email: user.email },
+            limit: 1
+          });
+        }
         return rows[0] || null;
       } catch (e) { return null; }
     },
