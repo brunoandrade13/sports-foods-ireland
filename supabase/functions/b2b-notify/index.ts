@@ -124,7 +124,7 @@ Deno.serve(async (req: Request) => {
           <p>Great news! Your B2B wholesale application for <strong>${company}</strong> has been approved.</p>
           <p>You now have access to our exclusive wholesale portal with discounted pricing on all products.</p>
           <div style="text-align:center;margin:30px 0;">
-            <a href="${SITE_URL}/b2b/shop.html" style="background:#2D6A4F;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">
+            <a href="${SITE_URL}/b2b/portal.html" style="background:#2D6A4F;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">
               Access Wholesale Portal →
             </a>
           </div>
