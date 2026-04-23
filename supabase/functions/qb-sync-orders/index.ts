@@ -312,7 +312,8 @@ Deno.serve(async (req: Request) => {
                 line.Description ||
                 qbNameRaw ||
                 "Unknown",
-              product_sku: matchedProduct?.sku || qbNameRaw || qbItemId || "",
+              product_sku: matchedProduct?.sku || qbItemId || "",
+              sku: matchedProduct?.sku || qbItemId || "",
               quantity: detail?.Qty || 1,
               unit_price: detail?.UnitPrice || line.Amount || 0,
               total_price: line.Amount || 0,

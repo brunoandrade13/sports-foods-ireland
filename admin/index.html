@@ -14615,7 +14615,10 @@ drawItemHeaders();
 
 var subtotal = 0, FS = 7.5, LS = 9.5, RPT = 3, RPB = 2;
 items.forEach(function(item) {
-var qty = parseInt(item.quantity) || 1, sku = item.sku || item.product_sku || '';
+var qty = parseInt(item.quantity) || 1;
+    var rawSku = item.sku || item.product_sku || '';
+    // Filter out invalid SKUs (QB garbage values like "Bonus for Fiscal year...")
+    var sku = (rawSku && rawSku.length <= 30 && !/bonus|fiscal|year|service date/i.test(rawSku)) ? rawSku : '';
     // Use the global sfiCleanVariant function (defined in renderOrderItemsTable)
     // and build clean desc for invoice line
     var dirtyVariant = item.variant_label || '';
