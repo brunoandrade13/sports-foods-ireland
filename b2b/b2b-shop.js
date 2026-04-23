@@ -123,13 +123,9 @@
     document.body.style.overflow = 'hidden';
 
     try {
-      let p = allProductsCache.find(x => x.id === id || x.id == id) || null;
-      try {
-        if (typeof sfi.products?.get === 'function') {
-          const full = await sfi.products.get(id);
-          if (full) p = Object.assign({}, p || {}, full);
-        }
-      } catch (e) { /* use cached */ }
+      // Use cache only — sfi.b2b.getProducts() now includes full variant data
+      // Do NOT call sfi.products.get() as it doesn't include variant data and would overwrite the cache
+      const p = allProductsCache.find(x => String(x.id) === String(id)) || null;
       if (!p) { body.innerHTML = '<div class="spm-loading">Product not found.</div>'; return; }
       renderShopModal(p);
     } catch (e) {
@@ -222,7 +218,7 @@
         <input type="number" id="spmQty" value="1" min="1" max="999">
       </div>
       <button class="spm-add-btn" id="spmAddBtn"
-        onclick="confirmShopAddToCart(${p.id},'${(p.nome||'').replace(/'/g,"\\'")}',${b2bPrice})"
+        onclick="confirmShopAddToCart('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}',${b2bPrice})"
         ${hasVar ? 'disabled' : ''}>
         ${hasVar ? 'Select an option above' : '🛒 Add to Cart'}
       </button>
@@ -321,7 +317,7 @@
   };
 
   window.confirmShopAddToCart = function(id, name, basePrice) {
-    const p       = allProductsCache.find(x => x.id === id || x.id == id);
+    const p       = allProductsCache.find(x => String(x.id) === String(id));
     const allOpts = (p?.variantes || p?.variants || []).flatMap(g => g.options || g.opcoes || []);
     const hasVar  = allOpts.length > 0;
 
@@ -357,7 +353,7 @@
 
   // ─── addB2BToCart — entry point from card button ───────────────────────────
   window.addB2BToCart = function(id, name, price, isBackorder) {
-    const cached  = allProductsCache.find(p => p.id === id || p.id == id);
+    const cached  = allProductsCache.find(p => String(p.id) === String(id));
     const allOpts = (cached?.variantes || cached?.variants || []).flatMap(g => g.options || g.opcoes || []);
 
     if (allOpts.length > 0) {
@@ -461,20 +457,21 @@
         : '<div class="b2b-stock-badge backorder">\uD83D\uDCCB Backorder</div>';
 
       const safeName = (p.nome||'').replace(/'/g,"\\'");
+      const pid    = String(p.id); // always string-safe for onclick attributes
       const btnClass = anyOk ? 'btn-add' : 'btn-backorder';
       const btnLabel = hasVar
         ? (anyOk ? 'Select Options' : '\uD83D\uDCCB Select Options')
         : (anyOk ? 'Add to Cart' : '\uD83D\uDCCB Backorder');
-      const btnClick = `event.stopPropagation();addB2BToCart(${p.id},'${safeName}',${p.b2b_price||0},${!anyOk})`;
+      const btnClick = `event.stopPropagation();addB2BToCart('${pid}','${safeName}',${p.b2b_price||0},${!anyOk})`;
 
       const favs  = JSON.parse(localStorage.getItem('sfi_b2b_favourites') || '[]');
-      const isFav = favs.some(f => f.id === p.id);
+      const isFav = favs.some(f => String(f.id) === pid);
       const favBtn = `<button class="b2b-fav-btn${isFav ? ' active' : ''}"
-        onclick="event.stopPropagation();toggleFav(${p.id},'${safeName}',${p.b2b_price||0},'${imgSrc.replace(/'/g,"\\'")}','${brandName.replace(/'/g,"\\'")}',this)"
+        onclick="event.stopPropagation();toggleFav('${pid}','${safeName}',${p.b2b_price||0},'${imgSrc.replace(/'/g,"\\'")}','${brandName.replace(/'/g,"\\'")}',this)"
         title="${isFav ? 'Remove from favourites' : 'Add to favourites'}">${isFav ? '\u2605' : '\u2606'}</button>`;
 
       return `<div class="b2b-card${!anyOk ? ' b2b-backorder' : ''}" style="cursor:pointer"
-        onclick="openShopProductModal(${p.id})" title="View details">
+        onclick="openShopProductModal('${pid}')" title="View details">
         ${favBtn}
         <img src="${imgSrc}" alt="${p.nome}" loading="lazy" onerror="this.src='../img/placeholder.webp'">
         <div class="b2b-card-body">

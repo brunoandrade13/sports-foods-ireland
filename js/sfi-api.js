@@ -671,7 +671,8 @@ const sfi = {
       if (sort === 'category') order = 'name.asc';
 
       // Include default variant to get wholesale_price when product-level wholesale_price_eur is missing
-      const variantsJoin = 'product_variants(id,label,wholesale_price,price,is_default,is_active,image_url,sku,sort_order,parent_variant_id,variant_type_id)';
+      // Include full variant data (stock included) for variant selection in shop
+      const variantsJoin = 'product_variants(id,label,wholesale_price,price,is_default,is_active,image_url,sku,stock,sort_order,parent_variant_id,variant_type_id)';
       const selectStr = encodeURIComponent(`*,${brandsJoin},${catsJoin},${subsJoin},${variantsJoin}`);
       const url = `${SUPABASE_URL}/rest/v1/products?select=${selectStr}&is_active=eq.true${extraFilters}&order=${order}&limit=${perPage}&offset=${(page - 1) * perPage}`;
       
@@ -699,6 +700,7 @@ const sfi = {
 
         return {
           id: p.legacy_id || p.id,
+          _id: p.id,
           nome: p.name,
           imagem: p.image_url || '',
           categoria: p.categories?.name || '',
@@ -713,9 +715,44 @@ const sfi = {
           em_stock: p.in_stock,
           backorder_available: p.backorder_available || false,
           desconto: p.discount_percent,
-          _id: p.id,
           _slug: p.slug,
-          _stock_qty: p.stock_quantity
+          _stock_qty: p.stock_quantity,
+          // Include structured variant data for variant selection in B2B shop
+          variantes: (() => {
+            const rawVars = (p.product_variants || []).filter(v => v.is_active !== false);
+            if (!rawVars.length) return [];
+            // Separate parents (no parent_variant_id) from children
+            const parents  = rawVars.filter(v => !v.parent_variant_id);
+            const children = rawVars.filter(v =>  v.parent_variant_id);
+            if (children.length > 0 && parents.length > 0) {
+              // Compound: return flat list with "Flavor / Size" labels from parent+child
+              const parentMap = {};
+              parents.forEach(par => { parentMap[par.id] = par.label || ''; });
+              const options = children.map(ch => ({
+                id:         ch.id,
+                label:      (parentMap[ch.parent_variant_id] || '') + ' / ' + (ch.label || ''),
+                price:      Number(ch.wholesale_price || ch.price || b2bEur),
+                stock:      ch.stock,
+                image_url:  ch.image_url || '',
+                sku:        ch.sku || '',
+                is_default: ch.is_default,
+              })).sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+              return [{ name: 'Option', options }];
+            }
+            // Simple flat variants
+            const options = parents.map(v => ({
+              id:         v.id,
+              label:      v.label || '',
+              price:      Number(v.wholesale_price || v.price || b2bEur),
+              stock:      v.stock,
+              image_url:  v.image_url || '',
+              sku:        v.sku || '',
+              is_default: v.is_default,
+            })).sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+            return [{ name: 'Option', options }];
+          })(),
+          // Keep raw variants for price calculation
+          product_variants: p.product_variants || [],
         };
       });
     }
