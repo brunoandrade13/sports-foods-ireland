@@ -2391,8 +2391,9 @@ style="cursor:help;font-size:0.85rem">ℹ️</span></th>
             style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
         </div>
         <div>
-          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Tax €</label>
-          <input type="number" id="moTax" step="0.01" min="0" oninput="recalcManualOrderTotal()"
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Tax € <span id="moTaxLabel" style="color:#f59e0b;font-size:0.7rem">(auto 23%)</span></label>
+          <input type="number" id="moTax" step="0.01" min="0"
+            oninput="this.dataset.manualOverride='true';document.getElementById('moTaxLabel').textContent='(manual)';recalcManualOrderTotal()"
             style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
         </div>
         <div style="border-top:2px solid var(--border);padding-top:10px;margin-top:2px">
@@ -12391,7 +12392,8 @@ Loading items...
       document.getElementById('moCurrency').value = 'EUR';
       document.getElementById('moFinancial').value = 'paid';
       document.getElementById('moFulfillment').value = 'unfulfilled';
-      ['moSubtotal', 'moDiscount', 'moShipping', 'moTax', 'moTotal'].forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; });
+      ['moSubtotal', 'moDiscount', 'moShipping', 'moTax', 'moTotal'].forEach(function (id) { const el = document.getElementById(id); if (el) { el.value = ''; el.dataset.manualOverride = 'false'; } });
+      const taxLbl = document.getElementById('moTaxLabel'); if (taxLbl) taxLbl.textContent = '(auto 23%)';
       const notesEl = document.getElementById('moNotes'); if (notesEl) notesEl.value = '';
       // Reset subcategory filter
       const subcatSel = document.getElementById('moSubcatFilter');
@@ -12409,7 +12411,18 @@ Loading items...
       const sub = parseFloat(document.getElementById('moSubtotal').value || '0') || 0;
       const disc = parseFloat(document.getElementById('moDiscount').value || '0') || 0;
       const ship = parseFloat(document.getElementById('moShipping').value || '0') || 0;
-      const tax = parseFloat(document.getElementById('moTax').value || '0') || 0;
+      // Auto-calculate VAT at 23% on (subtotal - discount) if tax field is empty or zero
+      const taxEl = document.getElementById('moTax');
+      const taxManual = taxEl && taxEl.dataset.manualOverride === 'true';
+      if (!taxManual && taxEl) {
+        // Check if selected customer is tax-exempt
+        const custId = document.getElementById('moCustomer')?.value;
+        const cust = (allCustomers || []).find(c => c.id === custId);
+        const isExempt = cust && cust.tax_exempt;
+        const autoTax = isExempt ? 0 : Math.round((sub - disc) * 23) / 100;
+        taxEl.value = autoTax.toFixed(2);
+      }
+      const tax = parseFloat(taxEl?.value || '0') || 0;
       const total = sub - disc + ship + tax;
       const totalEl = document.getElementById('moTotal');
       if (totalEl && !isNaN(total)) totalEl.value = total.toFixed(2);
