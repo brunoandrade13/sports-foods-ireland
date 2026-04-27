@@ -46,9 +46,38 @@
       const user = JSON.parse(userRaw);
       if (!user || !user.id) return false;
 
-      // Check token expiry
+      // Check token expiry — if expired, try to refresh before giving up
       const exp = localStorage.getItem('sfi_token_exp');
-      if (exp && Date.now() > Number(exp)) return false;
+      if (exp && Date.now() > Number(exp)) {
+        // Try silent refresh via sfi_refresh token
+        const refreshToken = localStorage.getItem('sfi_refresh');
+        if (refreshToken) {
+          try {
+            const rRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+              method: 'POST',
+              headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refresh_token: refreshToken })
+            });
+            const rData = await rRes.json();
+            if (rData.access_token) {
+              localStorage.setItem('sfi_token', rData.access_token);
+              if (rData.refresh_token) localStorage.setItem('sfi_refresh', rData.refresh_token);
+              if (rData.expires_in) localStorage.setItem('sfi_token_exp', String(Date.now() + rData.expires_in * 1000));
+              // Use refreshed token
+              const refreshedRes = await fetch(
+                `${SUPABASE_URL}/rest/v1/customers?user_id=eq.${user.id}&select=customer_type,b2b_status&limit=1`,
+                { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${rData.access_token}` } }
+              );
+              if (refreshedRes.ok) {
+                const rows = await refreshedRes.json();
+                const p = rows && rows[0];
+                if (p) return p.customer_type === 'b2b' && (p.b2b_status === 'approved' || p.b2b_status === null);
+              }
+            }
+          } catch (e) { /* silent */ }
+        }
+        return false;
+      }
 
       // Query customers table to confirm B2B status
       const url = `${SUPABASE_URL}/rest/v1/customers?user_id=eq.${user.id}&select=customer_type,b2b_status&limit=1`;
