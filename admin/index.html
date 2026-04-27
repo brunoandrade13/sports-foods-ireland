@@ -14692,7 +14692,11 @@ var discountedSubtotal = subtotal - discountAmount;
 // ---- TOTALS ----
 var shipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
 // Shipping already includes VAT — calculate VAT on products only
-var vatTotal = Math.round(discountedSubtotal * 23) / 100, total = discountedSubtotal + shipping + vatTotal;
+// Tax-exempt orders (tax_amount explicitly stored as 0): no VAT
+var taxAmountStored = order.tax_amount != null ? parseFloat(order.tax_amount) : null;
+var isTaxExempt = taxAmountStored !== null && taxAmountStored === 0;
+var vatTotal = isTaxExempt ? 0 : Math.round(discountedSubtotal * 23) / 100;
+var total = discountedSubtotal + shipping + vatTotal;
 checkPage(100);
 var tx = ML + CW - 200;
 var totalsRows = [['SUBTOTAL', fmtM(subtotal)]];
@@ -14710,7 +14714,11 @@ if (discountAmount > 0) {
   totalsRows.push(['NET TOTAL', fmtM(discountedSubtotal)]);
 }
 if (shipping > 0) totalsRows.push(['SHIPPING', fmtM(shipping)]);
-totalsRows.push(['VAT @ 23%', fmtM(vatTotal)]);
+if (isTaxExempt) {
+  totalsRows.push(['VAT EXEMPT (Zero-Rated)', fmtM(0)]);
+} else {
+  totalsRows.push(['VAT @ 23%', fmtM(vatTotal)]);
+}
 totalsRows.push(['TOTAL', fmtM(total)]);
 totalsRows.forEach(function(r) {
   var isDiscount = r[0].startsWith('DISCOUNT');
@@ -14730,7 +14738,11 @@ doc.setFillColor(224,224,224); doc.rect(ML, y, taxTW, 14, 'F'); doc.setDrawColor
 doc.setFont('helvetica','bold'); doc.setFontSize(7); var txp = ML; ['RATE', 'TAX', 'NET'].forEach(function(h, i) { doc.text(h, txp + 4, y + 10); txp += taxCW[i]; }); y += 14;
 doc.setDrawColor(204,204,204); doc.rect(ML, y, taxTW, 14, 'S');
 doc.setFont('helvetica','normal'); doc.setFontSize(8); txp = ML;
-doc.text('VAT @ 23%', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(vatTotal), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(discountedSubtotal), txp + 4, y + 10);
+if (isTaxExempt) {
+  doc.text('VAT EXEMPT', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(0), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(discountedSubtotal), txp + 4, y + 10);
+} else {
+  doc.text('VAT @ 23%', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(vatTotal), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(discountedSubtotal), txp + 4, y + 10);
+}
 
 // ---- Footer on last page ----
 addFooter();
@@ -14917,7 +14929,9 @@ function renderOrderItemsTable(items, order, editMode) {
   const activeItems = items.filter(i => !i.is_backorder);
   const subtotalCalc = activeItems.reduce((s, i) => s + (parseFloat(i.total_price) || parseFloat(i.total) || 0), 0);
   const subtotal = parseFloat(order.subtotal) || subtotalCalc;
-  const tax   = parseFloat(order.tax_amount)  || parseFloat(order.tax_total) || 0;
+  const taxRaw = order.tax_amount != null ? parseFloat(order.tax_amount) : (order.tax_total != null ? parseFloat(order.tax_total) : null);
+  const tax = taxRaw ?? 0;
+  const taxIsExplicit = taxRaw !== null; // true when tax_amount is stored in DB (even if 0 for exempt)
   const total = parseFloat(order.total) || 0;
 
   const bodyRows = items.map((i, idx) => {
@@ -14998,8 +15012,8 @@ function renderOrderItemsTable(items, order, editMode) {
       <tr><td colspan="5" style="text-align:right;padding:6px 10px;color:var(--text-muted);">Subtotal (ex VAT)</td><td style="padding:6px 10px;" id="om-subtotal">€${subtotal.toFixed(2)}</td></tr>
       ${shipping > 0 ? `<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping (${esc(sm)})</td><td style="padding:4px 10px;">€${shipping.toFixed(2)}</td></tr>` : `<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping</td><td style="padding:4px 10px;color:#22c55e;">Free</td></tr>`}
       ${discount > 0 ? `<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Discount${dc ? ' ('+esc(dc)+')' : ''}</td><td style="padding:4px 10px;color:#ef4444;">-€${discount.toFixed(2)}</td></tr>` : ''}
-      <tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">VAT (23%)</td><td style="padding:4px 10px;">€${(tax > 0 ? tax : Math.round((subtotal + shipping - discount) * 23) / 100).toFixed(2)}</td></tr>
-      <tr style="border-top:2px solid var(--border);"><td colspan="5" style="text-align:right;padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">Total (incl. VAT)</td><td style="padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">€${(tax > 0 ? total : (subtotal + shipping - discount) + Math.round((subtotal + shipping - discount) * 23) / 100).toFixed(2)}</td></tr>
+      <tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">VAT (23%)</td><td style="padding:4px 10px;">€${(taxIsExplicit ? tax : Math.round((subtotal + shipping - discount) * 23) / 100).toFixed(2)}</td></tr>
+      <tr style="border-top:2px solid var(--border);"><td colspan="5" style="text-align:right;padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">Total (incl. VAT)</td><td style="padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">€${(taxIsExplicit ? total : (subtotal + shipping - discount) + Math.round((subtotal + shipping - discount) * 23) / 100).toFixed(2)}</td></tr>
       <tr><td colspan="6" style="text-align:right;padding:4px 10px 8px;font-size:0.8rem;color:var(--text-muted);">💳 ${esc(pm)}</td></tr>
     </tfoot>
   </table>
