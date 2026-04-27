@@ -271,7 +271,7 @@
 
     // Also remap variant prices to wholesale when B2B
     let variantes = buildVariants(p.product_variants || []);
-    if (useB2B && variantes.length > 0) {
+    if (_isB2BCustomer && variantes.length > 0) {
       variantes = variantes.map(function(group) {
         return Object.assign({}, group, {
           options: group.options.map(function(opt) {
