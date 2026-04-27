@@ -1,5 +1,5 @@
 /**
- * create-b2b-order v9 — variant images in email + product_image_url in order_items
+ * create-b2b-order v10 — VAT 23% calculado e guardado nas ordens B2B
  */
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -98,9 +98,13 @@ Deno.serve(async (req: Request) => {
 
     const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     let customerId: string | null = null;
+    let isVatExempt = false;
     if (email) {
-      const { data: custRow } = await sb.from("customers").select("id").eq("email", email.trim().toLowerCase()).limit(1).single();
-      if (custRow) customerId = custRow.id;
+      const { data: custRow } = await sb.from("customers").select("id, tax_exempt").eq("email", email.trim().toLowerCase()).limit(1).single();
+      if (custRow) {
+        customerId = custRow.id;
+        isVatExempt = !!custRow.tax_exempt;
+      }
     }
 
     const resolvedItems = await Promise.all(items.map(async (it: Record<string, unknown>) => {
@@ -140,12 +144,18 @@ Deno.serve(async (req: Request) => {
       }
     }
     const total = parseFloat((subtotal - discount + shipCost).toFixed(2));
+    // v10: calcular VAT 23% sobre (subtotal - discount) para todos excepto clientes isentos
+    const VAT_RATE = 0.23;
+    const taxAmount = isVatExempt ? 0 : parseFloat(((subtotal - discount) * VAT_RATE).toFixed(2));
+    const totalWithVat = parseFloat((subtotal - discount + shipCost + taxAmount).toFixed(2));
     const methodLabel = payment_method === "net30" ? "Net 30 (Invoice)" : "Cash on Delivery";
     const customerName = contact ? `${contact.firstName || ""} ${contact.lastName || ""}`.trim() : "";
 
     const { data: orderRow, error } = await sb.from("orders").insert({
       order_number: orderId, status: "processing", payment_status: "pending", financial_status: "pending",
-      total, subtotal, shipping_cost: shipCost, discount_amount: discount, currency: currency.toUpperCase(),
+      total: totalWithVat, subtotal, shipping_cost: shipCost, discount_amount: discount,
+      tax_amount: taxAmount, tax_total: taxAmount,
+      currency: currency.toUpperCase(),
       customer_email: email || "", customer_name: customerName, customer_phone: contact?.phone || "",
       customer_id: customerId,
       shipping_address: shippingAddress || {}, billing_address: shippingAddress || {},
@@ -231,15 +241,15 @@ Deno.serve(async (req: Request) => {
       try {
         const imgMap = await getProductImages(resolvedItems, sb);
         const itemsHtml = buildItemsTable(resolvedItems, imgMap);
-        const html = buildEmail({ firstName: contact?.firstName || "Customer", orderId, date: new Date().toLocaleDateString("en-IE"), total: total.toFixed(2), method: methodLabel, itemsHtml });
+        const html = buildEmail({ firstName: contact?.firstName || "Customer", orderId, date: new Date().toLocaleDateString("en-IE"), total: totalWithVat.toFixed(2), method: methodLabel, itemsHtml });
         await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST", headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json" },
-          body: JSON.stringify({ sender: { name: "Sports Foods Ireland", email: "stores@sportsfoodsireland.ie" }, to: [{ email, name: customerName }], subject: `Order Confirmed #${orderId} \u2705`, htmlContent: html }),
+          body: JSON.stringify({ sender: { name: "Sports Foods Ireland", email: "noreply@sportsfoodsireland.ie" }, to: [{ email, name: customerName }], subject: `Order Confirmed #${orderId} \u2705`, htmlContent: html }),
         });
       } catch (e) { console.warn("[b2b] email:", e); }
     }
 
-    return new Response(JSON.stringify({ success: true, order_number: orderId, total, payment_method: methodLabel }), { status: 200, headers: { ...cors, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ success: true, order_number: orderId, total: totalWithVat, payment_method: methodLabel }), { status: 200, headers: { ...cors, "Content-Type": "application/json" } });
   } catch (err) {
     console.error("[b2b]", err);
     return new Response(JSON.stringify({ error: err instanceof Error ? err.message : "Error" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
