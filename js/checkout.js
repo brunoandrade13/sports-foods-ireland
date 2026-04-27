@@ -624,6 +624,8 @@
     async function placeB2BDirectOrder(method) {
         const SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
+        // Use the user's session JWT if available (B2B users are authenticated)
+        const sessionToken = localStorage.getItem('sfi_token') || SUPABASE_ANON_KEY;
         const cart = getCart();
         const currency = window.sfi?.currency || 'EUR';
         const items = cart.map(i => ({
@@ -637,7 +639,7 @@
 
         const res = await fetch(SUPABASE_URL + '/functions/v1/create-b2b-order', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+            headers: { 'Authorization': 'Bearer ' + sessionToken, 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 items, email: checkoutData.contact.email, currency,
                 shippingAddress: checkoutData.shipping, contact: checkoutData.contact,
