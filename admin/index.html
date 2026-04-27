@@ -2313,7 +2313,25 @@ style="cursor:help;font-size:0.85rem">ℹ️</span></th>
 
     <!-- Items added -->
     <div class="detail-panel">
-      <h3 style="margin:0 0 14px;font-size:0.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)">Items in This Order</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <h3 style="margin:0;font-size:0.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)">Items in This Order</h3>
+        <button type="button" onclick="showGlsDeliveryInput()" id="btnAddGlsDelivery"
+          style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:#f59e0b;color:#000;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer">
+          🚚 Add GLS Delivery
+        </button>
+      </div>
+      <!-- GLS Delivery inline input (hidden by default) -->
+      <div id="glsDeliveryInputRow" style="display:none;align-items:center;gap:10px;margin-bottom:12px;padding:10px 14px;background:#fffbeb;border:2px solid #f59e0b;border-radius:8px">
+        <span style="font-size:0.9rem;font-weight:600;color:#92400e">🚚 GLS Delivery Charge</span>
+        <span style="color:#92400e;font-weight:600">€</span>
+        <input type="number" id="glsDeliveryPrice" step="0.01" min="0" placeholder="0.00"
+          style="width:100px;padding:7px 10px;border:2px solid #f59e0b;border-radius:6px;font-size:0.95rem;font-weight:600;background:#fff;color:#1e293b"
+          onkeydown="if(event.key==='Enter')confirmGlsDelivery();if(event.key==='Escape')cancelGlsDelivery()">
+        <button type="button" onclick="confirmGlsDelivery()"
+          style="padding:7px 16px;background:#f59e0b;border:none;border-radius:6px;font-weight:700;cursor:pointer;color:#000">Add ✓</button>
+        <button type="button" onclick="cancelGlsDelivery()"
+          style="padding:7px 12px;background:none;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;color:var(--text-muted)">Cancel</button>
+      </div>
       <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
         <table style="width:100%;font-size:0.87rem;border-collapse:collapse">
           <thead>
@@ -12627,8 +12645,13 @@ Loading items...
       } else {
         body.innerHTML = manualOrderItems.map(function (i, idx) {
           const line = i.unit_price * i.qty;
-          return `<tr data-idx="${idx}">
-            <td>${esc(i.name)}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div></td>
+          const isDelivery = !!i.is_gls_delivery;
+          const nameHtml = isDelivery
+            ? `<span style="color:#92400e;font-weight:700">🚚 ${esc(i.name)}</span><div style="font-size:0.72rem;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;display:inline-block;margin-top:2px">Delivery Charge</div>`
+            : `${esc(i.name)}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div>`;
+          const rowStyle = isDelivery ? ' style="background:rgba(245,158,11,0.06)"' : '';
+          return `<tr data-idx="${idx}"${rowStyle}>
+            <td>${nameHtml}</td>
             <td style="text-align:right">
               <div id="moPriceDisplay_${idx}" style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
                 <span>€${i.unit_price.toFixed(2)}</span>
@@ -12680,6 +12703,38 @@ Loading items...
       document.getElementById('moPriceDisplay_' + idx).style.display = 'flex';
     }
 
+    function showGlsDeliveryInput() {
+      const row = document.getElementById('glsDeliveryInputRow');
+      const input = document.getElementById('glsDeliveryPrice');
+      if (row) { row.style.display = 'flex'; }
+      if (input) { input.value = ''; input.focus(); }
+    }
+
+    function cancelGlsDelivery() {
+      const row = document.getElementById('glsDeliveryInputRow');
+      if (row) row.style.display = 'none';
+    }
+
+    function confirmGlsDelivery() {
+      const input = document.getElementById('glsDeliveryPrice');
+      const price = parseFloat(input?.value || '0');
+      if (!price || price <= 0) { toast('Enter a valid delivery amount', 'error'); return; }
+      // Remove existing GLS delivery if any (only one allowed)
+      const idx = manualOrderItems.findIndex(function(i) { return i.is_gls_delivery; });
+      if (idx !== -1) manualOrderItems.splice(idx, 1);
+      manualOrderItems.push({
+        product_id: null,
+        name: 'GLS Delivery',
+        sku: 'GLS-DELIVERY',
+        unit_price: price,
+        qty: 1,
+        is_gls_delivery: true
+      });
+      cancelGlsDelivery();
+      renderManualOrderItems();
+      toast('GLS Delivery €' + price.toFixed(2) + ' added', 'success');
+    }
+
     function removeManualOrderItem(idx) {
       manualOrderItems.splice(idx, 1);
       renderManualOrderItems();
@@ -12702,7 +12757,10 @@ Loading items...
 
       // Subtotal always from items
       subtotal = manualOrderItems.reduce(function (s, i) { return s + i.unit_price * i.qty; }, 0);
-      if (!total || isNaN(total)) total = subtotal - discount + shipping + tax;
+      // If there's a GLS Delivery item, set shipping_cost = 0 (delivery is already in the items)
+      const hasGlsDelivery = manualOrderItems.some(function(i) { return i.is_gls_delivery; });
+      const effectiveShipping = hasGlsDelivery ? 0 : shipping;
+      if (!total || isNaN(total)) total = subtotal - discount + effectiveShipping + tax;
       if (total < 0) total = 0;
 
       const cust = (allCustomers || []).find(function (c) { return c.id === customerId; }) || {};
@@ -12739,7 +12797,8 @@ Loading items...
         currency,
         subtotal,
         discount_total: discount,
-        shipping_total: shipping,
+        shipping_total: effectiveShipping,
+        shipping_cost: effectiveShipping,
         tax_total: tax,
         total,
         financial_status: financial,
@@ -12773,12 +12832,13 @@ Loading items...
         const ord = Array.isArray(created) && created[0] ? created[0] : created;
         if (ord && ord.id) {
           for (const i of manualOrderItems) {
-            const p = (allProducts || []).find(function (x) { return x.id === i.product_id; }) || {};
+            const isGls = !!i.is_gls_delivery;
+            const p = isGls ? {} : ((allProducts || []).find(function (x) { return x.id === i.product_id; }) || {});
             const lineTotal = i.unit_price * i.qty;
-            const baseName = i.name ? i.name.split(' — ')[0] : (p.name || 'Product');
+            const baseName = isGls ? 'GLS Delivery' : (i.name ? i.name.split(' — ')[0] : (p.name || 'Product'));
             await supaInsert('order_items', {
               order_id: ord.id,
-              product_id: i.product_id,
+              product_id: isGls ? null : i.product_id,
               variant_id: i.variant_id || null,
               variant_label: i.variant_label || (i.variant_id ? i.name.split(' — ').slice(1).join(' — ') : null),
               quantity: i.qty,
@@ -12787,14 +12847,15 @@ Loading items...
               total_price: lineTotal,
               sku: i.sku || p.sku || null,
               product_name: baseName,
-              product_image_url: p.image_url || null,
-              requires_shipping: true
+              product_image_url: isGls ? null : (p.image_url || null),
+              requires_shipping: !isGls
             });
           }
         }
         toast('Manual order created');
         showPage('orders');
         manualOrderItems = [];
+        cancelGlsDelivery();
         await _refreshOrders();
       } catch (e) {
         console.error('Manual order error', e);
