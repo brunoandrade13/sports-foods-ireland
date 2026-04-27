@@ -2289,7 +2289,7 @@ style="cursor:help;font-size:0.85rem">ℹ️</span></th>
         </div>
         <div style="flex:2;min-width:200px">
           <label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:4px">Search product</label>
-          <input type="text" id="moProductSearch" placeholder="Name or SKU…" oninput="renderManualOrderProductPicker()"
+          <input type="text" id="moProductSearch" placeholder="Name, SKU or variant SKU…" oninput="renderManualOrderProductPicker()"
             style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
         </div>
       </div>
@@ -12493,7 +12493,11 @@ Loading items...
         if (catId && (!p.categories || p.categories.name !== catId)) return false;
         if (subcatId && String(p.subcategory_id || '') !== subcatId) return false;
         if (search) {
-          const txt = (p.name || '').toLowerCase() + ' ' + (p.sku || '').toLowerCase();
+          // Pesquisar em: nome do produto, SKU do produto e SKUs de todas as variantes
+          const variantSkus = (productVariantsCache[p.id] || [])
+            .map(function(v) { return (v.sku || '').toLowerCase(); })
+            .join(' ');
+          const txt = (p.name || '').toLowerCase() + ' ' + (p.sku || '').toLowerCase() + ' ' + variantSkus;
           if (!txt.includes(search)) return false;
         }
         return true;
