@@ -14790,10 +14790,57 @@ async function sendInvoiceByEmail() {
     }
   }
   if (!email) { email = prompt('Customer email not found. Enter email:'); if (!email) return; }
-  var confirmMsg = 'Send Invoice ' + invNum + ' to ' + email;
-  if (ccEmails.length > 0) confirmMsg += '\nCC: ' + ccEmails.join(', ');
-  const confirmed = confirm(confirmMsg + '?');
-  if (!confirmed) return;
+
+  // Se o email contém múltiplos endereços separados por vírgula, mostrar dialog de selecção
+  const emailList = email.split(',').map(e => e.trim()).filter(Boolean);
+  if (emailList.length > 1) {
+    const choice = await new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center';
+      overlay.innerHTML = `
+        <div style="background:#fff;border-radius:12px;padding:28px 32px;max-width:440px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+          <h3 style="margin:0 0 8px;color:#1e293b;font-size:1.1rem">📧 Multiple Emails Found</h3>
+          <p style="color:#64748b;font-size:0.9rem;margin:0 0 20px">This customer has <strong>${emailList.length} email addresses</strong>. Select which to send the invoice to:</p>
+          <div id="emailChoices" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+            ${emailList.map((em, i) => `
+              <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='#2D6A4F'" onmouseout="this.style.borderColor=this.querySelector('input').checked?'#2D6A4F':'#e2e8f0'">
+                <input type="radio" name="emailChoice" value="${em}" ${i===0?'checked':''} style="accent-color:#2D6A4F">
+                <span style="color:#1e293b;font-size:0.9rem">${em}</span>
+              </label>`).join('')}
+            <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer" onmouseover="this.style.borderColor='#2D6A4F'" onmouseout="this.style.borderColor=this.querySelector('input').checked?'#2D6A4F':'#e2e8f0'">
+              <input type="radio" name="emailChoice" value="__all__" style="accent-color:#2D6A4F">
+              <span style="color:#1e293b;font-size:0.9rem">📨 Send to <strong>all emails</strong></span>
+            </label>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button id="btnEmailCancel" style="padding:9px 20px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#64748b;cursor:pointer;font-size:0.9rem">Cancel</button>
+            <button id="btnEmailConfirm" style="padding:9px 20px;border:none;border-radius:8px;background:#2D6A4F;color:#fff;cursor:pointer;font-size:0.9rem;font-weight:600">Send Invoice</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      overlay.querySelector('#btnEmailCancel').onclick = () => { document.body.removeChild(overlay); resolve(null); };
+      overlay.querySelector('#btnEmailConfirm').onclick = () => {
+        const sel = overlay.querySelector('input[name="emailChoice"]:checked');
+        document.body.removeChild(overlay);
+        resolve(sel ? sel.value : null);
+      };
+    });
+    if (!choice) return;
+    if (choice === '__all__') {
+      // Enviar para o primeiro e adicionar os restantes como CC
+      email = emailList[0];
+      const extraEmails = emailList.slice(1).filter(e => !ccEmails.includes(e));
+      ccEmails = [...ccEmails, ...extraEmails];
+    } else {
+      email = choice;
+    }
+  } else {
+    // Email único — confirmar normalmente
+    var confirmMsg = 'Send Invoice ' + invNum + ' to ' + email;
+    if (ccEmails.length > 0) confirmMsg += '\nCC: ' + ccEmails.join(', ');
+    const confirmed = confirm(confirmMsg + '?');
+    if (!confirmed) return;
+  }
   const btn = document.querySelector('[onclick*="sendInvoiceByEmail"]');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
   try {
