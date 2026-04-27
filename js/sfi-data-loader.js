@@ -36,8 +36,36 @@
   // ============================================================
   // B2B CUSTOMER CHECK — Fast, runs before product transform
   // ============================================================
+  const B2B_FLAG_KEY = 'sfi_b2b_status';
+  const B2B_FLAG_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+  function readB2BFlag() {
+    try {
+      const raw = localStorage.getItem(B2B_FLAG_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (!data || !data.isB2B || !data.until) return null;
+      if (Date.now() > data.until) { localStorage.removeItem(B2B_FLAG_KEY); return null; }
+      return data;
+    } catch (e) { return null; }
+  }
+
+  function writeB2BFlag(userId, email) {
+    try {
+      localStorage.setItem(B2B_FLAG_KEY, JSON.stringify({
+        isB2B: true, userId, email,
+        until: Date.now() + B2B_FLAG_TTL,
+        saved: Date.now()
+      }));
+    } catch (e) { /* storage full */ }
+  }
+
   async function detectB2BCustomer() {
     try {
+      // ── Fast path: persistent flag (valid 7 days, survives token expiry) ──
+      const flag = readB2BFlag();
+      if (flag) return true;
+
       const token = localStorage.getItem('sfi_token');
       if (!token) return false;
 
@@ -67,7 +95,7 @@
         return null;
       }
 
-      // Check expiry from localStorage
+      // Check expiry
       const exp = localStorage.getItem('sfi_token_exp');
       let activeToken = token;
       if (exp && Date.now() > Number(exp)) {
@@ -77,29 +105,27 @@
 
       // Query customers table to confirm B2B status
       const url = `${SUPABASE_URL}/rest/v1/customers?user_id=eq.${user.id}&select=customer_type,b2b_status&limit=1`;
-      const res = await fetch(url, {
+      let res = await fetch(url, {
         headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${activeToken}` }
       });
 
-      // If 401 (token expired even without stored exp), try refresh once
+      // 401 → token expired without stored exp, try refresh
       if (res.status === 401) {
         const newToken = await tryRefresh();
         if (!newToken) return false;
-        const res2 = await fetch(url, {
+        res = await fetch(url, {
           headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${newToken}` }
         });
-        if (!res2.ok) return false;
-        const rows2 = await res2.json();
-        const p2 = rows2 && rows2[0];
-        if (!p2) return false;
-        return p2.customer_type === 'b2b' && (p2.b2b_status === 'approved' || p2.b2b_status === null);
       }
 
       if (!res.ok) return false;
       const rows = await res.json();
       const p = rows && rows[0];
       if (!p) return false;
-      return p.customer_type === 'b2b' && (p.b2b_status === 'approved' || p.b2b_status === null);
+      const isB2B = p.customer_type === 'b2b' && (p.b2b_status === 'approved' || p.b2b_status === null);
+      // ── Store persistent flag so future loads don't need API call ──
+      if (isB2B) writeB2BFlag(user.id, user.email);
+      return isB2B;
     } catch (e) {
       return false;
     }
