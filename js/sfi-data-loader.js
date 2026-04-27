@@ -69,10 +69,16 @@
       const token = localStorage.getItem('sfi_token');
       if (!token) return false;
 
-      const userRaw = localStorage.getItem('sfi_user');
-      if (!userRaw) return false;
-      const user = JSON.parse(userRaw);
-      if (!user || !user.id) return false;
+      // Get userId — from sfi_user OR decoded directly from JWT (sub claim)
+      let userId = null, userEmail = null;
+      try {
+        const userRaw = localStorage.getItem('sfi_user');
+        if (userRaw) { const u = JSON.parse(userRaw); if (u && u.id) { userId = u.id; userEmail = u.email; } }
+      } catch(e) {}
+      if (!userId) {
+        try { const p = JSON.parse(atob(token.split('.')[1])); if (p && p.sub) userId = p.sub; } catch(e) {}
+      }
+      if (!userId) return false;
 
       // Helper: refresh token and return new access_token or null
       async function tryRefresh() {
@@ -104,7 +110,7 @@
       }
 
       // Query customers table to confirm B2B status
-      const url = `${SUPABASE_URL}/rest/v1/customers?user_id=eq.${user.id}&select=customer_type,b2b_status&limit=1`;
+      const url = `${SUPABASE_URL}/rest/v1/customers?user_id=eq.${userId}&select=customer_type,b2b_status&limit=1`;
       let res = await fetch(url, {
         headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${activeToken}` }
       });
@@ -124,7 +130,7 @@
       if (!p) return false;
       const isB2B = p.customer_type === 'b2b' && (p.b2b_status === 'approved' || p.b2b_status === null);
       // ── Store persistent flag so future loads don't need API call ──
-      if (isB2B) writeB2BFlag(user.id, user.email);
+      if (isB2B) writeB2BFlag(userId, userEmail);
       return isB2B;
     } catch (e) {
       return false;
