@@ -6,7 +6,7 @@
   'use strict';
 
   const SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
   const REVIEWS_PER_PAGE = 5;
 
   let allReviews = [];
