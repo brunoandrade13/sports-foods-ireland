@@ -96,7 +96,7 @@ async function handleCheckoutComplete(
   const itemNames: string[] = safeJson(metadata.item_names, []);
   const variantLabels: Record<string, string> = safeJson(metadata.variant_labels, {});
 
-  const items = Array.isArray(rawItems)
+  const items = (Array.isArray(rawItems)
     ? rawItems.map((item: unknown, idx: number) => {
         if (Array.isArray(item)) {
           return {
@@ -112,7 +112,9 @@ async function handleCheckoutComplete(
         const it = item as Record<string, unknown>;
         return { ...it, variant_id: it.vid || it.variant_id || variantIds[String(idx)], variant_label: it.vlb || it.variant_label || variantLabels[String(idx)] };
       })
-    : [];
+    : [])
+  // Filter out "Shipping" pseudo-items — shipping is handled via order.shipping_cost only
+  .filter((item: any) => !/^shipping$/i.test(String(item.name || item.product_name || "").trim()));
   const shipping = safeJson(metadata.shipping_json, {});
 
   // order_number será gerado automaticamente pelo trigger trg_generate_order_number
@@ -320,7 +322,7 @@ async function sendCustomerConfirmation(p: {
     method: "POST",
     headers: { "api-key": brevoKey, "Content-Type": "application/json" },
     body: JSON.stringify({
-      sender: { name: "Sports Foods Ireland", email: "stores@sportsfoodsireland.ie" },
+      sender: { name: "Sports Foods Ireland", email: "noreply@sportsfoodsireland.ie" },
       to: [{ email: p.customerEmail, name: p.customerName || "Customer" }],
       subject: `Order Confirmed #${p.orderId} ✅`,
       htmlContent: html,
