@@ -733,6 +733,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load product
     loadProduct();
+
+    // Re-render product price if B2B is detected AFTER initial render
+    // (can happen when detectB2BCustomer() resolves after product is already shown)
+    window.addEventListener('sfi:products-loaded', function(e) {
+        if (e.detail && e.detail.isB2B && currentProduct && window.PRODUTOS) {
+            // Find updated product with B2B prices from PRODUTOS
+            const updated = window.PRODUTOS.find(function(p) {
+                return p.id === currentProduct.id || p._supabase_id === currentProduct._supabase_id;
+            });
+            if (updated && updated.preco !== currentProduct.preco) {
+                // Re-render with correct B2B prices
+                currentProduct = Object.assign({}, currentProduct, {
+                    preco: updated.preco,
+                    preco_antigo: updated.preco_antigo,
+                    variantes: updated.variantes,
+                    price: updated.preco
+                });
+                // Update displayed price
+                const priceEl = document.getElementById('productPrice');
+                if (priceEl) priceEl.textContent = '€' + Number(updated.preco).toFixed(2);
+                // Re-render variants with B2B prices
+                if (updated.variantes && updated.variantes.length > 0) {
+                    renderProductVariants(currentProduct);
+                }
+            }
+        }
+    }, { once: true });
 });
 
 // Load promotion products
