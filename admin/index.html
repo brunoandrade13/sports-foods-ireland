@@ -3544,7 +3544,8 @@ style="font-size:0.8rem;padding:4px 8px">
           <th>Postcode</th>
           <th style="text-align:right">Wt (kg)</th>
           <th>Status</th>
-          <th>Label</th>
+          <th style="text-align:center">Label</th>
+          <th style="text-align:center">Actions</th>
         </tr>
       </thead>
       <tbody id="glsTableBody">
@@ -19070,8 +19071,93 @@ async function sendSelectedStatements() {
 }
 
 /* ============================================================
-   GLS SHIPMENTS REPORT
+   GLS CANCEL + RESHIP
    ============================================================ */
+
+window.glsCancelShipment = async function(orderId, parcelNumber, evt) {
+  evt && evt.stopPropagation();
+  if (!parcelNumber) { toast('No parcel number found for this shipment', 'error'); return; }
+
+  const tn = parcelNumber.replace(/\s/g,'');
+  const confirmed = confirm(
+    '⚠️ Cancel GLS Shipment?\n\n' +
+    'Parcel: ' + parcelNumber + '\n\n' +
+    'This ONLY works if the parcel has NOT yet been collected by the GLS driver.\n' +
+    'After driver collection, contact GLS directly.\n\n' +
+    'Continue with cancellation?'
+  );
+  if (!confirmed) return;
+
+  try {
+    toast('Cancelling GLS shipment…', 'info');
+    const resp = await supaFetch('/functions/v1/gls-cancel-shipment', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ parcel_number: tn, order_id: orderId })
+    });
+    const d = await resp.json();
+    if (d.success) {
+      toast('✅ Shipment cancelled: ' + parcelNumber, 'success');
+      await loadGLSReport();
+    } else {
+      toast('❌ Cancel failed: ' + (d.error || 'Unknown error'), 'error');
+      console.error('[GLS Cancel]', d);
+    }
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+};
+
+window.glsEditReship = async function(orderId, evt) {
+  evt && evt.stopPropagation();
+  const order = _glsData.find(o => o.id === orderId);
+  if (!order) { toast('Order not found', 'error'); return; }
+
+  const tn = order.tracking_number || '';
+
+  // Confirm: this will cancel the existing shipment and open modal to recreate
+  const confirmed = confirm(
+    '✏️ Edit & Reship via GLS?\n\n' +
+    'This will:\n' +
+    '1. Cancel the existing shipment (parcel: ' + tn + ')\n' +
+    '2. Open the shipping form to create a new shipment\n\n' +
+    'Only works BEFORE GLS driver collection.\n' +
+    'After collection, contact GLS support directly.\n\n' +
+    'Continue?'
+  );
+  if (!confirmed) return;
+
+  if (tn) {
+    try {
+      toast('Cancelling existing shipment…', 'info');
+      const resp = await supaFetch('/functions/v1/gls-cancel-shipment', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ parcel_number: tn.replace(/\s/g,''), order_id: orderId })
+      });
+      const d = await resp.json();
+      if (!d.success) {
+        const proceed = confirm('GLS cancel returned: ' + (d.error||'error') + '\n\nProceed to reship anyway?');
+        if (!proceed) return;
+      } else {
+        toast('Existing shipment cancelled. Opening reship form…', 'success');
+      }
+    } catch(e) {
+      const proceed = confirm('Could not cancel via API: ' + e.message + '\n\nProceed to reship anyway?');
+      if (!proceed) return;
+    }
+  }
+
+  // Set the current modal order and open the GLS ship modal
+  window._currentModalOrder = order;
+  if (typeof openGLSShipModal === 'function') {
+    openGLSShipModal();
+  } else {
+    toast('Please open the order first and use "Ship via GLS" button', 'warning');
+  }
+};
+
+</script>
 
 function initGLSReport() {
   // Set default date range: today
@@ -19181,6 +19267,10 @@ function renderGLSTable(data) {
       <td><span style="color:${statusColor};font-size:0.8rem">${statusLabel}</span></td>
       <td style="text-align:center">
         ${hasLabel ? `<button onclick="glsPrintLabel('${o.id}',event)" style="border:none;background:none;cursor:pointer;font-size:1.1rem" title="Print Label">🏷️</button>` : '<span style="color:var(--text-muted);font-size:0.8rem">—</span>'}
+      </td>
+      <td style="text-align:center;white-space:nowrap">
+        <button onclick="glsEditReship('${o.id}',event)" title="Edit & Reship (cancel + recreate)" style="border:none;background:none;cursor:pointer;font-size:1rem;padding:2px 4px" >✏️</button>
+        <button onclick="glsCancelShipment('${o.id}','${o.tracking_number||''}',event)" title="Cancel shipment (only before GLS collection)" style="border:none;background:none;cursor:pointer;font-size:1rem;padding:2px 4px;color:#ef4444">🗑️</button>
       </td>
     </tr>`;
   }).join('');
