@@ -15507,6 +15507,45 @@ async function saveOrderItemEdits() {
   if (!items || !order) return;
   const saveBtn = document.getElementById('btnSaveItemEdits');
   if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+
+  // Helper: restore stock for qty units of an item
+  async function restoreStock(item, qty) {
+    if (!item.product_id || qty <= 0) return;
+    try {
+      // Check if product has variants
+      if (item.variant_id) {
+        // Restore variant stock
+        const varRows = await supaGet('product_variants', '?id=eq.' + item.variant_id + '&select=id,stock,product_id');
+        if (varRows && varRows[0]) {
+          await supaUpdate('product_variants', item.variant_id, {
+            stock: (varRows[0].stock || 0) + qty
+          });
+          // products.stock_quantity will be synced by trigger
+        }
+      } else {
+        // Restore product stock directly
+        const prodRows = await supaGet('products', '?id=eq.' + item.product_id + '&select=id,stock_quantity,track_inventory');
+        if (prodRows && prodRows[0] && prodRows[0].track_inventory) {
+          const newStock = (prodRows[0].stock_quantity || 0) + qty;
+          await supaUpdate('products', item.product_id, {
+            stock_quantity: newStock,
+            in_stock: newStock > 0
+          });
+        }
+      }
+      // Log movement
+      await supaInsert('inventory_movements', {
+        product_id: item.product_id,
+        variant_id: item.variant_id || null,
+        movement_type: 'adjustment',
+        quantity_change: qty,
+        reason: 'Item removed/backordered from order ' + (order.order_number || order.id),
+        order_id: order.id,
+        performed_by: 'admin_edit_items'
+      });
+    } catch(e) { console.warn('restoreStock error:', e); }
+  }
+
   try {
     let totalBackorderCount = 0;
     for (let idx = 0; idx < items.length; idx++) {
@@ -15521,16 +15560,21 @@ async function saveOrderItemEdits() {
 
       if (boQty === 0) {
         // Normal item — update price and quantity
+        // If quantity was REDUCED, restore the difference to stock
+        const origDbQty = item.quantity || 1;
+        const qtyDiff = origDbQty - origQty; // positive = reduction
         const newTotal = parseFloat((newPrice * origQty).toFixed(2));
         await supaUpdate('order_items', item.id, {
           unit_price: newPrice, quantity: origQty, total_price: newTotal, total: newTotal,
           is_backorder: false, backorder_status: null, fulfillment_status: item.fulfillment_status === 'backorder' ? 'unfulfilled' : item.fulfillment_status
         });
+        if (qtyDiff > 0) await restoreStock(item, qtyDiff);
         item.unit_price = newPrice; item.quantity = origQty; item.total_price = newTotal; item.total = newTotal;
         item.is_backorder = false; item._boQty = 0;
       } else if (boQty >= origQty) {
-        // Fully in backorder
+        // Fully in backorder — restore full quantity to stock (if not already backordered)
         totalBackorderCount += origQty;
+        if (!item.is_backorder) await restoreStock(item, origQty);
         await supaUpdate('order_items', item.id, {
           unit_price: newPrice, total_price: 0, total: 0,
           is_backorder: true, backorder_status: 'pending', fulfillment_status: 'backorder'
@@ -15538,8 +15582,9 @@ async function saveOrderItemEdits() {
         item.unit_price = newPrice; item.total_price = 0; item.total = 0;
         item.is_backorder = true; item._boQty = origQty;
       } else {
-        // Partial backorder — update send qty on existing record, insert BO record
+        // Partial backorder — restore the backorder portion to stock
         totalBackorderCount += boQty;
+        await restoreStock(item, boQty);
         const sendTotal = parseFloat((newPrice * sendQty).toFixed(2));
         const boTotal   = parseFloat((newPrice * boQty).toFixed(2));
         await supaUpdate('order_items', item.id, {
