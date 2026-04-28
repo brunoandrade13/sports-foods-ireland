@@ -12699,7 +12699,7 @@ Loading items...
           const isDelivery = !!i.is_gls_delivery;
           const nameHtml = isDelivery
             ? `<span style="color:#92400e;font-weight:700">🚚 ${esc(i.name)}</span><div style="font-size:0.72rem;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;display:inline-block;margin-top:2px">Delivery Charge</div>`
-            : `${esc(i.name)}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div>`;
+            : `${esc(i.name)}${i.variant_label ? `<span style="font-size:0.8rem;color:var(--accent);font-weight:600"> — ${esc(i.variant_label)}</span>` : ''}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div>`;
           const rowStyle = isDelivery ? ' style="background:rgba(245,158,11,0.06)"' : '';
           return `<tr data-idx="${idx}"${rowStyle}>
             <td>${nameHtml}</td>
