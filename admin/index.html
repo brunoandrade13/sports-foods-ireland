@@ -14606,6 +14606,10 @@ window.confirmGLSShip = async function confirmGLSShip() {
     if (result.all_labels_base64 && result.all_labels_base64.length > 1) {
       updateData.gls_all_labels = JSON.stringify(result.all_labels_base64);
     }
+    updateData.gls_parcel_count = parcelCount;
+    if (allParcels.length > 1) {
+      updateData.gls_all_parcel_numbers = allParcels.join(', ');
+    }
     await supaUpdate('orders', order.id, updateData);
 
     var idx = allOrders.findIndex(function(o) { return o.id === order.id; });
