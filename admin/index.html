@@ -15151,6 +15151,13 @@ function renderOrderItemsTable(items, order, editMode) {
           <div style="font-size:0.75rem;color:#4ade80;margin-top:2px;">Send: <span id="om-send-qty-${idx}">${sendQty}</span></div>
         </td>
         <td style="padding:8px 8px;font-weight:bold;" id="om-row-total-${idx}">€${rowTotal.toFixed(2)}</td>
+        <td style="padding:4px 6px;text-align:center;">
+          <button type="button" onclick="removeOrderItemFully(${idx})"
+            title="Remove this item from the order and restore stock"
+            style="background:#ef4444;color:#fff;border:none;border-radius:5px;padding:4px 9px;font-size:0.78rem;cursor:pointer;font-weight:600;white-space:nowrap">
+            🗑️ Remove
+          </button>
+        </td>
       </tr>`;
     } else {
       const rowStyle = isBO ? 'border-bottom:1px solid var(--border-color);opacity:0.5;' : 'border-bottom:1px solid var(--border-color);';
@@ -15178,15 +15185,16 @@ function renderOrderItemsTable(items, order, editMode) {
         <th style="padding:8px 10px;">Price</th>
         <th style="padding:8px 10px;">${editMode ? 'Qty / Backorder' : 'Qty'}</th>
         <th style="padding:8px 10px;">Total</th>
+        ${editMode ? '<th style="padding:8px 6px;width:80px;"></th>' : ''}
       </tr>
     </thead>
     <tbody>${bodyRows}</tbody>
     <tfoot>
-      <tr><td colspan="5" style="text-align:right;padding:6px 10px;color:var(--text-muted);">Subtotal (ex VAT)</td><td style="padding:6px 10px;" id="om-subtotal">€${subtotal.toFixed(2)}</td></tr>
-      ${shipping > 0 ? `<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping (${esc(sm)})</td><td style="padding:4px 10px;">€${shipping.toFixed(2)}</td></tr>` : `<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping</td><td style="padding:4px 10px;color:#22c55e;">Free</td></tr>`}
-      ${discount > 0 ? `<tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Discount${dc ? ' ('+esc(dc)+')' : ''}</td><td style="padding:4px 10px;color:#ef4444;">-€${discount.toFixed(2)}</td></tr>` : ''}
-      <tr><td colspan="5" style="text-align:right;padding:4px 10px;color:var(--text-muted);">VAT (23%)</td><td style="padding:4px 10px;">€${(taxIsExplicit ? tax : Math.round((subtotal + shipping - discount) * 23) / 100).toFixed(2)}</td></tr>
-      <tr style="border-top:2px solid var(--border);"><td colspan="5" style="text-align:right;padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">Total (incl. VAT)</td><td style="padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">€${(taxIsExplicit ? total : (subtotal + shipping - discount) + Math.round((subtotal + shipping - discount) * 23) / 100).toFixed(2)}</td></tr>
+      <tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:6px 10px;color:var(--text-muted);">Subtotal (ex VAT)</td><td style="padding:6px 10px;" id="om-subtotal">€${subtotal.toFixed(2)}</td></tr>
+      ${shipping > 0 ? `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping (${esc(sm)})</td><td style="padding:4px 10px;">€${shipping.toFixed(2)}</td></tr>` : `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping</td><td style="padding:4px 10px;color:#22c55e;">Free</td></tr>`}
+      ${discount > 0 ? `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Discount${dc ? ' ('+esc(dc)+')' : ''}</td><td style="padding:4px 10px;color:#ef4444;">-€${discount.toFixed(2)}</td></tr>` : ''}
+      <tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">VAT (23%)</td><td style="padding:4px 10px;">€${(taxIsExplicit ? tax : Math.round((subtotal + shipping - discount) * 23) / 100).toFixed(2)}</td></tr>
+      <tr style="border-top:2px solid var(--border);"><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">Total (incl. VAT)</td><td style="padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">€${(taxIsExplicit ? total : (subtotal + shipping - discount) + Math.round((subtotal + shipping - discount) * 23) / 100).toFixed(2)}</td></tr>
       <tr><td colspan="6" style="text-align:right;padding:4px 10px 8px;font-size:0.8rem;color:var(--text-muted);">💳 ${esc(pm)}</td></tr>
     </tfoot>
   </table>
@@ -15654,6 +15662,72 @@ async function saveOrderItemEdits() {
     alert('Error saving: ' + err.message);
   } finally {
     if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 Save Changes'; }
+  }
+}
+
+// Remove item completely from order + restore stock
+async function removeOrderItemFully(idx) {
+  const items = window._currentModalItems;
+  const order = window._currentModalOrder;
+  if (!items || !order) return;
+  const item = items[idx];
+  if (!item) return;
+
+  const itemName = item.product_name || 'this item';
+  const qty = item.quantity || 1;
+  if (!confirm(`Remove "${itemName}" (qty: ${qty}) from the order?\n\nThis will:\n• Delete the item from the order\n• Restore ${qty} unit(s) back to stock`)) return;
+
+  try {
+    // 1. Delete the order_item from DB
+    await fetch(`${SUPA_URL}/rest/v1/order_items?id=eq.${item.id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+
+    // 2. Restore stock
+    if (item.product_id) {
+      if (item.variant_id) {
+        const varRows = await supaGet('product_variants', '?id=eq.' + item.variant_id + '&select=id,stock');
+        if (varRows && varRows[0]) {
+          await supaUpdate('product_variants', item.variant_id, { stock: (varRows[0].stock || 0) + qty });
+        }
+      } else {
+        const prodRows = await supaGet('products', '?id=eq.' + item.product_id + '&select=id,stock_quantity,track_inventory');
+        if (prodRows && prodRows[0] && prodRows[0].track_inventory) {
+          const newStock = (prodRows[0].stock_quantity || 0) + qty;
+          await supaUpdate('products', item.product_id, { stock_quantity: newStock, in_stock: newStock > 0 });
+        }
+      }
+      // Log movement
+      await supaInsert('inventory_movements', {
+        product_id: item.product_id,
+        variant_id: item.variant_id || null,
+        movement_type: 'adjustment',
+        quantity_change: qty,
+        reason: 'Item removed from order ' + (order.order_number || order.id),
+        order_id: order.id,
+        performed_by: 'admin_remove_item'
+      });
+    }
+
+    // 3. Remove from local array and recalculate order total
+    items.splice(idx, 1);
+    window._currentModalItems = items;
+    const activeItems = items.filter(i => !i.is_backorder);
+    const newSubtotal = parseFloat(activeItems.reduce((s, i) => s + (parseFloat(i.total_price) || 0), 0).toFixed(2));
+    const shipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
+    const newVat = Math.round((newSubtotal + shipping) * 23) / 100;
+    const newTotal = parseFloat((newSubtotal + shipping + newVat).toFixed(2));
+    await supaUpdate('orders', order.id, {
+      subtotal: newSubtotal, tax_amount: newVat, tax_total: newVat, total: newTotal
+    });
+    order.subtotal = newSubtotal; order.tax_amount = newVat; order.total = newTotal;
+
+    renderOrderItemsTable(items, order, true);
+    toast(`✅ "${itemName}" removed. Stock restored.`, 'success');
+  } catch(e) {
+    console.error('removeOrderItemFully error:', e);
+    toast('Error removing item: ' + e.message, 'error');
   }
 }
 
