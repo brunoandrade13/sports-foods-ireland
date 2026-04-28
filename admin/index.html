@@ -19793,6 +19793,13 @@ function printGLSReport() {
 // SALES REPRESENTATIVES MODULE
 // ============================================================
 
+// Ensure page-sales-reps is inside .main (fix layout)
+(function() {
+  const pg = document.getElementById('page-sales-reps');
+  const main = document.querySelector('.main');
+  if (pg && main && !main.contains(pg)) main.appendChild(pg);
+})();
+
 let _salesRepsCache = [];
 
 async function loadSalesReps() {
