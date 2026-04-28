@@ -19882,11 +19882,18 @@ function printGLSReport() {
 // SALES REPRESENTATIVES MODULE
 // ============================================================
 
-// Ensure page-sales-reps is inside .main (fix layout)
+// Move all .page divs that are outside .main into .main (layout fix)
+// These pages ended up outside <div class="main"> in the HTML structure
+// causing them to appear incorrectly in the CSS Grid layout
 (function() {
-  const pg = document.getElementById('page-sales-reps');
   const main = document.querySelector('.main');
-  if (pg && main && !main.contains(pg)) main.appendChild(pg);
+  if (!main) return;
+  const allPages = document.querySelectorAll('.page');
+  allPages.forEach(function(pg) {
+    if (!main.contains(pg)) {
+      main.appendChild(pg);
+    }
+  });
 })();
 
 let _salesRepsCache = [];
