@@ -1508,6 +1508,9 @@ authorized staff</p>
 </div>
 <div class="nav-section">
 <div class="nav-section-title">B2B Wholesale</div>
+<div class="nav-item" data-page="sales-reps" onclick="showPage('sales-reps')">
+<span class="icon">🤝</span> Sales Reps
+</div>
 <div class="nav-item" data-page="b2b" onclick="showPage('b2b')">
 <span class="icon">🏢</span> B2B Management
 <span class="badge" id="b2bPendingCount" style="display:none">0</span>
@@ -2383,6 +2386,18 @@ style="cursor:help;font-size:0.85rem">ℹ️</span></th>
           </select>
         </div>
         <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Sales Representative</label>
+          <select id="moSalesRep" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+            <option value="">— None —</option>
+          </select>
+        </div>
+        <div id="moCommissionRateWrap" style="display:none">
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Commission Rate %</label>
+          <input type="number" id="moCommissionRate" value="" min="0" max="100" step="0.5"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)"
+            placeholder="Auto-filled from rep defaults">
+        </div>
+        <div>
           <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Fulfillment Status</label>
           <select id="moFulfillment" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
             <option value="unfulfilled" selected>Unfulfilled</option>
@@ -2435,6 +2450,144 @@ style="cursor:help;font-size:0.85rem">ℹ️</span></th>
 
   </div>
 </div>
+</div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SALES REPS PAGE -->
+<!-- ============================================================ -->
+<div class="page" id="page-sales-reps">
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <h1>🤝 Sales Representatives</h1>
+    <button class="btn btn-primary" onclick="openSalesRepModal()">+ Add Rep</button>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:0">
+    <button id="srTab-reps" onclick="srShowTab('reps')"
+      style="padding:8px 20px;border:none;background:none;color:var(--accent);font-weight:700;font-size:0.95rem;border-bottom:2px solid var(--accent);cursor:pointer;margin-bottom:-2px">
+      👥 Representatives
+    </button>
+    <button id="srTab-report" onclick="srShowTab('report')"
+      style="padding:8px 20px;border:none;background:none;color:var(--text-muted);font-size:0.95rem;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px">
+      📊 Commission Report
+    </button>
+  </div>
+
+  <!-- TAB: Representatives list -->
+  <div id="srPanel-reps">
+    <div class="card" style="overflow:hidden">
+      <table style="width:100%;border-collapse:collapse" id="srRepsTable">
+        <thead>
+          <tr style="background:var(--surface-2)">
+            <th style="padding:12px 16px;text-align:left;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Name</th>
+            <th style="padding:12px 16px;text-align:left;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Email</th>
+            <th style="padding:12px 16px;text-align:left;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Phone</th>
+            <th style="padding:12px 16px;text-align:center;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Commission %</th>
+            <th style="padding:12px 16px;text-align:center;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Status</th>
+            <th style="padding:12px 16px;text-align:center;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="srRepsBody">
+          <tr><td colspan="6" style="padding:32px;text-align:center;color:var(--text-muted)">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: Commission Report -->
+  <div id="srPanel-report" style="display:none">
+    <!-- Filters -->
+    <div class="card" style="padding:16px 20px;margin-bottom:16px">
+      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Representative</label>
+          <select id="srFilterRep" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);min-width:180px">
+            <option value="">— All Reps —</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Month</label>
+          <input type="month" id="srFilterMonth" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+        </div>
+        <div>
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Status</label>
+          <select id="srFilterStatus" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+            <option value="">All</option>
+            <option value="paid">Paid</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="loadSalesRepReport()">🔍 Run Report</button>
+      </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div id="srReportSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px"></div>
+
+    <!-- Detailed table -->
+    <div class="card" style="overflow:hidden">
+      <table style="width:100%;border-collapse:collapse" id="srReportTable">
+        <thead>
+          <tr style="background:var(--surface-2)">
+            <th style="padding:11px 14px;text-align:left;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Order</th>
+            <th style="padding:11px 14px;text-align:left;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Date</th>
+            <th style="padding:11px 14px;text-align:left;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Customer</th>
+            <th style="padding:11px 14px;text-align:left;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Rep</th>
+            <th style="padding:11px 14px;text-align:right;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Order Total</th>
+            <th style="padding:11px 14px;text-align:center;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Rate %</th>
+            <th style="padding:11px 14px;text-align:right;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Commission</th>
+            <th style="padding:11px 14px;text-align:center;font-size:0.8rem;text-transform:uppercase;color:var(--text-muted)">Status</th>
+          </tr>
+        </thead>
+        <tbody id="srReportBody">
+          <tr><td colspan="8" style="padding:32px;text-align:center;color:var(--text-muted)">Run a report to see results.</td></tr>
+        </tbody>
+        <tfoot id="srReportFoot"></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Sales Rep Modal -->
+<div class="modal-overlay" id="salesRepModal" style="display:none;align-items:center;justify-content:center;z-index:9000">
+  <div class="modal" style="width:480px;max-width:95vw;padding:28px;border-radius:16px;position:relative">
+    <button onclick="closeSalesRepModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted)">✕</button>
+    <h2 id="srModalTitle" style="margin:0 0 20px;font-size:1.1rem">Add Sales Rep</h2>
+    <input type="hidden" id="srModalId">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div>
+        <label style="font-size:0.82rem;color:var(--text-muted);display:block;margin-bottom:4px">Name *</label>
+        <input type="text" id="srModalName" placeholder="Full name" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+      </div>
+      <div>
+        <label style="font-size:0.82rem;color:var(--text-muted);display:block;margin-bottom:4px">Email</label>
+        <input type="email" id="srModalEmail" placeholder="email@example.com" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+      </div>
+      <div>
+        <label style="font-size:0.82rem;color:var(--text-muted);display:block;margin-bottom:4px">Phone</label>
+        <input type="text" id="srModalPhone" placeholder="+353 …" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+      </div>
+      <div>
+        <label style="font-size:0.82rem;color:var(--text-muted);display:block;margin-bottom:4px">Default Commission Rate %</label>
+        <input type="number" id="srModalRate" value="5" min="0" max="100" step="0.5" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:3px">Applied to each order unless overridden per-order</div>
+      </div>
+      <div>
+        <label style="font-size:0.82rem;color:var(--text-muted);display:block;margin-bottom:4px">Notes</label>
+        <textarea id="srModalNotes" rows="2" placeholder="Territory, contract details…" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="srModalActive" checked style="width:16px;height:16px;cursor:pointer">
+        <label for="srModalActive" style="font-size:0.9rem;cursor:pointer">Active</label>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closeSalesRepModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSalesRep()">💾 Save</button>
+    </div>
+  </div>
 </div>
 
 <div class="page" id="page-invoices">
@@ -4750,6 +4903,24 @@ style="background: var(--surface-2); padding: 15px; border-radius: 8px; margin-b
 <div style="flex: 1; min-width: 150px;">
 <p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Source</p>
 <div id="omSource">—</div>
+</div>
+<div style="flex: 1; min-width: 180px;">
+<p style="margin:0 0 5px 0; color: var(--text-muted); font-size: 0.85rem;">Sales Rep
+  <button id="btnEditSalesRep" onclick="toggleSalesRepEdit()" style="background:none;border:1px solid var(--border);border-radius:5px;padding:2px 8px;color:var(--text-muted);font-size:0.72rem;cursor:pointer;margin-left:6px">✏️ Edit</button>
+</p>
+<div id="omSalesRepDisplay" style="font-size:0.9rem;font-weight:600;color:var(--text)">—</div>
+<div id="omSalesRepEdit" style="display:none;margin-top:6px">
+  <select id="omSalesRepSelect" style="width:100%;padding:5px 8px;border:1px solid var(--accent);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.82rem;margin-bottom:5px">
+    <option value="">— None —</option>
+  </select>
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+    <label style="font-size:0.72rem;color:var(--text-muted);white-space:nowrap">Commission %</label>
+    <input type="number" id="omCommissionRate" min="0" max="100" step="0.5" placeholder="Default"
+      style="width:80px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.82rem">
+  </div>
+  <button onclick="saveOrderSalesRep()" class="btn btn-primary" style="padding:4px 14px;font-size:0.8rem">💾 Save</button>
+  <button onclick="toggleSalesRepEdit()" style="background:none;border:1px solid var(--border);border-radius:5px;padding:4px 10px;font-size:0.8rem;cursor:pointer;color:var(--text-muted);margin-left:4px">Cancel</button>
+</div>
 </div>
 </div>
 
@@ -7330,7 +7501,7 @@ Loading items...
       const titles = {
         dashboard: 'Dashboard', analytics: 'Analytics', products: 'Products', brands: 'Brands', categories: 'Categories',
         reviews: 'Reviews', orders: 'Orders', customers: 'Customers', abandoned: 'Abandoned Carts', discounts: 'Discount Codes',
-        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', 'gls-report': 'GLS Shipments', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'manual-order': 'Create Manual Order', 'monthly-closing': 'Monthly Closing', finance: 'Financial Reports', 'qb-financial': 'QuickBooks Financial', settings: 'Settings'
+        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', 'gls-report': 'GLS Shipments', b2b: 'B2B Management', b2c: 'B2C Management', 'sales-reps': 'Sales Representatives', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'manual-order': 'Create Manual Order', 'monthly-closing': 'Monthly Closing', finance: 'Financial Reports', 'qb-financial': 'QuickBooks Financial', settings: 'Settings'
       };
       document.getElementById('pageTitle').textContent = titles[page] || page;
 
@@ -7350,6 +7521,7 @@ Loading items...
         if (sf && sf.value !== 'active') { sf.value = 'active'; filterProducts(); }
       }
       if (page === 'backorders') loadBackorders();
+      if (page === 'sales-reps') loadSalesReps();
       if (page === 'monthly-closing') initMonthlyClosing();
     }
 
@@ -12250,6 +12422,33 @@ Loading items...
       if (srcEntry) srcHtml += '<div style="font-size:0.7rem;color:var(--text-dim);margin-top:1px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + esc(srcEntry) + '">' + esc(srcEntry.replace('https://sportsfoodsireland.ie', '')) + '</div>';
       document.getElementById('omSource').innerHTML = srcHtml;
 
+      // Sales Rep display
+      const srDisplay = document.getElementById('omSalesRepDisplay');
+      const srEdit    = document.getElementById('omSalesRepEdit');
+      if (srEdit) srEdit.style.display = 'none';
+      if (srDisplay) {
+        if (order.sales_rep_id) {
+          const rep = _salesRepsCache.find(r => r.id === order.sales_rep_id);
+          const rate = order.commission_rate || (rep ? rep.commission_rate : 0);
+          const amt  = order.commission_amount || parseFloat(((parseFloat(order.total)||0) * rate / 100).toFixed(2));
+          srDisplay.innerHTML = rep
+            ? `<span style="font-weight:700">${esc(rep.name)}</span>
+               <span style="font-size:0.78rem;color:var(--text-muted);margin-left:6px">${rate}% · €${amt.toFixed(2)}</span>`
+            : `<span style="color:var(--text-muted);font-size:0.85rem">ID: ${esc(order.sales_rep_id).slice(0,8)}…</span>`;
+          // Pre-fill edit fields
+          const sel = document.getElementById('omSalesRepSelect');
+          if (sel) sel.value = order.sales_rep_id;
+          const ri = document.getElementById('omCommissionRate');
+          if (ri) ri.value = rate || '';
+        } else {
+          srDisplay.textContent = '—';
+          const sel = document.getElementById('omSalesRepSelect');
+          if (sel) sel.value = '';
+          const ri = document.getElementById('omCommissionRate');
+          if (ri) ri.value = '';
+        }
+      }
+
       const wrapper = document.getElementById('omItemsWrapper');
       wrapper.innerHTML = '<span class="spinner" style="display:inline-block;width:16px;height:16px;border-width:2px;border-top-color:var(--primary-color);"></span> Loading items...';
 
@@ -12876,6 +13075,14 @@ Loading items...
             };
           }
           return {};
+        })(),
+        sales_rep_id: document.getElementById('moSalesRep')?.value || null,
+        commission_rate: parseFloat(document.getElementById('moCommissionRate')?.value) || null,
+        commission_amount: (() => {
+          const repId = document.getElementById('moSalesRep')?.value;
+          const rate  = parseFloat(document.getElementById('moCommissionRate')?.value);
+          if (repId && rate) return parseFloat((total * rate / 100).toFixed(2));
+          return null;
         })()
       };
 
@@ -19584,6 +19791,323 @@ function printGLSReport() {
   w.document.write(html);
   w.document.close();
 }
+
+// ============================================================
+// SALES REPRESENTATIVES MODULE
+// ============================================================
+
+let _salesRepsCache = [];
+
+async function loadSalesReps() {
+  _salesRepsCache = await supaGet('sales_reps', '?order=name.asc') || [];
+  renderSalesRepTable();
+  populateSalesRepSelects();
+}
+
+function renderSalesRepTable() {
+  const body = document.getElementById('srRepsBody');
+  if (!body) return;
+  if (!_salesRepsCache.length) {
+    body.innerHTML = '<tr><td colspan="6" style="padding:32px;text-align:center;color:var(--text-muted)">No sales reps yet. Add one to get started.</td></tr>';
+    return;
+  }
+  body.innerHTML = _salesRepsCache.map(r => `
+    <tr style="border-top:1px solid var(--border)">
+      <td style="padding:12px 16px;font-weight:600">${esc(r.name)}</td>
+      <td style="padding:12px 16px;color:var(--text-muted)">${esc(r.email || '—')}</td>
+      <td style="padding:12px 16px;color:var(--text-muted)">${esc(r.phone || '—')}</td>
+      <td style="padding:12px 16px;text-align:center">
+        <span style="background:#d1fae5;color:#065f46;padding:2px 10px;border-radius:10px;font-weight:700;font-size:0.9rem">${r.commission_rate}%</span>
+      </td>
+      <td style="padding:12px 16px;text-align:center">
+        ${r.is_active
+          ? '<span style="background:#d1fae5;color:#065f46;padding:2px 10px;border-radius:10px;font-size:0.82rem">● Active</span>'
+          : '<span style="background:#fee2e2;color:#991b1b;padding:2px 10px;border-radius:10px;font-size:0.82rem">○ Inactive</span>'}
+      </td>
+      <td style="padding:12px 16px;text-align:center">
+        <button onclick="openSalesRepModal('${r.id}')" class="btn-sm btn-outline" style="margin-right:6px">✏️ Edit</button>
+        <button onclick="toggleSalesRepActive('${r.id}', ${r.is_active})" class="btn-sm btn-outline"
+          style="color:${r.is_active ? '#f59e0b' : '#22c55e'}">${r.is_active ? '⏸ Deactivate' : '▶ Activate'}</button>
+      </td>
+    </tr>`).join('');
+}
+
+function populateSalesRepSelects() {
+  // Populate all sales rep selects across the page
+  const opts = '<option value="">— None —</option>' +
+    _salesRepsCache.filter(r => r.is_active).map(r =>
+      `<option value="${r.id}" data-rate="${r.commission_rate}">${esc(r.name)} (${r.commission_rate}%)</option>`
+    ).join('');
+  ['moSalesRep', 'srFilterRep', 'omSalesRepSelect'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const isFilter = (id === 'srFilterRep');
+    const allOpt = isFilter ? '<option value="">— All Reps —</option>' : '<option value="">— None —</option>';
+    el.innerHTML = allOpt + _salesRepsCache.map(r =>
+      `<option value="${r.id}" data-rate="${r.commission_rate}">${esc(r.name)}${isFilter ? '' : ' (' + r.commission_rate + '%)'}</option>`
+    ).join('');
+  });
+  // Set default month filter to current month
+  const mf = document.getElementById('srFilterMonth');
+  if (mf && !mf.value) {
+    const now = new Date();
+    mf.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  }
+  // Wire moSalesRep change to show commission field
+  const moRep = document.getElementById('moSalesRep');
+  if (moRep) {
+    moRep.onchange = function() {
+      const wrap = document.getElementById('moCommissionRateWrap');
+      const rateInput = document.getElementById('moCommissionRate');
+      if (this.value) {
+        const sel = this.options[this.selectedIndex];
+        rateInput.value = sel.dataset.rate || '';
+        wrap.style.display = 'block';
+      } else {
+        wrap.style.display = 'none';
+        rateInput.value = '';
+      }
+    };
+  }
+  // Wire omSalesRepSelect change to auto-fill commission rate
+  const omRep = document.getElementById('omSalesRepSelect');
+  if (omRep) {
+    omRep.onchange = function() {
+      const rateInput = document.getElementById('omCommissionRate');
+      if (this.value) {
+        const sel = this.options[this.selectedIndex];
+        rateInput.placeholder = sel.dataset.rate ? sel.dataset.rate + '%' : 'Default';
+        if (!rateInput.value) rateInput.value = sel.dataset.rate || '';
+      } else {
+        rateInput.value = '';
+        rateInput.placeholder = 'Default';
+      }
+    };
+  }
+}
+
+function srShowTab(tab) {
+  ['reps','report'].forEach(t => {
+    document.getElementById('srPanel-' + t).style.display = (t === tab) ? '' : 'none';
+    const btn = document.getElementById('srTab-' + t);
+    if (btn) {
+      btn.style.color = (t === tab) ? 'var(--accent)' : 'var(--text-muted)';
+      btn.style.borderBottomColor = (t === tab) ? 'var(--accent)' : 'transparent';
+      btn.style.fontWeight = (t === tab) ? '700' : 'normal';
+    }
+  });
+  if (tab === 'report') loadSalesRepReport();
+}
+
+function openSalesRepModal(id) {
+  const modal = document.getElementById('salesRepModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  document.getElementById('srModalId').value = '';
+  document.getElementById('srModalName').value = '';
+  document.getElementById('srModalEmail').value = '';
+  document.getElementById('srModalPhone').value = '';
+  document.getElementById('srModalRate').value = '5';
+  document.getElementById('srModalNotes').value = '';
+  document.getElementById('srModalActive').checked = true;
+  document.getElementById('srModalTitle').textContent = 'Add Sales Rep';
+  if (id) {
+    const rep = _salesRepsCache.find(r => r.id === id);
+    if (!rep) return;
+    document.getElementById('srModalTitle').textContent = 'Edit Sales Rep';
+    document.getElementById('srModalId').value = rep.id;
+    document.getElementById('srModalName').value = rep.name || '';
+    document.getElementById('srModalEmail').value = rep.email || '';
+    document.getElementById('srModalPhone').value = rep.phone || '';
+    document.getElementById('srModalRate').value = rep.commission_rate || 5;
+    document.getElementById('srModalNotes').value = rep.notes || '';
+    document.getElementById('srModalActive').checked = rep.is_active !== false;
+  }
+}
+
+function closeSalesRepModal() {
+  const m = document.getElementById('salesRepModal');
+  if (m) m.style.display = 'none';
+}
+
+async function saveSalesRep() {
+  const name = (document.getElementById('srModalName').value || '').trim();
+  if (!name) { toast('Name is required', 'error'); return; }
+  const id = document.getElementById('srModalId').value;
+  const payload = {
+    name,
+    email: document.getElementById('srModalEmail').value.trim() || null,
+    phone: document.getElementById('srModalPhone').value.trim() || null,
+    commission_rate: parseFloat(document.getElementById('srModalRate').value) || 5,
+    notes: document.getElementById('srModalNotes').value.trim() || null,
+    is_active: document.getElementById('srModalActive').checked
+  };
+  try {
+    if (id) {
+      await supaUpdate('sales_reps', id, payload);
+      toast('Sales rep updated ✅');
+    } else {
+      await supaInsert('sales_reps', payload);
+      toast('Sales rep added ✅');
+    }
+    closeSalesRepModal();
+    await loadSalesReps();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function toggleSalesRepActive(id, current) {
+  try {
+    await supaUpdate('sales_reps', id, { is_active: !current });
+    toast(!current ? 'Rep activated' : 'Rep deactivated');
+    await loadSalesReps();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ---- Commission Report ----
+async function loadSalesRepReport() {
+  const repId    = document.getElementById('srFilterRep')?.value || '';
+  const month    = document.getElementById('srFilterMonth')?.value || '';
+  const status   = document.getElementById('srFilterStatus')?.value || '';
+
+  let qs = '?select=id,order_number,created_at,customer_name,total,financial_status,sales_rep_id,commission_rate,commission_amount&sales_rep_id=not.is.null&order=created_at.desc';
+  if (repId)   qs += '&sales_rep_id=eq.' + repId;
+  if (status)  qs += '&financial_status=eq.' + status;
+  if (month) {
+    const [y, m] = month.split('-');
+    const from = `${y}-${m}-01`;
+    const lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
+    const to   = `${y}-${m}-${String(lastDay).padStart(2,'0')}`;
+    qs += `&created_at=gte.${from}T00:00:00&created_at=lte.${to}T23:59:59`;
+  }
+
+  const rows = await supaGet('orders', qs) || [];
+  const body = document.getElementById('srReportBody');
+  const foot = document.getElementById('srReportFoot');
+  const summary = document.getElementById('srReportSummary');
+
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="8" style="padding:32px;text-align:center;color:var(--text-muted)">No orders found for the selected filters.</td></tr>';
+    if (foot) foot.innerHTML = '';
+    if (summary) summary.innerHTML = '';
+    return;
+  }
+
+  // Calculate per-row commission if not stored
+  const processed = rows.map(o => {
+    const rep = _salesRepsCache.find(r => r.id === o.sales_rep_id);
+    const repName = rep ? rep.name : o.sales_rep_id;
+    const rate = parseFloat(o.commission_rate) || (rep ? rep.commission_rate : 0);
+    const total = parseFloat(o.total) || 0;
+    const commission = parseFloat(o.commission_amount) || parseFloat((total * rate / 100).toFixed(2));
+    return { ...o, _repName: repName, _rate: rate, _commission: commission, _total: total };
+  });
+
+  // Summary by rep
+  const byRep = {};
+  processed.forEach(o => {
+    if (!byRep[o._repName]) byRep[o._repName] = { orders: 0, revenue: 0, commission: 0 };
+    byRep[o._repName].orders++;
+    byRep[o._repName].revenue += o._total;
+    byRep[o._repName].commission += o._commission;
+  });
+
+  const totalRevenue    = processed.reduce((s, o) => s + o._total, 0);
+  const totalCommission = processed.reduce((s, o) => s + o._commission, 0);
+
+  // Summary cards
+  if (summary) {
+    summary.innerHTML = [
+      { label: 'Orders', value: processed.length, color: '#3b82f6', bg: '#eff6ff', fmt: v => v },
+      { label: 'Total Revenue', value: totalRevenue, color: '#065f46', bg: '#d1fae5', fmt: v => '€' + v.toFixed(2) },
+      { label: 'Total Commission', value: totalCommission, color: '#92400e', bg: '#fef3c7', fmt: v => '€' + v.toFixed(2) },
+      { label: 'Avg Commission', value: totalCommission / processed.length, color: '#6d28d9', bg: '#ede9fe', fmt: v => '€' + v.toFixed(2) }
+    ].map(c => `
+      <div class="card" style="padding:14px 18px;background:${c.bg};border-color:${c.color}30">
+        <div style="font-size:0.75rem;text-transform:uppercase;color:${c.color};font-weight:600;letter-spacing:.05em">${c.label}</div>
+        <div style="font-size:1.5rem;font-weight:800;color:${c.color};margin-top:4px">${c.fmt(c.value)}</div>
+      </div>`).join('');
+  }
+
+  // Per-rep breakdown
+  const repBreakdown = Object.entries(byRep).map(([name, d]) => `
+    <tr style="background:var(--surface-2);border-top:2px solid var(--border)">
+      <td colspan="3" style="padding:8px 14px;font-weight:700">🤝 ${esc(name)}</td>
+      <td></td>
+      <td style="padding:8px 14px;text-align:right;font-weight:700">€${d.revenue.toFixed(2)}</td>
+      <td style="padding:8px 14px;text-align:center">—</td>
+      <td style="padding:8px 14px;text-align:right;color:#92400e;font-weight:700">€${d.commission.toFixed(2)}</td>
+      <td style="padding:8px 14px;text-align:center;font-size:0.8rem;color:var(--text-muted)">${d.orders} orders</td>
+    </tr>`).join('');
+
+  body.innerHTML = repBreakdown + processed.map(o => {
+    const date = new Date(o.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    const badge = o.financial_status === 'paid'
+      ? '<span style="background:#d1fae5;color:#065f46;padding:1px 8px;border-radius:8px;font-size:0.78rem">Paid</span>'
+      : `<span style="background:#fef3c7;color:#92400e;padding:1px 8px;border-radius:8px;font-size:0.78rem">${esc(o.financial_status)}</span>`;
+    return `<tr style="border-top:1px solid var(--border)">
+      <td style="padding:10px 14px;font-family:monospace;font-size:0.85rem">
+        <a href="#" onclick="openOrderByNumber('${esc(o.order_number)}');return false" style="color:var(--accent)">${esc(o.order_number)}</a>
+      </td>
+      <td style="padding:10px 14px;font-size:0.85rem;color:var(--text-muted)">${date}</td>
+      <td style="padding:10px 14px;font-size:0.88rem">${esc(o.customer_name || '—')}</td>
+      <td style="padding:10px 14px;font-size:0.85rem;color:var(--text-muted)">${esc(o._repName)}</td>
+      <td style="padding:10px 14px;text-align:right;font-weight:600">€${o._total.toFixed(2)}</td>
+      <td style="padding:10px 14px;text-align:center">${o._rate}%</td>
+      <td style="padding:10px 14px;text-align:right;font-weight:700;color:#92400e">€${o._commission.toFixed(2)}</td>
+      <td style="padding:10px 14px;text-align:center">${badge}</td>
+    </tr>`;
+  }).join('');
+
+  if (foot) foot.innerHTML = `<tr style="border-top:2px solid var(--border);background:var(--surface-2)">
+    <td colspan="4" style="padding:10px 14px;font-weight:700">TOTAL</td>
+    <td style="padding:10px 14px;text-align:right;font-weight:700">€${totalRevenue.toFixed(2)}</td>
+    <td></td>
+    <td style="padding:10px 14px;text-align:right;font-weight:800;color:#92400e;font-size:1.05rem">€${totalCommission.toFixed(2)}</td>
+    <td style="padding:10px 14px;text-align:center;color:var(--text-muted);font-size:0.82rem">${processed.length} orders</td>
+  </tr>`;
+}
+
+// ---- Order modal: Sales Rep edit ----
+function toggleSalesRepEdit() {
+  const editDiv = document.getElementById('omSalesRepEdit');
+  const display = document.getElementById('omSalesRepDisplay');
+  if (!editDiv) return;
+  const showing = editDiv.style.display !== 'none';
+  editDiv.style.display = showing ? 'none' : 'block';
+  if (!showing && _salesRepsCache.length === 0) loadSalesReps();
+}
+
+async function saveOrderSalesRep() {
+  const order = window._currentModalOrder;
+  if (!order) return;
+  const repId = document.getElementById('omSalesRepSelect').value || null;
+  const rate  = parseFloat(document.getElementById('omCommissionRate').value) || null;
+  const total = parseFloat(order.total) || 0;
+  const amount = (repId && rate) ? parseFloat((total * rate / 100).toFixed(2)) : null;
+  try {
+    await supaUpdate('orders', order.id, {
+      sales_rep_id: repId,
+      commission_rate: rate,
+      commission_amount: amount
+    });
+    order.sales_rep_id = repId;
+    order.commission_rate = rate;
+    order.commission_amount = amount;
+    // Update display
+    const rep = _salesRepsCache.find(r => r.id === repId);
+    const display = document.getElementById('omSalesRepDisplay');
+    if (display) {
+      display.textContent = rep
+        ? `${rep.name} · ${rate || rep.commission_rate}% · €${(amount || 0).toFixed(2)}`
+        : '—';
+    }
+    toggleSalesRepEdit();
+    toast('Sales rep saved ✅');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// Call loadSalesReps early so selects are populated
+loadSalesReps();
 
 </script>
 
