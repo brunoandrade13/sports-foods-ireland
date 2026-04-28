@@ -1502,6 +1502,9 @@ authorized staff</p>
 <div class="nav-item" data-page="shipping" onclick="showPage('shipping')">
 <span class="icon">🚚</span> Shipping
 </div>
+<div class="nav-item" data-page="gls-report" onclick="showPage('gls-report')">
+<span class="icon">📦</span> GLS Shipments
+</div>
 </div>
 <div class="nav-section">
 <div class="nav-section-title">B2B Wholesale</div>
@@ -3507,6 +3510,48 @@ style="font-size:0.8rem;padding:4px 8px">
 </tbody>
 </table>
 </div>
+</div>
+</div>
+
+<div class="page" id="page-gls-report">
+<div class="page-header">
+  <h1>📦 GLS Shipments</h1>
+  <div class="actions" style="gap:8px;display:flex;flex-wrap:wrap;align-items:center">
+    <input type="date" id="glsDateFrom" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
+    <span style="color:var(--text-muted);font-size:0.85rem">to</span>
+    <input type="date" id="glsDateTo" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
+    <button class="btn btn-outline" onclick="loadGLSReport()" style="padding:7px 14px;font-size:0.85rem">🔍 Search</button>
+    <button class="btn btn-primary" onclick="printGLSReport()" style="padding:7px 14px;font-size:0.85rem;background:#f59e0b;border-color:#f59e0b">🖨️ Print Report</button>
+  </div>
+</div>
+
+<!-- Stats row -->
+<div id="glsStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px"></div>
+
+<!-- Table -->
+<div class="table-wrap">
+  <div style="overflow-x:auto">
+    <table class="data-table" id="glsTable">
+      <thead>
+        <tr>
+          <th style="width:30px"><input type="checkbox" id="glsSelectAll" onchange="glsToggleAll(this.checked)" title="Select all"></th>
+          <th>Order</th>
+          <th>Date</th>
+          <th>Customer</th>
+          <th>Delivery Address</th>
+          <th>City</th>
+          <th>Postcode</th>
+          <th>Tracking No.</th>
+          <th style="text-align:right">Total</th>
+          <th>Status</th>
+          <th>Label</th>
+        </tr>
+      </thead>
+      <tbody id="glsTableBody">
+        <tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text-muted)">Select a date range and press Search</td></tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 </div>
 
@@ -7270,6 +7315,7 @@ Loading items...
       finance: () => updateFinanceSummary().catch(()=>{}),
       b2b: () => loadB2BData(),
       'site-analytics': () => loadSAReport(saCurrentReport),
+      'gls-report': () => initGLSReport(),
       reports: () => {} // reports load on-demand via their own controls
     };
 
@@ -7283,7 +7329,7 @@ Loading items...
       const titles = {
         dashboard: 'Dashboard', analytics: 'Analytics', products: 'Products', brands: 'Brands', categories: 'Categories',
         reviews: 'Reviews', orders: 'Orders', customers: 'Customers', abandoned: 'Abandoned Carts', discounts: 'Discount Codes',
-        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'manual-order': 'Create Manual Order', 'monthly-closing': 'Monthly Closing', finance: 'Financial Reports', 'qb-financial': 'QuickBooks Financial', settings: 'Settings'
+        coupons: 'Coupons', giftcards: 'Gift Cards', stock: 'Stock Management', 'purchase-orders': 'Purchase Orders', suppliers: 'Suppliers', invoices: 'Invoices', shipping: 'Shipping Zones', 'gls-report': 'GLS Shipments', b2b: 'B2B Management', b2c: 'B2C Management', 'site-analytics': 'Site Analytics', receivables: 'Accounts Receivable', backorders: 'Pending Backorders', 'manual-order': 'Create Manual Order', 'monthly-closing': 'Monthly Closing', finance: 'Financial Reports', 'qb-financial': 'QuickBooks Financial', settings: 'Settings'
       };
       document.getElementById('pageTitle').textContent = titles[page] || page;
 
@@ -19021,6 +19067,259 @@ async function sendSelectedStatements() {
   }
   toast(sent + ' statement(s) sent' + (failed > 0 ? ', ' + failed + ' failed' : ''));
   btn.disabled = false; btn.textContent = '📧 Send Selected Statements';
+}
+
+/* ============================================================
+   GLS SHIPMENTS REPORT
+   ============================================================ */
+
+function initGLSReport() {
+  // Set default date range: today
+  const today = new Date().toISOString().split('T')[0];
+  const weekAgo = new Date(Date.now() - 7*86400000).toISOString().split('T')[0];
+  const f = document.getElementById('glsDateFrom');
+  const t = document.getElementById('glsDateTo');
+  if (f && !f.value) f.value = weekAgo;
+  if (t && !t.value) t.value = today;
+  loadGLSReport();
+}
+
+var _glsData = [];
+
+async function loadGLSReport() {
+  const from = document.getElementById('glsDateFrom').value;
+  const to   = document.getElementById('glsDateTo').value;
+  const tbody = document.getElementById('glsTableBody');
+  tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px"><span class="spinner"></span> Loading…</td></tr>';
+  document.getElementById('glsStats').innerHTML = '';
+
+  try {
+    // Build query: orders with tracking_number set in date range
+    let q = '?select=id,order_number,created_at,shipped_at,customer_name,customer_email,shipping_address,tracking_number,tracking_url,total,status,fulfillment_status,gls_label_base64,is_b2b';
+    q += '&tracking_number=not.is.null';
+    if (from) q += '&created_at=gte.' + from + 'T00:00:00';
+    if (to)   q += '&created_at=lte.' + to   + 'T23:59:59';
+    q += '&order=created_at.desc';
+
+    const rows = await supaGet('orders', q);
+    _glsData = rows || [];
+
+    renderGLSStats(_glsData);
+    renderGLSTable(_glsData);
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;color:#ef4444">Error loading data: ' + e.message + '</td></tr>';
+  }
+}
+
+function renderGLSStats(data) {
+  const el = document.getElementById('glsStats');
+  const total = data.length;
+  const withLabel = data.filter(o => o.gls_label_base64).length;
+  const b2b = data.filter(o => o.is_b2b).length;
+  const totalValue = data.reduce((s,o) => s + parseFloat(o.total||0), 0);
+
+  el.innerHTML = [
+    {label:'Total Shipments', val: total, color:'#3b82f6'},
+    {label:'Labels Generated', val: withLabel, color:'#10b981'},
+    {label:'B2B Orders', val: b2b, color:'#8b5cf6'},
+    {label:'Total Value', val: '€' + totalValue.toFixed(2), color:'#f59e0b'},
+  ].map(s => `
+    <div style="background:var(--surface-2);border-radius:8px;padding:14px 16px;border-left:3px solid ${s.color}">
+      <div style="font-size:1.5rem;font-weight:700;color:${s.color}">${s.val}</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px">${s.label}</div>
+    </div>`).join('');
+}
+
+function glsGetAddr(addr) {
+  if (!addr) return {name:'', line1:'', city:'', postcode:'', country:''};
+  if (typeof addr === 'string') try { addr = JSON.parse(addr); } catch(e) { return {name:'', line1:addr, city:'', postcode:'', country:''}; }
+  const first = addr.first_name || addr.firstName || '';
+  const last  = addr.last_name  || addr.lastName  || '';
+  return {
+    name:     (first + ' ' + last).trim() || addr.name || '',
+    line1:    addr.line1 || addr.addr1 || addr.address_1 || addr.address || '',
+    line2:    addr.line2 || addr.addr2 || addr.address_2 || '',
+    city:     addr.city || '',
+    county:   addr.county || addr.state || '',
+    postcode: addr.postcode || addr.postal_code || addr.zip || '',
+    country:  addr.country || 'IE',
+    phone:    addr.phone || ''
+  };
+}
+
+function renderGLSTable(data) {
+  const tbody = document.getElementById('glsTableBody');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text-muted)">No GLS shipments found for this period</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((o, i) => {
+    const addr = glsGetAddr(o.shipping_address);
+    const name = o.customer_name || addr.name || o.customer_email || '—';
+    const date = o.shipped_at || o.created_at;
+    const dateStr = date ? new Date(date).toLocaleDateString('en-IE', {day:'2-digit', month:'2-digit', year:'numeric'}) : '—';
+    const trackUrl = o.tracking_url || ('https://gls-group.com/track/' + o.tracking_number);
+    const statusColor = o.fulfillment_status === 'fulfilled' ? '#10b981' : o.fulfillment_status === 'partial' ? '#f59e0b' : '#94a3b8';
+    const statusLabel = o.fulfillment_status === 'fulfilled' ? '✅ Shipped' : o.fulfillment_status === 'partial' ? '⚡ Partial' : '📦 Pending';
+    const hasLabel = o.gls_label_base64;
+
+    return `<tr data-idx="${i}">
+      <td style="text-align:center"><input type="checkbox" class="gls-check" data-idx="${i}" checked></td>
+      <td><a href="#" onclick="openOrderModal('${o.id}');return false;" style="color:#3b82f6;font-weight:600">${o.order_number}</a></td>
+      <td style="white-space:nowrap">${dateStr}</td>
+      <td><div style="font-weight:500">${name}</div>${o.is_b2b ? '<span style="font-size:0.7rem;background:#8b5cf6;color:#fff;padding:1px 5px;border-radius:4px">B2B</span>' : ''}</td>
+      <td style="font-size:0.85rem">${addr.line1}${addr.line2?' '+addr.line2:''}</td>
+      <td>${addr.city}</td>
+      <td style="font-family:monospace">${addr.postcode}</td>
+      <td><a href="${trackUrl}" target="_blank" style="color:#3b82f6;font-family:monospace;font-size:0.85rem">${o.tracking_number}</a></td>
+      <td style="text-align:right;font-weight:600">€${parseFloat(o.total||0).toFixed(2)}</td>
+      <td><span style="color:${statusColor};font-size:0.8rem">${statusLabel}</span></td>
+      <td style="text-align:center">
+        ${hasLabel ? `<button onclick="glsPrintLabel('${o.id}',event)" style="border:none;background:none;cursor:pointer;font-size:1.1rem" title="Print Label">🏷️</button>` : '<span style="color:var(--text-muted);font-size:0.8rem">—</span>'}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function glsToggleAll(checked) {
+  document.querySelectorAll('.gls-check').forEach(cb => cb.checked = checked);
+}
+
+function glsPrintLabel(orderId, evt) {
+  evt && evt.stopPropagation();
+  // Find order in data
+  const order = _glsData.find(o => o.id === orderId);
+  if (!order || !order.gls_label_base64) { toast('No label available', 'error'); return; }
+  const b64 = order.gls_label_base64;
+  const byteChars = atob(b64);
+  const byteNums = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) byteNums[i] = byteChars.charCodeAt(i);
+  const blob = new Blob([new Uint8Array(byteNums)], {type:'application/pdf'});
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url);
+  if (w) w.onload = () => { w.print(); URL.revokeObjectURL(url); };
+}
+
+function printGLSReport() {
+  // Get selected rows
+  const selected = [];
+  document.querySelectorAll('.gls-check:checked').forEach(cb => {
+    const idx = parseInt(cb.dataset.idx);
+    if (!isNaN(idx) && _glsData[idx]) selected.push(_glsData[idx]);
+  });
+  if (!selected.length) { toast('No shipments selected', 'warning'); return; }
+
+  const from = document.getElementById('glsDateFrom').value;
+  const to   = document.getElementById('glsDateTo').value;
+  const dateRange = from && to ? from + ' – ' + to : new Date().toLocaleDateString('en-IE');
+  const printDate = new Date().toLocaleDateString('en-IE', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const totalValue = selected.reduce((s,o) => s + parseFloat(o.total||0), 0);
+
+  const rows = selected.map((o, i) => {
+    const addr = glsGetAddr(o.shipping_address);
+    const name = o.customer_name || addr.name || o.customer_email || '—';
+    const date = new Date(o.shipped_at || o.created_at).toLocaleDateString('en-IE', {day:'2-digit',month:'2-digit',year:'numeric'});
+    const fullAddr = [addr.line1, addr.line2, addr.city, addr.postcode].filter(Boolean).join(', ');
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${o.order_number}</strong></td>
+      <td>${date}</td>
+      <td>${name}</td>
+      <td>${fullAddr}</td>
+      <td>${addr.country}</td>
+      <td style="font-family:monospace">${o.tracking_number}</td>
+      <td style="text-align:right">€${parseFloat(o.total||0).toFixed(2)}</td>
+      <td style="text-align:center">${o.is_b2b ? 'B2B' : 'B2C'}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html>
+  <head>
+    <meta charset="utf-8">
+    <title>GLS Shipments Report – ${dateRange}</title>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      body { font-family: Arial, sans-serif; font-size: 11px; color: #000; padding: 20px; }
+      .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 2px solid #000; padding-bottom: 12px; }
+      .logo-block { display: flex; align-items: center; gap: 12px; }
+      .logo-text { font-size: 18px; font-weight: 700; color: #1B4332; }
+      .logo-sub { font-size: 10px; color: #555; }
+      .gls-badge { background: #f5a623; color: #fff; font-weight: 700; font-size: 14px; padding: 4px 10px; border-radius: 4px; }
+      .report-info { text-align: right; }
+      .report-info .title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+      .report-info .sub { font-size: 10px; color: #555; line-height: 1.5; }
+      .summary-box { display: flex; gap: 16px; margin-bottom: 14px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; padding: 10px 14px; }
+      .summary-item { }
+      .summary-item .val { font-size: 18px; font-weight: 700; color: #1B4332; }
+      .summary-item .lbl { font-size: 9px; color: #666; text-transform: uppercase; }
+      table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+      th { background: #1B4332; color: #fff; padding: 6px 8px; text-align: left; font-size: 10px; text-transform: uppercase; }
+      td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; vertical-align: top; }
+      tr:nth-child(even) td { background: #f9fbf9; }
+      .total-row td { border-top: 2px solid #1B4332; font-weight: 700; background: #f0faf4; }
+      .footer { margin-top: 16px; padding-top: 10px; border-top: 1px solid #ccc; display: flex; justify-content: space-between; font-size: 9px; color: #888; }
+      @media print { body { padding: 10px; } @page { margin: 10mm; } }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo-block">
+        <div>
+          <div class="logo-text">Sports Foods Ireland</div>
+          <div class="logo-sub">Unit 12, Northwest Business Park<br>Blanchardstown, Dublin D15 YC53</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="gls-badge">GLS</div>
+        <div class="report-info">
+          <div class="title">Shipment Manifest</div>
+          <div class="sub">Period: ${dateRange}<br>Printed: ${printDate}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-item"><div class="val">${selected.length}</div><div class="lbl">Parcels</div></div>
+      <div class="summary-item" style="border-left:1px solid #ddd;padding-left:16px"><div class="val">€${totalValue.toFixed(2)}</div><div class="lbl">Total Value</div></div>
+      <div class="summary-item" style="border-left:1px solid #ddd;padding-left:16px"><div class="val">${selected.filter(o=>o.is_b2b).length}</div><div class="lbl">B2B Orders</div></div>
+      <div class="summary-item" style="border-left:1px solid #ddd;padding-left:16px"><div class="val">${selected.filter(o=>!o.is_b2b).length}</div><div class="lbl">B2C Orders</div></div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:30px">#</th>
+          <th>Order</th>
+          <th>Date</th>
+          <th>Recipient</th>
+          <th>Delivery Address</th>
+          <th>Country</th>
+          <th>Tracking Number</th>
+          <th style="text-align:right">Value</th>
+          <th style="text-align:center">Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+        <tr class="total-row">
+          <td colspan="7" style="text-align:right">TOTAL (${selected.length} parcels)</td>
+          <td style="text-align:right">€${totalValue.toFixed(2)}</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      <span>Sports Foods Ireland | sportsfoodsireland.ie | info@sportsfoodsireland.ie</span>
+      <span>GLS Ireland | gls-group.eu</span>
+      <span>Page 1</span>
+    </div>
+    <script>window.onload=function(){window.print()}<\/script>
+  </body></html>`;
+
+  const w = window.open('', '_blank', 'width=900,height=700');
+  w.document.write(html);
+  w.document.close();
 }
 
 </script>
