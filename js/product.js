@@ -76,6 +76,10 @@ async function loadProduct() {
         const numId = parseInt(rawId);
         const productId = (!isNaN(numId) && String(numId) === rawId) ? numId : rawId;
 
+        // ── VIP discount: detect ?vip=XX param (set by vip-sale.html links) ──
+        const vipDiscount = parseFloat(urlParams.get('vip')) || 0;
+        window._sfiVipDiscount = vipDiscount > 0 ? vipDiscount / 100 : 0;
+
         // Usar helper para obter produtos
         const productsArray = await getProductsData();
 
@@ -87,12 +91,15 @@ async function loadProduct() {
             return;
         }
 
+        const _vipMult = window._sfiVipDiscount || 0;
+        const _basePrice = parseFloat(product.preco) || 0;
+        const _vipPrice = _vipMult > 0 ? parseFloat((_basePrice * (1 - _vipMult)).toFixed(2)) : _basePrice;
         currentProduct = {
             ...product,
             categoryEn: categoryMap[product.categoria] || product.categoria,
-            price: parseFloat(product.preco) || 0,
-            oldPrice: parseFloat(product.preco_antigo) || null,
-            discount: product.desconto || 0,
+            price: _vipPrice,
+            oldPrice: _vipMult > 0 ? _basePrice : (parseFloat(product.preco_antigo) || null),
+            discount: _vipMult > 0 ? Math.round(_vipMult * 100) : (product.desconto || 0),
             inStock: product.em_stock === true,
             stockQty: calculateTotalStock(product),
             backorderAvailable: product.backorder_available || false
@@ -923,7 +930,9 @@ function productPageAddToCart(productId) {
         nome: `${currentProduct.nome || currentProduct.name} — ${selectedVariantLabel}`,
         variant_id: selectedVariantId,
         variant_label: selectedVariantLabel,
-        preco: selectedVariantPrice ?? currentProduct.preco ?? currentProduct.price,
+        preco: window._sfiVipDiscount > 0
+            ? parseFloat(((selectedVariantPrice ?? currentProduct.price) * (1 - window._sfiVipDiscount)).toFixed(2))
+            : (selectedVariantPrice ?? currentProduct.preco ?? currentProduct.price),
         // Use variant-specific image if available
         imagem: window._selectedVariantImageUrl || currentProduct.imagem,
     } : currentProduct;

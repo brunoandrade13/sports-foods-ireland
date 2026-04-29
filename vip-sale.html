@@ -1512,5 +1512,55 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
   };
 })();
 </script>
+
+<script>
+// VIP page: inject &vip=20 into all product links so produto.html shows discounted price
+(function() {
+  var _origCreate = window.createProductCardHTML;
+  function patchCardHTML(html) {
+    if (!html) return html;
+    return html.replace(/href="produto\.html\?id=([^"]+)"/g, 'href="produto.html?id=$1&vip=20"');
+  }
+  if (typeof _origCreate === 'function') {
+    window.createProductCardHTML = function() {
+      return patchCardHTML(_origCreate.apply(this, arguments));
+    };
+  }
+  // Also patch after DOM loads in case cards already rendered
+  document.addEventListener('DOMContentLoaded', function() {
+    // Patch createProductCardHTML if loaded after DOMContentLoaded
+    var _orig2 = window.createProductCardHTML;
+    if (typeof _orig2 === 'function' && !_orig2._vipPatched) {
+      window.createProductCardHTML = function() {
+        return patchCardHTML(_orig2.apply(this, arguments));
+      };
+      window.createProductCardHTML._vipPatched = true;
+    }
+    // Patch any links already in the DOM
+    document.querySelectorAll('a[href*="produto.html?id="]').forEach(function(a) {
+      if (!a.href.includes('vip=')) {
+        a.href = a.href + '&vip=20';
+      }
+    });
+    // MutationObserver to catch dynamically added cards
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 1) {
+            var links = node.querySelectorAll ? node.querySelectorAll('a[href*="produto.html?id="]') : [];
+            links.forEach(function(a) {
+              if (!a.href.includes('vip=')) a.href = a.href + '&vip=20';
+            });
+            if (node.tagName === 'A' && node.href && node.href.includes('produto.html?id=') && !node.href.includes('vip=')) {
+              node.href = node.href + '&vip=20';
+            }
+          }
+        });
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+})();
+</script>
 </body>
 </html>
