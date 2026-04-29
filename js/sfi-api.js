@@ -321,7 +321,7 @@ const sfi = {
     signOut() {
       db.token = null;
       // Bug #19: sweep all sfi_* auth-related keys on logout
-      const authKeys = ['sfi_token','sfi_user','sfi_refresh','sfi_token_exp','sfi_user_email','sfi_b2b_email','sfi_reset_token'];
+      const authKeys = ['sfi_token','sfi_user','sfi_refresh','sfi_token_exp','sfi_user_email','sfi_b2b_email','sfi_reset_token','sfi_b2b_status'];
       for (const k of authKeys) try { localStorage.removeItem(k); } catch(e) {}
     },
 
