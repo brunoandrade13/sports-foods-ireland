@@ -1829,6 +1829,8 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
   if (!vipDiscount) return;
 
   var mult = vipDiscount / 100;
+  // Set global so product.min.js can use it in the preco calculation
+  window._sfiVipDiscount = mult;
 
   // ── Patch #productPrice textContent setter ──────────────────────────────
   function interceptPriceEl() {
@@ -1846,19 +1848,14 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
         var price = parseFloat(raw);
         if (price > 0) {
           var vip = Math.round(price * (1 - mult) * 100) / 100;
-          // Set VIP price in the element
           proto.set.call(this, '€' + vip.toFixed(2));
-          // Update supporting elements synchronously
           var oldEl  = document.getElementById('productOldPrice');
           var discEl = document.getElementById('productDiscount');
           if (oldEl)  { oldEl.textContent  = '€' + price.toFixed(2); oldEl.style.display  = 'inline'; }
           if (discEl) { discEl.textContent = '-' + Math.round(vipDiscount) + '%'; discEl.style.display = 'inline-block'; }
-          // Update currentProduct synchronously so addToCart reads correct price
           if (window.currentProduct) {
-            window.currentProduct._vipBase  = price;
-            window.currentProduct.price     = vip;
-            window.currentProduct.preco     = String(vip);
-            window.currentProduct.preco_original = String(price);
+            window.currentProduct.price = vip;
+            window.currentProduct.preco = String(vip);
           }
         } else {
           proto.set.call(this, val);
@@ -1867,35 +1864,15 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
     });
 
     // Apply to existing price
-    var cur = parseFloat((document.getElementById('productPrice').textContent || '').replace(/[^0-9.]/g, ''));
-    if (cur > 0) {
-      document.getElementById('productPrice').textContent = '€' + cur.toFixed(2); // triggers our setter
-    }
-  }
-
-  // ── Patch addToCartBtn capture phase ─────────────────────────────────────
-  // Runs BEFORE product.min.js listener, ensures currentProduct has VIP price
-  function patchAddToCart() {
-    var btn = document.getElementById('addToCartBtn');
-    if (!btn || btn._vipCartPatched) return;
-    btn._vipCartPatched = true;
-    btn.addEventListener('click', function() {
-      if (!window.currentProduct) return;
-      var priceEl = document.getElementById('productPrice');
-      var shown   = parseFloat((priceEl ? priceEl.textContent : '').replace(/[^0-9.]/g, '')) || 0;
-      if (shown > 0) {
-        window.currentProduct.price = shown;
-        window.currentProduct.preco = String(shown);
-      }
-    }, true); // capture=true → fires before product.min.js bubbling listener
+    var cur = parseFloat((priceEl.textContent || '').replace(/[^0-9.]/g, ''));
+    if (cur > 0) { priceEl.textContent = '€' + cur.toFixed(2); }
   }
 
   document.addEventListener('DOMContentLoaded', function() {
     interceptPriceEl();
-    patchAddToCart();
     setTimeout(interceptPriceEl, 300);
     setTimeout(interceptPriceEl, 800);
-    setTimeout(function() { interceptPriceEl(); patchAddToCart(); }, 1500);
+    setTimeout(interceptPriceEl, 1500);
   });
 })();
 </script>
