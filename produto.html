@@ -1819,75 +1819,66 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
 </script>
 
 <script>
-// VIP Discount — applied after product.min.js renders the product
+// VIP Discount — intercepts every price update from product.min.js
 (function() {
   var vipDiscount = 0;
   try {
     var up = new URLSearchParams(window.location.search);
-    var fromUrl = parseFloat(up.get('vip')) || 0;
-    var fromSession = parseFloat(sessionStorage.getItem('sfi_vip_discount') || '0') || 0;
-    vipDiscount = fromUrl || fromSession;
+    vipDiscount = parseFloat(up.get('vip')) || parseFloat(sessionStorage.getItem('sfi_vip_discount') || '0') || 0;
   } catch(e) {}
   if (!vipDiscount) return;
 
   var mult = vipDiscount / 100;
-  var lastVipPrice = null; // track last price WE set to avoid infinite loop
 
-  function applyVipDiscount() {
-    var priceEl    = document.getElementById('productPrice');
-    var oldPriceEl = document.getElementById('productOldPrice');
-    var discountEl = document.getElementById('productDiscount');
-    if (!priceEl) return;
-
-    var rawText    = priceEl.textContent.replace(/[^0-9.]/g, '');
-    var basePrice  = parseFloat(rawText);
-    if (!basePrice || basePrice <= 0) return;
-
-    // If this exact price was already set by us — skip (prevent infinite loop)
-    if (lastVipPrice !== null && Math.abs(basePrice - lastVipPrice) < 0.005) return;
-
-    var vipPrice = Math.round(basePrice * (1 - mult) * 100) / 100;
-    lastVipPrice = vipPrice;
-
-    // Apply discounted price
-    priceEl.textContent = '€' + vipPrice.toFixed(2);
-
-    // Show original as strikethrough
-    if (oldPriceEl) {
-      oldPriceEl.textContent = '€' + basePrice.toFixed(2);
-      oldPriceEl.style.display = 'inline';
-    }
-
-    // Show discount badge
-    if (discountEl) {
-      discountEl.textContent = '-' + Math.round(vipDiscount) + '%';
-      discountEl.style.display = 'inline-block';
-    }
-
-    // Patch currentProduct so addToCart uses VIP price
+  function applyToElements(basePrice) {
+    var oldEl  = document.getElementById('productOldPrice');
+    var discEl = document.getElementById('productDiscount');
+    if (oldEl)  { oldEl.textContent  = '€' + basePrice.toFixed(2); oldEl.style.display = 'inline'; }
+    if (discEl) { discEl.textContent = '-' + Math.round(vipDiscount) + '%'; discEl.style.display = 'inline-block'; }
     if (window.currentProduct) {
-      window.currentProduct._vipBasePrice  = basePrice;
-      window.currentProduct._vipFinalPrice = vipPrice;
-      window.currentProduct.price = vipPrice;
-      window.currentProduct.preco = String(vipPrice);
+      window.currentProduct.price = Math.round(basePrice * (1 - mult) * 100) / 100;
+      window.currentProduct.preco = String(window.currentProduct.price);
     }
   }
 
-  // Watch #productPrice for ANY change (initial render + variant selection)
-  document.addEventListener('DOMContentLoaded', function() {
+  // Wait until #productPrice exists then intercept its textContent setter
+  function interceptPriceEl() {
     var priceEl = document.getElementById('productPrice');
-    if (!priceEl) return;
+    if (!priceEl || priceEl._vipIntercepted) return;
+    priceEl._vipIntercepted = true;
 
-    // MutationObserver fires whenever product.min.js updates the price
-    var observer = new MutationObserver(function() {
-      applyVipDiscount();
+    var proto = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
+
+    Object.defineProperty(priceEl, 'textContent', {
+      configurable: true,
+      get: function() { return proto.get.call(this); },
+      set: function(val) {
+        var raw = String(val).replace(/[^0-9.]/g,'');
+        var price = parseFloat(raw);
+        if (price > 0) {
+          var vip = Math.round(price * (1 - mult) * 100) / 100;
+          proto.set.call(this, '€' + vip.toFixed(2));
+          setTimeout(function(){ applyToElements(price); }, 0);
+        } else {
+          proto.set.call(this, val);
+        }
+      }
     });
-    observer.observe(priceEl, { childList: true, characterData: true, subtree: true });
 
-    // Fallback timeouts for initial load
-    setTimeout(applyVipDiscount, 300);
-    setTimeout(applyVipDiscount, 800);
-    setTimeout(applyVipDiscount, 2000);
+    // Apply immediately to whatever price is already shown
+    var current = parseFloat(priceEl.textContent.replace(/[^0-9.]/g,''));
+    if (current > 0) {
+      var vip0 = Math.round(current * (1 - mult) * 100) / 100;
+      proto.set.call(priceEl, '€' + vip0.toFixed(2));
+      applyToElements(current);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    interceptPriceEl();
+    setTimeout(interceptPriceEl, 200);
+    setTimeout(interceptPriceEl, 600);
+    setTimeout(interceptPriceEl, 1500);
   });
 })();
 </script>
