@@ -76,8 +76,10 @@ async function loadProduct() {
         const numId = parseInt(rawId);
         const productId = (!isNaN(numId) && String(numId) === rawId) ? numId : rawId;
 
-        // ── VIP discount: detect ?vip=XX param (set by vip-sale.html links) ──
-        const vipDiscount = parseFloat(urlParams.get('vip')) || 0;
+        // ── VIP discount: from URL param OR sessionStorage (set by vip-sale.html) ──
+        const _vipParam = parseFloat(urlParams.get('vip')) || 0;
+        const _vipSession = parseFloat(typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('sfi_vip_discount') || '0' : '0') || 0;
+        const vipDiscount = _vipParam || _vipSession;
         window._sfiVipDiscount = vipDiscount > 0 ? vipDiscount / 100 : 0;
 
         // Usar helper para obter produtos
