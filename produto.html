@@ -1829,10 +1829,11 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
   if (!vipDiscount) return;
 
   var mult = vipDiscount / 100;
-  // Set global so product.min.js can use it in the preco calculation
   window._sfiVipDiscount = mult;
 
-  // ── Patch #productPrice textContent setter ──────────────────────────────
+  var currentBasePrice = 0; // track original price for old price display
+
+  // ── 1. Intercept #productPrice textContent setter ────────────────────────
   function interceptPriceEl() {
     var priceEl = document.getElementById('productPrice');
     if (!priceEl || priceEl._vipIntercepted) return;
@@ -1848,10 +1849,12 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
         var price = parseFloat(raw);
         if (price > 0) {
           var vip = Math.round(price * (1 - mult) * 100) / 100;
+          currentBasePrice = price;
           proto.set.call(this, '€' + vip.toFixed(2));
+          // update supporting elements
           var oldEl  = document.getElementById('productOldPrice');
           var discEl = document.getElementById('productDiscount');
-          if (oldEl)  { oldEl.textContent  = '€' + price.toFixed(2); oldEl.style.display  = 'inline'; }
+          if (oldEl)  { oldEl.textContent = '€' + price.toFixed(2); oldEl.style.display = 'inline'; }
           if (discEl) { discEl.textContent = '-' + Math.round(vipDiscount) + '%'; discEl.style.display = 'inline-block'; }
           if (window.currentProduct) {
             window.currentProduct.price = vip;
@@ -1863,16 +1866,48 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
       }
     });
 
-    // Apply to existing price
     var cur = parseFloat((priceEl.textContent || '').replace(/[^0-9.]/g, ''));
     if (cur > 0) { priceEl.textContent = '€' + cur.toFixed(2); }
   }
 
+  // ── 2. Observe #productOldPrice and prevent it being hidden ─────────────
+  function interceptOldPriceEl() {
+    var oldEl = document.getElementById('productOldPrice');
+    if (!oldEl || oldEl._vipOldObserved) return;
+    oldEl._vipOldObserved = true;
+
+    var obs = new MutationObserver(function() {
+      if (oldEl.style.display === 'none' && currentBasePrice > 0) {
+        // product.min.js just hid it — show it back immediately
+        oldEl.style.display = 'inline';
+        oldEl.textContent = '€' + currentBasePrice.toFixed(2);
+      }
+    });
+    obs.observe(oldEl, { attributes: true, attributeFilter: ['style'] });
+  }
+
+  // ── 3. Observe #productDiscount and keep it showing VIP % ────────────────
+  function interceptDiscountEl() {
+    var discEl = document.getElementById('productDiscount');
+    if (!discEl || discEl._vipDiscObserved) return;
+    discEl._vipDiscObserved = true;
+
+    var obs = new MutationObserver(function() {
+      if (discEl.style.display === 'none' && currentBasePrice > 0) {
+        discEl.style.display = 'inline-block';
+        discEl.textContent = '-' + Math.round(vipDiscount) + '%';
+      }
+    });
+    obs.observe(discEl, { attributes: true, attributeFilter: ['style'] });
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
     interceptPriceEl();
-    setTimeout(interceptPriceEl, 300);
-    setTimeout(interceptPriceEl, 800);
-    setTimeout(interceptPriceEl, 1500);
+    interceptOldPriceEl();
+    interceptDiscountEl();
+    setTimeout(function() { interceptPriceEl(); interceptOldPriceEl(); interceptDiscountEl(); }, 300);
+    setTimeout(function() { interceptPriceEl(); interceptOldPriceEl(); interceptDiscountEl(); }, 800);
+    setTimeout(function() { interceptPriceEl(); interceptOldPriceEl(); interceptDiscountEl(); }, 1500);
   });
 })();
 </script>
