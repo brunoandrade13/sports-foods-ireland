@@ -1819,7 +1819,7 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
 </script>
 
 <script>
-// VIP Discount — intercepts every price update from product.min.js
+// VIP Discount — intercepts price display AND addToCart
 (function() {
   var vipDiscount = 0;
   try {
@@ -1830,18 +1830,7 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
 
   var mult = vipDiscount / 100;
 
-  function applyToElements(basePrice) {
-    var oldEl  = document.getElementById('productOldPrice');
-    var discEl = document.getElementById('productDiscount');
-    if (oldEl)  { oldEl.textContent  = '€' + basePrice.toFixed(2); oldEl.style.display = 'inline'; }
-    if (discEl) { discEl.textContent = '-' + Math.round(vipDiscount) + '%'; discEl.style.display = 'inline-block'; }
-    if (window.currentProduct) {
-      window.currentProduct.price = Math.round(basePrice * (1 - mult) * 100) / 100;
-      window.currentProduct.preco = String(window.currentProduct.price);
-    }
-  }
-
-  // Wait until #productPrice exists then intercept its textContent setter
+  // ── Patch #productPrice textContent setter ──────────────────────────────
   function interceptPriceEl() {
     var priceEl = document.getElementById('productPrice');
     if (!priceEl || priceEl._vipIntercepted) return;
@@ -1853,32 +1842,60 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
       configurable: true,
       get: function() { return proto.get.call(this); },
       set: function(val) {
-        var raw = String(val).replace(/[^0-9.]/g,'');
+        var raw   = String(val).replace(/[^0-9.]/g, '');
         var price = parseFloat(raw);
         if (price > 0) {
           var vip = Math.round(price * (1 - mult) * 100) / 100;
+          // Set VIP price in the element
           proto.set.call(this, '€' + vip.toFixed(2));
-          setTimeout(function(){ applyToElements(price); }, 0);
+          // Update supporting elements synchronously
+          var oldEl  = document.getElementById('productOldPrice');
+          var discEl = document.getElementById('productDiscount');
+          if (oldEl)  { oldEl.textContent  = '€' + price.toFixed(2); oldEl.style.display  = 'inline'; }
+          if (discEl) { discEl.textContent = '-' + Math.round(vipDiscount) + '%'; discEl.style.display = 'inline-block'; }
+          // Update currentProduct synchronously so addToCart reads correct price
+          if (window.currentProduct) {
+            window.currentProduct._vipBase  = price;
+            window.currentProduct.price     = vip;
+            window.currentProduct.preco     = String(vip);
+            window.currentProduct.preco_original = String(price);
+          }
         } else {
           proto.set.call(this, val);
         }
       }
     });
 
-    // Apply immediately to whatever price is already shown
-    var current = parseFloat(priceEl.textContent.replace(/[^0-9.]/g,''));
-    if (current > 0) {
-      var vip0 = Math.round(current * (1 - mult) * 100) / 100;
-      proto.set.call(priceEl, '€' + vip0.toFixed(2));
-      applyToElements(current);
+    // Apply to existing price
+    var cur = parseFloat((document.getElementById('productPrice').textContent || '').replace(/[^0-9.]/g, ''));
+    if (cur > 0) {
+      document.getElementById('productPrice').textContent = '€' + cur.toFixed(2); // triggers our setter
     }
+  }
+
+  // ── Patch addToCartBtn capture phase ─────────────────────────────────────
+  // Runs BEFORE product.min.js listener, ensures currentProduct has VIP price
+  function patchAddToCart() {
+    var btn = document.getElementById('addToCartBtn');
+    if (!btn || btn._vipCartPatched) return;
+    btn._vipCartPatched = true;
+    btn.addEventListener('click', function() {
+      if (!window.currentProduct) return;
+      var priceEl = document.getElementById('productPrice');
+      var shown   = parseFloat((priceEl ? priceEl.textContent : '').replace(/[^0-9.]/g, '')) || 0;
+      if (shown > 0) {
+        window.currentProduct.price = shown;
+        window.currentProduct.preco = String(shown);
+      }
+    }, true); // capture=true → fires before product.min.js bubbling listener
   }
 
   document.addEventListener('DOMContentLoaded', function() {
     interceptPriceEl();
-    setTimeout(interceptPriceEl, 200);
-    setTimeout(interceptPriceEl, 600);
-    setTimeout(interceptPriceEl, 1500);
+    patchAddToCart();
+    setTimeout(interceptPriceEl, 300);
+    setTimeout(interceptPriceEl, 800);
+    setTimeout(function() { interceptPriceEl(); patchAddToCart(); }, 1500);
   });
 })();
 </script>
