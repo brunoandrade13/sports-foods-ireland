@@ -62,12 +62,15 @@
 
   async function detectB2BCustomer() {
     try {
-      // ── Fast path: persistent flag (valid 7 days, survives token expiry) ──
+      const token = localStorage.getItem('sfi_token');
+      // ── No token = logged out → clear B2B flag and return false ──
+      if (!token) {
+        try { localStorage.removeItem('sfi_b2b_status'); } catch(e) {}
+        return false;
+      }
+      // ── Fast path: persistent flag (valid 7 days) — only if logged in ──
       const flag = readB2BFlag();
       if (flag) return true;
-
-      const token = localStorage.getItem('sfi_token');
-      if (!token) return false;
 
       // Get userId — from sfi_user OR decoded directly from JWT (sub claim)
       let userId = null, userEmail = null;
