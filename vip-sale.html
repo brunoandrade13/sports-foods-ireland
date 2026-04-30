@@ -1542,24 +1542,30 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
 </script>
 
 <script>
-// VIP page: mark each cart item with its ID when added from this page
+// VIP page: intercept localStorage to tag newly added cart items
 (function() {
-  var interval = setInterval(function() {
-    if (typeof window.addToCart === 'function' && !window.addToCart._vipTagged) {
-      var _orig = window.addToCart;
-      window.addToCart = function(id) {
-        _orig.apply(this, arguments);
-        try {
-          var vipKeys = JSON.parse(localStorage.getItem('sfi_vip_cart_keys') || '[]');
-          var sid = String(id);
-          if (vipKeys.indexOf(sid) === -1) vipKeys.push(sid);
-          localStorage.setItem('sfi_vip_cart_keys', JSON.stringify(vipKeys));
-        } catch(e) {}
-      };
-      window.addToCart._vipTagged = true;
-      clearInterval(interval);
+  var _orig = Storage.prototype.setItem;
+  Storage.prototype.setItem = function(key, value) {
+    if (key === 'cart') {
+      try {
+        var oldCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        var newCart = JSON.parse(value);
+        var oldKeys = {};
+        oldCart.forEach(function(i) { oldKeys[String(i.id)+'__'+(i.variant_id||'')] = true; });
+        var vipKeys = JSON.parse(localStorage.getItem('sfi_vip_cart_keys') || '[]');
+        var vipSet = new Set(vipKeys);
+        newCart.forEach(function(item) {
+          var k = String(item.id)+'__'+(item.variant_id||'');
+          if (!oldKeys[k]) { // this item was just added
+            var sid = String(item.id);
+            if (!vipSet.has(sid)) { vipSet.add(sid); vipKeys.push(sid); }
+          }
+        });
+        _orig.call(localStorage, 'sfi_vip_cart_keys', JSON.stringify(vipKeys));
+      } catch(e) {}
     }
-  }, 50);
+    _orig.call(this, key, value);
+  };
 })();
 </script>
 </body>
