@@ -1,6 +1,40 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
+<script>
+// VIP tracking: tag cart items when added from a VIP context
+// Runs on vip-sale.html and produto.html?vip=XX
+(function() {
+  var isVipContext = window.location.search.indexOf('vip=') >= 0
+    || window.location.pathname.indexOf('vip-sale') >= 0;
+  if (!isVipContext) return;
+
+  var _orig = Storage.prototype.setItem;
+  Storage.prototype.setItem = function(key, value) {
+    if (key === 'cart') {
+      try {
+        var oldCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        var newCart = JSON.parse(value);
+        var oldKeys = {};
+        oldCart.forEach(function(i) {
+          oldKeys[String(i.id)+'__'+(i.variant_id||'')] = true;
+        });
+        var vipKeys = JSON.parse(localStorage.getItem('sfi_vip_cart_keys') || '[]');
+        var vipSet = new Set(vipKeys);
+        newCart.forEach(function(item) {
+          var k = String(item.id)+'__'+(item.variant_id||'');
+          if (!oldKeys[k]) {
+            var sid = String(item.id);
+            if (!vipSet.has(sid)) { vipSet.add(sid); vipKeys.push(sid); }
+          }
+        });
+        _orig.call(localStorage, 'sfi_vip_cart_keys', JSON.stringify(vipKeys));
+      } catch(e) {}
+    }
+    _orig.call(this, key, value);
+  };
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Buy premium sports nutrition online in Ireland. Professional energy, hydration and recovery for cyclists, triathletes, swimmers and runners.">
