@@ -347,55 +347,7 @@
 
 
 
-<!-- saltstick-ireland brand page: render products — identical to shop cards -->
-<script>
-(function() {
-  var BRAND_FILTER = 'saltstick';
-  var MAX_PRODUCTS = 8;
-  var GRID_ID = 'saltstickProductsGrid';
-  var _rendered = false;
 
-  function doRender() {
-    if (_rendered) return;
-    var grid = document.getElementById(GRID_ID);
-    if (!grid) return;
-    if (grid.querySelector('.product-card')) { _rendered = true; return; }
-    var prods = (window.PRODUTOS || []).filter(function(p) {
-      return (p.marca || '').toLowerCase().includes(BRAND_FILTER);
-    }).slice(0, MAX_PRODUCTS);
-    if (!prods.length) return;
-    if (typeof renderProductCards === 'function') {
-      renderProductCards(prods, GRID_ID);
-    } else if (typeof createProductCardHTML === 'function') {
-      grid.innerHTML = prods.map(function(p) { return createProductCardHTML(p); }).join('');
-    } else { return; }
-    _rendered = true;
-    if (typeof addQuickActionsToCards === 'function') setTimeout(addQuickActionsToCards, 200);
-  }
-
-  // 1. window.load — fires after ALL defer scripts have run
-  window.addEventListener('load', function() {
-    // Try immediately, then retry up to 3s in case Supabase fetch is still running
-    doRender();
-    if (!_rendered) {
-      var attempts = 0;
-      var retry = setInterval(function() {
-        doRender();
-        if (_rendered || ++attempts > 30) clearInterval(retry);
-      }, 100);
-    }
-  });
-
-  // 2. sfi:products-loaded event (fired by sfi-data-loader after Supabase fetch)
-  window.addEventListener('sfi:products-loaded', function() {
-    setTimeout(doRender, 0);
-  });
-
-  // 3. Supabase promise
-  if (window._sfiProductsPromise) {
-    window._sfiProductsPromise.then(function() { setTimeout(doRender, 0); });
-  }
-})();
-</script>
+<script src="js/brand-page-products.js?v=1" defer></script>
 </body>
 </html>
