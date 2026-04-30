@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Ordens com problema de VAT — para revisão</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; padding: 24px; line-height: 1.5; }
+  .container { max-width: 1280px; margin: 0 auto; }
+  h1 { color: #4ade80; font-size: 1.8rem; margin-bottom: 6px; }
+  .subtitle { color: #94a3b8; margin-bottom: 24px; font-size: 0.95rem; }
+
+  .summary { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 18px 22px; min-width: 200px; flex: 1; }
+  .card .label { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .card .value { font-size: 1.6rem; font-weight: 700; }
+  .card .value.orange { color: #fb923c; }
+  .card .value.red { color: #f87171; }
+  .card .value.yellow { color: #fbbf24; }
+  .card .value.green { color: #4ade80; }
+  .card .note { color: #64748b; font-size: 0.78rem; margin-top: 4px; }
+
+  .section { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .section h2 { color: #fbbf24; font-size: 1.15rem; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #334155; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: #94a3b8; text-align: left; padding: 10px 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.72rem; border-bottom: 2px solid #334155; }
+  td { padding: 10px 12px; border-bottom: 1px solid #334155; color: #cbd5e1; vertical-align: top; }
+  td.num { font-family: 'JetBrains Mono', monospace; text-align: right; }
+  td.order { color: #60a5fa; font-weight: 600; font-family: monospace; }
+  td.customer { color: #f1f5f9; }
+  td.company { color: #94a3b8; font-size: 0.78rem; }
+  .diff { color: #fca5a5; font-weight: 700; }
+  .total-should { color: #86efac; font-weight: 600; }
+  tr:hover td { background: rgba(51,65,85,0.3); }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+  .badge-portal { background: #581c87; color: #e9d5ff; }
+  .badge-website { background: #9a3412; color: #fed7aa; }
+  .badge-net30 { background: #134e4a; color: #99f6e4; font-size: 0.68rem; }
+  .badge-paypal { background: #1e40af; color: #bfdbfe; font-size: 0.68rem; }
+
+  .notes { background: #0c4a6e20; border-left: 3px solid #0ea5e9; padding: 12px 16px; border-radius: 6px; margin-top: 18px; font-size: 0.88rem; color: #7dd3fc; }
+  .warn { background: #7f1d1d20; border-left: 3px solid #ef4444; padding: 12px 16px; border-radius: 6px; margin-top: 16px; font-size: 0.88rem; color: #fca5a5; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📋 Ordens com problema de VAT</h1>
+<div class="subtitle">Para revisão — Bruno confirmar amanhã se os valores cobrados nestas ordens estão corretos</div>
+
+<div class="summary">
+  <div class="card">
+    <div class="label">Total de ordens afetadas</div>
+    <div class="value yellow">13</div>
+    <div class="note">12 portal B2B + 1 site público</div>
+  </div>
+  <div class="card">
+    <div class="label">Subtotal combinado (ex-VAT)</div>
+    <div class="value">€4.889,32</div>
+    <div class="note">Valor efetivamente cobrado</div>
+  </div>
+  <div class="card">
+    <div class="label">VAT não cobrado (23%)</div>
+    <div class="value red">€1.353,71</div>
+    <div class="note">A somar no total correto</div>
+  </div>
+  <div class="card">
+    <div class="label">Total corrigido</div>
+    <div class="value green">€6.243,03</div>
+    <div class="note">Com VAT + shipping</div>
+  </div>
+  <div class="card">
+    <div class="label">Status</div>
+    <div class="value orange">12 PENDING</div>
+    <div class="note">Ainda não pagas — podem ser corrigidas</div>
+  </div>
+</div>
+
+<div class="warn">
+  ⚠️ <strong>12 dessas ordens estão PENDING</strong> (Net 30 / COD). Ainda não foram faturadas.
+  Apenas <strong>SFI-25017</strong> (Roca Sports, via PayPal) já está <strong>PAID</strong>.
+</div>
+
+<div class="section">
+  <h2>🟣 Grupo A — Portal B2B sem VAT (12 ordens)</h2>
+  <p style="color:#94a3b8;font-size:0.85rem;margin-bottom:12px">
+    Ordens criadas pelo <code style="background:#334155;padding:2px 6px;border-radius:3px">create-b2b-order</code> antes da correção v31.
+    Todas com <code style="background:#334155;padding:2px 6px;border-radius:3px">tax_amount=0</code>.
+    Precisam recalcular adicionando 23% de VAT ao subtotal.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Order #</th>
+        <th>Data</th>
+        <th>Cliente</th>
+        <th>Pagamento</th>
+        <th style="text-align:right">Subtotal<br><span style="font-weight:400;color:#64748b">ex-VAT</span></th>
+        <th style="text-align:right">Desconto</th>
+        <th style="text-align:right">Shipping</th>
+        <th style="text-align:right">VAT 23%<br><span style="font-weight:400;color:#64748b">deveria</span></th>
+        <th style="text-align:right">Total atual</th>
+        <th style="text-align:right">Total correto<br><span style="font-weight:400;color:#86efac">(incl. VAT)</span></th>
+        <th style="text-align:right">Diferença</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="order">SFI-25028</td>
+        <td>21/04/2026</td>
+        <td><div class="customer">john@suasclimbing.ie</div><div class="company">Urban Trends Ltd</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€151.20</td>
+        <td class="num">—</td>
+        <td class="num">FREE</td>
+        <td class="num">€34.78</td>
+        <td class="num">€151.20</td>
+        <td class="num total-should">€185.98</td>
+        <td class="num diff">+€34.78</td>
+      </tr>
+      <tr>
+        <td class="order">SFI-25027</td>
+        <td>21/04/2026</td>
+        <td><div class="customer">info@callofthewild.ie</div><div class="company">Call of the Wild</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€156.35</td>
+        <td class="num">—</td>
+        <td class="num">FREE</td>
+        <td class="num">€35.96</td>
+        <td class="num">€156.35</td>
+        <td class="num total-should">€192.31</td>
+        <td class="num diff">+€35.96</td>
+      </tr>
+      <tr>
+        <td class="order">SFI-25026</td>
+        <td>21/04/2026</td>
+        <td><div class="customer">goods-in@theedge-sports.com</div><div class="company">The Edge Sports</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€679.16</td>
+        <td class="num">—</td>
+        <td class="num">FREE</td>
+        <td class="num">€156.21</td>
+        <td class="num">€679.16</td>
+        <td class="num total-should">€835.37</td>
+        <td class="num diff">+€156.21</td>
+      </tr>
+      <tr>
+        <td class="order">SFI-25025</td>
+        <td>21/04/2026</td>
+        <td><div class="customer">hello@trihub.ie</div><div class="company">Trihub</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€657.75</td>
+        <td class="num">-€49.33</td>
+        <td class="num">FREE</td>
+        <td class="num">€139.94</td>
+        <td class="num">€608.42</td>
+        <td class="num total-should">€748.36</td>
+        <td class="num diff">+€139.94</td>
+      </tr>
+      <tr>
+        <td class="order">SFI-25020</td>
+        <td>20/04/2026</td>
+        <td><div class="customer">damian.zawikowski@cyclesuperstore.ie</div><div class="company">Cycle Super Store</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€729.35</td>
+        <td class="num">—</td>
+        <td class="num">FREE</td>
+        <td class="num">€167.75</td>
+        <td class="num">€729.35</td>
+        <td class="num total-should">€897.10</td>
+        <td class="num diff">+€167.75</td>
+      </tr>
+      <tr>
+        <td class="order">SFI-25018</td>
+        <td>20/04/2026</td>
+        <td><div class="customer">aungier@therunhub.ie</div><div class="company">The Run Hub — Aungier St</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€561.29</td>
+        <td class="num">—</td>
+        <td class="num">FREE</td>
+        <td class="num">€129.10</td>
+        <td class="num">€561.29</td>
+        <td class="num total-should">€690.39</td>
+        <td class="num diff">+€129.10</td>
+      </tr>
+      <tr>
+        <td class="order">SFI-25016</td>
+        <td>18/04/2026</td>
+        <td><div class="customer">mark@thesportsroom.ie</div><div class="company">The Sports Rooms</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€209.29</td>
+        <td class="num">—</td>
+        <td class="num">FREE</td>
+        <td class="num">€48.14</td>
+        <td class="num">€209.29</td>
+        <td class="num total-should">€257.43</td>
+        <td class="num diff">+€48.14</td>
+      </tr>
+      <tr style="background:rgba(251,191,36,0.06)">
+        <td class="order">SFI-25015</td>
+        <td>16/04/2026</td>
+        <td><div class="customer">damien@sportsfoodsireland.ie</div><div class="company" style="color:#fbbf24">⚠ Conta interna SFI</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€238.59</td>
+        <td class="num">—</td>
+        <td class="num">FREE</td>
+        <td class="num">€54.88</td>
+        <td class="num">€238.59</td>
+        <td class="num total-should">€293.47</td>
+        <td class="num diff">+€54.88</td>
+      </tr>
+      <tr>
+        <td class="order">SFI-25013</td>
+        <td>16/04/2026</td>
+        <td><div class="customer">info@base2race.ie</div><div class="company">Base 2 Race</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€253.72</td>
+        <td class="num">—</td>
+        <td class="num">FREE</td>
+        <td class="num">€58.36</td>
+        <td class="num">€253.72</td>
+        <td class="num total-should">€312.08</td>
+        <td class="num diff">+€58.36</td>
+      </tr>
+      <tr>
+        <td class="order">SFI-25012</td>
+        <td>15/04/2026</td>
+        <td><div class="customer">jimmystagg@staggcycles.com</div><div class="company">Stagg Cycles</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€147.60</td>
+        <td class="num">—</td>
+        <td class="num">€9.04</td>
+        <td class="num">€33.95</td>
+        <td class="num">€147.60</td>
+        <td class="num total-should">€190.59</td>
+        <td class="num diff">+€42.99</td>
+      </tr>
+      <tr>
+        <td class="order">SFI-25011</td>
+        <td>15/04/2026</td>
+        <td><div class="customer">goods-in@theedge-sports.com</div><div class="company">The Edge Sports</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€1.401,86</td>
+        <td class="num">—</td>
+        <td class="num">FREE</td>
+        <td class="num">€322.43</td>
+        <td class="num">€1.401,86</td>
+        <td class="num total-should">€1.724,29</td>
+        <td class="num diff">+€322.43</td>
+      </tr>
+      <tr style="background:rgba(251,191,36,0.06)">
+        <td class="order">SFI-25009</td>
+        <td>15/04/2026</td>
+        <td><div class="customer">damien@sportsfoodsireland.ie</div><div class="company" style="color:#fbbf24">⚠ Conta interna SFI</div></td>
+        <td><span class="badge badge-net30">Net 30</span></td>
+        <td class="num">€114.00</td>
+        <td class="num">—</td>
+        <td class="num">€9.04</td>
+        <td class="num">€26.22</td>
+        <td class="num">€123.04</td>
+        <td class="num total-should">€149.26</td>
+        <td class="num diff">+€26.22</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>🟠 Grupo B — Cliente B2B que comprou no site público (1 ordem)</h2>
+  <p style="color:#94a3b8;font-size:0.85rem;margin-bottom:12px">
+    Cliente tem conta B2B mas usou o checkout público (PayPal). Foi processada como B2C.
+    <strong>Já está PAGA</strong> — mais complexo corrigir.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Order #</th>
+        <th>Data</th>
+        <th>Cliente</th>
+        <th>Pagamento</th>
+        <th style="text-align:right">Subtotal<br><span style="font-weight:400;color:#64748b">ex-VAT</span></th>
+        <th style="text-align:right">VAT cobrado<br><span style="font-weight:400;color:#64748b">atual</span></th>
+        <th style="text-align:right">VAT correto<br><span style="font-weight:400;color:#86efac">deveria</span></th>
+        <th style="text-align:right">Total pago</th>
+        <th style="text-align:right">Total correto<br><span style="font-weight:400;color:#86efac">(incl. VAT)</span></th>
+        <th style="text-align:right">Diferença</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:rgba(239,68,68,0.06)">
+        <td class="order">SFI-25017</td>
+        <td>20/04/2026</td>
+        <td><div class="customer">sales@rocasports.ie</div><div class="company">Roca Sports Ireland (B2B aprovado)</div></td>
+        <td><span class="badge badge-paypal">PayPal</span> <span style="color:#86efac;font-size:0.72rem">✓ PAID</span></td>
+        <td class="num">€189.16</td>
+        <td class="num">€35.37</td>
+        <td class="num">€43.51</td>
+        <td class="num">€189.16</td>
+        <td class="num total-should">€232.67</td>
+        <td class="num diff">+€43.51</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="warn" style="margin-top:12px">
+    <strong>Observação sobre SFI-25017:</strong><br>
+    • Roca pagou €189.16 (preço wholesale). Sistema registrou VAT embutido de €35.37 (como se fosse retail).<br>
+    • Na verdade o preço era ex-VAT → VAT correto seria €43.51, e total €232.67.<br>
+    • <strong>Diferença: €43.51 de VAT não coletado.</strong><br>
+    • Como já está paga, precisa decidir: <strong>(a)</strong> contactar Roca para cobrar adicional, <strong>(b)</strong> aceitar perda e ajustar apenas internamente no QuickBooks.
+  </div>
+</div>
+
+<div class="notes">
+  <strong>💡 Próximos passos sugeridos:</strong><br><br>
+  <strong>1.</strong> Para ordens <strong>PENDING</strong> (Grupo A, exceto SFI-25015 e SFI-25009 que são contas internas):<br>
+  &nbsp;&nbsp;&nbsp;Contactar o cliente, enviar invoice correta com VAT, cobrar a diferença antes do Net 30 vencer.<br><br>
+  <strong>2.</strong> Para contas internas (SFI-25015 e SFI-25009 — damien@):<br>
+  &nbsp;&nbsp;&nbsp;Decidir internamente se ajusta o total ou arquiva como teste/interno.<br><br>
+  <strong>3.</strong> Para SFI-25017 (PAID):<br>
+  &nbsp;&nbsp;&nbsp;Decisão comercial — contactar Roca ou absorver a diferença de €43.51.<br><br>
+  <strong>4.</strong> Futuras ordens B2B: <strong>a partir de agora estão corretas</strong> (create-b2b-order v31 já soma VAT automaticamente).<br><br>
+  <strong>5.</strong> Bug #3.5 (B2B no site público): preciso corrigir create-checkout e paypal-capture para detectar cliente B2B por email e aplicar VAT automaticamente. <strong>Em andamento.</strong>
+</div>
+
+<div style="text-align:center;margin-top:30px;color:#64748b;font-size:0.8rem">
+  Gerado em 21 de abril de 2026 · Auditoria de pagamentos SFI
+</div>
+
+</div>
+</body>
+</html>

@@ -318,11 +318,31 @@ const sfi = {
       return data;
     },
 
-    signOut() {
+    signOut(opts) {
       db.token = null;
       // Bug #19: sweep all sfi_* auth-related keys on logout
       const authKeys = ['sfi_token','sfi_user','sfi_refresh','sfi_token_exp','sfi_user_email','sfi_b2b_email','sfi_reset_token','sfi_b2b_status'];
       for (const k of authKeys) try { localStorage.removeItem(k); } catch(e) {}
+      // SignOut bug fix (Apr 2026): clear in-memory product cache so B2B prices vanish
+      // immediately without needing a page reload. Then dispatch 'sfi:auth-change'
+      // so any rendered product cards re-render with B2C prices.
+      try {
+        window._sfiCustomerIsB2B = false;
+        if (window.allProducts) {
+          window.allProducts = null;
+          window.PRODUTOS = null;
+          window.EMBEDDED_PRODUCTS = null;
+          window.produtosFiltrados = null;
+        }
+      } catch(e) {}
+      try { window.dispatchEvent(new CustomEvent('sfi:auth-change', { detail: { signedIn: false } })); } catch(e) {}
+      // Force reload to guarantee a clean state (prices, cart, header).
+      // Pass {noReload: true} to skip — used by internal flows that handle UI manually.
+      const noReload = opts && opts.noReload === true;
+      if (!noReload) {
+        // small delay so any toast/UI feedback shows briefly
+        setTimeout(() => { try { window.location.reload(); } catch(e) {} }, 350);
+      }
     },
 
     /** Sign in with OAuth provider (Google, Facebook) */

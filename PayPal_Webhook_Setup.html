@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>PayPal Webhook — Setup Guide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.6; padding: 40px 20px; }
+  .container { max-width: 820px; margin: 0 auto; }
+  h1 { color: #4ade80; margin-bottom: 8px; font-size: 1.8rem; }
+  .subtitle { color: #94a3b8; margin-bottom: 32px; }
+  .section { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  h2 { color: #60a5fa; margin-bottom: 14px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+  h3 { color: #fbbf24; margin: 18px 0 10px; font-size: 1rem; }
+  .status-ok { background: #166534; color: #bbf7d0; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+  .status-pending { background: #854d0e; color: #fef3c7; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+  code { background: #0f172a; padding: 2px 8px; border-radius: 4px; font-family: ui-monospace, 'JetBrains Mono', monospace; font-size: 0.88rem; color: #fbbf24; word-break: break-all; }
+  pre { background: #0f172a; padding: 14px; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; color: #e2e8f0; margin: 10px 0; border-left: 3px solid #4ade80; }
+  .url-box { background: #064e3b; border: 2px solid #10b981; border-radius: 8px; padding: 14px; font-family: monospace; color: #d1fae5; word-break: break-all; margin: 10px 0; font-size: 0.9rem; }
+  ol { padding-left: 22px; margin: 10px 0; }
+  ol li { margin-bottom: 10px; color: #cbd5e1; }
+  .event-list { background: #0f172a; padding: 12px 18px; border-radius: 8px; margin: 10px 0; }
+  .event-list li { font-family: monospace; color: #67e8f9; font-size: 0.9rem; }
+  .note { background: #1e3a5f; border-left: 3px solid #3b82f6; padding: 12px 16px; border-radius: 6px; margin: 14px 0; font-size: 0.9rem; }
+  .warn { background: #7c2d12; border-left: 3px solid #f97316; padding: 12px 16px; border-radius: 6px; margin: 14px 0; font-size: 0.9rem; }
+  .check-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  .check-table td { padding: 8px 10px; border-bottom: 1px solid #334155; font-size: 0.9rem; }
+  .check-table td:first-child { color: #94a3b8; width: 60%; }
+  .btn { display: inline-block; background: #2563eb; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 10px; font-size: 0.9rem; }
+  .btn:hover { background: #1d4ed8; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🔗 PayPal Webhook — Passo Final</h1>
+<p class="subtitle">Tudo do lado Supabase está <strong>100% pronto e testado</strong>. Falta apenas 1 passo que só você pode fazer (é sua conta PayPal).</p>
+
+<!-- STATE -->
+<div class="section">
+  <h2>📊 Estado Atual</h2>
+  <table class="check-table">
+    <tr><td>Edge function <code>paypal-webhook</code> v3 deployed</td><td><span class="status-ok">✓ OK</span></td></tr>
+    <tr><td>Verificação via API lookup (não precisa webhook_id)</td><td><span class="status-ok">✓ OK</span></td></tr>
+    <tr><td>Verificação via signature (usa webhook_id se configurado)</td><td><span class="status-ok">✓ Ready</span></td></tr>
+    <tr><td>Rejeição de webhooks forjados (testado)</td><td><span class="status-ok">✓ 401 capture_not_found</span></td></tr>
+    <tr><td>Idempotência event.id (testado)</td><td><span class="status-ok">✓ duplicate:true</span></td></tr>
+    <tr><td>Orphan recovery (pending_paypal_orders)</td><td><span class="status-ok">✓ OK</span></td></tr>
+    <tr><td>Trigger QB invoice + staff notification</td><td><span class="status-ok">✓ OK</span></td></tr>
+    <tr><td>Alert email pra Bruno quando orphan recuperado</td><td><span class="status-ok">✓ Brevo OK</span></td></tr>
+    <tr><td>PAYPAL_CLIENT_ID / _SECRET no Supabase</td><td><span class="status-ok">✓ Configurados</span></td></tr>
+    <tr><td>PAYPAL_MODE=live</td><td><span class="status-ok">✓ Live</span></td></tr>
+    <tr><td><strong>Webhook criado no PayPal dashboard</strong></td><td><span class="status-pending">⏳ Sua ação</span></td></tr>
+  </table>
+</div>
+
+<!-- WHY YOU -->
+<div class="section">
+  <h2>🤷 Por que eu não pude fazer isso por você</h2>
+  <p style="color:#cbd5e1;margin-bottom:10px">Duas limitações técnicas reais:</p>
+  <ol>
+    <li><strong>A API de Edge Functions do Supabase não expõe setar secrets programaticamente.</strong> Só o dashboard permite isso. (Por isso <code>PAYPAL_WEBHOOK_ID</code> ainda não está setado — mas o v3 funciona sem ele, via API lookup.)</li>
+    <li><strong>Eu não tenho acesso ao seu dashboard PayPal</strong> (developer.paypal.com). Sua conta, suas credenciais — inacessíveis pra mim.</li>
+  </ol>
+  <div class="note">
+    <strong>Boa notícia:</strong> graças ao v3, o sistema <strong>já está seguro e funcional</strong> sem <code>PAYPAL_WEBHOOK_ID</code>. A verificação via API lookup já provou (teste acima) que rejeita fakes. Setar o webhook_id é apenas uma otimização (evita 1 chamada extra ao PayPal por evento).
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<div class="section">
+  <h2>1️⃣ Criar webhook no PayPal dashboard</h2>
+  
+  <h3>URL do webhook (copiar esse valor):</h3>
+  <div class="url-box">https://styynhgzrkyoioqjssuw.supabase.co/functions/v1/paypal-webhook</div>
+  
+  <h3>Passos:</h3>
+  <ol>
+    <li>Abrir <a href="https://developer.paypal.com/dashboard/applications/live" style="color:#60a5fa">developer.paypal.com/dashboard/applications/live</a> e logar na sua conta.</li>
+    <li>Selecionar o app <strong>live</strong> que você já usa pro checkout da SFI (o mesmo que gerou as <code>PAYPAL_CLIENT_ID</code> / <code>_SECRET</code>).</li>
+    <li>Rolar até a seção <strong>"Webhooks"</strong> (geralmente no fim da página do app).</li>
+    <li>Clicar em <strong>"Add Webhook"</strong>.</li>
+    <li>Em <strong>Webhook URL</strong>, colar a URL acima.</li>
+    <li>Em <strong>Event types</strong>, selecionar:
+      <ul class="event-list">
+        <li>✓ PAYMENT.CAPTURE.COMPLETED</li>
+      </ul>
+      <p style="color:#94a3b8;font-size:0.85rem;margin-top:6px">(Você pode adicionar outros tipos sem impacto — a função já faz early-return pra eventos não processados.)</p>
+    </li>
+    <li>Clicar em <strong>Save</strong>.</li>
+    <li>O PayPal vai mostrar um <strong>Webhook ID</strong> (algo como <code>1YH04408XS...</code>). <strong>Copiar esse valor.</strong></li>
+  </ol>
+</div>
+
+<!-- STEP 2 -->
+<div class="section">
+  <h2>2️⃣ (Opcional) Setar <code>PAYPAL_WEBHOOK_ID</code> no Supabase</h2>
+  <div class="note">
+    Este passo é <strong>opcional</strong>. A função já funciona 100% sem ele — a verificação por API lookup é robusta. Mas setar o secret é uma otimização (evita 1 chamada extra ao PayPal por evento).
+  </div>
+  <ol>
+    <li>Abrir <a href="https://supabase.com/dashboard/project/styynhgzrkyoioqjssuw/functions/secrets" style="color:#60a5fa">Supabase → Settings → Edge Functions → Secrets</a>.</li>
+    <li>Clicar em <strong>"Add new secret"</strong>.</li>
+    <li>Name: <code>PAYPAL_WEBHOOK_ID</code></li>
+    <li>Value: (o Webhook ID do passo 1)</li>
+    <li>Save.</li>
+  </ol>
+  <p style="color:#cbd5e1;margin-top:10px">Depois disso, chamar health check pra verificar:</p>
+  <pre>curl -X POST \
+  'https://styynhgzrkyoioqjssuw.supabase.co/functions/v1/paypal-webhook' \
+  -H 'Authorization: Bearer sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH' \
+  -H 'x-paypal-webhook-health: 1'</pre>
+  <p style="color:#94a3b8;font-size:0.85rem">Deve retornar <code>"has_webhook_id": true</code>.</p>
+</div>
+
+<!-- STEP 3 -->
+<div class="section">
+  <h2>3️⃣ Testar end-to-end</h2>
+  <ol>
+    <li>No PayPal dashboard, encontrar o webhook criado no passo 1.</li>
+    <li>Clicar em <strong>"Send Test"</strong> (ou "Simulator").</li>
+    <li>Selecionar evento <code>PAYMENT.CAPTURE.COMPLETED</code>.</li>
+    <li>PayPal vai enviar um evento de teste pra URL. Esperar.</li>
+    <li>No Supabase, abrir <a href="https://supabase.com/dashboard/project/styynhgzrkyoioqjssuw/functions/paypal-webhook/logs" style="color:#60a5fa">Edge Function Logs</a> da <code>paypal-webhook</code>.</li>
+    <li>Deve aparecer log tipo:
+      <pre>[paypal-webhook] Event: PAYMENT.CAPTURE.COMPLETED id=WH-...
+[paypal-webhook] verify OK (method=api_lookup)
+[paypal-webhook] ORPHAN detectado ...
+   ou
+[paypal-webhook] Order SFI-XXXX ja existe — NO-OP</pre>
+    </li>
+  </ol>
+  <div class="warn">
+    O evento de teste do PayPal simulator usa capture_id falso. <strong>O sistema vai rejeitar com 401 "capture_not_found"</strong> — isso é o comportamento correto! Prova que está protegido contra fakes. O teste real só acontece quando um cliente de verdade paga.
+  </div>
+</div>
+
+<!-- MONITOR -->
+<div class="section">
+  <h2>📈 Depois que estiver rodando — como monitorar</h2>
+  <h3>Ver webhooks processados (DB):</h3>
+  <pre>SELECT event_id, event_type, gateway, processed_at
+FROM processed_webhook_events
+WHERE gateway = 'paypal'
+ORDER BY processed_at DESC LIMIT 20;</pre>
+
+  <h3>Ver orphans recuperados (orders criadas pelo webhook):</h3>
+  <pre>SELECT order_number, customer_email, total, notes, created_at
+FROM orders
+WHERE notes LIKE '%orphan PayPal capture%'
+ORDER BY created_at DESC;</pre>
+
+  <h3>Ver pending_paypal_orders não processados (clientes que abriram checkout mas não fecharam):</h3>
+  <pre>SELECT paypal_order_id, email, total, created_at, expires_at
+FROM pending_paypal_orders
+WHERE processed = false
+  AND expires_at > NOW()
+ORDER BY created_at DESC;</pre>
+
+  <h3>Alertas por email:</h3>
+  <p style="color:#cbd5e1">Quando um orphan é recuperado, você recebe email automático em <code>info@sportsfoodsireland.ie</code> com:</p>
+  <ul style="margin-left:22px;color:#cbd5e1;font-size:0.9rem">
+    <li>🔄 Subject "PayPal Orphan Recovered: SFI-XXXXX"</li>
+    <li>Detalhes da order recuperada</li>
+    <li>Capture ID + link pra PayPal</li>
+  </ul>
+  <p style="color:#cbd5e1;margin-top:10px">Quando um capture chega sem pending cart correspondente (caso crítico — cliente pagou mas nem salvamos o carrinho):</p>
+  <ul style="margin-left:22px;color:#cbd5e1;font-size:0.9rem">
+    <li>⚠️ Subject "PayPal Orphan Capture: [paypal_order_id]"</li>
+    <li>Precisa criar a order manualmente no admin</li>
+  </ul>
+</div>
+
+<p style="text-align:center;color:#64748b;font-size:0.85rem;margin-top:32px">
+Gerado 22 Abril 2026 · paypal-webhook v3 · Health check: <code>{version:3, mode:live, has_paypal_credentials:true, has_brevo:true}</code>
+</p>
+
+</div>
+</body>
+</html>

@@ -1,7 +1,7 @@
-// SFI Service Worker v3.1 — Cache with correct versioning
-const CACHE_NAME = 'sfi-v3.1';
-const CACHE_STATIC = 'sfi-static-v3.1';
-const CACHE_IMAGES = 'sfi-images-v3.1';
+// SFI Service Worker v3.2 — Cache busted Apr 2026 (logout B2B price fix)
+const CACHE_NAME = 'sfi-v3.2';
+const CACHE_STATIC = 'sfi-static-v3.2';
+const CACHE_IMAGES = 'sfi-images-v3.2';
 
 // Critical resources to precache on install
 const PRECACHE_URLS = [
@@ -13,7 +13,7 @@ const PRECACHE_URLS = [
   '/js/main.min.js?v=16',
   '/js/cart.min.js?v=10',
   '/js/sfi-api.min.js',
-  '/js/sfi-data-loader.min.js?v=8',
+  '/js/sfi-data-loader.min.js?v=15',
   '/js/product-card.min.js?v=10',
   '/js/sfi-fixes.min.js?v=8',
   '/js/sfi-enhancements.min.js',

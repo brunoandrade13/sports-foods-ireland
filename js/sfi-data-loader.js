@@ -478,4 +478,36 @@
   // ============================================================
   window._sfiProductsPromise = loadProducts();
 
+  // Cross-tab sync (Apr 2026 fix): if user logs out in another tab/window,
+  // the localStorage 'storage' event fires here. If sfi_token disappears
+  // while we still think we're B2B, force a reload so prices revert to B2C.
+  try {
+    window.addEventListener('storage', function(e) {
+      if (!e || e.storageArea !== localStorage) return;
+      // If sfi_token was removed (set to null) and we currently render B2B prices, reload
+      if (e.key === 'sfi_token' && !e.newValue && window._sfiCustomerIsB2B === true) {
+        try { window.location.reload(); } catch(_) {}
+      }
+      // If sfi_b2b_status was removed (logout), same behaviour
+      if (e.key === 'sfi_b2b_status' && !e.newValue && window._sfiCustomerIsB2B === true) {
+        try { window.location.reload(); } catch(_) {}
+      }
+    });
+  } catch(e) {}
+
+  // BFCache fix (Apr 2026): if user clicks Back/Forward and the page is restored
+  // from bfcache, the JS state is frozen. If auth status changed since freeze
+  // (e.g. logged out in another tab), the displayed B2B prices would be stale.
+  // Re-check token on pageshow and reload if mismatch.
+  try {
+    window.addEventListener('pageshow', function(e) {
+      if (!e.persisted) return; // only fires for bfcache restores
+      const hasToken = !!localStorage.getItem('sfi_token');
+      const wasB2B = window._sfiCustomerIsB2B === true;
+      if (wasB2B && !hasToken) {
+        try { window.location.reload(); } catch(_) {}
+      }
+    });
+  } catch(e) {}
+
 })();
