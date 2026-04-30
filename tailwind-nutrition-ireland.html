@@ -459,160 +459,69 @@
 <script src="js/main.min.js?v=16" defer></script>
 <script src="js/sfi-fixes.min.js?v=10" defer></script>
 <script src="js/sfi-enhancements.min.js" defer></script>
+
 <script src="js/brevo-integration.min.js" defer></script>
 
-<!-- Brand page: Supabase variant lookup on Add to Basket -->
+<!-- Tailwind brand page: load 3 parent products using the same shop card as the shop -->
 <script>
 (function() {
-  const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
+  var TAILWIND_IDS = [46, 47, 56];
 
-  // ── The 3 Tailwind parent products (Supabase UUIDs) ──────────────────────
-  var TAILWIND_PRODUCTS = [
-    {
-      id: '6f26dba1-6c11-4b4a-afb1-979adb4f3109',
-      name: 'Tailwind Endurance Fuel',
-      description: 'All-day endurance fuel — clean ingredients, no gut distress. Available in multiple flavours and sizes.',
-      image: 'img/produtos-279/046-tailwind-endurance-fuel-berry-flavour.webp',
-      price_from: '35.99',
-      slug: 'tailwind-endurance-fuel',
-      legacy_id: 46
-    },
-    {
-      id: '51fa2b10-08aa-4a52-ba79-8b1c7b7ba61e',
-      name: 'Tailwind Endurance Fuel Caffeinated',
-      description: 'Same complete endurance fuel with a natural caffeine kick. Perfect for early starts and race day.',
-      image: 'img/produtos-279/047-tailwind-endurance-fuel-cola-caffeinated.webp',
-      price_from: '36.00',
-      slug: 'tailwind-endurance-fuel-caffeinated',
-      legacy_id: 47
-    },
-    {
-      id: '7b02b6ae-0581-4135-ac73-c42de33cc984',
-      name: 'Tailwind Rebuild Recovery Mix',
-      description: 'Complete post-workout recovery with protein, carbs and electrolytes. Just add water.',
-      image: 'img/produtos-279/057-tailwind-recovery-mix-vanilla.webp',
-      price_from: '45.85',
-      slug: 'tailwind-rebuild-recovery-mix',
-      legacy_id: 56
+  function render() {
+    var grid = document.getElementById('tailwindProductsGrid');
+    if (!grid) return;
+    var all = window.PRODUTOS || [];
+    // Keep order: 46, 47, 56
+    var prods = TAILWIND_IDS.map(function(id) {
+      return all.find(function(p) { return Number(p.id) === id; });
+    }).filter(Boolean);
+    if (!prods.length) return;
+    // Use exact same card HTML as the shop
+    if (typeof createProductCardHTML === 'function') {
+      grid.innerHTML = prods.map(function(p) {
+        return createProductCardHTML(p, { showBrand: false });
+      }).join('');
+    } else {
+      // Fallback if createProductCardHTML not yet loaded
+      grid.innerHTML = prods.map(function(p) {
+        var img = p.imagem || 'img/placeholder.webp';
+        var price = Number(p.preco || 0).toFixed(2);
+        return '<article class="product-card" data-id="' + p.id + '" data-product-id="' + p.id + '">' +
+          '<a href="produto.html?id=' + p.id + '">' +
+            '<img src="' + img + '" alt="' + (p.nome||'') + '" class="product-img" loading="lazy" onerror="this.src='img/placeholder.webp'">' +
+          '</a>' +
+          '<h3 class="product-name"><a href="produto.html?id=' + p.id + '">' + (p.nome||'') + '</a></h3>' +
+          '<div class="product-prices"><span class="new-price">\u20ac' + price + '</span></div>' +
+          '<button class="btn-basket" data-product-id="' + p.id + '" type="button">ADD TO BASKET</button>' +
+        '</article>';
+      }).join('');
     }
-  ];
-
-  // ── Per-product variant cache ────────────────────────────────────────────
-  var _varCache = {};
-
-  async function fetchVariants(supabaseId) {
-    if (_varCache[supabaseId] !== undefined) return _varCache[supabaseId];
-    try {
-      var res = await fetch(
-        SUPA_URL + '/rest/v1/product_variants?select=id,label,price,wholesale_price,stock,is_active,image_url&product_id=eq.' + supabaseId + '&is_active=eq.true&order=sort_order.asc,label.asc',
-        { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } }
-      );
-      var variants = await res.json();
-      _varCache[supabaseId] = variants && variants.length ? variants : [];
-      return _varCache[supabaseId];
-    } catch(e) {
-      _varCache[supabaseId] = [];
-      return [];
-    }
-  }
-
-  // ── Render the 3 product cards ───────────────────────────────────────────
-  function buildCard(prod) {
-    var href = 'produto.html?id=' + (prod.legacy_id || prod.slug);
-    return '<article class="product-card" data-supa-id="' + prod.id + '" data-id="' + (prod.legacy_id||0) + '">' +
-      '<a href="' + href + '">' +
-        '<img src="' + prod.image + '" alt="' + prod.name + '" class="product-img" loading="lazy" onerror="this.src=\'img/placeholder.webp\'">' +
-      '</a>' +
-      '<h3 class="product-name"><a href="' + href + '">' + prod.name + '</a></h3>' +
-      '<p style="font-size:0.82rem;color:#666;padding:0 12px 6px;line-height:1.4;margin:0">' + prod.description + '</p>' +
-      '<div class="product-prices"><span class="new-price">From €' + prod.price_from + '</span></div>' +
-      '<button class="btn-basket" data-supa-id="' + prod.id + '" type="button" aria-label="Select variant and add to basket">SELECT & ADD TO BASKET</button>' +
-    '</article>';
-  }
-
-  var grid = document.getElementById('tailwindProductsGrid');
-  if (grid) {
-    grid.innerHTML = TAILWIND_PRODUCTS.map(buildCard).join('');
-    // Add quick actions (wishlist heart) to newly rendered cards
     if (typeof addQuickActionsToCards === 'function') {
-      setTimeout(addQuickActionsToCards, 400);
+      setTimeout(addQuickActionsToCards, 300);
     }
   }
 
-  // ── Handle btn-basket click (capture phase — runs before main.js) ────────
-  document.addEventListener('click', async function(e) {
-    var btn = e.target.closest('.brand-products-section .btn-basket[data-supa-id]');
-    if (!btn) return;
-    e.stopImmediatePropagation();
-    e.preventDefault();
+  // Try immediately (products may already be loaded)
+  if (window.PRODUTOS && window.PRODUTOS.length) { render(); return; }
 
-    var supaId = btn.getAttribute('data-supa-id');
-    var prod = TAILWIND_PRODUCTS.find(function(p) { return p.id === supaId; });
-    if (!prod) return;
+  // Wait for sfi-data-loader to finish
+  window.addEventListener('sfi:products-loaded', render);
 
-    var origText = btn.textContent;
-    btn.textContent = '⏳ Loading…';
-    btn.disabled = true;
+  // Also via promise
+  if (window._sfiProductsPromise) {
+    window._sfiProductsPromise.then(function() {
+      if (!document.querySelector('#tailwindProductsGrid .product-card')) render();
+    });
+  }
 
-    try {
-      var variants = await fetchVariants(supaId);
-      btn.textContent = origText;
-      btn.disabled = false;
-
-      if (!variants.length) {
-        if (typeof window.addToCart === 'function') {
-          window.addToCart(supaId, 1, { nome: prod.name, preco: parseFloat(prod.price_from), imagem: prod.image });
-          btn.textContent = '✓ Added!';
-          btn.style.background = '#00A651';
-          setTimeout(function() { btn.textContent = origText; btn.style.background = ''; }, 2000);
-        }
-        return;
-      }
-
-      // Build prodData in the format showSupabaseVariantModal expects
-      var prodData = {
-        id: supaId,
-        nome: prod.name,
-        imagem: prod.image,
-        preco: parseFloat(prod.price_from),
-        backorder_available: true,
-        variantes: [{
-          type: 'Option',
-          options: variants.map(function(v) {
-            return { id: v.id, label: v.label, price: v.price, stock: v.stock, image_url: v.image_url };
-          })
-        }]
-      };
-
-      if (typeof window.showSupabaseVariantModal === 'function') {
-        window.showSupabaseVariantModal(prodData, function(selected) {
-          if (typeof window.addToCart === 'function') {
-            window.addToCart(supaId, 1, {
-              nome: prod.name + ' — ' + selected.label,
-              preco: selected.price || parseFloat(prod.price_from),
-              imagem: selected.image_url || prod.image,
-              variant: selected.label,
-              variant_label: selected.label,
-              variantId: selected.id,
-              variant_id: selected.id
-            });
-            btn.textContent = '✓ Added!';
-            btn.style.background = '#00A651';
-            setTimeout(function() { btn.textContent = origText; btn.style.background = ''; }, 2000);
-          }
-        });
-      } else {
-        // Fallback: redirect to product page
-        window.location.href = 'shop.html?brand=tailwind';
-      }
-    } catch(err) {
-      btn.textContent = origText;
-      btn.disabled = false;
-      console.warn('[tailwind-page] error:', err);
-    }
-  }, true);
+  // Last-resort poll
+  var _t = 0;
+  var _poll = setInterval(function() {
+    if (window.PRODUTOS && window.PRODUTOS.length) { clearInterval(_poll); render(); }
+    if (++_t > 40) clearInterval(_poll);
+  }, 250);
 })();
 </script>
+
 </body>
 </html>
