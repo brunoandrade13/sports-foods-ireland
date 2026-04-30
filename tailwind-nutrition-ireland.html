@@ -473,25 +473,28 @@
       id: '6f26dba1-6c11-4b4a-afb1-979adb4f3109',
       name: 'Tailwind Endurance Fuel',
       description: 'All-day endurance fuel — clean ingredients, no gut distress. Available in multiple flavours and sizes.',
-      image: 'https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/tailwind-endurance-fuel-1774879329130-0.webp',
+      image: 'img/produtos-279/046-tailwind-endurance-fuel-berry-flavour.webp',
       price_from: '35.99',
-      slug: 'tailwind-endurance-fuel'
+      slug: 'tailwind-endurance-fuel',
+      legacy_id: 46
     },
     {
       id: '51fa2b10-08aa-4a52-ba79-8b1c7b7ba61e',
       name: 'Tailwind Endurance Fuel Caffeinated',
-      description: 'Same complete endurance fuel with an extra kick of natural caffeine. Perfect for early starts and race day.',
-      image: 'https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/tailwind-endurance-fuel-caffeinated-1774348714193-0.png',
+      description: 'Same complete endurance fuel with a natural caffeine kick. Perfect for early starts and race day.',
+      image: 'img/produtos-279/047-tailwind-endurance-fuel-cola-caffeinated.webp',
       price_from: '36.00',
-      slug: 'tailwind-endurance-fuel-caffeinated'
+      slug: 'tailwind-endurance-fuel-caffeinated',
+      legacy_id: 47
     },
     {
       id: '7b02b6ae-0581-4135-ac73-c42de33cc984',
       name: 'Tailwind Rebuild Recovery Mix',
-      description: 'Complete post-workout recovery. Rebuild muscle, restore energy — just add water.',
-      image: 'https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/tailwind-new-recover-mix-1774881971770-4.webp',
+      description: 'Complete post-workout recovery with protein, carbs and electrolytes. Just add water.',
+      image: 'img/produtos-279/057-tailwind-recovery-mix-vanilla.webp',
       price_from: '45.85',
-      slug: 'tailwind-rebuild-recovery-mix'
+      slug: 'tailwind-rebuild-recovery-mix',
+      legacy_id: 56
     }
   ];
 
@@ -516,14 +519,15 @@
 
   // ── Render the 3 product cards ───────────────────────────────────────────
   function buildCard(prod) {
-    return '<article class="product-card" data-supa-id="' + prod.id + '">' +
-      '<a href="produto.html?slug=' + prod.slug + '">' +
+    var href = 'produto.html?id=' + (prod.legacy_id || prod.slug);
+    return '<article class="product-card" data-supa-id="' + prod.id + '" data-id="' + (prod.legacy_id||0) + '">' +
+      '<a href="' + href + '">' +
         '<img src="' + prod.image + '" alt="' + prod.name + '" class="product-img" loading="lazy" onerror="this.src=\'img/placeholder.webp\'">' +
       '</a>' +
-      '<h3 class="product-name"><a href="produto.html?slug=' + prod.slug + '">' + prod.name + '</a></h3>' +
+      '<h3 class="product-name"><a href="' + href + '">' + prod.name + '</a></h3>' +
       '<p style="font-size:0.82rem;color:#666;padding:0 12px 6px;line-height:1.4;margin:0">' + prod.description + '</p>' +
       '<div class="product-prices"><span class="new-price">From €' + prod.price_from + '</span></div>' +
-      '<button class="btn-basket" data-supa-id="' + prod.id + '" type="button" aria-label="Add to basket">SELECT & ADD TO BASKET</button>' +
+      '<button class="btn-basket" data-supa-id="' + prod.id + '" type="button" aria-label="Select variant and add to basket">SELECT & ADD TO BASKET</button>' +
     '</article>';
   }
 
