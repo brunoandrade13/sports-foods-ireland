@@ -6025,31 +6025,30 @@ Loading items...
       const byMonth = {};
       finRawData.forEach(row => {
         const m = row.month;
-        if (!byMonth[m]) byMonth[m] = { rev:0, qty:0, orders:new Set(), profit:0 };
+        if (!byMonth[m]) byMonth[m] = { rev:0, qty:0, orders:0, profit:0 };
         byMonth[m].rev += Number(row.total_revenue||0);
         byMonth[m].qty += Number(row.total_qty||0);
-        byMonth[m].orders.add(row.order_count);
+        // Use monthly_order_count (real distinct order count from SQL) — same value for all rows in the month
+        // Take the max across rows (all rows for same month have the same value)
+        if (row.monthly_order_count && Number(row.monthly_order_count) > byMonth[m].orders) {
+          byMonth[m].orders = Number(row.monthly_order_count);
+        }
         if (hasRowProfit) {
           const rev = Number(row.total_revenue || 0);
           const cost = Number(row.total_cost != null ? row.total_cost : 0);
           byMonth[m].profit += row.net_profit != null ? Number(row.net_profit) : (rev - cost);
         }
       });
-      // Count orders from allOrders for accuracy
+      // Build monthly data using the SQL-sourced order counts (accurate, includes Net30 + partially_paid)
       const months = Object.keys(byMonth).sort();
       const mData = months.map(m => {
         const [y,mo] = m.split('-').map(Number);
-        const ordCount = (allOrders||[]).filter(o => {
-          if(o.financial_status!=='paid') return false;
-          const d = new Date(o.created_at);
-          return d.getFullYear()===y && (d.getMonth()+1)===mo;
-        }).length;
         return {
           key: m,
           label: `${MONTH_NAMES[mo-1]} ${y}`,
           rev: byMonth[m].rev,
           qty: byMonth[m].qty,
-          orders: ordCount,
+          orders: byMonth[m].orders,
           profit: hasRowProfit ? (byMonth[m].profit || 0) : undefined
         };
       });
