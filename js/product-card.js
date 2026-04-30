@@ -139,8 +139,10 @@ function createProductCardHTML(rawProd, opts = {}) {
                     // Se tem variantes, verificar se ALGUMA tem stock > 0
                     const variants = rawProd.variantes || rawProd.variants || [];
                     const allOptions = variants.flatMap(g => g.options || g.opcoes || []);
+                    const isB2BUser = window._sfiCustomerIsB2B === true;
+                    // B2C: só contar stock real (>0). B2B: incluir backorder (stock null = disponível)
                     const anyVariantInStock = allOptions.length > 0
-                        ? allOptions.some(o => o.stock == null || Number(o.stock) > 0)
+                        ? allOptions.some(o => isB2BUser ? (o.stock == null || Number(o.stock) > 0) : Number(o.stock) > 0)
                         : null;
                     const isInStock = anyVariantInStock !== null
                         ? anyVariantInStock
@@ -645,13 +647,14 @@ function showSupabaseVariantModal(product, onConfirm) {
     const imgSrc = getCardProductImage(product.imagem || product.image || '', product.id || 0);
     const variants = product.variantes;
     const currency = '€';
-    const backorderAllowed = product.backorder_available === true || product.backorderAvailable === true;
+    const backorderAllowed = (product.backorder_available === true || product.backorderAvailable === true)
+        && window._sfiCustomerIsB2B === true; // Backorder apenas para clientes B2B
 
     // Se produto sem stock e sem backorder — não abrir modal
     if (!backorderAllowed) {
         const allOptions = (variants || []).flatMap(g => g.options || []);
-        const hasAvailable = allOptions.some(o => o.stock == null || o.stock > 0);
-        if (!hasAvailable) return; // Sem opções disponíveis — bloquear
+        const hasAvailable = allOptions.some(o => Number(o.stock) > 0); // B2C: só stock real
+        if (!hasAvailable) return; // Sem opções em stock — bloquear modal para B2C
     }
 
     // Detect compound variants (labels with " / " and multiple distinct level1+level2)
@@ -741,7 +744,7 @@ function showSupabaseVariantModal(product, onConfirm) {
                 if (outOfStock && !backorderAllowed) return '';
                 return `<button class="variant-option${outOfStock ? ' backorder-variant' : ''}" type="button"
                     data-variant-id="${opt.id}" data-label="${opt.label.replace(/"/g, '&quot;')}"
-                    data-price="${opt.price || ''}" data-image="${opt.image_url || ''}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.l2}${outOfStock ? ' (Backorder)' : ''}</button>`;
+                    data-price="${opt.price || ''}" data-image="${opt.image_url || ''}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.l2}${outOfStock && backorderAllowed ? ' (Backorder)' : ''}</button>`;
             }).join('\n');
             level2Wrap.style.display = '';
             level2Wrap.style.animation = 'fadeSlideIn 0.3s ease';
@@ -768,7 +771,7 @@ function showSupabaseVariantModal(product, onConfirm) {
                 if (outOfStock && !backorderAllowed) return '';
                 return `<button class="variant-option${outOfStock ? ' backorder-variant' : ''}" type="button"
                     data-variant-id="${opt.id}" data-label="${(opt.label || '').replace(/"/g, '&quot;')}"
-                    data-price="${opt.price || ''}" data-image="${opt.image_url || ''}" data-group="${gi}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.label}${outOfStock ? ' (Backorder)' : ''}</button>`;
+                    data-price="${opt.price || ''}" data-image="${opt.image_url || ''}" data-group="${gi}" ${outOfStock ? 'data-backorder="true"' : ''}>${opt.label}${outOfStock && backorderAllowed ? ' (Backorder)' : ''}</button>`;
             }).join('\n');
             return `<div class="vm-group" data-group-index="${gi}" ${hidden}>
                 <div class="vm-label">${group.type}</div>
