@@ -462,19 +462,22 @@
 
 <script src="js/brevo-integration.min.js" defer></script>
 
-<!-- tailwind-nutrition-ireland brand page: render products using same shop cards -->
+
+
+<!-- tailwind-nutrition-ireland brand page: render products — identical to shop cards -->
 <script>
 (function() {
   var BRAND_FILTER = 'tailwind';
   var MAX_PRODUCTS = 8;
   var GRID_ID = 'tailwindProductsGrid';
+  var _rendered = false;
 
   function doRender() {
+    if (_rendered) return;
     var grid = document.getElementById(GRID_ID);
     if (!grid) return;
-    if (grid.querySelector('.product-card')) return;
-    var all = window.PRODUTOS || [];
-    var prods = all.filter(function(p) {
+    if (grid.querySelector('.product-card')) { _rendered = true; return; }
+    var prods = (window.PRODUTOS || []).filter(function(p) {
       return (p.marca || '').toLowerCase().includes(BRAND_FILTER);
     }).slice(0, MAX_PRODUCTS);
     if (!prods.length) return;
@@ -482,35 +485,34 @@
       renderProductCards(prods, GRID_ID);
     } else if (typeof createProductCardHTML === 'function') {
       grid.innerHTML = prods.map(function(p) { return createProductCardHTML(p); }).join('');
-    }
+    } else { return; }
+    _rendered = true;
     if (typeof addQuickActionsToCards === 'function') setTimeout(addQuickActionsToCards, 200);
   }
 
-  function tryRender() {
-    var hasProds = window.PRODUTOS && window.PRODUTOS.length > 0;
-    var hasFn = typeof renderProductCards === 'function' || typeof createProductCardHTML === 'function';
-    if (hasProds && hasFn) { doRender(); return true; }
-    return false;
+  // 1. window.load — fires after ALL defer scripts have run
+  window.addEventListener('load', function() {
+    // Try immediately, then retry up to 3s in case Supabase fetch is still running
+    doRender();
+    if (!_rendered) {
+      var attempts = 0;
+      var retry = setInterval(function() {
+        doRender();
+        if (_rendered || ++attempts > 30) clearInterval(retry);
+      }, 100);
+    }
+  });
+
+  // 2. sfi:products-loaded event (fired by sfi-data-loader after Supabase fetch)
+  window.addEventListener('sfi:products-loaded', function() {
+    setTimeout(doRender, 0);
+  });
+
+  // 3. Supabase promise
+  if (window._sfiProductsPromise) {
+    window._sfiProductsPromise.then(function() { setTimeout(doRender, 0); });
   }
-
-  window.addEventListener('sfi:products-loaded', function() { setTimeout(tryRender, 50); });
-  if (window._sfiProductsPromise) window._sfiProductsPromise.then(function() { setTimeout(tryRender, 50); });
-
-  var _t = 0;
-  var _poll = setInterval(function() {
-    if (tryRender()) { clearInterval(_poll); return; }
-    if (++_t > 100) clearInterval(_poll);
-  }, 100);
-})();
-
-  // Poll until both products and functions are ready (max 10 seconds)
-  var _t = 0;
-  var _poll = setInterval(function() {
-    if (tryRender()) { clearInterval(_poll); return; }
-    if (++_t > 100) { clearInterval(_poll); }
-  }, 100);
 })();
 </script>
-
 </body>
 </html>
