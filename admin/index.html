@@ -6057,6 +6057,8 @@ Loading items...
       const totalOrd = mData.reduce((s,d)=>s+d.orders,0);
       const totalQty = mData.reduce((s,d)=>s+d.qty,0);
       const avgOrd = totalOrd > 0 ? totalRev/totalOrd : 0;
+      // VAT estimate (23%) + subtotal for reconciliation with dashboard
+      const totalRevWithVAT = totalRev * 1.23;
 
       let totalProfit = 0;
       if (hasRowProfit) {
@@ -6068,22 +6070,50 @@ Loading items...
       const mDataWithProfit = mData.map(d => ({ ...d, profit: d.profit != null ? d.profit : d.rev * profitFactor }));
 
       out.innerHTML = `
+        <!-- Info banner: explain ex-VAT values -->
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:1.1rem">ℹ️</span>
+          <div style="font-size:0.82rem;color:#1e40af;">
+            <strong>Revenue values are ex-VAT (product revenue only)</strong> — excludes shipping, VAT and delivery charges.
+            To reconcile with the dashboard total: multiply by 1.23 to add VAT, then add shipping costs.
+          </div>
+        </div>
         <div class="stats-grid" style="margin-bottom:16px">
-          <div class="stat-card" style="background:#f0fdf4"><div class="label">Total Revenue</div><div class="value" style="color:var(--accent)">€${totalRev.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+          <div class="stat-card" style="background:#f0fdf4">
+            <div class="label">Revenue (ex-VAT)</div>
+            <div class="value" style="color:var(--accent)">€${totalRev.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+            <div style="font-size:0.72rem;color:#6b7280;margin-top:3px">product revenue only</div>
+          </div>
+          <div class="stat-card" style="background:#e0f2fe">
+            <div class="label">Revenue (incl. VAT 23%)</div>
+            <div class="value" style="color:#0369a1">€${totalRevWithVAT.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+            <div style="font-size:0.72rem;color:#6b7280;margin-top:3px">est. dashboard value</div>
+          </div>
           <div class="stat-card" style="background:#f5f3ff"><div class="label">Total Orders</div><div class="value">${totalOrd}</div></div>
           <div class="stat-card" style="background:#eff6ff"><div class="label">Items Sold</div><div class="value">${totalQty}</div></div>
-          <div class="stat-card" style="background:#fefce8"><div class="label">Avg Order Value</div><div class="value">€${avgOrd.toFixed(2)}</div></div>
+          <div class="stat-card" style="background:#fefce8"><div class="label">Avg Order Value</div><div class="value">€${avgOrd.toFixed(2)}</div><div style="font-size:0.72rem;color:#6b7280;margin-top:3px">ex-VAT</div></div>
         </div>
         <div style="background:var(--card-bg);border-radius:8px;padding:16px;border:1px solid var(--border);margin-bottom:16px">
           <canvas id="finMainChart" height="280"></canvas>
         </div>
         <div style="overflow-x:auto">
-          <table><thead><tr><th>Month</th><th style="text-align:right">Orders</th><th style="text-align:right">Items</th><th style="text-align:right">Revenue</th><th style="text-align:right">Profit (est.)</th><th style="text-align:right">Avg Order</th></tr></thead>
+          <table><thead><tr>
+            <th>Month</th>
+            <th style="text-align:right">Orders</th>
+            <th style="text-align:right">Items</th>
+            <th style="text-align:right">Revenue (ex-VAT) <span style="font-weight:400;font-size:0.75rem;opacity:.7">product only</span></th>
+            <th style="text-align:right">≈ incl. VAT <span style="font-weight:400;font-size:0.75rem;opacity:.7">×1.23</span></th>
+            <th style="text-align:right">Profit (est.)</th>
+            <th style="text-align:right">Avg Order</th>
+          </tr></thead>
           <tbody>${mDataWithProfit.slice().reverse().map(d => {
             const avg = d.orders > 0 ? (d.rev/d.orders).toFixed(2) : '0.00';
+            const withVat = (d.rev * 1.23).toFixed(2);
             return `<tr style="cursor:pointer" onclick="openFinMonth('${d.key}','${d.label.replace(/'/g,"\\'")}')">
               <td><strong>${d.label}</strong></td><td style="text-align:right">${d.orders}</td><td style="text-align:right">${d.qty}</td>
-              <td style="text-align:right" class="price">€${d.rev.toFixed(2)}</td><td style="text-align:right" class="price">${profitFactor>0?`€${d.profit.toFixed(2)}`:'—'}</td><td style="text-align:right">€${avg}</td></tr>`;
+              <td style="text-align:right" class="price">€${d.rev.toFixed(2)}</td>
+              <td style="text-align:right;color:#0369a1;font-size:0.85rem">€${withVat}</td>
+              <td style="text-align:right" class="price">${profitFactor>0?`€${d.profit.toFixed(2)}`:'—'}</td><td style="text-align:right">€${avg}</td></tr>`;
           }).join('')}</tbody></table>
         </div>`;
 
