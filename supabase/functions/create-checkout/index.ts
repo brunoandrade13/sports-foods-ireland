@@ -181,16 +181,8 @@ Deno.serve(async (req: Request) => {
                 `client sent ${item.price}, using server price ${serverPrice}`,
             );
           }
-          const isVipProduct = vipIds.has(String(item.id));
-          let finalPrice = serverPrice;
-          if (isVipProduct) {
-            // Only apply VIP discount if client sent a price that's ~20% off server price
-            // This confirms the item was added from the VIP page (already discounted in cart)
-            const expectedVipPrice = serverPrice * 0.8;
-            const tolerance = serverPrice * 0.05; // 5% tolerance for rounding
-            const clientSentVipPrice = Math.abs(item.price - expectedVipPrice) <= tolerance;
-            finalPrice = clientSentVipPrice ? Math.round(expectedVipPrice * 100) / 100 : serverPrice;
-          }
+          const isVip = vipIds.has(String(item.id));
+          const finalPrice = isVip ? Math.round(serverPrice * 0.8 * 100) / 100 : serverPrice;
           return { ...item, price: finalPrice };
         }
         // No server price found — log and allow (e.g. shipping-only items)
