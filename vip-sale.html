@@ -1542,36 +1542,13 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
 </script>
 
 <script>
-// VIP Sale: tag cart items with vip_disc when added from this page
+// VIP Sale: store all VIP product IDs in sessionStorage for checkout
 (function() {
-  var VIP_DISC = 20;
-  function wrapAddToCart() {
-    if (typeof window.addToCart !== 'function' || window.addToCart._vipWrapped) return;
-    var _orig = window.addToCart;
-    window.addToCart = function(id, qty, variant, sub) {
-      _orig.apply(this, arguments);
-      try {
-        var cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        var sid = String(id);
-        var varId = (variant && (variant.variant_id || variant.variantId)) || undefined;
-        var item = varId
-          ? cart.find(function(i) { return String(i.id) === sid && i.variant_id === varId; })
-          : cart.find(function(i) { return String(i.id) === sid && !i.variant_id; });
-        if (item && !item.vip_disc) {
-          item.vip_disc = VIP_DISC;
-          localStorage.setItem('cart', JSON.stringify(cart));
-          if (typeof updateCartModalContent === 'function') updateCartModalContent();
-        }
-      } catch(e) {}
-    };
-    window.addToCart._vipWrapped = true;
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    wrapAddToCart();
-    setTimeout(wrapAddToCart, 300);
-    setTimeout(wrapAddToCart, 800);
-    setTimeout(wrapAddToCart, 1500);
-  });
+  try {
+    var vipIds = ["138", "e3b5344f-86d0-4d43-8a50-6f5b35ecf665", "143", "fc8fc558-48cf-42a0-9241-01e484778499", "144", "0ae789bf-399f-4ac4-bdce-563248e7a8b3", "145", "1e82f6a7-37eb-4ad7-bf3c-8e3201d2bb80", "147", "71794c62-f396-4ab2-b084-d9ed0c19816e", "153", "3c9dd617-92a1-4239-8abc-a2bb0f2957ec", "161", "08512463-158f-4552-9a36-f0773e3b51b5", "162", "307c3cd1-0057-460f-870f-22ca7d0c493f", "166", "9035e27f-29bb-4246-a215-edd44f2ccd1a", "288", "c08086ed-8d55-46c1-a44f-5ff96542ef25", "174", "a0d7c868-de05-4868-83d7-c14edbb820ab", "175", "499419cf-9590-4054-8507-057b8d41dff8", "178", "bd278d0e-43ce-4926-9443-fb8ac5a14eac", "193", "7a01ea1f-48cd-44e2-976a-220e75b62d30", "194", "35ab49fc-81b4-4b16-81a9-4f09179b53b6", "192", "97d6cd35-ab8e-4106-b41f-bba4c72bd371", "180", "16ce050f-77fb-4a78-8468-a8b58ac673a8", "181", "99ff370e-02c0-4cc6-afc9-d5f0d1066c3d", "182", "d193a11b-4c53-46ff-bec3-41856f3b2d3d", "184", "6f3eac10-bc02-46d7-927a-e79a6cab3128", "185", "ee3f4718-0c84-4295-87c3-2f8d788dea67", "197", "419d895a-edf4-4e42-bba0-1de056138fc9", "198", "fa131b84-8fe8-405a-9e5d-8738803e3d1f", "199", "0c1ef3f2-c067-49c0-89e8-d43dfd9e91da", "202", "b701b020-cd7f-4e60-83ad-5bb21178f90b", "204", "35f407d5-e668-43c1-bf55-83a68c2af615", "206", "45e49ac1-aef5-42b1-ae3f-259d5e9e761f", "207", "62cf5092-55d0-46b4-98c8-654c418fe0f1", "210", "6e21ab4e-91f5-49c2-b325-ed629c9d47a7", "209", "06c7c03d-9316-4b40-95a4-c337fb000d78", "211", "a2a7e8f8-0f99-40c6-8cf8-be8a282dac20", "218", "f1d6b4d2-3c18-4d93-80d9-b5302caaf2da", "219", "a7d48f8f-dfeb-4f6d-923d-d4fe2202ecc9", "268", "ec01ee8f-4d11-4719-8f4e-bdb7cc18ebf0", "266", "a1029d03-910d-44a4-9d57-b4ac7d71c329", "267", "8f46990b-6982-49fc-87b7-49dbaba0ffcd", "254", "968aaa2f-361f-4b8f-b287-034df0e78115", "255", "eeef75a3-4272-49d8-8012-f5a94029713b", "257", "4cec6ccd-afa1-44e6-bd35-4e4fc101cf2d", "258", "cf0e7410-b1e6-46a1-b394-73ede8de7608", "259", "d31778fa-e982-4569-9b84-5e2d4269a363", "260", "a2dc7019-eda1-48f1-b255-8d6a3b2b3367", "265", "e6e819a6-5c0e-427b-8789-af2907f7e499", "234", "a58ba7f9-5b54-4b3f-98ad-fc986435189b", "236", "cc1d258c-68d4-4de1-9b40-294a57c54e24", "256", "c39dad3c-03eb-4857-a066-6c55ac854cb2", "313", "1057cccf-3b8a-4765-a1bd-7c5ed6acdfe7", "238", "760fe027-d164-45ba-9ca1-188f1570d6c2", "239", "e8055770-a0a1-485b-a3a6-4f8fa17682af", "240", "07695974-d887-4ef6-9d51-83924c9e258e", "241", "b9bd045f-afa9-4258-a2e5-875798f758f2", "242", "547c73d1-dcc1-4d52-9726-f056c16c38e7", "243", "174ba3f4-30dc-455f-9959-3cef40534def", "252", "a14967ec-d2a4-4fa6-a49b-e396333ccaaf", "248", "294bfee1-5b78-4bc8-b85d-5f093cca2c4b", "100", "fe5b518f-d3a0-41f7-8d92-0de5c1188eae", "103", "4ebafb80-e3bd-41f4-870f-41d9fd2ff0ef", "110", "3818d5a5-98cb-4ec7-afbb-5b68adc2dc1d", "112", "12c147e0-f445-423f-8bb9-10b14e7557f1", "116", "0719df74-9741-42da-b6a0-8fe3ed9eaaa0", "117", "259ecbcf-5ec8-4e82-865d-418d52b01631", "118", "86b69f04-a71f-4787-865a-64910a33c35c", "122", "f0dee19e-38b0-4ac5-b34d-78bcf61da7b0", "123", "c2f248bf-d0b6-4bde-821b-7e9b75076483", "262", "6b375fe0-bcab-4098-91fb-4b00559ee1ae", "246", "c99d1e03-e32f-494f-8080-77cf2b9ceb08", "247", "b0f2307f-2d3b-4304-afc5-217eae9eccb0", "102", "ede5a24a-b8e7-4288-8b6a-6c798a2f891f", "104", "e9d64682-e887-473e-9deb-7e00cb9ff6bd", "105", "fec17cf1-747d-4a6f-9e4a-e432df44dcac", "106", "e703e83c-784a-4e79-a867-cff50159d166", "121", "6510ac81-aba3-40a8-be99-425455deb74b", "167", "cef14b49-d993-48de-85ec-e082e08d4feb", "170", "820f31e2-e44b-49a8-99e2-b8da3c860c03", "115", "f972ea89-0ac0-4c53-96aa-a2d37279c61b", "119", "80187e3d-2525-403f-9ffa-b2cf30b9416a", "120", "bc685da4-43c4-4d77-8d9b-770745b80d24", "183", "eee1b217-f1b4-418a-abf9-b815451a70b4", "96da9a4a-d39d-4d3f-b2f7-20832935176d", "96da9a4a-d39d-4d3f-b2f7-20832935176d"];
+    sessionStorage.setItem('sfi_vip_product_ids', JSON.stringify(vipIds));
+    sessionStorage.setItem('sfi_vip_discount', '20');
+  } catch(e) {}
 })();
 </script>
 </body>
