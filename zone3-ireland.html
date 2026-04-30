@@ -345,6 +345,7 @@
 
 
 
+
 <!-- zone3-ireland brand page: render products using same shop cards -->
 <script>
 (function() {
@@ -356,14 +357,11 @@
     var grid = document.getElementById(GRID_ID);
     if (!grid) return;
     if (grid.querySelector('.product-card')) return;
-
     var all = window.PRODUTOS || [];
     var prods = all.filter(function(p) {
       return (p.marca || '').toLowerCase().includes(BRAND_FILTER);
     }).slice(0, MAX_PRODUCTS);
-
     if (!prods.length) return;
-
     if (typeof renderProductCards === 'function') {
       renderProductCards(prods, GRID_ID);
     } else if (typeof createProductCardHTML === 'function') {
@@ -373,9 +371,9 @@
   }
 
   function tryRender() {
-    var ok = window.PRODUTOS && window.PRODUTOS.length > 0
-          && (typeof renderProductCards === 'function' || typeof createProductCardHTML === 'function');
-    if (ok) { doRender(); return true; }
+    var hasProds = window.PRODUTOS && window.PRODUTOS.length > 0;
+    var hasFn = typeof renderProductCards === 'function' || typeof createProductCardHTML === 'function';
+    if (hasProds && hasFn) { doRender(); return true; }
     return false;
   }
 
