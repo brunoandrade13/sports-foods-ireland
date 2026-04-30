@@ -185,13 +185,12 @@
 }
 .brand-hero-cta:hover { background: #e07030; }
 
-/* ── Products Section ─────────────────── */
 .brand-products-section {
   padding: 52px 0;
   background: #f5f7f5;
 }
 .brand-products-section h2 {
-  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-family: var(--font-display, sans-serif);
   font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 28px;
@@ -199,129 +198,13 @@
 }
 .brand-products-section .category-products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 18px;
 }
-/* Card base */
-.brand-products-section .product-card {
-  background: #fff !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;
-  border: 1px solid #e4ece5 !important;
-  transition: transform 0.25s, box-shadow 0.25s !important;
-  display: flex !important;
-  flex-direction: column !important;
-  position: relative !important;
-}
-.brand-products-section .product-card:hover {
-  transform: translateY(-4px) !important;
-  box-shadow: 0 8px 24px rgba(45,106,79,0.14) !important;
-}
-/* Image area */
-.brand-products-section .product-card > a:first-child {
-  display: block !important;
-  overflow: hidden !important;
-  background: #f5f8f5 !important;
-  aspect-ratio: 1 / 1 !important;
-  width: 100% !important;
-  flex-shrink: 0 !important;
-}
-.brand-products-section .product-img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  padding: 10px !important;
-  transition: transform 0.3s !important;
-  display: block !important;
-}
-.brand-products-section .product-card:hover .product-img {
-  transform: scale(1.04) !important;
-}
-/* Product name */
-.brand-products-section .product-name {
-  font-size: 0.88rem !important;
-  font-weight: 600 !important;
-  padding: 10px 12px 4px !important;
-  line-height: 1.35 !important;
-  flex: 1 !important;
-  margin: 0 !important;
-}
-.brand-products-section .product-name a {
-  color: #1B3A2D !important;
-  text-decoration: none !important;
-}
-.brand-products-section .product-name a:hover { color: #2D6A4F !important; }
-/* Price */
-.brand-products-section .product-prices {
-  padding: 3px 12px 8px !important;
-  margin: 0 !important;
-}
-.brand-products-section .new-price {
-  font-size: 1.05rem !important;
-  font-weight: 700 !important;
-  color: #2D6A4F !important;
-}
-.brand-products-section .old-price {
-  font-size: 0.82rem !important;
-  color: #aaa !important;
-  text-decoration: line-through !important;
-  margin-right: 5px !important;
-}
-/* Wishlist quick-actions injected by product-card.min.js — keep it but style it properly */
-.brand-products-section .product-quick-actions-inline {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  padding: 0 12px 4px !important;
-  background: transparent !important;
-  min-height: 28px !important;
-}
-.brand-products-section .product-quick-actions-inline button,
-.brand-products-section .product-quick-actions-inline a {
-  background: transparent !important;
-  border: none !important;
-  cursor: pointer !important;
-  padding: 3px !important;
-  color: #aaa !important;
-  font-size: 1rem !important;
-}
-.brand-products-section .product-quick-actions-inline button:hover { color: #e05 !important; }
-/* ADD TO BASKET button — explicit colours, no CSS vars */
-.brand-products-section .btn-basket {
-  display: block !important;
-  margin: 0 12px 14px !important;
-  padding: 10px 0 !important;
-  background: #2D6A4F !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 8px !important;
-  font-weight: 700 !important;
-  font-size: 0.8rem !important;
-  letter-spacing: 0.5px !important;
-  cursor: pointer !important;
-  width: calc(100% - 24px) !important;
-  text-align: center !important;
-  transition: background 0.2s !important;
-  flex-shrink: 0 !important;
-}
-.brand-products-section .btn-basket:hover {
-  background: #1B4332 !important;
-}
-.brand-products-section .btn-basket:active {
-  background: #163828 !important;
-  transform: scale(0.98) !important;
-}
-.brand-view-all {
-  text-align: center;
-  margin-top: 32px;
-}
-
 @media (max-width: 600px) {
-  .brand-products-section .category-products-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
+  .brand-products-section .category-products-grid { grid-template-columns: repeat(2,1fr); gap: 12px; }
+  .brand-hero-body h1 { font-size: 1.7rem; }
+}
   .brand-hero-body h1 { font-size: 1.7rem; }
   .brand-products-section .btn-basket { font-size: 0.72rem !important; padding: 9px 0 !important; }
 }
@@ -375,75 +258,12 @@
 <!-- Products Grid -->
 <section class="brand-products-section">
   <div class="container">
-    <h2 style="font-family:var(--font-display);font-size:1.8rem;font-weight:700;margin-bottom:32px;color:var(--dark);">High5 Products</h2>
-    <div class="category-products-grid">
-      <article class="product-card">
-  <a href="produto.html?id=18">
-    <img src="img/produtos-279/018-energy-drink-caffeine-hit-sachet-12-x-47g.webp" alt="Energy Drink Caffeine Hit Sachet 12 X 47g" class="product-img" loading="lazy" width="300" height="300" onerror="this.src='img/placeholder.webp'">
-  </a>
-  <h3 class="product-name"><a href="produto.html?id=18">Energy Drink Caffeine Hit Sachet 12 X 47g</a></h3>
-  <div class="product-prices"><span class="new-price">€25.87</span></div>
-  <button class="btn-basket" data-product-id="18" type="button" aria-label="Add to basket">ADD TO BASKET</button>
-</article>
-<article class="product-card">
-  <a href="produto.html?id=19">
-    <img src="img/produtos-279/019-energy-drink-with-protein-sachet-12-x-47g.webp" alt="Energy Drink with Protein Sachet 12 X 47g" class="product-img" loading="lazy" width="300" height="300" onerror="this.src='img/placeholder.webp'">
-  </a>
-  <h3 class="product-name"><a href="produto.html?id=19">Energy Drink with Protein Sachet 12 X 47g</a></h3>
-  <div class="product-prices"><span class="new-price">€28.67</span></div>
-  <button class="btn-basket" data-product-id="19" type="button" aria-label="Add to basket">ADD TO BASKET</button>
-</article>
-<article class="product-card">
-  <a href="produto.html?id=20">
-    <img src="img/produtos-279/020-high-5-energy-drink-22kg.webp" alt="High 5 Energy Drink 2.2kg" class="product-img" loading="lazy" width="300" height="300" onerror="this.src='img/placeholder.webp'">
-  </a>
-  <h3 class="product-name"><a href="produto.html?id=20">High 5 Energy Drink 2.2kg</a></h3>
-  <div class="product-prices"><span class="new-price">€29.99</span></div>
-  <button class="btn-basket" data-product-id="20" type="button" aria-label="Add to basket">ADD TO BASKET</button>
-</article>
-<article class="product-card">
-  <a href="produto.html?id=21">
-    <img src="img/produtos-279/021-high-5-energy-drink-with-protein-16kg.webp" alt="High 5 Energy Drink with Protein 1.6kg" class="product-img" loading="lazy" width="300" height="300" onerror="this.src='img/placeholder.webp'">
-  </a>
-  <h3 class="product-name"><a href="produto.html?id=21">High 5 Energy Drink with Protein 1.6kg</a></h3>
-  <div class="product-prices"><span class="new-price">€49.99</span></div>
-  <button class="btn-basket" data-product-id="21" type="button" aria-label="Add to basket">ADD TO BASKET</button>
-</article>
-<article class="product-card">
-  <a href="produto.html?id=22">
-    <img src="img/produtos-279/022-high-5-energy-gel-20-pack.webp" alt="High 5 Energy Gel 20 Pack" class="product-img" loading="lazy" width="300" height="300" onerror="this.src='img/placeholder.webp'">
-  </a>
-  <h3 class="product-name"><a href="produto.html?id=22">High 5 Energy Gel 20 Pack</a></h3>
-  <div class="product-prices"><span class="new-price">€26</span></div>
-  <button class="btn-basket" data-product-id="22" type="button" aria-label="Add to basket">ADD TO BASKET</button>
-</article>
-<article class="product-card">
-  <a href="produto.html?id=23">
-    <img src="img/produtos-279/023-high-5-energy-gel-20-pack-caffeine.webp" alt="High 5 Energy Gel 20 Pack Caffeine" class="product-img" loading="lazy" width="300" height="300" onerror="this.src='img/placeholder.webp'">
-  </a>
-  <h3 class="product-name"><a href="produto.html?id=23">High 5 Energy Gel 20 Pack Caffeine</a></h3>
-  <div class="product-prices"><span class="new-price">€29</span></div>
-  <button class="btn-basket" data-product-id="23" type="button" aria-label="Add to basket">ADD TO BASKET</button>
-</article>
-<article class="product-card">
-  <a href="produto.html?id=24">
-    <img src="img/produtos-279/024-high-5-energy-gel-aqua-x-20.webp" alt="High 5 Energy Gel Aqua X 20" class="product-img" loading="lazy" width="300" height="300" onerror="this.src='img/placeholder.webp'">
-  </a>
-  <h3 class="product-name"><a href="produto.html?id=24">High 5 Energy Gel Aqua X 20</a></h3>
-  <div class="product-prices"><span class="new-price">€29</span></div>
-  <button class="btn-basket" data-product-id="24" type="button" aria-label="Add to basket">ADD TO BASKET</button>
-</article>
-<article class="product-card">
-  <a href="produto.html?id=25">
-    <img src="img/produtos-279/025-high5-zero-electrolyte-tablets-box-of-8-x-20-tabs.webp" alt="High5 Zero Electrolyte Tablets Box of 8 x 20 Tabs" class="product-img" loading="lazy" width="300" height="300" onerror="this.src='img/placeholder.webp'">
-  </a>
-  <h3 class="product-name"><a href="produto.html?id=25">High5 Zero Electrolyte Tablets Box of 8 x 20 Tabs</a></h3>
-  <div class="product-prices"><span class="new-price">€72</span></div>
-  <button class="btn-basket" data-product-id="25" type="button" aria-label="Add to basket">ADD TO BASKET</button>
-</article>
+    <h2 style="font-family:var(--font-display);font-size:1.8rem;font-weight:700;margin-bottom:32px;color:var(--dark);">HIGH5 Products</h2>
+    <div class="category-products-grid" id="high5ProductsGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:#888">Loading products…</div>
     </div>
     <div style="text-align:center;margin-top:32px;">
-      <a href="shop.html?brand=high5" class="btn-cta btn-cta-primary">View All High5 Products →</a>
+      <a href="shop.html?brand=high5" class="btn-cta btn-cta-primary">View All HIGH5 Products →</a>
     </div>
   </div>
 </section>
@@ -517,149 +337,57 @@
 <script src="js/sfi-attribution.min.js" defer></script>
 <script src="js/sfi-data-loader.min.js?v=15" defer></script>
 <script src="js/cart.min.js?v=12" defer></script>
-<script src="js/product-card.min.js?v=10" defer></script>
+<script src="js/product-card.min.js?v=11" defer></script>
 <script src="js/main.min.js?v=16" defer></script>
 <script src="js/sfi-fixes.min.js?v=10" defer></script>
 <script src="js/sfi-enhancements.min.js" defer></script>
 <script src="js/brevo-integration.min.js" defer></script>
 
-<!-- Brand page: Supabase variant lookup on Add to Basket -->
+
+
+<!-- high5-ireland brand page: render products using same shop cards -->
 <script>
 (function() {
-  const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
+  var BRAND_FILTER = 'high5';
+  var MAX_PRODUCTS = 8;
+  var GRID_ID = 'high5ProductsGrid';
 
-  // Cache to avoid refetching
-  const _varCache = {};
+  function doRender() {
+    var grid = document.getElementById(GRID_ID);
+    if (!grid) return;
+    if (grid.querySelector('.product-card')) return;
 
-  async function fetchVariants(productId) {
-    if (_varCache[productId] !== undefined) return _varCache[productId];
-    try {
-      // First try to find the Supabase UUID from legacy numeric ID
-      const prodRes = await fetch(
-        SUPA_URL + '/rest/v1/products?select=id,name,stock_quantity,image_url,backorder_available&or=(legacy_id.eq.' + productId + ',woo_product_id.eq.' + productId + ')&limit=1',
-        { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } }
-      );
-      const prods = await prodRes.json();
-      if (!prods || !prods.length) { _varCache[productId] = null; return null; }
-      const prod = prods[0];
+    var all = window.PRODUTOS || [];
+    var prods = all.filter(function(p) {
+      return (p.marca || '').toLowerCase().includes(BRAND_FILTER);
+    }).slice(0, MAX_PRODUCTS);
 
-      // Fetch variants
-      const varRes = await fetch(
-        SUPA_URL + '/rest/v1/product_variants?select=id,label,price,wholesale_price,stock,is_active,image_url&product_id=eq.' + prod.id + '&is_active=eq.true&order=sort_order.asc,label.asc',
-        { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } }
-      );
-      const variants = await varRes.json();
-      if (!variants || !variants.length) { _varCache[productId] = null; return null; }
+    if (!prods.length) return;
 
-      const result = {
-        supabase_id: prod.id,
-        nome: prod.name,
-        imagem: prod.image_url || '',
-        preco: variants[0].price || 0,
-        backorder_available: prod.backorder_available,
-        stock_quantity: prod.stock_quantity,
-        variantes: [{
-          type: 'Option',
-          options: variants.map(v => ({
-            id: v.id,
-            label: v.label,
-            price: v.price,
-            wholesale_price: v.wholesale_price,
-            stock: v.stock,
-            image_url: v.image_url
-          }))
-        }]
-      };
-      _varCache[productId] = result;
-      return result;
-    } catch (e) {
-      console.warn('[brand-page] variant fetch error:', e);
-      _varCache[productId] = null;
-      return null;
+    if (typeof renderProductCards === 'function') {
+      renderProductCards(prods, GRID_ID);
+    } else if (typeof createProductCardHTML === 'function') {
+      grid.innerHTML = prods.map(function(p) { return createProductCardHTML(p); }).join('');
     }
+    if (typeof addQuickActionsToCards === 'function') setTimeout(addQuickActionsToCards, 200);
   }
 
-  // Intercept btn-basket clicks at capture phase (before main.js handler)
-  document.addEventListener('click', async function(e) {
-    const btn = e.target.closest('.brand-products-section .btn-basket');
-    if (!btn) return;
-    const productId = btn.getAttribute('data-product-id');
-    if (!productId) return;
+  function tryRender() {
+    var ok = window.PRODUTOS && window.PRODUTOS.length > 0
+          && (typeof renderProductCards === 'function' || typeof createProductCardHTML === 'function');
+    if (ok) { doRender(); return true; }
+    return false;
+  }
 
-    // Prevent main.js from handling it (we'll handle it here)
-    e.stopImmediatePropagation();
-    e.preventDefault();
+  window.addEventListener('sfi:products-loaded', function() { setTimeout(tryRender, 50); });
+  if (window._sfiProductsPromise) window._sfiProductsPromise.then(function() { setTimeout(tryRender, 50); });
 
-    // Show loading state
-    const origText = btn.textContent;
-    btn.textContent = '⏳ Loading...';
-    btn.disabled = true;
-
-    try {
-      const prodData = await fetchVariants(parseInt(productId, 10));
-
-      if (prodData && prodData.variantes && prodData.variantes[0].options.length > 0) {
-        // Has variants → show modal
-        btn.textContent = origText;
-        btn.disabled = false;
-        if (typeof window.showSupabaseVariantModal === 'function') {
-          window.showSupabaseVariantModal(prodData, function(selected) {
-            if (typeof window.addToCart === 'function') {
-              window.addToCart(parseInt(productId, 10), 1, {
-                nome: (prodData.nome || 'Product') + ' — ' + selected.label,
-                preco: selected.price || prodData.preco,
-                imagem: selected.image_url || prodData.imagem,
-                variant: selected.label,
-                variant_label: selected.label,
-                variantId: selected.id,
-                variant_id: selected.id
-              });
-              btn.textContent = '✓ Added!';
-              btn.style.background = '#00A651';
-              setTimeout(function() {
-                btn.textContent = origText;
-                btn.style.background = '';
-              }, 2000);
-            }
-          });
-        } else {
-          // Fallback: redirect to product page
-          window.location.href = 'produto.html?id=' + productId;
-        }
-      } else {
-        // No variants — check if product is in stock
-        btn.textContent = origText;
-        btn.disabled = false;
-        // Fallback to main.js via window.addToCart directly
-        if (typeof window.addToCart === 'function') {
-          // Get product details from dados.json (already loaded in PRODUTOS)
-          const legacyProd = (window.PRODUTOS || []).find(p => p.id == productId);
-          if (legacyProd) {
-            window.addToCart(parseInt(productId, 10), 1);
-          } else {
-            window.addToCart(parseInt(productId, 10), 1);
-          }
-          btn.textContent = '✓ Added!';
-          btn.style.background = '#00A651';
-          setTimeout(function() {
-            btn.textContent = origText;
-            btn.style.background = '';
-          }, 2000);
-        } else {
-          window.location.href = 'produto.html?id=' + productId;
-        }
-      }
-    } catch (err) {
-      btn.textContent = origText;
-      btn.disabled = false;
-      console.warn('[brand-page] Error handling add to basket:', err);
-      // Fallback to product page
-      window.location.href = 'produto.html?id=' + productId;
-    }
-  }, true); // capture phase — fires before main.js listener
+  var _t = 0;
+  var _poll = setInterval(function() {
+    if (tryRender()) { clearInterval(_poll); return; }
+    if (++_t > 100) clearInterval(_poll);
+  }, 100);
 })();
 </script>
-
 </body>
 </html>
