@@ -223,7 +223,8 @@
   display: block !important;
   overflow: hidden !important;
   background: #f5f8f5 !important;
-  aspect-ratio: 1 / 1 !important;
+  height: 200px !important;
+  aspect-ratio: unset !important;
   width: 100% !important;
   flex-shrink: 0 !important;
 }
@@ -231,21 +232,25 @@
   width: 100% !important;
   height: 100% !important;
   object-fit: contain !important;
-  padding: 10px !important;
+  padding: 8px !important;
   transition: transform 0.3s !important;
   display: block !important;
 }
 .brand-products-section .product-card:hover .product-img {
   transform: scale(1.04) !important;
 }
-/* Product name */
+/* Product name — allow full text, no clipping */
 .brand-products-section .product-name {
   font-size: 0.88rem !important;
   font-weight: 600 !important;
   padding: 10px 12px 4px !important;
-  line-height: 1.35 !important;
+  line-height: 1.4 !important;
   flex: 1 !important;
   margin: 0 !important;
+  max-height: none !important;
+  -webkit-line-clamp: unset !important;
+  overflow: visible !important;
+  display: block !important;
 }
 .brand-products-section .product-name a {
   color: #1B3A2D !important;
