@@ -83,6 +83,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    const body = await req.json();
     const {
       items,
       email,
@@ -90,7 +91,11 @@ Deno.serve(async (req: Request) => {
       shippingAddress,
       coupon,
       is_b2b = false,
-    } = await req.json();
+      vip_discount = 0,
+    } = body;
+    // VIP discount: max 50% allowed, server-side cap for security
+    const vipMultiplier = (typeof vip_discount === 'number' && vip_discount > 0 && vip_discount <= 50)
+      ? (1 - vip_discount / 100) : 1;
 
     if (!items?.length) {
       return new Response(JSON.stringify({ error: "Cart is empty" }), {
@@ -177,7 +182,8 @@ Deno.serve(async (req: Request) => {
                 `client sent ${item.price}, using server price ${serverPrice}`,
             );
           }
-          return { ...item, price: serverPrice };
+          const vipPrice = vipMultiplier < 1 ? Math.round(serverPrice * vipMultiplier * 100) / 100 : serverPrice;
+          return { ...item, price: vipPrice };
         }
         // No server price found — log and allow (e.g. shipping-only items)
         console.warn(
@@ -220,6 +226,7 @@ Deno.serve(async (req: Request) => {
               ...(imageUrl ? { images: [imageUrl] } : {}),
             },
             unit_amount: Math.round(item.price * 100),
+            tax_behavior: "inclusive",
           },
           quantity: item.quantity || 1,
         };
