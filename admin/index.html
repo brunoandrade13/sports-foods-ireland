@@ -18645,20 +18645,29 @@ try {
 loadRealARBanner();
 // Only show genuine accounts receivable (B2B invoices, Net 30, COD, Check)
 // Exclude abandoned online payments (PayPal, Stripe, Google Pay, Credit Card)
-const allPending = await supaGet('orders', '?select=order_number,customer_name,customer_email,total,qb_balance,financial_status,payment_method,order_source,created_at,payment_due_date,notes&financial_status=in.(pending,partially_paid)&order=created_at.desc');
+const [allPending, allCredits] = await Promise.all([
+  supaGet('orders', '?select=order_number,customer_name,customer_email,total,qb_balance,financial_status,payment_method,order_source,created_at,payment_due_date,notes&financial_status=in.(pending,partially_paid)&order=created_at.desc'),
+  supaGet('credit_memos', '?select=customer_name,balance,total_amount,doc_number,txn_date,status&status=eq.open&balance=gt.0').catch(() => [])
+]);
 _recData = allPending.filter(o => {
-const pm = (o.payment_method || '').toLowerCase();
-const src = (o.order_source || '').toLowerCase();
-// Include: QuickBooks invoices, B2B portal orders, Check payments, Account payments
-if (src === 'quickbooks') return true;
-if (src === 'b2b_portal') return true;
-if (pm.includes('net 30') || pm.includes('invoice')) return true;
-if (pm.includes('cash on delivery') || pm.includes('cod')) return true;
-if (pm.includes('check') || pm.includes('cheque')) return true;
-if (pm.includes('account')) return true;
-if (pm.includes('bank transfer') || pm.includes('wire')) return true;
-// Exclude: PayPal, Stripe, Google Pay, Apple Pay, Credit Card, Klarna
-return false;
+  const pm = (o.payment_method || '').toLowerCase();
+  const src = (o.order_source || '').toLowerCase();
+  if (src === 'quickbooks') return true;
+  if (src === 'b2b_portal') return true;
+  if (pm.includes('net 30') || pm.includes('invoice')) return true;
+  if (pm.includes('cash on delivery') || pm.includes('cod')) return true;
+  if (pm.includes('check') || pm.includes('cheque')) return true;
+  if (pm.includes('account')) return true;
+  if (pm.includes('bank transfer') || pm.includes('wire')) return true;
+  return false;
+});
+// Build credit map by customer name (normalised)
+window._recCredits = {};
+(allCredits || []).forEach(cm => {
+  const key = (cm.customer_name || '').trim().toLowerCase();
+  if (!window._recCredits[key]) window._recCredits[key] = { total: 0, memos: [] };
+  window._recCredits[key].total += Number(cm.balance || 0);
+  window._recCredits[key].memos.push(cm);
 });
 renderReceivablesSummary();
 filterReceivables();
@@ -18684,29 +18693,70 @@ async function loadRealARBanner() {
 
 function renderReceivablesSummary() {
 const now = new Date();
-const totalPending = _recData.reduce((s, o) => s + Number(o.qb_balance != null ? o.qb_balance : o.total), 0);
+const credits = window._recCredits || {};
+
+const totalGross = _recData.reduce((s, o) => s + Number(o.qb_balance != null ? o.qb_balance : o.total), 0);
+const totalCreditsAvailable = Object.values(credits).reduce((s, c) => s + c.total, 0);
+const totalNet = Math.max(0, totalGross - totalCreditsAvailable);
+
 const overdue = _recData.filter(o => o.payment_due_date && new Date(o.payment_due_date) < now);
 const overdueAmount = overdue.reduce((s, o) => s + Number(o.qb_balance != null ? o.qb_balance : o.total), 0);
 const customers = new Set(_recData.map(o => o.customer_name || o.customer_email)).size;
 
-document.getElementById('recTotalPending').textContent = '\u20ac' + totalPending.toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
+document.getElementById('recTotalPending').innerHTML =
+  '\u20ac' + totalNet.toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2}) +
+  (totalCreditsAvailable > 0 ? `<div style="font-size:0.7rem;color:#16a34a;margin-top:2px">After €${totalCreditsAvailable.toFixed(2)} credits</div>` : '');
 document.getElementById('recOverdue').textContent = '\u20ac' + overdueAmount.toLocaleString('en-IE', {minimumFractionDigits:2, maximumFractionDigits:2});
 document.getElementById('recOrderCount').textContent = _recData.length;
 document.getElementById('recCustomerCount').textContent = customers;
 
-// Customer breakdown
+// Customer breakdown with credits
 const byCustomer = {};
 _recData.forEach(o => {
-const key = o.customer_name || o.customer_email || 'Unknown';
-if (!byCustomer[key]) byCustomer[key] = { name: key, email: o.customer_email, total: 0, orders: 0, oldest: o.created_at };
-byCustomer[key].total += Number(o.qb_balance != null ? o.qb_balance : o.total);
-byCustomer[key].orders++;
-if (o.created_at < byCustomer[key].oldest) byCustomer[key].oldest = o.created_at;
+  const key = o.customer_name || o.customer_email || 'Unknown';
+  if (!byCustomer[key]) byCustomer[key] = { name: key, email: o.customer_email, gross: 0, orders: 0, oldest: o.created_at };
+  byCustomer[key].gross += Number(o.qb_balance != null ? o.qb_balance : o.total);
+  byCustomer[key].orders++;
+  if (o.created_at < byCustomer[key].oldest) byCustomer[key].oldest = o.created_at;
 });
-const sorted = Object.values(byCustomer).sort((a, b) => b.total - a.total);
-let custHtml = '<h3 style="margin-bottom:12px">Balances by Customer</h3><table style="width:100%;font-size:0.85rem"><thead><tr><th>Customer</th><th>Email</th><th style="text-align:right">Open Orders</th><th style="text-align:right">Total Owed</th></tr></thead><tbody>';
+
+// Add credit info per customer
+Object.values(byCustomer).forEach(c => {
+  const cKey = c.name.trim().toLowerCase();
+  c.credit = (credits[cKey] && credits[cKey].total) || 0;
+  c.net = Math.max(0, c.gross - c.credit);
+  c.total = c.net; // for sorting
+});
+
+const sorted = Object.values(byCustomer).sort((a, b) => b.gross - a.gross);
+const hasCredits = Object.keys(credits).length > 0;
+
+let custHtml = `<h3 style="margin-bottom:8px">Balances by Customer</h3>`;
+if (hasCredits) {
+  custHtml += `<div style="background:#fef9c3;border:1px solid #fde047;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:0.82rem;color:#713f12">
+    ⚠️ <strong>€${totalCreditsAvailable.toFixed(2)} in unapplied credit memos</strong> across ${Object.keys(credits).length} customers.
+    The <span style="color:#dc2626">Gross</span> column is the QB invoice balance. 
+    <span style="color:#16a34a">Net</span> is after applying available credits. Please apply credits in QuickBooks to update invoice balances.
+  </div>`;
+}
+custHtml += `<table style="width:100%;font-size:0.83rem"><thead><tr>
+  <th>Customer</th>
+  <th style="text-align:right">Orders</th>
+  <th style="text-align:right">Gross Owed</th>
+  ${hasCredits ? '<th style="text-align:right;color:#16a34a">Available Credits</th><th style="text-align:right;color:#1d4ed8;font-weight:700">Net Balance</th>' : ''}
+</tr></thead><tbody>`;
+
 sorted.forEach(c => {
-custHtml += '<tr><td style="font-weight:600">' + (c.name || '—') + '</td><td>' + (c.email || '—') + '</td><td style="text-align:right">' + c.orders + '</td><td style="text-align:right;font-weight:700;color:var(--danger)">\u20ac' + c.total.toFixed(2) + '</td></tr>';
+  const hasCredit = c.credit > 0;
+  const isZero = c.net <= 0.01;
+  const rowStyle = isZero ? 'opacity:0.5' : '';
+  custHtml += `<tr style="${rowStyle}">
+    <td style="font-weight:600;padding:5px 4px">${c.name || '—'}${isZero ? ' <span style="font-size:0.72rem;background:#d1fae5;color:#065f46;padding:1px 5px;border-radius:4px;margin-left:4px">✓ Cleared by credit</span>' : ''}</td>
+    <td style="text-align:right;padding:5px 4px">${c.orders}</td>
+    <td style="text-align:right;font-weight:600;color:${hasCredit?'#9ca3af':'#dc2626'};padding:5px 4px">\u20ac${c.gross.toFixed(2)}</td>
+    ${hasCredits ? `<td style="text-align:right;color:#16a34a;padding:5px 4px">${hasCredit ? '−\u20ac'+c.credit.toFixed(2) : '—'}</td>
+    <td style="text-align:right;font-weight:700;color:${isZero?'#16a34a':'#1d4ed8'};padding:5px 4px">\u20ac${c.net.toFixed(2)}</td>` : ''}
+  </tr>`;
 });
 custHtml += '</tbody></table>';
 document.getElementById('recByCustomer').innerHTML = custHtml;
