@@ -462,61 +462,69 @@
 
 <script src="js/brevo-integration.min.js" defer></script>
 
-<!-- Tailwind brand page: load parent products using the same shop card as the shop -->
+<!-- Tailwind brand page: load parent products — identical to shop cards -->
 <script>
 (function() {
-  // Active Tailwind parent product IDs (legacy_id in PRODUTOS)
-  // 46=Endurance Fuel, 55=High Carb, 56=Recovery Mix
+  // IDs 46=Endurance Fuel, 55=High Carb, 56=Recovery Mix (all is_active=true)
   var TAILWIND_IDS = [46, 55, 56];
 
-  function render() {
+  function doRender() {
     var grid = document.getElementById('tailwindProductsGrid');
     if (!grid) return;
+    if (grid.querySelector('.product-card')) return; // already rendered
+
     var all = window.PRODUTOS || [];
-    // Keep order: 46, 47, 56
     var prods = TAILWIND_IDS.map(function(id) {
       return all.find(function(p) { return Number(p.id) === id; });
     }).filter(Boolean);
-    // Fallback: find by brand name if IDs don't match
+
+    // Fallback: find by brand name
     if (!prods.length) {
       prods = all.filter(function(p) {
         return (p.marca || '').toLowerCase().includes('tailwind');
       }).slice(0, 4);
     }
     if (!prods.length) return;
-    // Already rendered?
-    if (grid.querySelector('.product-card')) return;
-    // Use EXACT same card as shop
+
+    // renderProductCards is defined in main.min.js — identical to shop
     if (typeof renderProductCards === 'function') {
       renderProductCards(prods, 'tailwindProductsGrid');
     } else if (typeof createProductCardHTML === 'function') {
-      grid.innerHTML = prods.map(function(p) {
-        return createProductCardHTML(p);
-      }).join('');
+      grid.innerHTML = prods.map(function(p) { return createProductCardHTML(p); }).join('');
     }
-
-        if (typeof addQuickActionsToCards === 'function') {
-      setTimeout(addQuickActionsToCards, 300);
-    }
+    if (typeof addQuickActionsToCards === 'function') setTimeout(addQuickActionsToCards, 200);
   }
 
-  // Try immediately
-  if (window.PRODUTOS && window.PRODUTOS.length) { render(); return; }
+  // Render function with safety: waits for both products AND card functions to be available
+  function tryRender() {
+    var hasProducts = window.PRODUTOS && window.PRODUTOS.length > 0;
+    var hasFunctions = typeof renderProductCards === 'function' || typeof createProductCardHTML === 'function';
+    if (hasProducts && hasFunctions) {
+      doRender();
+      return true;
+    }
+    return false;
+  }
 
-  // Wait for sfi-data-loader event
-  window.addEventListener('sfi:products-loaded', render);
+  // Listen for sfi:products-loaded event (fired by sfi-data-loader after Supabase fetch)
+  window.addEventListener('sfi:products-loaded', function() {
+    // Defer slightly to let main.min.js finish setting up renderProductCards
+    setTimeout(tryRender, 50);
+  });
 
-  // Also via promise
+  // Also listen via promise
   if (window._sfiProductsPromise) {
-    window._sfiProductsPromise.then(render);
+    window._sfiProductsPromise.then(function() {
+      setTimeout(tryRender, 50);
+    });
   }
 
-  // Poll fallback — longer timeout
+  // Poll until both products and functions are ready (max 10 seconds)
   var _t = 0;
   var _poll = setInterval(function() {
-    if (window.PRODUTOS && window.PRODUTOS.length) { clearInterval(_poll); render(); }
-    if (++_t > 60) clearInterval(_poll);
-  }, 200);
+    if (tryRender()) { clearInterval(_poll); return; }
+    if (++_t > 100) { clearInterval(_poll); }
+  }, 100);
 })();
 </script>
 
