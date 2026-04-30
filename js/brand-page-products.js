@@ -4,6 +4,42 @@
  * Loaded with defer, so runs AFTER all other defer scripts.
  */
 (function() {
+  // Inject CSS fix for brand page cards — override shop card defaults
+  // that cause images to be too small and names to be clipped
+  (function injectCSS() {
+    if (document.getElementById('brand-page-card-fix')) return;
+    var style = document.createElement('style');
+    style.id = 'brand-page-card-fix';
+    style.textContent = [
+      '.brand-products-section .product-card > a:first-child {',
+      '  display: block !important;',
+      '  height: 200px !important;',
+      '  aspect-ratio: unset !important;',
+      '  overflow: hidden !important;',
+      '  background: #f5f8f5 !important;',
+      '  width: 100% !important;',
+      '}',
+      '.brand-products-section .product-img {',
+      '  width: 100% !important;',
+      '  height: 100% !important;',
+      '  object-fit: contain !important;',
+      '  padding: 8px !important;',
+      '  display: block !important;',
+      '}',
+      '.brand-products-section .product-name {',
+      '  max-height: none !important;',
+      '  -webkit-line-clamp: unset !important;',
+      '  -webkit-box-orient: unset !important;',
+      '  display: block !important;',
+      '  overflow: visible !important;',
+      '  white-space: normal !important;',
+      '}',
+      '@media (max-width: 600px) {',
+      '  .brand-products-section .product-card > a:first-child { height: 160px !important; }',
+      '}',
+    ].join('\n');
+    document.head.appendChild(style);
+  })();
   // Map: grid element ID → brand name filter
   var BRAND_GRIDS = {
     'tailwindProductsGrid': 'tailwind',
