@@ -462,10 +462,12 @@
 
 <script src="js/brevo-integration.min.js" defer></script>
 
-<!-- Tailwind brand page: load 3 parent products using the same shop card as the shop -->
+<!-- Tailwind brand page: load parent products using the same shop card as the shop -->
 <script>
 (function() {
-  var TAILWIND_IDS = [46, 47, 56];
+  // Active Tailwind parent product IDs (legacy_id in PRODUTOS)
+  // 46=Endurance Fuel, 55=High Carb, 56=Recovery Mix
+  var TAILWIND_IDS = [46, 55, 56];
 
   function render() {
     var grid = document.getElementById('tailwindProductsGrid');
@@ -475,51 +477,46 @@
     var prods = TAILWIND_IDS.map(function(id) {
       return all.find(function(p) { return Number(p.id) === id; });
     }).filter(Boolean);
+    // Fallback: find by brand name if IDs don't match
+    if (!prods.length) {
+      prods = all.filter(function(p) {
+        return (p.marca || '').toLowerCase().includes('tailwind');
+      }).slice(0, 4);
+    }
     if (!prods.length) return;
-    // Use exact same card HTML as the shop
-    if (typeof createProductCardHTML === 'function') {
+    // Already rendered?
+    if (grid.querySelector('.product-card')) return;
+    // Use EXACT same card as shop
+    if (typeof renderProductCards === 'function') {
+      renderProductCards(prods, 'tailwindProductsGrid');
+    } else if (typeof createProductCardHTML === 'function') {
       grid.innerHTML = prods.map(function(p) {
-        return createProductCardHTML(p, { showBrand: false });
-      }).join('');
-    } else {
-      // Fallback if createProductCardHTML not yet loaded
-      grid.innerHTML = prods.map(function(p) {
-        var img = p.imagem || 'img/placeholder.webp';
-        var price = Number(p.preco || 0).toFixed(2);
-        return '<article class="product-card" data-id="' + p.id + '" data-product-id="' + p.id + '">' +
-          '<a href="produto.html?id=' + p.id + '">' +
-            '<img src="' + img + '" alt="' + (p.nome||'') + '" class="product-img" loading="lazy" onerror="this.src='img/placeholder.webp'">' +
-          '</a>' +
-          '<h3 class="product-name"><a href="produto.html?id=' + p.id + '">' + (p.nome||'') + '</a></h3>' +
-          '<div class="product-prices"><span class="new-price">\u20ac' + price + '</span></div>' +
-          '<button class="btn-basket" data-product-id="' + p.id + '" type="button">ADD TO BASKET</button>' +
-        '</article>';
+        return createProductCardHTML(p);
       }).join('');
     }
-    if (typeof addQuickActionsToCards === 'function') {
+
+        if (typeof addQuickActionsToCards === 'function') {
       setTimeout(addQuickActionsToCards, 300);
     }
   }
 
-  // Try immediately (products may already be loaded)
+  // Try immediately
   if (window.PRODUTOS && window.PRODUTOS.length) { render(); return; }
 
-  // Wait for sfi-data-loader to finish
+  // Wait for sfi-data-loader event
   window.addEventListener('sfi:products-loaded', render);
 
   // Also via promise
   if (window._sfiProductsPromise) {
-    window._sfiProductsPromise.then(function() {
-      if (!document.querySelector('#tailwindProductsGrid .product-card')) render();
-    });
+    window._sfiProductsPromise.then(render);
   }
 
-  // Last-resort poll
+  // Poll fallback — longer timeout
   var _t = 0;
   var _poll = setInterval(function() {
     if (window.PRODUTOS && window.PRODUTOS.length) { clearInterval(_poll); render(); }
-    if (++_t > 40) clearInterval(_poll);
-  }, 250);
+    if (++_t > 60) clearInterval(_poll);
+  }, 200);
 })();
 </script>
 
