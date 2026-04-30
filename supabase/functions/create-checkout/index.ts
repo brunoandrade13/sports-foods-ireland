@@ -91,11 +91,10 @@ Deno.serve(async (req: Request) => {
       shippingAddress,
       coupon,
       is_b2b = false,
-      vip_discount = 0,
+      vip_item_ids = [],
     } = body;
-    // VIP discount: max 50% allowed, server-side cap for security
-    const vipMultiplier = (typeof vip_discount === 'number' && vip_discount > 0 && vip_discount <= 50)
-      ? (1 - vip_discount / 100) : 1;
+    // VIP discount: 20% applied only to items in vip_item_ids list (set by vip-sale.html)
+    const vipIds = new Set((Array.isArray(vip_item_ids) ? vip_item_ids : []).map(String));
 
     if (!items?.length) {
       return new Response(JSON.stringify({ error: "Cart is empty" }), {
@@ -182,7 +181,8 @@ Deno.serve(async (req: Request) => {
                 `client sent ${item.price}, using server price ${serverPrice}`,
             );
           }
-          const vipPrice = vipMultiplier < 1 ? Math.round(serverPrice * vipMultiplier * 100) / 100 : serverPrice;
+          const isVip = vipIds.has(String(item.id));
+          const vipPrice = isVip ? Math.round(serverPrice * 0.8 * 100) / 100 : serverPrice;
           return { ...item, price: vipPrice };
         }
         // No server price found — log and allow (e.g. shipping-only items)

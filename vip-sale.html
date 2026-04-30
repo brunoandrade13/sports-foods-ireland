@@ -1540,5 +1540,39 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
   });
 })();
 </script>
+
+<script>
+// VIP Sale: tag cart items with vip_disc when added from this page
+(function() {
+  var VIP_DISC = 20;
+  function wrapAddToCart() {
+    if (typeof window.addToCart !== 'function' || window.addToCart._vipWrapped) return;
+    var _orig = window.addToCart;
+    window.addToCart = function(id, qty, variant, sub) {
+      _orig.apply(this, arguments);
+      try {
+        var cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        var sid = String(id);
+        var varId = (variant && (variant.variant_id || variant.variantId)) || undefined;
+        var item = varId
+          ? cart.find(function(i) { return String(i.id) === sid && i.variant_id === varId; })
+          : cart.find(function(i) { return String(i.id) === sid && !i.variant_id; });
+        if (item && !item.vip_disc) {
+          item.vip_disc = VIP_DISC;
+          localStorage.setItem('cart', JSON.stringify(cart));
+          if (typeof updateCartModalContent === 'function') updateCartModalContent();
+        }
+      } catch(e) {}
+    };
+    window.addToCart._vipWrapped = true;
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    wrapAddToCart();
+    setTimeout(wrapAddToCart, 300);
+    setTimeout(wrapAddToCart, 800);
+    setTimeout(wrapAddToCart, 1500);
+  });
+})();
+</script>
 </body>
 </html>
