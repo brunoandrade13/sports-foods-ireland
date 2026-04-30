@@ -201,39 +201,8 @@
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 18px;
 }
-/* Fix: image container — fixed height so portrait images fill space better */
-.brand-products-section .product-card > a:first-child {
-  display: block !important;
-  aspect-ratio: unset !important;
-  height: 200px !important;
-  overflow: hidden !important;
-  background: #f5f8f5 !important;
-}
-.brand-products-section .product-img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  padding: 8px !important;
-}
-/* Fix: product name — allow 3 lines, no clipping */
-.brand-products-section .product-name {
-  max-height: none !important;
-  -webkit-line-clamp: unset !important;
-  overflow: visible !important;
-  display: block !important;
-  font-size: 0.9rem !important;
-  font-weight: 600 !important;
-  padding: 10px 12px 4px !important;
-  line-height: 1.4 !important;
-}
 @media (max-width: 600px) {
   .brand-products-section .category-products-grid { grid-template-columns: repeat(2,1fr); gap: 12px; }
-  .brand-hero-body h1 { font-size: 1.7rem; }
-  .brand-products-section .product-card > a:first-child { height: 160px !important; }
-}
-  .brand-hero-body h1 { font-size: 1.7rem; }
-  .brand-products-section .btn-basket { font-size: 0.72rem !important; padding: 9px 0 !important; }
-}
   .brand-hero-body h1 { font-size: 1.7rem; }
 }
 </style>
@@ -374,6 +343,6 @@
 
 
 
-<script src="js/brand-page-products.js?v=2" defer></script>
+<script src="js/brand-page-products.js?v=3" defer></script>
 </body>
 </html>

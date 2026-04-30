@@ -1,46 +1,10 @@
 /**
- * brand-page-products.js
- * Renders product cards on brand pages — identical to shop cards.
- * Loaded with defer, so runs AFTER all other defer scripts.
+ * brand-page-products.js  v3
+ * Renders product cards on brand pages using the EXACT same
+ * renderProductCards() function as the shop — zero extra CSS.
+ * The shop's sfi-styles.min.css handles all card styling automatically.
  */
 (function() {
-  // Inject CSS fix for brand page cards — override shop card defaults
-  // that cause images to be too small and names to be clipped
-  (function injectCSS() {
-    if (document.getElementById('brand-page-card-fix')) return;
-    var style = document.createElement('style');
-    style.id = 'brand-page-card-fix';
-    style.textContent = [
-      '.brand-products-section .product-card > a:first-child {',
-      '  display: block !important;',
-      '  height: 200px !important;',
-      '  aspect-ratio: unset !important;',
-      '  overflow: hidden !important;',
-      '  background: #f5f8f5 !important;',
-      '  width: 100% !important;',
-      '}',
-      '.brand-products-section .product-img {',
-      '  width: 100% !important;',
-      '  height: 100% !important;',
-      '  object-fit: contain !important;',
-      '  padding: 8px !important;',
-      '  display: block !important;',
-      '}',
-      '.brand-products-section .product-name {',
-      '  max-height: none !important;',
-      '  -webkit-line-clamp: unset !important;',
-      '  -webkit-box-orient: unset !important;',
-      '  display: block !important;',
-      '  overflow: visible !important;',
-      '  white-space: normal !important;',
-      '}',
-      '@media (max-width: 600px) {',
-      '  .brand-products-section .product-card > a:first-child { height: 160px !important; }',
-      '}',
-    ].join('\n');
-    document.head.appendChild(style);
-  })();
-  // Map: grid element ID → brand name filter
   var BRAND_GRIDS = {
     'tailwindProductsGrid': 'tailwind',
     'clifProductsGrid':     'clif',
@@ -54,7 +18,7 @@
   function renderGrid(gridId, brandFilter) {
     var grid = document.getElementById(gridId);
     if (!grid) return false;
-    if (grid.querySelector('.product-card')) return true; // already rendered
+    if (grid.querySelector('.product-card')) return true;
 
     var prods = (window.PRODUTOS || []).filter(function(p) {
       return (p.marca || '').toLowerCase().includes(brandFilter);
@@ -80,31 +44,20 @@
     });
   }
 
-  // This script is defer — runs after all other defer scripts.
-  // If PRODUTOS is already loaded, render immediately.
   if (window.PRODUTOS && window.PRODUTOS.length > 0) {
     renderAll();
     return;
   }
 
-  // Otherwise wait for sfi:products-loaded
-  window.addEventListener('sfi:products-loaded', function() {
-    setTimeout(renderAll, 0);
-  });
+  window.addEventListener('sfi:products-loaded', function() { setTimeout(renderAll, 0); });
 
-  // Also via promise
   if (window._sfiProductsPromise) {
     window._sfiProductsPromise.then(function() { setTimeout(renderAll, 50); });
   }
 
-  // Fallback poll — max 5 seconds
   var _t = 0;
   var _poll = setInterval(function() {
-    if (window.PRODUTOS && window.PRODUTOS.length > 0) {
-      renderAll();
-      clearInterval(_poll);
-      return;
-    }
+    if (window.PRODUTOS && window.PRODUTOS.length > 0) { renderAll(); clearInterval(_poll); return; }
     if (++_t > 50) clearInterval(_poll);
   }, 100);
 })();
