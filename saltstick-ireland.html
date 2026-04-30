@@ -482,5 +482,144 @@
 <script src="js/sfi-fixes.min.js?v=10" defer></script>
 <script src="js/sfi-enhancements.min.js" defer></script>
 <script src="js/brevo-integration.min.js" defer></script>
+
+<!-- Brand page: Supabase variant lookup on Add to Basket -->
+<script>
+(function() {
+  const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
+
+  // Cache to avoid refetching
+  const _varCache = {};
+
+  async function fetchVariants(productId) {
+    if (_varCache[productId] !== undefined) return _varCache[productId];
+    try {
+      // First try to find the Supabase UUID from legacy numeric ID
+      const prodRes = await fetch(
+        SUPA_URL + '/rest/v1/products?select=id,name,stock_quantity,image_url,backorder_available&or=(legacy_id.eq.' + productId + ',woo_product_id.eq.' + productId + ')&limit=1',
+        { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } }
+      );
+      const prods = await prodRes.json();
+      if (!prods || !prods.length) { _varCache[productId] = null; return null; }
+      const prod = prods[0];
+
+      // Fetch variants
+      const varRes = await fetch(
+        SUPA_URL + '/rest/v1/product_variants?select=id,label,price,wholesale_price,stock,is_active,image_url&product_id=eq.' + prod.id + '&is_active=eq.true&order=sort_order.asc,label.asc',
+        { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } }
+      );
+      const variants = await varRes.json();
+      if (!variants || !variants.length) { _varCache[productId] = null; return null; }
+
+      const result = {
+        supabase_id: prod.id,
+        nome: prod.name,
+        imagem: prod.image_url || '',
+        preco: variants[0].price || 0,
+        backorder_available: prod.backorder_available,
+        stock_quantity: prod.stock_quantity,
+        variantes: [{
+          type: 'Option',
+          options: variants.map(v => ({
+            id: v.id,
+            label: v.label,
+            price: v.price,
+            wholesale_price: v.wholesale_price,
+            stock: v.stock,
+            image_url: v.image_url
+          }))
+        }]
+      };
+      _varCache[productId] = result;
+      return result;
+    } catch (e) {
+      console.warn('[brand-page] variant fetch error:', e);
+      _varCache[productId] = null;
+      return null;
+    }
+  }
+
+  // Intercept btn-basket clicks at capture phase (before main.js handler)
+  document.addEventListener('click', async function(e) {
+    const btn = e.target.closest('.brand-products-section .btn-basket');
+    if (!btn) return;
+    const productId = btn.getAttribute('data-product-id');
+    if (!productId) return;
+
+    // Prevent main.js from handling it (we'll handle it here)
+    e.stopImmediatePropagation();
+    e.preventDefault();
+
+    // Show loading state
+    const origText = btn.textContent;
+    btn.textContent = '⏳ Loading...';
+    btn.disabled = true;
+
+    try {
+      const prodData = await fetchVariants(parseInt(productId, 10));
+
+      if (prodData && prodData.variantes && prodData.variantes[0].options.length > 0) {
+        // Has variants → show modal
+        btn.textContent = origText;
+        btn.disabled = false;
+        if (typeof window.showSupabaseVariantModal === 'function') {
+          window.showSupabaseVariantModal(prodData, function(selected) {
+            if (typeof window.addToCart === 'function') {
+              window.addToCart(parseInt(productId, 10), 1, {
+                nome: (prodData.nome || 'Product') + ' — ' + selected.label,
+                preco: selected.price || prodData.preco,
+                imagem: selected.image_url || prodData.imagem,
+                variant: selected.label,
+                variant_label: selected.label,
+                variantId: selected.id,
+                variant_id: selected.id
+              });
+              btn.textContent = '✓ Added!';
+              btn.style.background = '#00A651';
+              setTimeout(function() {
+                btn.textContent = origText;
+                btn.style.background = '';
+              }, 2000);
+            }
+          });
+        } else {
+          // Fallback: redirect to product page
+          window.location.href = 'produto.html?id=' + productId;
+        }
+      } else {
+        // No variants — check if product is in stock
+        btn.textContent = origText;
+        btn.disabled = false;
+        // Fallback to main.js via window.addToCart directly
+        if (typeof window.addToCart === 'function') {
+          // Get product details from dados.json (already loaded in PRODUTOS)
+          const legacyProd = (window.PRODUTOS || []).find(p => p.id == productId);
+          if (legacyProd) {
+            window.addToCart(parseInt(productId, 10), 1);
+          } else {
+            window.addToCart(parseInt(productId, 10), 1);
+          }
+          btn.textContent = '✓ Added!';
+          btn.style.background = '#00A651';
+          setTimeout(function() {
+            btn.textContent = origText;
+            btn.style.background = '';
+          }, 2000);
+        } else {
+          window.location.href = 'produto.html?id=' + productId;
+        }
+      }
+    } catch (err) {
+      btn.textContent = origText;
+      btn.disabled = false;
+      console.warn('[brand-page] Error handling add to basket:', err);
+      // Fallback to product page
+      window.location.href = 'produto.html?id=' + productId;
+    }
+  }, true); // capture phase — fires before main.js listener
+})();
+</script>
+
 </body>
 </html>
