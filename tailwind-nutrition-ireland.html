@@ -455,69 +455,53 @@
 <script src="js/sfi-attribution.min.js" defer></script>
 <script src="js/sfi-data-loader.min.js?v=15" defer></script>
 <script src="js/cart.min.js?v=12" defer></script>
-<script src="js/product-card.min.js?v=10" defer></script>
+<script src="js/product-card.min.js?v=11" defer></script>
 <script src="js/main.min.js?v=16" defer></script>
 <script src="js/sfi-fixes.min.js?v=10" defer></script>
 <script src="js/sfi-enhancements.min.js" defer></script>
 
 <script src="js/brevo-integration.min.js" defer></script>
 
-<!-- Tailwind brand page: load parent products — identical to shop cards -->
+<!-- tailwind-nutrition-ireland brand page: render products using same shop cards -->
 <script>
 (function() {
-  // IDs 46=Endurance Fuel, 55=High Carb, 56=Recovery Mix (all is_active=true)
-  var TAILWIND_IDS = [46, 55, 56];
+  var BRAND_FILTER = 'tailwind';
+  var MAX_PRODUCTS = 8;
+  var GRID_ID = 'tailwindProductsGrid';
 
   function doRender() {
-    var grid = document.getElementById('tailwindProductsGrid');
+    var grid = document.getElementById(GRID_ID);
     if (!grid) return;
-    if (grid.querySelector('.product-card')) return; // already rendered
-
+    if (grid.querySelector('.product-card')) return;
     var all = window.PRODUTOS || [];
-    var prods = TAILWIND_IDS.map(function(id) {
-      return all.find(function(p) { return Number(p.id) === id; });
-    }).filter(Boolean);
-
-    // Fallback: find by brand name
-    if (!prods.length) {
-      prods = all.filter(function(p) {
-        return (p.marca || '').toLowerCase().includes('tailwind');
-      }).slice(0, 4);
-    }
+    var prods = all.filter(function(p) {
+      return (p.marca || '').toLowerCase().includes(BRAND_FILTER);
+    }).slice(0, MAX_PRODUCTS);
     if (!prods.length) return;
-
-    // renderProductCards is defined in main.min.js — identical to shop
     if (typeof renderProductCards === 'function') {
-      renderProductCards(prods, 'tailwindProductsGrid');
+      renderProductCards(prods, GRID_ID);
     } else if (typeof createProductCardHTML === 'function') {
       grid.innerHTML = prods.map(function(p) { return createProductCardHTML(p); }).join('');
     }
     if (typeof addQuickActionsToCards === 'function') setTimeout(addQuickActionsToCards, 200);
   }
 
-  // Render function with safety: waits for both products AND card functions to be available
   function tryRender() {
-    var hasProducts = window.PRODUTOS && window.PRODUTOS.length > 0;
-    var hasFunctions = typeof renderProductCards === 'function' || typeof createProductCardHTML === 'function';
-    if (hasProducts && hasFunctions) {
-      doRender();
-      return true;
-    }
+    var hasProds = window.PRODUTOS && window.PRODUTOS.length > 0;
+    var hasFn = typeof renderProductCards === 'function' || typeof createProductCardHTML === 'function';
+    if (hasProds && hasFn) { doRender(); return true; }
     return false;
   }
 
-  // Listen for sfi:products-loaded event (fired by sfi-data-loader after Supabase fetch)
-  window.addEventListener('sfi:products-loaded', function() {
-    // Defer slightly to let main.min.js finish setting up renderProductCards
-    setTimeout(tryRender, 50);
-  });
+  window.addEventListener('sfi:products-loaded', function() { setTimeout(tryRender, 50); });
+  if (window._sfiProductsPromise) window._sfiProductsPromise.then(function() { setTimeout(tryRender, 50); });
 
-  // Also listen via promise
-  if (window._sfiProductsPromise) {
-    window._sfiProductsPromise.then(function() {
-      setTimeout(tryRender, 50);
-    });
-  }
+  var _t = 0;
+  var _poll = setInterval(function() {
+    if (tryRender()) { clearInterval(_poll); return; }
+    if (++_t > 100) clearInterval(_poll);
+  }, 100);
+})();
 
   // Poll until both products and functions are ready (max 10 seconds)
   var _t = 0;
