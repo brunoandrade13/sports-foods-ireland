@@ -2,6 +2,25 @@
 <html lang="en-GB">
 <head>
 <script>
+// VIP Access Guard — page only accessible with valid token from email link
+(function() {
+  var TOKEN = "rLKsqN9XbIJyBYVIzUhhZWgWxAWsPmm_Oc2oZUDM48g";
+  var params = new URLSearchParams(window.location.search);
+  var access = params.get('access');
+  if (access === TOKEN) {
+    // Valid — store in sessionStorage so navigation within the page works
+    try { sessionStorage.setItem('sfi_vip_access', TOKEN); } catch(e) {}
+    return; // allow page to load
+  }
+  // Check sessionStorage (for page refreshes during same session)
+  try {
+    if (sessionStorage.getItem('sfi_vip_access') === TOKEN) return;
+  } catch(e) {}
+  // Invalid — redirect to home
+  window.location.replace('https://sportsfoodsireland.ie');
+})();
+</script>
+<script>
 // VIP tracking: tag cart items when added from a VIP context
 // Runs on vip-sale.html and produto.html?vip=XX
 (function() {
@@ -1444,7 +1463,7 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 <script src="js/sfi-attribution.min.js" defer></script>
 <script id="vip-loader-noop">window.dispatchEvent(new CustomEvent('sfi:products-loaded',{detail:{count:(window.PRODUTOS||[]).length,source:'vip',currency:'EUR',isB2B:false}}));</script>
 <script src="js/cart.min.js?v=12" defer></script>
-<script src="js/product-card.min.js?v=10" defer></script>
+<script src="js/product-card.min.js?v=11" defer></script>
 <script src="js/main.min.js?v=16" defer></script>
 <script src="js/shop.min.js?v=16" defer></script>
 <script src="js/sfi-fixes.min.js?v=10" defer></script>
