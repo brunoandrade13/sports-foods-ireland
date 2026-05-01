@@ -1,46 +1,8 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-<script>
-// VIP Access Guard — only allow access via email link with valid token
-(function() {
-  var VALID_TOKEN = "pSzsTrm5z-9YB-Y3m8VYtpJhJ5Sm0-Aeb8Swctm-3Pw";
-  var SESSION_KEY = "sfi_vip_access";
-  try {
-    var up = new URLSearchParams(window.location.search);
-    var token = up.get("access");
-    if (token === VALID_TOKEN) {
-      // Valid token — store in sessionStorage so page refresh still works
-      sessionStorage.setItem(SESSION_KEY, VALID_TOKEN);
-    } else if (sessionStorage.getItem(SESSION_KEY) === VALID_TOKEN) {
-      // Already validated this session — allow
-    } else {
-      // No valid token — redirect to home
-      window.location.replace("/");
-    }
-  } catch(e) {
-    window.location.replace("/");
-  }
-})();
-</script>
-<script>
-// VIP Access Guard — page only accessible with valid token from email link
-(function() {
-  var TOKEN = "rLKsqN9XbIJyBYVIzUhhZWgWxAWsPmm_Oc2oZUDM48g";
-  var params = new URLSearchParams(window.location.search);
-  var access = params.get('access');
-  if (access === TOKEN) {
-    // Valid — store in sessionStorage so navigation within the page works
-    try { sessionStorage.setItem('sfi_vip_access', TOKEN); } catch(e) {}
-    return; // allow page to load
-  }
-  // Check sessionStorage (for page refreshes during same session)
-  try {
-    if (sessionStorage.getItem('sfi_vip_access') === TOKEN) return;
-  } catch(e) {}
-  // Invalid — redirect to home
-  window.location.replace('https://sportsfoodsireland.ie');
-})();
+<script>// VIP Access Guard
+(function(){var T="rLKsqN9XbIJyBYVIzUhhZWgWxAWsPmm_Oc2oZUDM48g",S="sfi_vip_access";try{var p=new URLSearchParams(window.location.search),t=p.get("access");if(t===T){sessionStorage.setItem(S,T);}else if(sessionStorage.getItem(S)===T){}else{window.location.replace("/");}}catch(e){window.location.replace("/");}}();
 </script>
 <script>
 // VIP tracking: tag cart items when added from a VIP context
