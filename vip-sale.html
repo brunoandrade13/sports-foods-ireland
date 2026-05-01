@@ -1,8 +1,16 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-<script>// VIP Access Guard
-(function(){var T="rLKsqN9XbIJyBYVIzUhhZWgWxAWsPmm_Oc2oZUDM48g",S="sfi_vip_access";try{var p=new URLSearchParams(window.location.search),t=p.get("access");if(t===T){sessionStorage.setItem(S,T);}else if(sessionStorage.getItem(S)===T){}else{window.location.replace("/");}}catch(e){window.location.replace("/");}}();
+<script>
+(function(){
+  var T="y550MM9G0hn6qvMErrH8ooLo8vHHKaKs";
+  try {
+    var t=new URLSearchParams(window.location.search).get("access");
+    if(t===T){ localStorage.setItem("sfi_vip_ok",T); return; }
+    if(localStorage.getItem("sfi_vip_ok")===T){ return; }
+    window.location.replace("https://sportsfoodsireland.ie");
+  } catch(e){ window.location.replace("https://sportsfoodsireland.ie"); }
+})();
 </script>
 <script>
 // VIP tracking: tag cart items when added from a VIP context
