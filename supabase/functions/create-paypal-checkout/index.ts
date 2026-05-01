@@ -39,7 +39,9 @@ Deno.serve(async (req: Request) => {
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { items, email, shippingAddress, contact, coupon, is_b2b, return_base } = await req.json();
+    const body = await req.json();
+    const { items, email, shippingAddress, contact, coupon, is_b2b, return_base, vip_item_ids = [] } = body;
+    const vipIds = new Set((Array.isArray(vip_item_ids) ? vip_item_ids : []).map(String));
     if (!items?.length) {
       return new Response(JSON.stringify({ error: "Cart is empty" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -52,7 +54,29 @@ Deno.serve(async (req: Request) => {
       baseUrl = (originUrl && originUrl !== "null" && originUrl.startsWith("http")) ? originUrl : siteUrl;
     }
 
-    const subtotal = items.reduce((s: number, i: { price: number; quantity: number }) =>
+    // Server-side price validation + VIP discount
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+    const SUPABASE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const productIds = items.map((i: { id: string | number }) => i.id).filter(Boolean);
+    let validatedItems = items;
+    if (productIds.length > 0 && SUPABASE_URL) {
+      const dbRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/products?id=in.(${productIds.join(",")})&select=id,price_eur`,
+        { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+      );
+      if (dbRes.ok) {
+        const dbProducts: { id: number; price_eur: number }[] = await dbRes.json();
+        const priceMap = new Map(dbProducts.map(p => [String(p.id), p.price_eur]));
+        validatedItems = items.map((item: { id: string | number; price: number; quantity: number; name: string; [key: string]: unknown }) => {
+          const serverPrice = priceMap.get(String(item.id));
+          if (!serverPrice) return item;
+          const isVip = vipIds.has(String(item.id));
+          const finalPrice = isVip ? Math.round(serverPrice * 0.8 * 100) / 100 : serverPrice;
+          return { ...item, price: finalPrice };
+        });
+      }
+    }
+    const subtotal = validatedItems.reduce((s: number, i: { price: number; quantity: number }) =>
       s + i.price * (i.quantity || 1), 0);
 
     const freeShipMin = is_b2b ? FREE_SHIP_MIN_B2B : FREE_SHIP_MIN_B2C;
@@ -68,7 +92,7 @@ Deno.serve(async (req: Request) => {
 
     const total = subtotal - discountAmount + shippingCost;
 
-    const ppItems = items.map((item: { name: string; price: number; quantity: number }) => ({
+    const ppItems = validatedItems.map((item: { name: string; price: number; quantity: number }) => ({
       name: item.name.substring(0, 127),
       unit_amount: { currency_code: CURRENCY, value: item.price.toFixed(2) },
       quantity: String(item.quantity || 1),
