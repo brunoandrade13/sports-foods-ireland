@@ -340,38 +340,41 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
 
   // ── 3. Exact legacy path rewrites ──────────────────────────────────
   var EXACT = {
-    "/wholesale":                 "b2b/landing.html",
-    "/wholesale-log-in-page":     "b2b/portal.html",
-    "/wholesale-ordering":        "b2b/landing.html",
-    "/sign-in-s.php":             "account.html",
-    "/view-cats.php":             "categories.html",
-    "/home":                      "index.html",
-    "/shop":                      "shop.html",
-    "/products":                  "shop.html",
-    "/cart":                      "cart.html",
-    "/index.php":                 "index.html",
-    "/home/index.html":           "index.html"
+    "/wholesale":                 "/b2b/landing.html",
+    "/wholesale-log-in-page":     "/b2b/portal.html",
+    "/wholesale-ordering":        "/b2b/landing.html",
+    "/sign-in-s.php":             "/account.html",
+    "/view-cats.php":             "/categories.html",
+    "/home":                      "/",
+    "/shop":                      "/shop.html",
+    "/products":                  "/shop.html",
+    "/cart":                      "/cart.html",
+    "/index.php":                 "/",
+    "/home/index.html":           "/"
   };
 
   function redirect(url) {
+    // Always use absolute root-relative paths to avoid sub-path loops
+    if (url && url.charAt(0) !== '/' && url.charAt(0) !== 'h') {
+      url = '/' + url;
+    }
     window.location.replace(url);
   }
 
   // Check exact matches first
   if (EXACT[path]) { redirect(EXACT[path]); return; }
 
-  // Check /product/SLUG[/index.html|/shop.html|/site.webmanifest]
+  // Check /product/SLUG — strip any sub-path after the slug
   var productMatch = path.match(/^\/product\/([^\/]+)/);
   if (productMatch) {
     var slug = productMatch[1].replace(/\/$/, '');
-    // Strip sub-paths like /index.html /shop.html /site.webmanifest
     var id = PRODUCTS[slug];
     if (id) {
-      redirect('produto.html?id=' + id);
+      redirect('/produto.html?id=' + id);
       return;
     }
     // Fallback: search by slug keywords
-    redirect('shop.html?search=' + encodeURIComponent(slug.replace(/-/g,' ')));
+    redirect('/shop.html?search=' + encodeURIComponent(slug.replace(/-/g,' ')));
     return;
   }
 
@@ -379,22 +382,20 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
   var catMatch = path.match(/^\/product-category\/([^\/]+)/);
   if (catMatch) {
     var cat = catMatch[1].replace(/\/$/, '');
-    // Try direct match, then sub-path match
     var dest = CATEGORIES[cat];
     if (!dest) {
-      // Try matching any segment of the path
       var segments = path.replace('/product-category/','').split('/');
       for (var i = 0; i < segments.length; i++) {
         if (CATEGORIES[segments[i]]) { dest = CATEGORIES[segments[i]]; break; }
       }
     }
-    redirect(dest || 'shop.html');
+    redirect(dest || '/shop.html');
     return;
   }
 
   // /product-category/brand/page/N → shop.html
   if (path.startsWith('/product-category/')) {
-    redirect('shop.html');
+    redirect('/shop.html');
     return;
   }
 
