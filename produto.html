@@ -42,11 +42,12 @@
 <meta name="author" content="Sports Foods Ireland">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Product - Sports Foods Ireland">
-<meta property="og:description" content="Buy premium sports nutrition online in Ireland. Professional energy, hydration and recovery for cyclists, triathletes, swimmers and runners.">
+<meta property="og:title" content="Sports Nutrition Products | Sports Foods Ireland">
+<meta property="og:description" content="Shop professional sports nutrition in Ireland. Energy gels, electrolytes, wetsuits and accessories for triathletes, cyclists and runners. Fast delivery.">
 
 <meta property="og:url" content="https://www.sportsfoodsireland.ie/produto.html">
 <meta property="og:image" content="https://www.sportsfoodsireland.ie/img/og-product.jpg">
+<title>Sports Nutrition Products | Sports Foods Ireland</title>
 <meta property="og:site_name" content="Sports Foods Ireland">
 <title>Sports Nutrition Product | Sports Foods Ireland</title>
 <link rel="alternate" hreflang="en-IE" href="https://www.sportsfoodsireland.ie/produto.html">
@@ -54,6 +55,21 @@
 <link rel="alternate" hreflang="en" href="https://www.sportsfoodsireland.ie/produto.html">
 <link rel="alternate" hreflang="x-default" href="https://www.sportsfoodsireland.ie/produto.html">
 <link rel="canonical" href="https://www.sportsfoodsireland.ie/produto.html">
+<script>
+// CRITICAL SEO: Fix canonical/hreflang/OG URL immediately — before any render
+// Googlebot reads these before deferred JS runs
+(function(){
+  var id=(new URLSearchParams(window.location.search)).get('id');
+  if(!id)return;
+  var base='https://www.sportsfoodsireland.ie/produto.html?id='+encodeURIComponent(id);
+  var c=document.querySelector('link[rel="canonical"]');
+  if(c)c.setAttribute('href',base);
+  var alts=document.querySelectorAll('link[rel="alternate"]');
+  alts.forEach(function(a){a.setAttribute('href',base);});
+  var ogUrl=document.querySelector('meta[property="og:url"]');
+  if(ogUrl)ogUrl.setAttribute('content',base);
+})();
+</script>
 <link rel="icon" type="image/png" href="img/favicon.webp">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
