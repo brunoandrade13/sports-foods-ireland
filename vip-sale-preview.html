@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VIP Sale Preview — Sports Foods Ireland</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f8faf9;color:#2d3436}
+/* PREVIEW BANNER */
+.preview-bar{position:sticky;top:0;z-index:9999;background:#eab308;color:#1a1a1a;text-align:center;padding:10px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+/* HEADER */
+.site-header{background:#1B4332;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:70px;position:sticky;top:40px;z-index:100}
+.site-logo{color:#fff;font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.site-logo span{color:#95D5B2;font-size:.75rem;font-weight:500;display:block;letter-spacing:.05em}
+.header-nav{display:flex;gap:24px}
+.header-nav a{color:#95D5B2;font-size:.85rem;text-decoration:none;transition:color .2s}
+.header-nav a:hover{color:#fff}
+.header-right{display:flex;align-items:center;gap:16px}
+.cart-btn{background:#2D6A4F;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+/* BENEFITS BAR */
+.benefits{background:#2D6A4F;color:#fff;padding:8px 24px;font-size:12px;display:flex;justify-content:center;gap:40px}
+.benefits span{display:flex;align-items:center;gap:6px}
+/* VIP HERO */
+.vip-hero{background:linear-gradient(135deg,#1B4332 0%,#0f2a1e 100%);padding:52px 24px 44px;text-align:center;border-bottom:3px solid #2D6A4F}
+.vip-hero .eyebrow{font-size:.85rem;color:#a7f3d0;font-weight:600;letter-spacing:.08em;margin-bottom:14px;text-transform:uppercase}
+.vip-hero h1{font-family:'Space Grotesk',sans-serif;font-size:2.4rem;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.15}
+.vip-hero h1 span{color:#FF883E}
+.vip-hero .sub{color:#a7f3d0;font-size:1rem;margin-bottom:24px}
+.vip-badge{display:inline-block;background:#FF883E;color:#fff;font-size:.8rem;font-weight:700;padding:7px 24px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em}
+.vip-note{margin-top:16px;color:#6b9e7a;font-size:.78rem}
+/* CONTENT */
+.content{max-width:1400px;margin:0 auto;padding:44px 24px 60px}
+.brand-section{margin-bottom:56px}
+.brand-title{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;color:#1B4332;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #e2e8f0;display:flex;align-items:center;gap:10px}
+.brand-count{font-size:.85rem;font-weight:400;color:#94a3b8;margin-left:4px}
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px}
+/* CARD */
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .2s,box-shadow .2s;position:relative;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.card.oos{opacity:.55}
+.card-img{position:relative;background:#f1f5f9;height:200px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card-img img{width:100%;height:200px;object-fit:contain}
+.no-img{font-size:48px;color:#cbd5e1}
+.badge{position:absolute;top:10px;right:10px;background:#FF883E;color:#fff;font-size:12px;font-weight:800;padding:4px 10px;border-radius:6px}
+.card-body{padding:14px;flex:1;display:flex;flex-direction:column;gap:6px}
+.brand{font-size:.72rem;font-weight:600;color:#2D6A4F;text-transform:uppercase;letter-spacing:.05em}
+.name{font-size:.88rem;font-weight:700;color:#1e293b;line-height:1.35;flex:1}
+.prices{display:flex;align-items:baseline;gap:8px;margin-top:4px}
+.old{text-decoration:line-through;color:#94a3b8;font-size:.85rem}
+.new{color:#169B62;font-size:1.25rem;font-weight:800}
+.btn-add{margin-top:8px;background:#1B4332;color:#fff;border:none;padding:9px 0;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:.04em;transition:background .2s}
+.btn-add:hover{background:#2D6A4F}
+.btn-out{margin-top:8px;background:#94a3b8;color:#fff;border:none;padding:9px 0;border-radius:8px;font-size:.8rem;font-weight:700;width:100%;cursor:not-allowed;text-transform:uppercase;letter-spacing:.04em}
+/* FOOTER */
+.site-footer{background:#1B4332;color:#a7f3d0;text-align:center;padding:28px 24px;font-size:.82rem;border-top:1px solid #2d6a4f}
+.site-footer a{color:#95D5B2;text-decoration:none}
+/* RESPONSIVE */
+@media(max-width:768px){
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .vip-hero h1{font-size:1.7rem}
+  .header-nav,.benefits{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="preview-bar">⚠️ PREVIEW MODE — Token guard disabled. Em produção: ?access=sfi2026vip</div>
+
+<header class="site-header">
+  <div class="site-logo">
+    <div>
+      <div style="font-size:1.15rem">Sports Foods Ireland</div>
+      <span>sportsfoodsireland.ie</span>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <a href="#">Home</a>
+    <a href="#">Shop</a>
+    <a href="#">Categories</a>
+    <a href="#">Brands</a>
+    <a href="#">About</a>
+  </nav>
+  <div class="header-right">
+    <button class="cart-btn">🛒 Cart (0)</button>
+  </div>
+</header>
+
+<div class="benefits">
+  <span>🚚 Free Delivery over €60</span>
+  <span>↩️ 30-Day Returns</span>
+  <span>🔒 Secure Payment</span>
+  <span>⭐ Trusted Since 2010</span>
+</div>
+
+<div class="vip-hero">
+  <p class="eyebrow">🏃 Sports Foods Ireland</p>
+  <h1>Exclusive <span>VIP Sale</span></h1>
+  <p class="sub">Special offer for our email subscribers — Zone3 &amp; Spatzwear</p>
+  <div class="vip-badge">20% Off — VIP Customers Only</div>
+  <p class="vip-note">This offer is exclusive to email subscribers and is not available in the public store.</p>
+</div>
+
+<main class="content">
+<section class="brand-section">
+  <h2 class="brand-title">🏊 Zone3 <span class="brand-count">61 products</span></h2>
+  <div class="grid"><article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/ows-renew-classic-costume-1774463527844-0.webp" alt="'OWS Renew' Classic Costume" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">'OWS Renew' Classic Costume</h3>
+    <div class="prices"><span class="old">&euro;54.99</span><span class="new">&euro;43.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/active-flex-swim-beanie-grey-orange-1774463770216-0.jpg" alt="Active-Flex Swim Beanie" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Active-Flex Swim Beanie</h3>
+    <div class="prices"><span class="old">&euro;34.99</span><span class="new">&euro;27.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/active-flex-swim-cap-grey-orange-1774463832056-0.jpg" alt="Active-Flex Swim Cap" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Active-Flex Swim Cap</h3>
+    <div class="prices"><span class="old">&euro;34.99</span><span class="new">&euro;27.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/active-flex-swim-glove-grey-orange-1774463868838-0.jpg" alt="Active-Flex Swim Glove" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Active-Flex Swim Glove</h3>
+    <div class="prices"><span class="old">&euro;34.99</span><span class="new">&euro;27.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/adult-towelling-changing-robe-1774463955189-0.jpg" alt="Adult Towelling Changing Robe" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Adult Towelling Changing Robe</h3>
+    <div class="prices"><span class="old">&euro;64.99</span><span class="new">&euro;51.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/buoyancy-shorts-next-step-3-2mm-1774464041771-0.jpg" alt="Buoyancy Shorts Next Step 3/2mm" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Buoyancy Shorts Next Step 3/2mm</h3>
+    <div class="prices"><span class="old">&euro;64.99</span><span class="new">&euro;51.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/girls-high-jazz-2-0-strap-back-costume-1774465841842-0.jpg" alt="Girls High Jazz 2.0 Strap Back Costume" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Girls High Jazz 2.0 Strap Back Costume</h3>
+    <div class="prices"><span class="old">&euro;34.99</span><span class="new">&euro;27.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/heat-tech-neoprene-swim-balaclava-1774465899582-0.webp" alt="Heat-Tech Neoprene Swim Balaclava" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Heat-Tech Neoprene Swim Balaclava</h3>
+    <div class="prices"><span class="old">&euro;64.99</span><span class="new">&euro;51.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/junior-towelling-robe-1774466721785-0.webp" alt="Junior Towelling Robe" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Junior Towelling Robe</h3>
+    <div class="prices"><span class="old">&euro;48.99</span><span class="new">&euro;39.19</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/kids-aspect-wetsuit-1774466842706-0.webp" alt="Kids - Adventure Triathlon Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Kids - Adventure Triathlon Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;244.99</span><span class="new">&euro;195.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/kids-aspect-wetsuit-1774466842706-0.webp" alt="Kids - Aspect Open Water Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Kids - Aspect Open Water Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;169.99</span><span class="new">&euro;135.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/neoprene-warmth-vest-baselayer-1774480647004-0.webp" alt="LongSleeve Neoprene Baselayer" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">LongSleeve Neoprene Baselayer</h3>
+    <div class="prices"><span class="old">&euro;79.00</span><span class="new">&euro;63.20</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/men-s-activate-tri-shorts-black-red-1774476739067-0.webp" alt="Men's Activate Tri Shorts" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Men's Activate Tri Shorts</h3>
+    <div class="prices"><span class="old">&euro;64.99</span><span class="new">&euro;51.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/men-s-advance-wetsuit-1774476924294-0.webp" alt="Men's Active-Flex Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Men's Active-Flex Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;229.99</span><span class="new">&euro;183.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/men-s-aspect-wetsuit-1774476986700-0.jpg" alt="Men's Aspect Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Men's Aspect Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;199.99</span><span class="new">&euro;159.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/mens-aspire-wetsuit-1774477963811-0.jpg" alt="Mens Aspire Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Mens Aspire Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;549.99</span><span class="new">&euro;439.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/mens-azure-2-0-wetsuit-1774478013919-0.webp" alt="Mens Azure 2.0 Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Mens Azure 2.0 Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;249.99</span><span class="new">&euro;199.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/mens-agile-thermal-wetsuit-1774477796701-0.webp" alt="Mens Agile Thermal Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Mens Agile Thermal Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;150.00</span><span class="new">&euro;120.00</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/men-s-prism-3-0-jammers-1774477062549-0.webp" alt="Men's Prism 3.0 Jammers" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Men's Prism 3.0 Jammers</h3>
+    <div class="prices"><span class="old">&euro;45.00</span><span class="new">&euro;36.00</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/men-s-terraprene-vision-wetsuit-1774477187292-0.webp" alt="Men's Terraprene Vision Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Men's Terraprene Vision Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;499.99</span><span class="new">&euro;399.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><div class="no-img">📦</div><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Men's Venture Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;129.99</span><span class="new">&euro;103.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/men-s-yulex-jammers-1774477308655-0.webp" alt="Men's Yulex Jammers" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Men's Yulex Jammers</h3>
+    <div class="prices"><span class="old">&euro;99.99</span><span class="new">&euro;79.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-yulex-switch-wetsuit-black-orange-1774484111561-0.jpg" alt="Men's YULEX Switch Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Men's YULEX Switch Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;425.99</span><span class="new">&euro;340.79</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/mens-kona-speed-jammers-1774478314132-0.jpg" alt="Mens Kona Speed Jammers" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Mens Kona Speed Jammers</h3>
+    <div class="prices"><span class="old">&euro;44.99</span><span class="new">&euro;35.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/mens-prism-3-0-aqua-shorts-1774478606448-1.webp" alt="Mens Prism 3.0 Aqua Shorts" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Mens Prism 3.0 Aqua Shorts</h3>
+    <div class="prices"><span class="old">&euro;34.99</span><span class="new">&euro;27.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/mens-thermal-aspire-wetsuit-1774479196191-5.webp" alt="Mens Thermal Aspire Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Mens Thermal Aspire Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;599.99</span><span class="new">&euro;479.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/men-s-versa-multi-sport-wetsuit-1774477245210-0.jpg" alt="Mens Versa Swimrun Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Mens Versa Swimrun Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;258.99</span><span class="new">&euro;207.19</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/mens-vision-wetsuit-1774479984335-0.jpg" alt="Mens Vision Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Mens Vision Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;429.99</span><span class="new">&euro;343.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/microfibre-changing-robe-poncho-1774884704059-9.webp" alt="Microfibre Changing Robe/Poncho" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Microfibre Changing Robe/Poncho</h3>
+    <div class="prices"><span class="old">&euro;38.99</span><span class="new">&euro;31.19</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/neoprene-swim-cap-vi-vis-orange-1774480333354-2.webp" alt="Neoprene Swim Cap Vi-Vis Orange" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Neoprene Swim Cap Vi-Vis Orange</h3>
+    <div class="prices"><span class="old">&euro;34.99</span><span class="new">&euro;27.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/neoprene-swim-caps-1774884998978-0.webp" alt="Neoprene Swim Caps" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Neoprene Swim Caps</h3>
+    <div class="prices"><span class="old">&euro;34.99</span><span class="new">&euro;27.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/neoprene-women-s-kneeskin-1774480740986-2.webp" alt="Neoprene Women's Kneeskin" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Neoprene Women's Kneeskin</h3>
+    <div class="prices"><span class="old">&euro;149.99</span><span class="new">&euro;119.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/neoprene-warmth-vest-baselayer-1774480647004-0.webp" alt="Neoprene Warmth Vest Baselayer" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Neoprene Warmth Vest Baselayer</h3>
+    <div class="prices"><span class="old">&euro;68.99</span><span class="new">&euro;55.19</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/oversize-heat-tech-polar-fleece-parka-robe-1774480917782-0.jpg" alt="Oversize Heat-Tech Polar Fleece Parka" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Oversize Heat-Tech Polar Fleece Parka</h3>
+    <div class="prices"><span class="old">&euro;178.99</span><span class="new">&euro;143.19</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/silicone-v-flex-fins-1774481398616-0.webp" alt="Silicone V-Flex Fins" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Silicone V-Flex Fins</h3>
+    <div class="prices"><span class="old">&euro;38.99</span><span class="new">&euro;31.19</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/strapless-neoprene-swim-cap-1774481468188-0.webp" alt="Strapless Neoprene Swim Cap" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Strapless Neoprene Swim Cap</h3>
+    <div class="prices"><span class="old">&euro;38.99</span><span class="new">&euro;31.19</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/yulex-swim-beanie-navy-1774489156282-1.webp" alt="Yulex Swim Beanie Navy" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Yulex Swim Beanie Navy</h3>
+    <div class="prices"><span class="old">&euro;39.99</span><span class="new">&euro;31.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/yulex-swim-gloves-navy-1774488976182-0.webp" alt="Yulex Swim Gloves Navy" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Yulex Swim Gloves Navy</h3>
+    <div class="prices"><span class="old">&euro;49.99</span><span class="new">&euro;39.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/yulex-swim-socks-navy-1774489045334-0.webp" alt="Yulex Swim Socks Navy" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Yulex Swim Socks Navy</h3>
+    <div class="prices"><span class="old">&euro;49.99</span><span class="new">&euro;39.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/womens-agile-thermal-wetsuit-1774486702608-0.jpg" alt="Womens Agile Thermal Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Womens Agile Thermal Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;329.99</span><span class="new">&euro;263.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/womens-aspire-thermal-wetsuit-1774486880743-0.webp" alt="Womens Aspire Thermal Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Womens Aspire Thermal Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;599.00</span><span class="new">&euro;479.20</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/womens-cosmic-2-0-back-costume-1774487193913-0.webp" alt="Womens Cosmic 2.0 Back Costume" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Womens Cosmic 2.0 Back Costume</h3>
+    <div class="prices"><span class="old">&euro;44.99</span><span class="new">&euro;35.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/womens-cosmic-3-0-strap-back-costume-1774487346432-0.jpg" alt="Womens Cosmic 3.0 Strap Back Costume" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Womens Cosmic 3.0 Strap Back Costume</h3>
+    <div class="prices"><span class="old">&euro;44.99</span><span class="new">&euro;35.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/womens-cosmic-two-piece-bikini-1774487559218-3.jpg" alt="Womens Cosmic Two-Piece Bikini" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Womens Cosmic Two-Piece Bikini</h3>
+    <div class="prices"><span class="old">&euro;44.99</span><span class="new">&euro;35.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/womens-kona-speed-strap-back-costume-1774487682434-2.webp" alt="Womens Kona Speed Strap Back Costume" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Womens Kona Speed Strap Back Costume</h3>
+    <div class="prices"><span class="old">&euro;48.99</span><span class="new">&euro;39.19</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/womens-ows-renew-high-neck-costume-black-1774488159490-4.webp" alt="Womens OWS Renew High Neck Black" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Womens OWS Renew High Neck Black</h3>
+    <div class="prices"><span class="old">&euro;65.00</span><span class="new">&euro;52.00</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/womens-vision-wetsuit-1774488854198-0.jpg" alt="Womens Vision Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Womens Vision Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;429.99</span><span class="new">&euro;343.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-active-flex-wetsuit-1774482590533-4.webp" alt="Women's Active-Flex Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Active-Flex Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;229.99</span><span class="new">&euro;183.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-aspect-wetsuit-1774482829156-0.jpg" alt="Women's Aspect Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Aspect Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;199.99</span><span class="new">&euro;159.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-aspire-wetsuit-new-2025-1774482973917-0.webp" alt="Women's Aspire Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Aspire Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;549.99</span><span class="new">&euro;439.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card oos">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-classic-swimsuit-ss26-black-1775036632197-0.webp" alt="Women's Classic Swimsuit SS26 Black" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Classic Swimsuit SS26 Black</h3>
+    <div class="prices"><span class="old">&euro;74.99</span><span class="new">&euro;59.99</span></div>
+    <button class="btn-out">Out of Stock</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-terraprene-vision-wetsuit-1774483162442-6.webp" alt="Women's Terraprene Vision Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Terraprene Vision Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;499.99</span><span class="new">&euro;399.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-venture-wetsuit-black-orange-1774483398213-3.webp" alt="Women's Venture Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Venture Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;129.99</span><span class="new">&euro;103.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-versa-multi-sport-wetsuit-1774483568008-0.webp" alt="Women's Versa Multi Sport Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Versa Multi Sport Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;239.99</span><span class="new">&euro;191.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-yulex-long-sleeve-swimsuit-black-1774483735718-0.webp" alt="Women's Yulex Long Sleeve Swimsuit Black" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Yulex Long Sleeve Swimsuit Black</h3>
+    <div class="prices"><span class="old">&euro;169.99</span><span class="new">&euro;135.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-yulex-long-sleeve-top-1774483874528-0.webp" alt="Women's Yulex Long Sleeve Top" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Yulex Long Sleeve Top</h3>
+    <div class="prices"><span class="old">&euro;129.99</span><span class="new">&euro;103.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-yulex-switch-wetsuit-black-orange-1774484111561-0.jpg" alt="Women's YULEX Switch Wetsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's YULEX Switch Wetsuit</h3>
+    <div class="prices"><span class="old">&euro;425.99</span><span class="new">&euro;340.79</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-yulex-shorts-1774484803856-4.webp" alt="Women's Yulex Shorts" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Yulex Shorts</h3>
+    <div class="prices"><span class="old">&euro;79.99</span><span class="new">&euro;63.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-yulex-sleeveless-swimsuit-1774485206474-4.webp" alt="Women's Yulex Sleeveless Swimsuit" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Yulex Sleeveless Swimsuit</h3>
+    <div class="prices"><span class="old">&euro;139.99</span><span class="new">&euro;111.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-yulex-long-sleeve-swimsuit-multi-blue-white-1774484595052-0.webp" alt="Women's Yulex LS Swimsuit Multi Blue" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Yulex LS Swimsuit Multi Blue</h3>
+    <div class="prices"><span class="old">&euro;169.99</span><span class="new">&euro;135.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/women-s-yulex-long-sleeve-swimsuit-navy-1774484691637-5.webp" alt="Women's Yulex LS Swimsuit Navy" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Zone3</p>
+    <h3 class="name">Women's Yulex LS Swimsuit Navy</h3>
+    <div class="prices"><span class="old">&euro;169.99</span><span class="new">&euro;135.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article></div>
+</section><section class="brand-section">
+  <h2 class="brand-title">🚴 Spatzwear <span class="brand-count">18 products</span></h2>
+  <div class="grid"><article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/fasta-lite-uci-legal-race-overshoes-1774458562600-0.webp" alt="Fasta Lite UCI Legal Race Overshoes" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">Fasta Lite UCI Legal Race Overshoes</h3>
+    <div class="prices"><span class="old">&euro;89.99</span><span class="new">&euro;71.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/pro-stealth-overshoe-system-with-protoez-toe-warmers-1774458671280-0.webp" alt="Pro Stealth Overshoe System + Protoez" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">Pro Stealth Overshoe System + Protoez</h3>
+    <div class="prices"><span class="old">&euro;149.99</span><span class="new">&euro;119.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/sokz-2-one-size-1774651730187-0.webp" alt="Sokz 2 (one size)" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">Sokz 2 (one size)</h3>
+    <div class="prices"><span class="old">&euro;19.00</span><span class="new">&euro;15.20</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatz-armz-rain-specific-arm-warmers-1774458716122-0.jpg" alt="SPATZ ARMZ Rain Arm Warmers" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZ ARMZ Rain Arm Warmers</h3>
+    <div class="prices"><span class="old">&euro;51.99</span><span class="new">&euro;41.59</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatz-burnr-4-season-arm-warmers-1774458759534-0.webp" alt="SPATZ BURNR Arm Warmers (4 season)" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZ BURNR Arm Warmers (4 season)</h3>
+    <div class="prices"><span class="old">&euro;45.99</span><span class="new">&euro;36.79</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatz-burnr-4-season-leg-warmers-1774458824770-0.webp" alt="SPATZ BURNR Leg Warmers (4 season)" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZ BURNR Leg Warmers (4 season)</h3>
+    <div class="prices"><span class="old">&euro;59.99</span><span class="new">&euro;47.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatz-basez-2-baselayer-black-1774459164538-0.jpg" alt="Spatz Basez 2 Baselayer Black" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">Spatz Basez 2 Baselayer Black</h3>
+    <div class="prices"><span class="old">&euro;89.99</span><span class="new">&euro;71.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatz-fasta-lite-long-overshoes-1774459339064-0.webp" alt="Spatz Fasta Lite Long Overshoes" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">Spatz Fasta Lite Long Overshoes</h3>
+    <div class="prices"><span class="old">&euro;114.99</span><span class="new">&euro;91.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatz-neoz-thermal-neoprene-rain-gloves-1774459495654-0.jpg" alt="SPATZ NEOZ Neoprene Rain Gloves" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZ NEOZ Neoprene Rain Gloves</h3>
+    <div class="prices"><span class="old">&euro;64.99</span><span class="new">&euro;51.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatz-thrmoz-deep-winter-gloves-with-fold-out-wind-blocking-shell-1774459554377-0.jpeg" alt="SPATZ THRMOZ Deep Winter Gloves" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZ THRMOZ Deep Winter Gloves</h3>
+    <div class="prices"><span class="old">&euro;89.99</span><span class="new">&euro;71.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatzwear-burnr-gilet-1774459600060-0.webp" alt="SPATZWEAR BurnR Gilet" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZWEAR BurnR Gilet</h3>
+    <div class="prices"><span class="old">&euro;144.99</span><span class="new">&euro;115.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatzwear-convoy-cargo-bib-shorts-1774459708291-0.jpg" alt="SPATZWEAR CONVOY Cargo Bib Shorts" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZWEAR CONVOY Cargo Bib Shorts</h3>
+    <div class="prices"><span class="old">&euro;244.99</span><span class="new">&euro;195.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatzwear-coolr-summer-indoor-baselayer-white-1774459752203-0.jpg" alt="SPATZWEAR CoolR Baselayer White" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZWEAR CoolR Baselayer White</h3>
+    <div class="prices"><span class="old">&euro;64.99</span><span class="new">&euro;51.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatzwear-heatr-4-season-long-sleeve-jersey-1774653680920-8.webp" alt="SPATZWEAR HEATR 4-Season Jersey" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZWEAR HEATR 4-Season Jersey</h3>
+    <div class="prices"><span class="old">&euro;234.99</span><span class="new">&euro;187.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatzwear-race-layer-short-sleeve-baselayer-1774459951286-0.jpg" alt="SPATZWEAR RACE LAYER Baselayer" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZWEAR RACE LAYER Baselayer</h3>
+    <div class="prices"><span class="old">&euro;74.99</span><span class="new">&euro;59.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/spatzwear-squadron-ss-cargo-jersey-1774654303995-0.webp" alt="SPATZWEAR SQUADRON SS Cargo Jersey" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">SPATZWEAR SQUADRON SS Cargo Jersey</h3>
+    <div class="prices"><span class="old">&euro;169.99</span><span class="new">&euro;135.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/windsock-2-1500-1024x1024-2x-757a24a9-befd-4148-96a4-485f305bed33-720x-1775733298313-2.webp" alt="Spatz Windsock Shoe Covers" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">Spatz Windsock Shoe Covers</h3>
+    <div class="prices"><span class="old">&euro;49.99</span><span class="new">&euro;39.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article>
+<article class="card">
+  <div class="card-img"><img src="https://styynhgzrkyoioqjssuw.supabase.co/storage/v1/object/public/product-images/toez-silicone-toe-warmers-1774460208767-0.jpg" alt="Toez Silicone Toe Warmers" loading="lazy" onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'"><span class="badge">-20%</span></div>
+  <div class="card-body">
+    <p class="brand">Spatzwear</p>
+    <h3 class="name">Toez Silicone Toe Warmers</h3>
+    <div class="prices"><span class="old">&euro;29.99</span><span class="new">&euro;23.99</span></div>
+    <button class="btn-add">ADD TO BASKET</button>
+  </div>
+</article></div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <p>Sports Foods Ireland · <a href="https://sportsfoodsireland.ie">sportsfoodsireland.ie</a></p>
+  <p style="margin-top:6px">Prices include VAT. Offer valid while stocks last. Exclusive to VIP subscribers.</p>
+</footer>
+
+</body>
+</html>

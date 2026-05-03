@@ -1334,7 +1334,11 @@ const B2B = (function() {
     let added = 0;
     items.forEach(i => {
       if (i.legacy_id) {
-        addToCart(i.legacy_id, i.quantity||1, { nome: i.product_name, preco: Number(i.unit_price), imagem: i.image_url||'' });
+        // Bug #6: preservar variant_id do item original para permitir reorder de produtos com variantes
+        const opts = { nome: i.product_name, preco: Number(i.unit_price), imagem: i.image_url||'' };
+        if (i.variant_id) { opts.variant_id = i.variant_id; opts.variantId = i.variant_id; }
+        if (i.variant_label) { opts.variant_label = i.variant_label; opts.variant = i.variant_label; }
+        addToCart(i.legacy_id, i.quantity||1, opts);
         added++;
       }
     });
@@ -2024,9 +2028,11 @@ const B2B = (function() {
     grid.innerHTML = products.map(function(p) {
       var rawImg = p.imagem || p.image_url || '';
       var img = rawImg ? (rawImg.startsWith('http') ? rawImg : '../' + rawImg) : '../img/placeholder.webp';
-      var price = p.b2b_price != null ? currency + Number(p.b2b_price).toFixed(2) : 'N/A';
-      var brand = p.brands?.name || p.marca || '';
-      var inStock = p.em_stock === true;
+      var _vOpts2 = (p.variantes || p.variants || []).flatMap(function(g) { return g.options || g.opcoes || []; });
+      var _vPrices2 = _vOpts2.map(function(o) { return Number(o.price || 0); }).filter(function(v) { return v > 0; });
+      var _maxV2 = _vPrices2.length ? Math.max.apply(null, _vPrices2) : 0;
+      var _effP2 = _maxV2 > 0 ? _maxV2 : (Number(p.b2b_price) > 0 ? Number(p.b2b_price) : 0);
+      var price = _effP2 > 0 ? (currency + _effP2.toFixed(2)) : 'N/A';
       var backorderOk = p.backorder_available === true;
       var freq = frequentMap[p.id];
       var freqBadge = freq ? '<div style="font-size:0.65rem;color:#2D6A4F;font-weight:700;background:#f0fdf4;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px;">🔁 Ordered ' + freq.orders + 'x</div>' : '';

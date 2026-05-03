@@ -176,6 +176,34 @@ async function handleCheckoutComplete(
     event_type: "checkout.session.completed",
   });
 
+  // ── Fetch Stripe transaction fee (balance_transaction) ──────────────────
+  if (insertedOrder?.id && session.payment_intent && STRIPE_SECRET_KEY) {
+    try {
+      const piRes = await fetch(
+        `https://api.stripe.com/v1/payment_intents/${session.payment_intent}` +
+        `?expand[]=latest_charge.balance_transaction`,
+        { headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` } }
+      );
+      if (piRes.ok) {
+        const pi = await piRes.json();
+        const balTxn = pi?.latest_charge?.balance_transaction;
+        if (balTxn && balTxn.fee != null) {
+          const feeEur = Math.round(balTxn.fee) / 100;
+          const feePct = totalEur > 0 ? parseFloat(((feeEur / totalEur) * 100).toFixed(4)) : 0;
+          await supabase.from("orders").update({
+            payment_fee:     feeEur,
+            payment_fee_pct: feePct,
+            payment_gateway: "stripe",
+            net_after_fee:   parseFloat((totalEur - feeEur).toFixed(2)),
+          }).eq("id", insertedOrder.id);
+          console.log(`[stripe-webhook] Fee captured: €${feeEur} (${feePct}%) for order ${insertedOrder.id}`);
+        }
+      }
+    } catch (e) {
+      console.warn("[stripe-webhook] Could not fetch Stripe fee:", e);
+    }
+  }
+
   // ---- Create order_items from metadata.items_json ----
   if (insertedOrder?.id && items.length > 0) {
     await insertOrderItems(supabase, insertedOrder.id, items);

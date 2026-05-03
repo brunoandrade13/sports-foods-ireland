@@ -154,10 +154,13 @@
 
     const imgSrc    = p.imagem ? (p.imagem.startsWith('http') ? p.imagem : '../' + p.imagem) : '../img/placeholder.webp';
     const brand     = p.brands?.name || p.marca || '';
-    const b2bPrice  = Number(p.b2b_price || 0);
     const varGroups = p.variantes || p.variants || [];
     const allOpts   = varGroups.flatMap(g => g.options || g.opcoes || []);
     const hasVar    = allOpts.length > 0;
+    // Initial price: use highest variant price (or b2b_price if no variants)
+    const _varPrices = allOpts.map(o => Number(o.price || 0)).filter(v => v > 0);
+    const _maxVarP   = _varPrices.length ? Math.max(..._varPrices) : 0;
+    const b2bPrice   = _maxVarP > 0 ? _maxVarP : Number(p.b2b_price || 0);
     const inStock   = productInStock(p);
 
     const stockBadge = inStock
@@ -464,21 +467,15 @@
       const variants  = (p.variantes || p.variants || []).flatMap(g => g.options || g.opcoes || []);
       const hasVar    = variants.length > 0;
 
-      // Price display: show max variant price as "from €X" when prices differ, else show fixed price
+      // Price display: show HIGHEST variant price by default
+      // Fallback chain: max variant price > b2b_price > 0
       let b2bPrice = 'N/A';
-      if (p.b2b_price != null && Number(p.b2b_price) > 0) {
-        if (hasVar) {
-          const varPrices = variants.map(o => Number(o.price || 0)).filter(v => v > 0);
-          const minVarPrice = varPrices.length ? Math.min(...varPrices) : 0;
-          const maxVarPrice = varPrices.length ? Math.max(...varPrices) : 0;
-          if (varPrices.length > 1 && maxVarPrice > minVarPrice) {
-            b2bPrice = 'from \u20ac' + minVarPrice.toFixed(2);
-          } else {
-            b2bPrice = '\u20ac' + Number(p.b2b_price).toFixed(2);
-          }
-        } else {
-          b2bPrice = '\u20ac' + Number(p.b2b_price).toFixed(2);
-        }
+      const varPricesAll = variants.map(o => Number(o.price || 0)).filter(v => v > 0);
+      const maxVarPriceAll = varPricesAll.length ? Math.max(...varPricesAll) : 0;
+      const effectivePrice = maxVarPriceAll > 0 ? maxVarPriceAll
+                           : (Number(p.b2b_price) > 0 ? Number(p.b2b_price) : 0);
+      if (effectivePrice > 0) {
+        b2bPrice = '\u20ac' + effectivePrice.toFixed(2);
       }
       const anyOk     = hasVar
         ? variants.some(o => o.stock == null || Number(o.stock) > 0)
