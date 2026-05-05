@@ -369,9 +369,31 @@
   };
 
   // ─── addB2BToCart — entry point from card button ───────────────────────────
-  window.addB2BToCart = function(id, name, price, isBackorder) {
+  window.addB2BToCart = async function(id, name, price, isBackorder) {
     const cached  = allProductsCache.find(p => String(p.id) === String(id));
-    const allOpts = (cached?.variantes || cached?.variants || []).flatMap(g => g.options || g.opcoes || []);
+    let allOpts = (cached?.variantes || cached?.variants || []).flatMap(g => g.options || g.opcoes || []);
+
+    // Safety net: if no variants in cache, fetch directly from Supabase before deciding
+    // This prevents adding variant products without flavour selection when cache is partial
+    if (allOpts.length === 0) {
+      try {
+        const SUPA_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
+        const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
+        const supaId = cached?._supabase_id || cached?.supabase_id || (String(id).includes('-') ? id : null);
+        if (supaId) {
+          const r = await fetch(
+            `${SUPA_URL}/rest/v1/product_variants?select=id,label,is_active&product_id=eq.${supaId}&is_active=eq.true&limit=5`,
+            { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` } }
+          );
+          const variants = await r.json();
+          if (Array.isArray(variants) && variants.length > 0) {
+            // Product has variants — force modal open
+            openShopProductModal(id);
+            return;
+          }
+        }
+      } catch(e) { /* If fetch fails, fall through to normal flow */ }
+    }
 
     if (allOpts.length > 0) {
       openShopProductModal(id);
