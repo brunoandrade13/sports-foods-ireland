@@ -637,6 +637,35 @@
             variant_label: i.variant_label || undefined,
         }));
 
+        // ── CAMADA 3: Validação client-side antes de enviar ───────────────────
+        // Verificar itens sem variant_id cujo nome NÃO contém " — " (indicador de variante)
+        // Se o nome não tem " — Flavour" é provável que seja produto com variante não seleccionada
+        const suspectItems = items.filter(it => !it.variant_id);
+        if (suspectItems.length > 0) {
+            // Verificar na Supabase se algum desses produtos tem variantes
+            try {
+                const uuids = suspectItems.map(it => it.id).filter(id => id && /^[0-9a-f]{8}-/i.test(String(id)));
+                if (uuids.length > 0) {
+                    const checkRes = await fetch(
+                        `${SUPABASE_URL}/rest/v1/product_variants?select=product_id&product_id=in.(${uuids.join(',')})&is_active=eq.true&limit=50`,
+                        { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+                    );
+                    const variantRows = await checkRes.json();
+                    const productsWithVariants = new Set((variantRows || []).map((v) => v.product_id));
+                    const missingVariant = suspectItems.filter(it => productsWithVariants.has(it.id));
+                    if (missingVariant.length > 0) {
+                        const names = missingVariant.map(it => `"${it.name}"`).join(', ');
+                        throw new Error(`Please select a flavour/size for: ${names}. Go back to your cart and select the correct variant.`);
+                    }
+                }
+            } catch (e) {
+                // Re-throw if it's our validation error; otherwise log and continue
+                if (e.message && e.message.startsWith('Please select')) throw e;
+                console.warn('[checkout] variant check failed (non-critical):', e);
+            }
+        }
+        // ── Fim da validação client-side ──────────────────────────────────────
+
         const res = await fetch(SUPABASE_URL + '/functions/v1/create-b2b-order', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + sessionToken, 'Content-Type': 'application/json' },

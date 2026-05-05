@@ -1,5 +1,5 @@
 /**
- * create-b2b-order v10 — VAT 23% calculado e guardado nas ordens B2B
+ * create-b2b-order v11 — VAT 23% calculado + validação obrigatória de variantes
  */
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -97,6 +97,51 @@ Deno.serve(async (req: Request) => {
     if (!payment_method || !["net30", "cod"].includes(payment_method)) return new Response(JSON.stringify({ error: "Invalid payment" }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
 
     const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // ── CAMADA 2: Validação de variantes obrigatórias ─────────────────────────
+    // Para cada item sem variant_id, verifica se o produto tem variantes activas.
+    // Se tiver, rejeita a ordem com mensagem clara antes de qualquer inserção.
+    const itemsWithoutVariant = items.filter((it: Record<string, unknown>) =>
+      !it.variant_id && !it.variantId
+    );
+    if (itemsWithoutVariant.length > 0) {
+      // Resolver product UUIDs para os itens sem variante
+      const idsToCheck: string[] = [];
+      for (const it of itemsWithoutVariant) {
+        const rawId = it.id ? String(it.id) : null;
+        if (!rawId) continue;
+        if (/^[0-9a-f]{8}-/i.test(rawId)) {
+          idsToCheck.push(rawId);
+        } else if (!isNaN(Number(rawId))) {
+          const { data: pRow } = await sb.from("products").select("id").or(`legacy_id.eq.${Number(rawId)},woo_product_id.eq.${Number(rawId)}`).limit(1);
+          if (pRow?.[0]?.id) idsToCheck.push(pRow[0].id);
+        }
+      }
+      if (idsToCheck.length > 0) {
+        // Verificar quais desses produtos têm variantes activas
+        const { data: variantCheck } = await sb
+          .from("product_variants")
+          .select("product_id, products(name)")
+          .in("product_id", idsToCheck)
+          .eq("is_active", true)
+          .limit(idsToCheck.length * 5);
+        const productsWithVariants = new Set((variantCheck || []).map((v: Record<string, unknown>) => v.product_id));
+        const offendingItems = itemsWithoutVariant.filter((_it: Record<string, unknown>, idx: number) => {
+          const pid = idsToCheck[idx];
+          return pid && productsWithVariants.has(pid);
+        });
+        if (offendingItems.length > 0) {
+          const names = offendingItems.map((it: Record<string, unknown>) => `"${it.name || it.id}"`).join(", ");
+          console.error(`[b2b] VARIANT VALIDATION FAILED: ${names}`);
+          return new Response(JSON.stringify({
+            error: `Please select a flavour/size for: ${names}. These products require a variant selection before ordering.`,
+            variant_error: true,
+            offending_items: offendingItems.map((it: Record<string, unknown>) => ({ id: it.id, name: it.name }))
+          }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
+        }
+      }
+    }
+    // ── Fim da validação de variantes ─────────────────────────────────────────
     let customerId: string | null = null;
     let isVatExempt = false;
     if (email) {
