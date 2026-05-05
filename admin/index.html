@@ -2298,6 +2298,14 @@ style="cursor:help;font-size:0.85rem">ℹ️</span></th>
           <input type="text" id="moProductSearch" placeholder="Name, SKU or variant SKU…" oninput="renderManualOrderProductPicker()"
             style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem">
         </div>
+        <!-- Free Gift Toggle -->
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);border-radius:8px;flex-shrink:0">
+          <label class="toggle-switch" style="margin:0" title="Add product as free gift at €0.00">
+            <input type="checkbox" id="moFreeGiftToggle" onchange="renderManualOrderProductPicker()">
+            <span class="toggle-slider"></span>
+          </label>
+          <span style="font-size:0.82rem;font-weight:700;color:#22c55e;white-space:nowrap">🎁 Free Gift (€0.00)</span>
+        </div>
       </div>
       <div style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
         <table style="width:100%;font-size:0.85rem;border-collapse:collapse">
@@ -12789,10 +12797,14 @@ Loading items...
       body.innerHTML = list.map(function (p) {
         const brand = (p.brands && p.brands.name) || '';
         const price = getB2BPriceForProduct(p, custId);
+        const isFreeGift = document.getElementById('moFreeGiftToggle') && document.getElementById('moFreeGiftToggle').checked;
+        const priceDisplay = isFreeGift
+          ? `<span style="color:#22c55e;font-weight:700">€0.00</span> <span style="text-decoration:line-through;color:var(--text-muted);font-size:0.75rem">€${price.toFixed(2)}</span>`
+          : `€${price.toFixed(2)}`;
         return `<tr data-product-id="${p.id}">
           <td>${esc(p.name || '')}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(p.sku || '')}</div></td>
           <td>${esc(brand || '')}</td>
-          <td style="text-align:right">€${price.toFixed(2)}</td>
+          <td style="text-align:right">${priceDisplay}</td>
           <td style="text-align:right"><input type="number" min="1" value="1" style="width:70px;text-align:right" onchange="if(this.value<1)this.value=1"></td>
           <td style="text-align:right"><button class="btn-sm btn-primary" type="button" onclick="addManualOrderItemFromRow(this)">Add</button></td>
         </tr>`;
@@ -12848,6 +12860,8 @@ Loading items...
       }
       // No variants — add directly
       const unit = getB2BPriceForProduct(prod, custId);
+      const isFreeGift = document.getElementById('moFreeGiftToggle') && document.getElementById('moFreeGiftToggle').checked;
+      const finalUnit = isFreeGift ? 0 : unit;
       const existing = manualOrderItems.find(function (i) { return i.product_id === prodId && !i.variant_id; });
       if (existing) {
         existing.qty += qty;
@@ -12856,8 +12870,9 @@ Loading items...
           product_id: prodId,
           name: prod.name || '',
           sku: prod.sku || '',
-          unit_price: unit,
-          qty: qty
+          unit_price: finalUnit,
+          qty: qty,
+          is_free_gift: isFreeGift
         });
       }
       renderManualOrderItems();
@@ -12879,6 +12894,8 @@ Loading items...
       let html = '<h3 style="margin:0 0 4px">' + esc(prod.name) + '</h3>';
       if (hasSpecialPrice) html += '<p style="color:#22c55e;margin:0 0 4px;font-size:0.8rem;font-weight:600">⭐ Special price applied for this customer</p>';
       html += '<p style="color:var(--text-muted);margin:0 0 16px;font-size:0.85rem">Select a variant:</p>';
+      const isFreeGift = document.getElementById('moFreeGiftToggle') && document.getElementById('moFreeGiftToggle').checked;
+      if (isFreeGift) html += '<div style="background:rgba(34,197,94,0.12);border:1px solid #22c55e;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:0.82rem;color:#22c55e;font-weight:600">🎁 Free Gift mode — price will be set to €0.00</div>';
       html += '<table class="data-table"><thead><tr><th>Variant</th><th>SKU</th><th style="text-align:right">Price</th><th style="text-align:right">Stock</th><th></th></tr></thead><tbody>';
       variants.forEach(function (v) {
         const typeName = (v.variant_types && v.variant_types.name) || '';
@@ -12887,14 +12904,15 @@ Loading items...
         const label = parentVariant ? (parentVariant.label + ' — ' + v.label) : (v.label || '—');
         // Special price overrides variant wholesale price
         const vPrice = hasSpecialPrice ? unit : (parseFloat(v.wholesale_price) || parseFloat(v.price) || unit);
+        const displayPrice = isFreeGift ? 0 : vPrice;
         const stock = v.stock != null ? v.stock : '—';
         const stockColor = v.stock != null && v.stock <= 0 ? 'color:#ef4444' : '';
         html += '<tr>';
         html += '<td><strong>' + esc(label) + '</strong>' + (typeName ? '<div style="font-size:0.7rem;color:var(--text-muted)">' + esc(typeName) + '</div>' : '') + '</td>';
         html += '<td style="font-size:0.8rem">' + esc(v.sku || '') + '</td>';
-        html += '<td style="text-align:right;font-weight:600">€' + vPrice.toFixed(2) + '</td>';
+        html += '<td style="text-align:right;font-weight:600">' + (isFreeGift ? '<span style="color:#22c55e">€0.00</span><span style="text-decoration:line-through;color:var(--text-muted);font-size:0.78rem;margin-left:4px">€' + vPrice.toFixed(2) + '</span>' : '€' + vPrice.toFixed(2)) + '</td>';
         html += '<td style="text-align:right;' + stockColor + '">' + stock + '</td>';
-        html += '<td style="text-align:right"><button class="btn-sm btn-primary" onclick="addVariantToManualOrder(\'' + prod.id + '\',\'' + v.id + '\',' + qty + ',' + vPrice + ',\'' + esc((prod.name || '').replace(/'/g, "\\'")) + '\',\'' + esc((label || '').replace(/'/g, "\\'")) + '\',\'' + esc((v.sku || '').replace(/'/g, "\\'")) + '\')">Add</button></td>';
+        html += '<td style="text-align:right"><button class="btn-sm btn-primary" onclick="addVariantToManualOrder(\'' + prod.id + '\',\'' + v.id + '\',' + qty + ',' + vPrice + ',\'' + esc((prod.name || '').replace(/'/g, "\\'")) + '\',\'' + esc((label || '').replace(/'/g, "\\'")) + '\',\'' + esc((v.sku || '').replace(/'/g, "\\'")) + '\',' + isFreeGift + ')">Add</button></td>';
         html += '</tr>';
       });
       html += '</tbody></table>';
@@ -12902,7 +12920,8 @@ Loading items...
       modal.style.display = 'flex';
     }
 
-    function addVariantToManualOrder(prodId, variantId, qty, price, prodName, variantLabel, variantSku) {
+    function addVariantToManualOrder(prodId, variantId, qty, price, prodName, variantLabel, variantSku, isFreeGift) {
+      const finalPrice = isFreeGift ? 0 : price;
       const existing = manualOrderItems.find(function (i) { return i.product_id === prodId && i.variant_id === variantId; });
       if (existing) {
         existing.qty += qty;
@@ -12913,8 +12932,9 @@ Loading items...
           name: prodName,
           variant_label: variantLabel,
           sku: variantSku || '',
-          unit_price: price,
-          qty: qty
+          unit_price: finalPrice,
+          qty: qty,
+          is_free_gift: isFreeGift || false
         });
       }
       document.getElementById('moVariantModal').style.display = 'none';
@@ -12930,10 +12950,11 @@ Loading items...
         body.innerHTML = manualOrderItems.map(function (i, idx) {
           const line = i.unit_price * i.qty;
           const isDelivery = !!i.is_gls_delivery;
+          const isFreeGift = !!i.is_free_gift;
           const nameHtml = isDelivery
             ? `<span style="color:#92400e;font-weight:700">🚚 ${esc(i.name)}</span><div style="font-size:0.72rem;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;display:inline-block;margin-top:2px">Delivery Charge</div>`
-            : `${esc(i.name)}${i.variant_label ? `<span style="font-size:0.8rem;color:var(--accent);font-weight:600"> — ${esc(i.variant_label)}</span>` : ''}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div>`;
-          const rowStyle = isDelivery ? ' style="background:rgba(245,158,11,0.06)"' : '';
+            : `${esc(i.name)}${i.variant_label ? `<span style="font-size:0.8rem;color:var(--accent);font-weight:600"> — ${esc(i.variant_label)}</span>` : ''}${isFreeGift ? `<span style="font-size:0.72rem;background:rgba(34,197,94,0.15);color:#22c55e;border-radius:4px;padding:1px 6px;display:inline-block;margin-left:6px;font-weight:700">🎁 FREE GIFT</span>` : ''}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div>`;
+          const rowStyle = isDelivery ? ' style="background:rgba(245,158,11,0.06)"' : isFreeGift ? ' style="background:rgba(34,197,94,0.05)"' : '';
           return `<tr data-idx="${idx}"${rowStyle}>
             <td>${nameHtml}</td>
             <td style="text-align:right">
