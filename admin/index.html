@@ -12862,7 +12862,8 @@ Loading items...
       const unit = getB2BPriceForProduct(prod, custId);
       const isFreeGift = document.getElementById('moFreeGiftToggle') && document.getElementById('moFreeGiftToggle').checked;
       const finalUnit = isFreeGift ? 0 : unit;
-      const existing = manualOrderItems.find(function (i) { return i.product_id === prodId && !i.variant_id; });
+      // Dedup: same product + same variant + same gift status → merge. Paid and gift are ALWAYS separate lines.
+      const existing = manualOrderItems.find(function (i) { return i.product_id === prodId && !i.variant_id && !!i.is_free_gift === !!isFreeGift; });
       if (existing) {
         existing.qty += qty;
       } else {
@@ -12922,7 +12923,8 @@ Loading items...
 
     function addVariantToManualOrder(prodId, variantId, qty, price, prodName, variantLabel, variantSku, isFreeGift) {
       const finalPrice = isFreeGift ? 0 : price;
-      const existing = manualOrderItems.find(function (i) { return i.product_id === prodId && i.variant_id === variantId; });
+      // Dedup: same product + same variant + same gift status → merge. Paid and gift are ALWAYS separate lines.
+      const existing = manualOrderItems.find(function (i) { return i.product_id === prodId && i.variant_id === variantId && !!i.is_free_gift === !!isFreeGift; });
       if (existing) {
         existing.qty += qty;
       } else {
