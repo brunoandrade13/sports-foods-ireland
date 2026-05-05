@@ -420,6 +420,43 @@
             variant_label: i.variant_label || undefined,
         }));
 
+        // ── CAMADA 3 (B2C): Validação antes de ir ao Stripe/PayPal ───────────
+        try {
+            const SUPABASE_URL_V = 'https://styynhgzrkyoioqjssuw.supabase.co';
+            const SUPA_KEY_V = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
+            const withoutVariant = items.filter(it => !it.variant_id);
+            if (withoutVariant.length > 0) {
+                const uuids = withoutVariant.map(it => it.id).filter(id => id && /^[0-9a-f]{8}-/i.test(String(id)));
+                if (uuids.length > 0) {
+                    const vRes = await fetch(
+                        `${SUPABASE_URL_V}/rest/v1/product_variants?select=product_id&product_id=in.(${uuids.join(',')})&is_active=eq.true&limit=50`,
+                        { headers: { apikey: SUPA_KEY_V, Authorization: `Bearer ${SUPA_KEY_V}` } }
+                    );
+                    const vRows = await vRes.json();
+                    const withVars = new Set((vRows || []).map(v => v.product_id));
+                    const bad = withoutVariant.filter(it => withVars.has(it.id));
+                    if (bad.length > 0) {
+                        const names = bad.map(it => `"${it.name}"`).join(', ');
+                        if (btn) { btn.textContent = 'Try Again'; btn.disabled = false; }
+                        if (typeof showNotification === 'function') {
+                            showNotification(`Please select a flavour/size for: ${names}. Go back to your cart and select the correct variant.`, 'error');
+                        } else {
+                            alert(`Please select a flavour/size for: ${names}`);
+                        }
+                        return;
+                    }
+                }
+            }
+        } catch (ve) {
+            if (ve.message && ve.message.startsWith('Please select')) {
+                if (btn) { btn.textContent = 'Try Again'; btn.disabled = false; }
+                alert(ve.message);
+                return;
+            }
+            console.warn('[checkout] B2C variant check failed (non-critical):', ve);
+        }
+        // ── Fim da validação B2C ──────────────────────────────────────────────
+
         try {
             const SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';

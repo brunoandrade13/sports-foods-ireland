@@ -103,9 +103,48 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // SERVER-SIDE PRICE VALIDATION
-    // Fetch real prices from database to prevent client-side price manipulation
+    // ── CAMADA 2 (B2C): Validação de variantes obrigatórias ───────────────────
+    // Verificar se algum item sem variant_id pertence a um produto com variantes activas
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const itemsWithoutVariant = items.filter((it: { variant_id?: string; variantId?: string }) =>
+      !it.variant_id && !it.variantId
+    );
+    if (itemsWithoutVariant.length > 0) {
+      const uuidRegex = /^[0-9a-f]{8}-/i;
+      const idsToCheck: string[] = [];
+      for (const it of itemsWithoutVariant) {
+        const rawId = it.id ? String(it.id) : null;
+        if (!rawId) continue;
+        if (uuidRegex.test(rawId)) {
+          idsToCheck.push(rawId);
+        } else if (!isNaN(Number(rawId))) {
+          const { data: pRow } = await supabase.from("products").select("id").or(`legacy_id.eq.${Number(rawId)},woo_product_id.eq.${Number(rawId)}`).limit(1);
+          if (pRow?.[0]?.id) idsToCheck.push(pRow[0].id);
+        }
+      }
+      if (idsToCheck.length > 0) {
+        const { data: variantCheck } = await supabase
+          .from("product_variants")
+          .select("product_id")
+          .in("product_id", idsToCheck)
+          .eq("is_active", true)
+          .limit(idsToCheck.length * 5);
+        const productsWithVariants = new Set((variantCheck || []).map((v: { product_id: string }) => v.product_id));
+        const offending = itemsWithoutVariant.filter((_it: { id?: string | number }, idx: number) => {
+          const pid = idsToCheck[idx];
+          return pid && productsWithVariants.has(pid);
+        });
+        if (offending.length > 0) {
+          const names = offending.map((it: { name?: string; id?: string | number }) => `"${it.name || it.id}"`).join(", ");
+          console.error(`[create-checkout] VARIANT VALIDATION FAILED: ${names}`);
+          return new Response(JSON.stringify({
+            error: `Please select a flavour/size for: ${names}. These products require a variant selection before ordering.`,
+            variant_error: true
+          }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+      }
+    }
+    // ── Fim da validação de variantes ─────────────────────────────────────────
     const priceField = currency === "GBP" ? "price_gbp" : "price_eur";
     const itemIds = items
       .map((i: { id?: string | number }) => i.id)
