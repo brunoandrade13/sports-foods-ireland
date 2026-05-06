@@ -530,7 +530,7 @@
             }
 
             // Security: validate redirect URL before navigating
-            const allowedDomains = ['checkout.stripe.com', 'sportsfoodsireland.ie', 'www.sportsfoodsireland.ie', 'www.paypal.com', 'www.sandbox.paypal.com', 'paypal.com'];
+            const allowedDomains = ['checkout.stripe.com', 'sportsfoodsireland.ie', 'sportsfoodsireland.ie', 'www.paypal.com', 'www.sandbox.paypal.com', 'paypal.com'];
             try {
                 const redirectUrl = new URL(data.url);
                 if (!allowedDomains.some(d => redirectUrl.hostname === d || redirectUrl.hostname.endsWith('.' + d))) {
