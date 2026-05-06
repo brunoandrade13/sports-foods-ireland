@@ -2791,7 +2791,7 @@ html[data-theme="dark"] .category-product-card {
 .btn-basket {
   width: 100%;
   height: 50px;
-  background: #FF883E;
+  background: #C45500;
   color: #fff;
   border: none;
   font-family: var(--font-title);
@@ -2804,7 +2804,7 @@ html[data-theme="dark"] .category-product-card {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-top: auto;
-  box-shadow: 0 2px 8px rgba(255,136,62,0.3);
+  box-shadow: 0 2px 8px rgba(196,85,0,0.3);
 }
 
 /* Smaller button in carousel */
@@ -2818,7 +2818,7 @@ html[data-theme="dark"] .category-product-card {
 .btn-basket:hover,
 .btn-basket:focus {
   background: #e87030;
-  box-shadow: 0 4px 16px rgba(255,136,62,0.5);
+  box-shadow: 0 4px 16px rgba(196,85,0,0.5);
   transform: translateY(-1px);
 }
 
@@ -15258,7 +15258,7 @@ section.brands-section .brands-subtitle {
 
 /* ============================================
    NEWSLETTER/SUBSCRIBE SECTION - DEGRADÊ BANDEIRA IRLANDA
-   Verde (#169B62) -> Branco (#FFFFFF) -> Laranja (#FF883E)
+   Verde (#169B62) -> Branco (#FFFFFF) -> Laranja (#C45500)
    ============================================ */
 
 html body main section.newsletter-section,
@@ -15275,7 +15275,7 @@ section.newsletter-section,
 section.newsletter,
 .newsletter-section,
 .newsletter {
-    background: linear-gradient(135deg, #169B62 0%, #FFFFFF 50%, #FF883E 100%);
+    background: linear-gradient(135deg, #169B62 0%, #FFFFFF 50%, #C45500 100%);
     background-color: #169B62;
 }
 
@@ -15352,7 +15352,7 @@ footer li {
 .main-footer a:hover,
 footer.main-footer a:hover,
 footer a:hover {
-    color: #FF883E;
+    color: #C45500;
     opacity: 1;
 }
 
@@ -15755,12 +15755,12 @@ header .container {
 /* Dark mode ativo */
 html[data-theme="dark"] .theme-toggle {
     background: #333333;
-    border-color: #FF883E;
-    color: #FF883E;
+    border-color: #C45500;
+    color: #C45500;
 }
 
 html[data-theme="dark"] .theme-toggle:hover {
-    background: #FF883E;
+    background: #C45500;
     color: #333333;
 }
 
@@ -15847,12 +15847,12 @@ html[data-theme="dark"] .theme-toggle:hover {
 /* Dark mode ativo - botão */
 html[data-theme="dark"] .theme-toggle {
     background: #333333;
-    border-color: #FF883E;
-    color: #FF883E;
+    border-color: #C45500;
+    color: #C45500;
 }
 
 html[data-theme="dark"] .theme-toggle:hover {
-    background: #FF883E;
+    background: #C45500;
     color: #333333;
 }
 
@@ -16142,7 +16142,7 @@ html[data-theme="dark"] .footer-bottom {
 }
 
 html[data-theme="dark"] .footer-col a:hover {
-    color: #FF883E;
+    color: #C45500;
 }
 
 html[data-theme="dark"] .footer-bottom {
@@ -16164,7 +16164,7 @@ html[data-theme="dark"] .footer-social .social-links a {
 html[data-theme="dark"] .newsletter-section,
 html[data-theme="dark"] section.newsletter-section,
 html[data-theme="dark"] .subscribe-section {
-    background: linear-gradient(135deg, #169B62 0%, #FFFFFF 50%, #FF883E 100%);
+    background: linear-gradient(135deg, #169B62 0%, #FFFFFF 50%, #C45500 100%);
 }
 
 html[data-theme="dark"] .newsletter-section h2,
@@ -16467,8 +16467,8 @@ html[data-theme="dark"] .benefit-svg-icon {
    ============================================ */
 
 .cart-count {
-    background: #FF883E;
-    background-color: #FF883E;
+    background: #C45500;
+    background-color: #C45500;
     color: #FFFFFF;
 }
 
@@ -16540,7 +16540,7 @@ html[data-theme="dark"] #cartIcon img.header-svg-icon {
 
 html[data-theme="dark"] .header-icon:hover img.header-svg-icon,
 html[data-theme="dark"] .cart:hover img.header-svg-icon {
-    filter: invert(1) brightness(1.5) drop-shadow(0 0 3px rgba(255,136,62,0.8));
+    filter: invert(1) brightness(1.5) drop-shadow(0 0 3px rgba(196,85,0,0.8));
 }
 
 /* ============================================
@@ -16618,7 +16618,7 @@ img.social-icon {
 }
 
 #searchBtn:hover {
-    color: #FF883E;
+    color: #C45500;
 }
 
 #searchBtn svg {

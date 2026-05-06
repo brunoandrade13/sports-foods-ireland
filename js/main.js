@@ -796,7 +796,7 @@ function initHeroCarousel() {
         if (carouselContainer) {
             carouselContainer.addEventListener('touchstart', (e) => {
                 if (e.touches && e.touches[0]) touchStartX = e.touches[0].screenX;
-            });
+            }, { passive: true });
 
             carouselContainer.addEventListener('touchend', (e) => {
                 if (e.changedTouches && e.changedTouches[0]) {
