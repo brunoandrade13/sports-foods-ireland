@@ -3,20 +3,20 @@
 
   <!-- Main pages (home, shop, brand pages, blog) -->
   <sitemap>
-    <loc>https://www.sportsfoodsireland.ie/sitemap-pages.xml</loc>
-    <lastmod>2026-05-03</lastmod>
+    <loc>https://sportsfoodsireland.ie/sitemap-pages.xml</loc>
+    <lastmod>2026-05-06</lastmod>
   </sitemap>
 
   <!-- All 232 product pages -->
   <sitemap>
-    <loc>https://www.sportsfoodsireland.ie/sitemap-products.xml</loc>
-    <lastmod>2026-05-03</lastmod>
+    <loc>https://sportsfoodsireland.ie/sitemap-products.xml</loc>
+    <lastmod>2026-05-06</lastmod>
   </sitemap>
 
   <!-- Product images -->
   <sitemap>
-    <loc>https://www.sportsfoodsireland.ie/sitemap-images.xml</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://sportsfoodsireland.ie/sitemap-images.xml</loc>
+    <lastmod>2026-05-06</lastmod>
   </sitemap>
 
 </sitemapindex>

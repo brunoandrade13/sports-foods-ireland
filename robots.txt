@@ -1,12 +1,12 @@
 # Sports Foods Ireland - robots.txt
-# https://www.sportsfoodsireland.ie
+# https://sportsfoodsireland.ie
 
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://www.sportsfoodsireland.ie/sitemap.xml
-Sitemap: https://www.sportsfoodsireland.ie/sitemap-images.xml
+Sitemap: https://sportsfoodsireland.ie/sitemap.xml
+Sitemap: https://sportsfoodsireland.ie/sitemap-images.xml
 
 # Block dev/internal files
 Disallow: /dev-archive/

@@ -132,8 +132,8 @@ function updateProductPageSEO(product) {
     const brand = product.marca || 'Sports Foods Ireland';
     const price = parseFloat(product.preco) || 0;
     const desc = product.descricao || ('Buy ' + name + ' online at Sports Foods Ireland. Professional sports nutrition delivered across Ireland.');
-    const imgPath = product.imagem ? (product.imagem.startsWith('http') ? product.imagem : 'https://www.sportsfoodsireland.ie/' + product.imagem) : 'https://www.sportsfoodsireland.ie/img/og-home.jpg';
-    const url = 'https://www.sportsfoodsireland.ie/produto.html?id=' + (product.id || '');
+    const imgPath = product.imagem ? (product.imagem.startsWith('http') ? product.imagem : 'https://sportsfoodsireland.ie/' + product.imagem) : 'https://sportsfoodsireland.ie/img/og-home.jpg';
+    const url = 'https://sportsfoodsireland.ie/produto.html?id=' + (product.id || '');
     const sku = product.sku || (product.id ? String(product.id) : '');
     const inStock = product.em_stock === true;
     const rating = parseFloat(product.rating) || 4.8;
@@ -192,7 +192,7 @@ function updateProductPageSEO(product) {
                 'priceValidUntil': new Date(new Date().getFullYear() + 1, 11, 31).toISOString().split('T')[0],
                 'availability': inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
                 'itemCondition': 'https://schema.org/NewCondition',
-                'seller': { '@type': 'Organization', 'name': 'Sports Foods Ireland', 'url': 'https://www.sportsfoodsireland.ie' }
+                'seller': { '@type': 'Organization', 'name': 'Sports Foods Ireland', 'url': 'https://sportsfoodsireland.ie' }
             },
             'aggregateRating': {
                 '@type': 'AggregateRating',
@@ -212,8 +212,8 @@ function updateProductPageSEO(product) {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             'itemListElement': [
-                { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://www.sportsfoodsireland.ie/' },
-                { '@type': 'ListItem', 'position': 2, 'name': category, 'item': 'https://www.sportsfoodsireland.ie/shop.html#' + category.toLowerCase().replace(/\s+/g, '') },
+                { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://sportsfoodsireland.ie/' },
+                { '@type': 'ListItem', 'position': 2, 'name': category, 'item': 'https://sportsfoodsireland.ie/shop.html#' + category.toLowerCase().replace(/\s+/g, '') },
                 { '@type': 'ListItem', 'position': 3, 'name': name, 'item': url }
             ]
         };
