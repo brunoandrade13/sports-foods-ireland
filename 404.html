@@ -138,6 +138,134 @@
 <!-- TikTok Pixel Code End -->
 </head>
 <body>
+<script>
+// ── SFI Legacy Redirect — runs at body start, before any content renders ─
+(function(){
+  var path = window.location.pathname.replace(/\/+$/,'');
+
+  var PRODUCTS = {
+    "beet-it-regen-cherry-shot-15-x-70ml":1,"beet-it-sport-nitrate-400-70ml-shots-x-15":2,
+    "clif-bar-12-x-65g":13,"clif-bar-12-x-68g":13,"clif-bar-minis-10-x-28g-pack":14,
+    "clif-bar-nut-butter-12-x-50g":15,"clif-shot-bloks-energy-chews-18-x-60g":16,
+    "clif-shot-bloks-18-x-60g":16,"energy-drink-caffeine-hit-sachet-12-x-47g":18,
+    "micro-shaker-500-ml":28,"power-bar-hydro-gel-box-67ml-x-24":30,
+    "powerbar-hydro-gel-box-67ml-x-24":30,"powerbar-powergel-original-24-x-41g":36,
+    "powerbar-powergel-sports-shots-60g-x-24":37,"powerbar-recover-active-choc-1210g":39,
+    "powerbar-recovery-max-protein-114kg":40,"saltstick-capsules":42,
+    "saltstick-fastchews-10-chew-pack-box-of-12":43,"saltstick-fastchews-10-chew-packs-box-of-12":43,
+    "saltstick-fastchews-60-tables":44,"sports-beans-x-24-x-28g":45,
+    "tailwind-endurance-fuel-berry-flavour":46,"tailwind-endurance-fuel-dauwatermelon-flavour":48,
+    "tailwind-endurance-fuel-lemon-flavour":49,"tailwind-endurance-fuel-mandarin-flavour":50,
+    "tailwind-endurance-fuel-naked-flavour":51,"tailwind-endurance-fuel-raspberry-caffeinated":52,
+    "tailwind-endurance-fuel-tropical-caffeinated":53,"tailwind-high-carb-fuel-6-servings":55,
+    "tailwind-new-recovery-mix-20-serv":56,"tailwind-recovery-mix-vanilla":57,
+    "armband-heart-rate-monitor-hr70":60,"bsc100s-gps-bike-computer":61,
+    "bsc200s-bike-computer":62,"igpsbsc200s-bike-computer":62,
+    "igs630-gps-cycling-computer":68,"igs800-bike-computer":69,
+    "igsport-cadence-sensor":70,"igsport-lw10-smart-watch":71,
+    "igsport-out-front-mount":72,"igsport-tl50-rear-light":73,"igsport-tl30-rear-light":73,
+    "igsport-vs800s-front-light":74,"spd70-speed-sensor":75,
+    "original-lock-laces-no-tie-shoelaces":76,"safety-skin-spread-42gr":97,
+    "the-icebein-recovery-system":99,"heat-tech-neoprene-swim-socks":101,
+    "spatz-burnr-4-season-arm-warmers":105,"spatz-burnr-4-season-leg-warmers":106,
+    "spatz-thrmoz-deep-winter-gloves-with-fold-out-wind-blocking-shell":116,
+    "spatzwear-burnr-gilet":117,"spatzwear-convoy-cargo-bib-shorts":118,
+    "spatzwear-coolr-summer-indoor-baselayer-white":119,
+    "spatzwear-heatr-4-season-long-sleeve-jersey":120,
+    "spatzwear-race-layer-short-sleeve-baselayer":121,
+    "spatzwear-squadron-ss-cargo-jersey-black-or-khaki":122,"toez-silicone-toe-warmers":123,
+    "bubble-swim-hat":127,"kids-aquahero-goggle-bluered":128,
+    "award-winning-transition-back-pack":151,"buoyancy-waterproof-phone-pouch":154,
+    "elastic-shoe-laces":155,"elastic-shoe-laces-for-fast-transitions":155,
+    "endurance-number-belt-with-lycra-fuel-pouch-and-energy-gel-storage":156,
+    "ergo-swim-training-hand-paddles":158,"extra-long-hair-silicone-swim-cap":159,
+    "front-facing-swim-drill-snorkel":160,"heat-tech-neoprene-swim-balaclava":162,
+    "heat-tech-neoprene-swim-gloves":164,"kids-adventure-wetsuit":167,
+    "kids-aspect-wetsuit":170,"large-mesh-training-backpack-navyorange":171,
+    "large-mesh-training-bag":171,"large-micro-fibre-towel-navy":172,
+    "mens-activate-tri-shorts-blackred":174,"mens-active-flex-wetsuit":175,
+    "mens-advance-wetsuit":176,"mens-agile-wetsuit":177,"mens-aspect-wetsuit":178,
+    "mens-aspire-wetsuit-new-2025":179,"mens-aspire-wetsuit-new-2026":310,
+    "mens-azure-20-wetsuit":194,"mens-azure-2-0-wetsuit":194,
+    "mens-kona-speed-jammers":197,"mens-vanquish-x-wetsuit":200,
+    "mens-venture-wetsuit-blackorange":182,"mens-venture-wetsuit-black-orange":182,
+    "mens-vision-wetsuit":202,"neoprene-warmth-vest-baselayer":209,
+    "neoprene-womens-kneeskin":210,"recycled-swim-safety-buoytow-float":216,
+    "recycled-swim-safety-buoy-tow-float":216,"silicone-swim-cap-48g":217,
+    "silicone-v-flex-fins":218,"thermo-tech-swim-mitts":220,
+    "transition-backpack-with-cycle-helmet-compartment-blackgrey":221,
+    "waist-belt-leash-set":131,"tow-donut":214,"wild-swim-bag":279,
+    "womens-advance-wetsuit":253,"womens-agile-wetsuit":235,
+    "womens-aspire-wetsuit-new-2025":237,"womens-aspire-wetsuit-new-2026":311,
+    "womens-cosmic-30-strap-back-costume":258,
+    "womens-ows-renew-high-neck-costume-cosmic-20":263,
+    "womens-ows-renew-high-neck-costume-cosmic-2-0":263,
+    "womens-venture-wetsuit-blackorange":239,"womens-vision-wetsuit":265,
+    "womens-yulex-long-sleeve-suit":241,"womens-yulex-long-sleeve-swimsuit-black":241,
+    "womens-yulex-sleeveless-swimsuit-blackgrey":249,"womens-yulex-sleeveless-swimsuit-multi-bluewhite":250,
+    "mcnett-neo-slix-wetsuit-lubricant-250ml-x-12":271,
+    "100-natural-glide-anti-chafing-balm-18-x-60g":269,
+    "trainer-armour-big-toe-hole-preventer-x-1":284,"trainer-armour-big-toe-hole-preventer-x-5":284,
+    "trainer-armour-heel-hole-preventer-x-1":285,"trainer-armour-heel-hole-preventer-x-5":285,
+    "butt-napkins-box-of-30":286,"high-5-energy-gel-aqua-caffeine-x-20":287,
+    "fitletic-mini-sports-belt":282,"fitletic-trail-25-hydra-vest":283,
+    "womens-ascend-sleeveless-wetsuit-ss26":309,"heat-tech-dura-swim-boot-ss26":314,
+    "mens-ascend-sleeveless-wetsuit-ss26":315
+  };
+
+  var CATEGORIES = {
+    "tailwind":"shop.html?brand=Tailwind","salt-stick":"shop.html?brand=SaltStick",
+    "beet-it-shots":"shop.html?brand=Beet+It","saltstick":"shop.html?brand=SaltStick",
+    "power-bar":"shop.html?brand=PowerBar","powerbar":"shop.html?brand=PowerBar",
+    "clif-bar":"shop.html?brand=Clif+Bar","high-5":"shop.html?brand=High5",
+    "nuun-electrolyte":"shop.html?brand=Nuun","zone-3":"shop.html?brand=Zone3",
+    "zone3":"shop.html?brand=Zone3","spatzwear":"shop.html?brand=Spatzwear",
+    "igpsport":"shop.html?brand=iGPSPORT","igsport":"shop.html?brand=iGPSPORT",
+    "swim-secure":"shop.html?brand=Swim+Secure","swin-secure":"shop.html?brand=Swim+Secure",
+    "sports-nuitrition":"shop.html","sports-nutrition":"shop.html",
+    "accessories":"shop.html","swimming-watersports":"shop.html"
+  };
+
+  var EXACT = {
+    "/wholesale":"/b2b/landing.html","/wholesale-log-in-page":"/b2b/portal.html",
+    "/wholesale-ordering":"/b2b/landing.html","/sign-in-s.php":"/account.html",
+    "/view-cats.php":"/categories.html","/home":"/","/shop":"/shop.html",
+    "/products":"/shop.html","/cart":"/cart.html","/index.php":"/",
+    "/home/index.html":"/"
+  };
+
+  function redirect(url) {
+    if (url && url.charAt(0) !== '/' && url.charAt(0) !== 'h') url = '/' + url;
+    window.location.replace(url);
+  }
+
+  if (EXACT[path]) { redirect(EXACT[path]); return; }
+
+  var productMatch = path.match(/^\/product\/([^\/]+)/);
+  if (productMatch) {
+    var slug = productMatch[1].replace(/\/$/, '');
+    var id = PRODUCTS[slug];
+    if (id) { redirect('/produto.html?id=' + id); return; }
+    redirect('/shop.html?search=' + encodeURIComponent(slug.replace(/-/g,' ')));
+    return;
+  }
+
+  var catMatch = path.match(/^\/product-category\/([^\/]+)/);
+  if (catMatch) {
+    var cat = catMatch[1].replace(/\/$/, '');
+    var dest = CATEGORIES[cat];
+    if (!dest) {
+      var segs = path.replace('/product-category/','').split('/');
+      for (var i=0;i<segs.length;i++) { if(CATEGORIES[segs[i]]){dest=CATEGORIES[segs[i]];break;} }
+    }
+    redirect(dest || '/shop.html');
+    return;
+  }
+
+  if (path.startsWith('/product-category/')) { redirect('/shop.html'); return; }
+
+})();
+</script>
 <a href="#main-content" class="skip-to-content">Skip to main content</a>
 
 <main id="main-content">
@@ -166,241 +294,6 @@ window.addEventListener('load',function(){
 navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
 });
 }
-</script>
-<script>
-// ── SFI Legacy Redirect Handler ─────────────────────────────────────────
-// Handles WooCommerce URLs (/product/slug/, /product-category/...) and
-// other legacy paths. Runs before the 404 page renders.
-// GitHub Pages serves 404.html for any missing URL — window.location.pathname
-// contains the originally requested path.
-(function(){
-  var path = window.location.pathname.replace(/\/+$/,'');
-
-  // ── 1. /product/SLUG → produto.html?id=ID ──────────────────────────
-  var PRODUCTS = {
-    "beet-it-regen-cherry-shot-15-x-70ml":1,"beet-it-sport-nitrate-400-70ml-shots-x-15":2,
-    "beet-it-sport-nitrate-energy-gel-top-up-100-12-x-43g":3,"black-line-90g-carbs-fuel-sports-drink-sachet-10-x-94g":4,
-    "black-line-amino-mega-liquid-20-x-25ml":6,"black-line-caffeine-boost-20-x-25ml":7,
-    "black-line-hydro-fuel-gel-30grams-12-x-50ml":8,"black-line-isotonic-sports-drink-30-608g":9,
-    "black-line-l-carnitin-liquid-20-x-25ml":10,"black-line-magnesium-liquid-25ml-x-20":11,
-    "black-line-waterbottle-500ml":12,"clif-bar-12-x-65g":13,"clif-bar-minis-10-x-28g-pack":14,
-    "clif-bar-nut-butter-12-x-50g":15,"clif-shot-bloks-energy-chews-18-x-60g":16,
-    "creatine-monohydrate-powder-300g":17,"energy-drink-caffeine-hit-sachet-12-x-47g":18,
-    "energy-drink-with-protein-sachet-12-x-47g":19,"high-5-energy-drink-22kg":20,
-    "high-5-energy-drink-with-protein-16kg":21,"high-5-energy-gel-20-pack":22,
-    "high-5-energy-gel-20-pack-caffeine":23,"high-5-energy-gel-aqua-x-20":24,
-    "high5-zero-electrolyte-tablets-box-of-8-x-20-tabs":25,"high5-zero-electrolyte-tablets-box-of-8-x-20-tabs-caffeine-hit":26,
-    "high5-zero-electrolyte-tablets-box-of-8-x-20-tabs-protect":27,"micro-shaker-500-ml":28,
-    "nuun-sport-electrolyte-drink-8-x-10-tablet-tubes":29,"power-bar-hydro-gel-box-67ml-x-24":30,
-    "powerbar-5-electrolytes-10-tabs-x-12-tubes":31,"powerbar-build-whey-protein-isolate-hydroisolate-550g-powder":32,
-    "powerbar-energize-original-bar-15-x-55g":33,"powerbar-isoactive-drink-mix-132kg":34,
-    "powerbar-isoactive-drink-mix-600g":35,"powerbar-powergel-original-24-x-41g":36,
-    "powerbar-powergel-sports-shots-60g-x-24":37,"powerbar-protein-soft-layer-12x40g":38,
-    "powerbar-recover-active-choc-1210g":39,"powerbar-recovery-max-protein-114kg":40,
-    "powerbar-ride-bar-box-of-18-x-55g":41,"saltstick-capsules":42,
-    "saltstick-fastchews-10-chew-pack-box-of-12":43,"saltstick-fastchews-60-tables":44,
-    "sports-beans-x-24-x-28g":45,"tailwind-endurance-fuel-berry-flavour":46,
-    "tailwind-endurance-fuel-cola-caffeinated":47,"tailwind-endurance-fuel-dauwatermelon-flavour":48,
-    "tailwind-endurance-fuel-lemon-flavour":49,"tailwind-endurance-fuel-mandarin-flavour":50,
-    "tailwind-endurance-fuel-naked-flavour":51,"tailwind-endurance-fuel-raspberry-caffeinated":52,
-    "tailwind-endurance-fuel-tropical-caffeinated":53,"tailwind-endurance-matchagreen-tea-flavour":54,
-    "tailwind-high-carb-fuel-6-servings":55,"tailwind-new-recovery-mix-20-serv":56,
-    "tailwind-recovery-mix-vanilla":57,"tailwind-recovery-new-mix-strawberry":58,
-    "tailwind-recovery-new-mix-chocolate":59,"armband-heart-rate-monitor-hr70":60,
-    "bsc100s-gps-bike-computer":61,"bsc200s-bike-computer":62,"computer-protective-case-for-bsc100s-bsc200":63,
-    "heart-rate-monitor-hr50":64,"igpsport-m80-s82-adapter":65,"igpsport-sr-mini-radar-rear-light":66,
-    "igpsport-vs1200s-front-light":67,"igs630-gps-cycling-computer":68,"igs800-bike-computer":69,
-    "igsport-cadence-sensor":70,"igsport-lw10-smart-watch":71,"igsport-out-front-mount":72,
-    "igsport-tl50-rear-light":73,"igsport-vs800s-front-light":74,"spd70-speed-sensor":75,
-    "original-lock-laces-no-tie-shoelaces":76,"chamois-buttr-10-pack-x-9ml-sachet":77,
-    "chamois-buttr-eurostyle-235ml-tube-x-12":78,"chamois-buttr-for-her-235ml-tube-x-12":79,
-    "chamois-buttr-original-235ml-tube-x-12":80,"safety-skin-spread-42gr":97,
-    "the-icebein-recovery-system":99,"fasta-lite-uci-legal-race-overshoes":100,
-    "heat-tech-neoprene-swim-socks":101,"pro-stealth-overshoe-system-with-protoez-toe-warmers":102,
-    "sokz-2-one-size":103,"spatz-armz-rain-specific-arm-warmers":104,
-    "spatz-burnr-4-season-arm-warmers":105,"spatz-burnr-4-season-leg-warmers":106,
-    "spatz-quadz-thigh-warmers":107,"spatz-aero-race-glovz-long-finger":108,
-    "spatz-aero-race-glovz-short-finger":109,"spatz-basez-2-baselayer-black":110,
-    "spatz-burnr-light":111,"spatz-fasta-lite-long-overshoes":112,"spatz-heatr-head-warmerbalaclava":113,
-    "spatz-neotoez-neoprene-toe-warmers-one-size":114,"spatz-neoz-thermal-neoprene-rain-gloves":115,
-    "spatz-thrmoz-deep-winter-gloves-with-fold-out-wind-blocking-shell":116,"spatzwear-burnr-gilet":117,
-    "spatzwear-convoy-cargo-bib-shorts":118,"spatzwear-coolr-summer-indoor-baselayer-white":119,
-    "spatzwear-heatr-4-season-long-sleeve-jersey":120,"spatzwear-race-layer-short-sleeve-baselayer":121,
-    "spatzwear-squadron-ss-cargo-jersey-black-or-khaki":122,"toez-silicone-toe-warmers":123,
-    "adventure-lights":124,"aspect-goggles":125,"attack-goggles":126,"bubble-swim-hat":127,
-    "kids-aquahero-goggle-bluered":128,"kids-aquahero-goggles-blackgreen":129,
-    "protective-swim-goggle-case":130,"replacement-waist-belt-leash-set":131,
-    "shell-ear-plugs-x-12":132,"vacuum-insulated-flask":133,"vapour-goggles":134,
-    "venator-x-goggles":135,"viper-speed-swim-goggles":136,"vision-clear-swim-mask":137,
-    "ows-renew-classic-costume":138,"2-led-light-28l-backpack-swim-safety-buoydry-bag":140,
-    "2-led-light-swim-safety-buoydry-bag-28l-waterproof-phone-pouch-inc":141,
-    "active-flex-buoyancy-jammer-32mm-blackorange":142,"active-flex-swim-beanie-greyorange":143,
-    "active-flex-swim-cap-greyorange":144,"active-flex-swim-glove-greyorange":145,
-    "active-flex-swim-sock-greyorange":146,"adult-towelling-changing-robe":147,
-    "aero-top-tube-cycling-triathlon-bento-box-bag":148,"award-winning-transition-back-pack":151,
-    "buoyancy-shorts-the-originals-53mm":152,"buoyancy-shorts-next-step-32mm":153,
-    "buoyancy-waterproof-phone-pouch":154,"elastic-shoe-laces":155,
-    "endurance-number-belt-with-lycra-fuel-pouch-and-energy-gel-storage":156,
-    "endurance-number-belt-with-neoprene-fuel-pouch-and-energy-gel-storage":157,
-    "ergo-swim-training-hand-paddles":158,"extra-long-hair-silicone-swim-cap":159,
-    "front-facing-swim-drill-snorkel":160,"girls-high-jazz-20-strap-back-costume":161,
-    "heat-tech-neoprene-swim-balaclava":162,"heat-tech-neoprene-swim-cap":163,
-    "heat-tech-neoprene-swim-gloves":164,"junior-towelling-robe":166,"kids-adventure-wetsuit":167,
-    "kids-aspect-wetsuit":170,"large-mesh-training-backpack-navyorange":171,
-    "large-micro-fibre-towel-navy":172,"long-hair-swim-silicone-cap":173,
-    "mens-activate-tri-shorts-blackred":174,"mens-active-flex-wetsuit":175,"mens-advance-wetsuit":176,
-    "mens-agile-wetsuit":177,"mens-aspect-wetsuit":178,"mens-aspire-wetsuit-new-2025":179,
-    "mens-prism-30-jammers":180,"mens-terraprene-vision-wetsuit":181,
-    "mens-venture-wetsuit-blackorange":182,"mens-versa-multi-sport-wetsuit":183,
-    "mens-yulex-jammers":184,"mens-yulex-switch-wetsuit-blackorange":185,"mens-yulex-kneeskin":186,
-    "mens-yulex-top":187,"mens-yulex-vest-black-grey":188,
-    "mens-activate-kona-speed-short-sleeve-full-zip-tri-suit-blackwhiteneon-orange":189,
-    "mens-active-short-sleeve-full-zip-trisuit-blackred":190,"mens-active-tri-top-blackred":191,
-    "mens-agile-thermal-wetsuit":192,"mens-aspire-wetsuit":193,"mens-azure-20-wetsuit":194,
-    "mens-cosmic-30-aqua-shorts":195,"mens-iconic-jammers-blackgold":196,"mens-kona-speed-jammers":197,
-    "mens-prism-30-aqua-shorts":198,"mens-thermal-aspire-wetsuit":199,"mens-vanquish-x-wetsuit":200,
-    "mens-vision-sleeveless-wetsuit":201,"mens-vision-wetsuit":202,
-    "mesh-training-bagswim-training-aids-bag":203,"microfibre-changing-robeponcho":204,
-    "neoprene-headband":205,"neoprene-swim-cap-vi-vis-orange":206,"neoprene-swim-caps":207,
-    "neoprene-timing-chip-strap":208,"neoprene-warmth-vest-baselayer":209,"neoprene-womens-kneeskin":210,
-    "oversize-heat-tech-polar-fleece-parka-robe":211,"power-stroke-paddles":212,
-    "recycled-on-the-go-swim-buoy-donut":214,"recycled-swim-safety-buoydry-bag-28l":215,
-    "recycled-swim-safety-buoytow-float":216,"silicone-swim-cap-48g":217,"silicone-v-flex-fins":218,
-    "strapless-neoprene-swim-cap":219,"thermo-tech-swim-mitts":220,
-    "transition-backpack-with-cycle-helmet-compartment-blackgrey":221,
-    "ultimate-race-number-belt-with-gel-loops":222,"waterproof-dry-bag-10-l":227,
-    "wetsuit-changing-mat":228,"womens-activate-plus-short-sleeve-full-zip-trisuit":229,
-    "womens-activate-short-sleeve-full-zip-trisuit-blackturquoise":230,
-    "womens-activate-tri-shorts-blackturquoise":231,"womens-activate-tri-top-blackturquoise":232,
-    "womens-activate-trisuit-blackturquoise":233,"womens-active-flex-wetsuit":234,
-    "womens-agile-wetsuit":235,"womens-aspect-wetsuit":236,"womens-aspire-wetsuit-new-2025":237,
-    "womens-terraprene-vision-wetsuit":238,"womens-venture-wetsuit-blackorange":239,
-    "womens-versa-multi-sport-wetsuit":240,"womens-yulex-long-sleeve-swimsuit-black":241,
-    "womens-yulex-long-sleeve-top":242,"womens-yulex-switch-wetsuit-blackorange":243,
-    "womens-yulex-kneesk-multi-bluewhite":244,"womens-yulex-legging-multi-bluewhite":245,
-    "womens-yulex-long-sleeve-swimsuit-multi-bluewhite":246,"womens-yulex-long-sleeve-swimsuit-navy":247,
-    "womens-yulex-sleeveless-swimsuit":248,"womens-yulex-sleeveless-swimsuit-blackgrey":249,
-    "womens-yulex-sleeveless-swimsuit-multi-bluewhite":250,"womens-yulex-vest-multi-bluewhite":251,
-    "womens-yulex-shorts":252,"womens-advance-wetsuit":253,"womens-agile-thermal-wetsuit":254,
-    "womens-aspire-thermal-wetsuit":255,"womens-aspire-wetsuit":256,"womens-cosmic-20-back-costume":257,
-    "womens-cosmic-30-strap-back-costume":258,"womens-cosmic-two-piece-bikini":259,
-    "womens-kona-speed-strap-back-costume":260,"womens-ows-renew-classic-costume-cosmic-20":261,
-    "womens-ows-renew-high-neck-costume-black":262,"womens-ows-renew-high-neck-cosmic-20":263,
-    "womens-vanquish-x-wetsuit":264,"womens-vision-wetsuit":265,"yulex-swim-gloves-navy":266,
-    "yulex-swim-socks-navy":267,"yulex-swim-beanie-navy":268,
-    "100-natural-glide-anti-chafing-balm-18-x-60g":269,
-    "mcnett-black-witch-quick-drying-neoprene-adhesive-x-24":270,
-    "mcnett-neo-slix-wetsuit-lubricant-250ml-x-12":271,"hydration-float":273,"tow-woggle":278,
-    "wild-swim-bag":279,"fitletic-360-plus-belt":280,"fitletic-hydra-16-hydration-belt":281,
-    "fitletic-mini-sports-belt":282,"fitletic-trail-25-hydra-vest":283,
-    "trainer-armour-big-toe-hole-preventer-x-1":284,"trainer-armour-heel-hole-preventer-x-1":285,
-    "butt-napkins-box-of-30":286,"high-5-energy-gel-aqua-caffeine-x-20":287,
-    "longsleeve-neoprene-baselayer":288,"sporttape-x-k-tape":289,
-    "womens-ascend-sleeveless-wetsuit-ss26":309,"mens-aspire-wetsuit-new-2026":310,
-    "womens-aspire-wetsuit-new-2026":311,"womens-classic-swimsuit-ss26-teal":312,
-    "womens-classic-swimsuit-ss26-black":313,"heat-tech-dura-swim-boot-ss26":314,
-    "mens-ascend-sleeveless-wetsuit-ss26":315,
-    // WooCommerce slug variants (different naming conventions)
-    "igpsbsc200s-bike-computer":62,"saltstick-fastchews-10-chew-packs-box-of-12":43,
-    "trainer-armour-big-toe-hole-preventer-x-5":284,"trainer-armour-heel-hole-preventer-x-5":285,
-    "clif-shot-bloks-18-x-60g":16,"mens-azure-2-0-wetsuit":194,"mens-venture-wetsuit-black-orange":182,
-    "womens-ows-renew-high-neck-costume-cosmic-2-0":263,"womens-yulex-long-sleeve-suit":241,
-    "igsport-tl30-rear-light":73,"recycled-swim-safety-buoy-tow-float":216,
-    "beet-it-nitrate-400-concentrated-beetroot-shot-15-x-70ml":2,
-    "large-mesh-training-bag":171,"elastic-shoe-laces-for-fast-transitions":155,
-    "waist-belt-leash-set":131,"tow-donut":214,"saltstick-fastchews-60-tables":44,
-    "100-natural-glide":269,"clif-bar-12-x-68g":13,"powerbar-hydro-gel-box-67ml-x-24":30
-  };
-
-  // ── 2. /product-category/SLUG → shop.html filters ──────────────────
-  var CATEGORIES = {
-    "tailwind":           "shop.html?brand=Tailwind",
-    "salt-stick":         "shop.html?brand=SaltStick",
-    "beet-it-shots":      "shop.html?brand=Beet+It",
-    "saltstick":          "shop.html?brand=SaltStick",
-    "power-bar":          "shop.html?brand=PowerBar",
-    "powerbar":           "shop.html?brand=PowerBar",
-    "clif-bar":           "shop.html?brand=Clif+Bar",
-    "high-5":             "shop.html?brand=High5",
-    "nuun-electrolyte":   "shop.html?brand=Nuun",
-    "zone-3":             "shop.html?brand=Zone3",
-    "zone3":              "shop.html?brand=Zone3",
-    "spatzwear":          "shop.html?brand=Spatzwear",
-    "igpsport":           "shop.html?brand=iGPSPORT",
-    "igsport":            "shop.html?brand=iGPSPORT",
-    "swim-secure":        "shop.html?brand=Swim+Secure",
-    "sports-nuitrition":  "shop.html",
-    "sports-nutrition":   "shop.html",
-    "accessories":        "shop.html",
-    "swimming-watersports":"shop.html",
-    "mens-swim-wear":     "shop.html",
-    "butt-napkins":       "shop.html",
-    "sporttape-x":        "shop.html",
-    "high-5":             "shop.html?brand=High5"
-  };
-
-  // ── 3. Exact legacy path rewrites ──────────────────────────────────
-  var EXACT = {
-    "/wholesale":                 "/b2b/landing.html",
-    "/wholesale-log-in-page":     "/b2b/portal.html",
-    "/wholesale-ordering":        "/b2b/landing.html",
-    "/sign-in-s.php":             "/account.html",
-    "/view-cats.php":             "/categories.html",
-    "/home":                      "/",
-    "/shop":                      "/shop.html",
-    "/products":                  "/shop.html",
-    "/cart":                      "/cart.html",
-    "/index.php":                 "/",
-    "/home/index.html":           "/"
-  };
-
-  function redirect(url) {
-    // Always use absolute root-relative paths to avoid sub-path loops
-    if (url && url.charAt(0) !== '/' && url.charAt(0) !== 'h') {
-      url = '/' + url;
-    }
-    window.location.replace(url);
-  }
-
-  // Check exact matches first
-  if (EXACT[path]) { redirect(EXACT[path]); return; }
-
-  // Check /product/SLUG — strip any sub-path after the slug
-  var productMatch = path.match(/^\/product\/([^\/]+)/);
-  if (productMatch) {
-    var slug = productMatch[1].replace(/\/$/, '');
-    var id = PRODUCTS[slug];
-    if (id) {
-      redirect('/produto.html?id=' + id);
-      return;
-    }
-    // Fallback: search by slug keywords
-    redirect('/shop.html?search=' + encodeURIComponent(slug.replace(/-/g,' ')));
-    return;
-  }
-
-  // Check /product-category/SLUG
-  var catMatch = path.match(/^\/product-category\/([^\/]+)/);
-  if (catMatch) {
-    var cat = catMatch[1].replace(/\/$/, '');
-    var dest = CATEGORIES[cat];
-    if (!dest) {
-      var segments = path.replace('/product-category/','').split('/');
-      for (var i = 0; i < segments.length; i++) {
-        if (CATEGORIES[segments[i]]) { dest = CATEGORIES[segments[i]]; break; }
-      }
-    }
-    redirect(dest || '/shop.html');
-    return;
-  }
-
-  // /product-category/brand/page/N → shop.html
-  if (path.startsWith('/product-category/')) {
-    redirect('/shop.html');
-    return;
-  }
-
-})();
 </script>
 </body>
 </html>

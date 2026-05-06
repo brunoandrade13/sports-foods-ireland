@@ -156,10 +156,14 @@
 
   // ---- Time on Page ----
   const pageStartTime = Date.now();
+  let _pageViewSent = false; // guard: prevent double-insert
 
   // ---- Track Page View (on unload to capture time + scroll) ----
   function sendPageView() {
-    const timeOnPage = Math.round((Date.now() - pageStartTime) / 1000);
+    if (_pageViewSent) return;
+    _pageViewSent = true;
+    // Cap at 1800s (30 min) — prevents overnight-open tabs from skewing averages
+    const timeOnPage = Math.min(Math.round((Date.now() - pageStartTime) / 1000), 1800);
     const utm = getUTM();
     const data = {
       session_id: getSessionId(),
@@ -214,11 +218,13 @@
   // ---- Initialize ----
   incrementVisitCount();
 
-  // Send page view on unload (captures final time + scroll)
+  // Send page view on tab close / navigate away (beforeunload)
   window.addEventListener('beforeunload', sendPageView);
 
-  // Also send after 30s in case user stays long (backup)
-  setTimeout(function() { sendPageView(); }, 30000);
+  // visibilitychange fires on mobile when app is backgrounded — more reliable than beforeunload
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') sendPageView();
+  });
 
   // Track initial page load as funnel step
   const pt = detectPageType();

@@ -10,6 +10,24 @@
     function fmt(n) { return '€' + Number(n).toFixed(2); }
     let step = 1;
     let checkoutData = { contact: {}, shipping: {}, payment: {} };
+
+    // ── Persist checkout progress across refreshes / back-button (Fix: conversion) ──
+    (function restoreCheckoutProgress() {
+        try {
+            const saved = sessionStorage.getItem('sfi_ck_progress');
+            if (saved) {
+                const p = JSON.parse(saved);
+                if (p.checkoutData) checkoutData = p.checkoutData;
+                if (p.step && p.step > 1) step = p.step;
+            }
+        } catch(e) {}
+    })();
+    function saveCheckoutProgress() {
+        try { sessionStorage.setItem('sfi_ck_progress', JSON.stringify({ step, checkoutData })); } catch(e) {}
+    }
+    function clearCheckoutProgress() {
+        try { sessionStorage.removeItem('sfi_ck_progress'); } catch(e) {}
+    }
     let appliedCoupon = null;
 
     // === PII localStorage TTL helpers (GDPR / security) ===
@@ -146,7 +164,21 @@
         </div>
         <div class="summary-row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
         ${discount > 0 ? `<div class="summary-row" style="color:#16a34a"><span>Discount</span><span>-${fmt(discount)}</span></div>` : ''}
-        <div class="summary-row"><span>Shipping</span><span>${shipCost === 0 ? 'FREE' : fmt(shipCost)}</span></div>
+        ${(() => {
+            const remain = freeShipMin - subtotal;
+            if (shipCost === 0) {
+                return `<div class="summary-row" style="color:#16a34a;font-size:13px"><span>🎉 Free Shipping</span><span>€0.00</span></div>`;
+            } else {
+                const pct = Math.round((subtotal / freeShipMin) * 100);
+                return `<div style="margin:6px 0 10px">
+                    <div style="font-size:12px;color:#636E72;margin-bottom:4px">Add <strong style="color:#16a34a">${fmt(remain)}</strong> more for FREE shipping</div>
+                    <div style="background:#e5e7eb;border-radius:6px;height:6px;overflow:hidden">
+                        <div style="width:${Math.min(pct,99)}%;background:#16a34a;height:100%;border-radius:6px;transition:width .3s"></div>
+                    </div>
+                </div>
+                <div class="summary-row"><span>Shipping</span><span>${fmt(shipCost)}</span></div>`;
+            }
+        })()}
         <div class="summary-row summary-total">
             <span>Total</span>
             <span style="text-align:right">
@@ -327,7 +359,7 @@
                     email: document.getElementById('ckEmail').value.trim(),
                     phone: document.getElementById('ckPhone').value.trim()
                 };
-                step = 2; renderCheckout();
+                step = 2; saveCheckoutProgress(); renderCheckout();
             } else if (step === 2) {
                 checkoutData.shipping = {
                     addr1: document.getElementById('ckAddr1').value.trim(),
@@ -336,7 +368,7 @@
                     postcode: document.getElementById('ckPostcode').value.trim(),
                     country: document.getElementById('ckCountry').value
                 };
-                step = 3; renderCheckout();
+                step = 3; saveCheckoutProgress(); renderCheckout();
             } else if (step === 3) {
                 placeOrder();
             }
@@ -532,7 +564,27 @@
     }
 
     // ---- Shared success screen ----
-    function showPaymentSuccess(provider, captureId) {
+    function showPaymentSuccess(provider, captureId, orderTotal) {
+        // ── Fire conversion events (Fix: purchasing_sessions = 0) ──
+        clearCheckoutProgress();
+        if (typeof window.sfiTrackFunnel === 'function') {
+            window.sfiTrackFunnel('purchase', {
+                payment_method: provider,
+                value: orderTotal || null
+            });
+        }
+        // GA4 purchase event
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'purchase', {
+                currency: 'EUR',
+                value: orderTotal || 0,
+                transaction_id: captureId || ('ORD-' + Date.now())
+            });
+        }
+        // TikTok CompletePayment pixel
+        if (typeof ttq !== 'undefined') {
+            ttq.track('CompletePayment', { value: orderTotal || 0, currency: 'EUR' });
+        }
         container.innerHTML = `
         <div class="ck-confirmation">
             <div class="ck-check">✓</div>
@@ -581,10 +633,14 @@
                 .then(r => r.json())
                 .then(data => {
                     if (data.status === 'COMPLETED') {
+                        const ppCart = getCart();
+                        const ppTotal = ppCart.reduce
+                            ? ppCart.reduce((s, i) => s + Number(i.preco) * (i.quantidade || 1), 0)
+                            : (ppData.items || []).reduce((s, i) => s + Number(i.price || 0) * (i.quantity || 1), 0);
                         localStorage.setItem('cart', '[]');
                         localStorage.removeItem('sfi_paypal_checkout');
                         if (typeof updateCartCount === 'function') updateCartCount();
-                        showPaymentSuccess('PayPal', data.capture_id);
+                        showPaymentSuccess('PayPal', data.capture_id, ppTotal);
                     } else {
                         container.innerHTML = `
                         <div class="ck-confirmation" style="text-align:center;padding:60px 20px;">
@@ -612,9 +668,13 @@
             }
 
             // Stripe success (or PayPal without token — fallback)
+            const cartBeforeClear = getCart();
+            const totalBeforeClear = cartBeforeClear.reduce
+                ? cartBeforeClear.reduce((s, i) => s + Number(i.preco) * (i.quantidade || 1), 0)
+                : 0;
             localStorage.setItem('cart', '[]');
             if (typeof updateCartCount === 'function') updateCartCount();
-            showPaymentSuccess(isPayPal ? 'PayPal' : 'Stripe');
+            showPaymentSuccess(isPayPal ? 'PayPal' : 'Stripe', null, totalBeforeClear);
             return true;
         }
 
@@ -716,8 +776,18 @@
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.error || 'Order creation failed');
 
+        const b2bTotal = items.reduce((s, i) => s + Number(i.price || 0) * (i.quantity || 1), 0);
         localStorage.removeItem('cart');
         if (typeof window.updateCartCount === 'function') window.updateCartCount();
+        clearCheckoutProgress();
+
+        // Fire purchase events (Fix: purchasing_sessions)
+        if (typeof window.sfiTrackFunnel === 'function') {
+            window.sfiTrackFunnel('purchase', { payment_method: method, value: b2bTotal, order_number: data.order_number });
+        }
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'purchase', { currency: 'EUR', value: b2bTotal, transaction_id: data.order_number || ('B2B-' + Date.now()) });
+        }
 
         const methodLabel = data.payment_method || (method === 'net30' ? 'Net 30 (Invoice)' : 'Cash on Delivery');
         const successMsg = method === 'net30'
