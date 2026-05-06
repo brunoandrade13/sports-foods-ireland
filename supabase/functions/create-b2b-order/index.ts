@@ -144,11 +144,22 @@ Deno.serve(async (req: Request) => {
     // ── Fim da validação de variantes ─────────────────────────────────────────
     let customerId: string | null = null;
     let isVatExempt = false;
+    let groupEmail: string | null = null;
     if (email) {
-      const { data: custRow } = await sb.from("customers").select("id, tax_exempt").eq("email", email.trim().toLowerCase()).limit(1).single();
+      const { data: custRow } = await sb.from("customers")
+        .select("id, tax_exempt, parent_customer_id")
+        .eq("email", email.trim().toLowerCase()).limit(1).single();
       if (custRow) {
         customerId = custRow.id;
         isVatExempt = !!custRow.tax_exempt;
+        // If this customer belongs to a group, fetch the group email for CC
+        if (custRow.parent_customer_id) {
+          const { data: groupRow } = await sb.from("customers")
+            .select("email")
+            .eq("id", custRow.parent_customer_id)
+            .single();
+          if (groupRow?.email) groupEmail = groupRow.email.split(",")[0].trim();
+        }
       }
     }
 
@@ -289,7 +300,13 @@ Deno.serve(async (req: Request) => {
         const html = buildEmail({ firstName: contact?.firstName || "Customer", orderId, date: new Date().toLocaleDateString("en-IE"), total: totalWithVat.toFixed(2), method: methodLabel, itemsHtml });
         await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST", headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json" },
-          body: JSON.stringify({ sender: { name: "Sports Foods Ireland", email: "noreply@sportsfoodsireland.ie" }, to: [{ email, name: customerName }], subject: `Order Confirmed #${orderId} \u2705`, htmlContent: html }),
+          body: JSON.stringify({
+            sender: { name: "Sports Foods Ireland", email: "noreply@sportsfoodsireland.ie" },
+            to: [{ email, name: customerName }],
+            ...(groupEmail && groupEmail !== email ? { cc: [{ email: groupEmail, name: "Head Office" }] } : {}),
+            subject: `Order Confirmed #${orderId} \u2705`,
+            htmlContent: html
+          }),
         });
       } catch (e) { console.warn("[b2b] email:", e); }
     }
