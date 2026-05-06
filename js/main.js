@@ -2548,6 +2548,9 @@ function showCookieBanner() {
 function acceptCookies() {
     localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted');
     hideCookieBanner();
+    // Load TikTok pixel now that user has consented
+    if (typeof window._loadTikTokPixel === 'function') window._loadTikTokPixel();
+    window.dispatchEvent(new Event('sfi:cookies-accepted'));
 }
 
 function declineCookies() {
