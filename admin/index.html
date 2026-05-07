@@ -13061,18 +13061,24 @@ Loading items...
           const isDelivery = !!i.is_gls_delivery;
           const isFreeGift = !!i.is_free_gift;
           // Detect backorder: check product stock in allProducts cache
+          // Only mark as backorder if product explicitly has backorder_available = true AND stock = 0
           let isBackorder = false;
           if (!isDelivery && !isFreeGift) {
             const pRef = (allProducts || []).find(function(x) { return x.id === i.product_id; });
-            if (pRef) {
+            if (pRef && pRef.backorder_available === true) {
               let stock = 0;
               if (i.variant_id) {
-                const vRef = (pRef.variantes || []).flatMap(g => g.options || g.opcoes || []).find(function(v) { return v.id === i.variant_id; });
-                stock = vRef ? (Number(vRef.stock) || 0) : (Number(pRef.stock || 0));
+                // Check variant stock from product_variants array
+                const variants = pRef.product_variants || pRef.variantes || [];
+                const allVars = Array.isArray(variants) && variants.length > 0 && variants[0].options
+                  ? variants.flatMap(function(g) { return g.options || g.opcoes || []; })
+                  : variants;
+                const vRef = allVars.find(function(v) { return v.id === i.variant_id; });
+                stock = vRef ? (Number(vRef.stock) || 0) : (Number(pRef.stock_quantity) || 0);
               } else {
-                stock = Number(pRef.stock || pRef.stock_quantity || 0);
+                stock = Number(pRef.stock_quantity) || 0;
               }
-              if (stock <= 0 && (pRef.backorder_available || pRef.manages_stock !== false)) isBackorder = true;
+              if (stock <= 0) isBackorder = true;
             }
           }
           const nameHtml = isDelivery
@@ -13275,27 +13281,21 @@ Loading items...
             const lineTotal = i.unit_price * i.qty;
             const baseName = isGls ? 'GLS Delivery' : (i.name ? i.name.split(' — ')[0] : (p.name || 'Product'));
 
-            // Determine if this item is a backorder based on current stock
+            // Determine if this item is a backorder — ONLY if product explicitly has backorder_available = true
             let isBackorder = false;
-            if (!isGls) {
-              let availableStock = null;
+            if (!isGls && p.backorder_available === true) {
+              let availableStock = 0;
               if (i.variant_id) {
-                // Check variant stock
-                const variant = (p.product_variants || []).find(function(v) { return v.id === i.variant_id; });
-                availableStock = variant ? (Number(variant.stock) || 0) : null;
-                // Fallback: fetch from allProducts variant data
-                if (availableStock === null) {
-                  const pFull = (allProducts || []).find(function(x) { return x.id === i.product_id; });
-                  const vFull = (pFull?.variantes || []).flatMap(g => g.options || g.opcoes || []).find(function(v) { return v.id === i.variant_id; });
-                  if (vFull) availableStock = Number(vFull.stock) || 0;
-                }
+                const variants = p.product_variants || p.variantes || [];
+                const allVars = Array.isArray(variants) && variants.length > 0 && variants[0].options
+                  ? variants.flatMap(function(g) { return g.options || g.opcoes || []; })
+                  : variants;
+                const vRef = allVars.find(function(v) { return v.id === i.variant_id; });
+                availableStock = vRef ? (Number(vRef.stock) || 0) : (Number(p.stock_quantity) || 0);
               } else {
-                availableStock = Number(p.stock || p.stock_quantity || 0);
+                availableStock = Number(p.stock_quantity) || 0;
               }
-              // Mark as backorder if stock is 0 or less, and product allows backorder
-              if (availableStock !== null && availableStock <= 0 && (p.backorder_available || p.manages_stock !== false)) {
-                isBackorder = true;
-              }
+              if (availableStock <= 0) isBackorder = true;
             }
 
             await supaInsert('order_items', {
