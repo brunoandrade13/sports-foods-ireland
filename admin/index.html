@@ -13060,31 +13060,10 @@ Loading items...
           const line = i.unit_price * i.qty;
           const isDelivery = !!i.is_gls_delivery;
           const isFreeGift = !!i.is_free_gift;
-          // Detect backorder: check product stock in allProducts cache
-          // Only mark as backorder if product explicitly has backorder_available = true AND stock = 0
-          let isBackorder = false;
-          if (!isDelivery && !isFreeGift) {
-            const pRef = (allProducts || []).find(function(x) { return x.id === i.product_id; });
-            if (pRef && pRef.backorder_available === true) {
-              let stock = 0;
-              if (i.variant_id) {
-                // Check variant stock from product_variants array
-                const variants = pRef.product_variants || pRef.variantes || [];
-                const allVars = Array.isArray(variants) && variants.length > 0 && variants[0].options
-                  ? variants.flatMap(function(g) { return g.options || g.opcoes || []; })
-                  : variants;
-                const vRef = allVars.find(function(v) { return v.id === i.variant_id; });
-                stock = vRef ? (Number(vRef.stock) || 0) : (Number(pRef.stock_quantity) || 0);
-              } else {
-                stock = Number(pRef.stock_quantity) || 0;
-              }
-              if (stock <= 0) isBackorder = true;
-            }
-          }
           const nameHtml = isDelivery
             ? `<span style="color:#92400e;font-weight:700">🚚 ${esc(i.name)}</span><div style="font-size:0.72rem;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;display:inline-block;margin-top:2px">Delivery Charge</div>`
-            : `${esc(i.name)}${i.variant_label ? `<span style="font-size:0.8rem;color:var(--accent);font-weight:600"> — ${esc(i.variant_label)}</span>` : ''}${isFreeGift ? `<span style="font-size:0.72rem;background:rgba(34,197,94,0.15);color:#22c55e;border-radius:4px;padding:1px 6px;display:inline-block;margin-left:6px;font-weight:700">🎁 FREE GIFT</span>` : ''}${isBackorder ? `<span style="font-size:0.72rem;background:rgba(220,38,38,0.15);color:#dc2626;border-radius:4px;padding:1px 6px;display:inline-block;margin-left:6px;font-weight:700">⚠️ BACKORDER</span>` : ''}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div>`;
-          const rowStyle = isDelivery ? ' style="background:rgba(245,158,11,0.06)"' : isFreeGift ? ' style="background:rgba(34,197,94,0.05)"' : isBackorder ? ' style="background:rgba(220,38,38,0.04)"' : '';
+            : `${esc(i.name)}${i.variant_label ? `<span style="font-size:0.8rem;color:var(--accent);font-weight:600"> — ${esc(i.variant_label)}</span>` : ''}${isFreeGift ? `<span style="font-size:0.72rem;background:rgba(34,197,94,0.15);color:#22c55e;border-radius:4px;padding:1px 6px;display:inline-block;margin-left:6px;font-weight:700">🎁 FREE GIFT</span>` : ''}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div>`;
+          const rowStyle = isDelivery ? ' style="background:rgba(245,158,11,0.06)"' : isFreeGift ? ' style="background:rgba(34,197,94,0.05)"' : '';
           return `<tr data-idx="${idx}"${rowStyle}>
             <td>${nameHtml}</td>
             <td style="text-align:right">
