@@ -17873,7 +17873,7 @@ html += '</div>';
 html += '<div style="padding:20px">';
 accounts.forEach(function(acc, ai) {
 var isMain = ai === 0;
-var border = isMain ? 'background:#f0fdf4' : 'border-left:3px solid var(--border)';
+var border = isMain ? 'border:1px solid var(--accent);border-left:3px solid var(--accent)' : 'border-left:3px solid var(--border)';
 html += '<div style="background:var(--surface-2);border-radius:8px;padding:16px;margin-bottom:12px;' + border + '">';
 // Header row
 html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
@@ -17886,18 +17886,18 @@ html += '</div></div>';
 
 // Editable fields - row 1: First Name + Last Name
 html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
-html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">First Name</label><input type="text" data-cid="' + acc.customer_id + '" data-field="first_name" value="' + esc(acc.first_name || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.9rem"></div>';
-html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Last Name</label><input type="text" data-cid="' + acc.customer_id + '" data-field="last_name" value="' + esc(acc.last_name || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.9rem"></div>';
+html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">First Name</label><input type="text" data-cid="' + acc.customer_id + '" data-field="first_name" value="' + esc(acc.first_name || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem"></div>';
+html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Last Name</label><input type="text" data-cid="' + acc.customer_id + '" data-field="last_name" value="' + esc(acc.last_name || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.9rem"></div>';
 html += '</div>';
 // Row 2: Email + Company
 html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">';
-html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Email</label><input type="text" data-cid="' + acc.customer_id + '" data-field="email" value="' + esc(acc.email || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.85rem"></div>';
-html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Company</label><input type="text" data-cid="' + acc.customer_id + '" data-field="b2b_company_name" value="' + esc(acc.b2b_company_name || acc.company || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.85rem"></div>';
+html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Email</label><input type="text" data-cid="' + acc.customer_id + '" data-field="email" value="' + esc(acc.email || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem"></div>';
+html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Company</label><input type="text" data-cid="' + acc.customer_id + '" data-field="b2b_company_name" value="' + esc(acc.b2b_company_name || acc.company || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem"></div>';
 html += '</div>';
 // Row 3: VAT + Customer Type
 html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">';
-html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">VAT Number</label><input type="text" data-cid="' + acc.customer_id + '" data-field="b2b_vat_number" value="' + esc(acc.b2b_vat_number || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.85rem"></div>';
-html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Customer Type</label><select data-cid="' + acc.customer_id + '" data-field="customer_type" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text);font-size:0.85rem"><option value="b2b"' + (acc.customer_type === 'b2b' ? ' selected' : '') + '>B2B (Wholesale)</option><option value="b2c"' + (acc.customer_type === 'b2c' ? ' selected' : '') + '>B2C (Retail)</option></select></div>';
+html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">VAT Number</label><input type="text" data-cid="' + acc.customer_id + '" data-field="b2b_vat_number" value="' + esc(acc.b2b_vat_number || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem"></div>';
+html += '<div><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px">Customer Type</label><select data-cid="' + acc.customer_id + '" data-field="customer_type" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem"><option value="b2b"' + (acc.customer_type === 'b2b' ? ' selected' : '') + '>B2B (Wholesale)</option><option value="b2c"' + (acc.customer_type === 'b2c' ? ' selected' : '') + '>B2C (Retail)</option></select></div>';
 html += '</div>';
 html += '</div>'; // close card
 });
