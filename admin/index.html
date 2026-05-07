@@ -4963,21 +4963,13 @@ Loading items...
     style="padding:5px 10px;font-size:0.78rem;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;border-radius:6px">Clear</button>
 </div>
 <!-- Observations field — appears in QB invoice CustomerMemo -->
-<div style="margin-bottom:12px">
-  <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);display:block;margin-bottom:5px">
-    Observações <span style="opacity:0.5;font-weight:400;text-transform:none">(aparece no final da invoice)</span>
-  </label>
+<div style="margin:12px 0">
+  <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);display:block;margin-bottom:5px">Observações <span style="opacity:0.5;font-weight:400;text-transform:none">(aparece no final da invoice)</span></label>
   <div style="display:flex;gap:8px;align-items:flex-start">
-    <textarea id="omOrderNotes" rows="2"
-      placeholder="Número PO, instruções especiais, observações para o cliente…"
-      style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem;resize:vertical;min-height:52px"></textarea>
-    <button class="btn btn-outline" onclick="saveOrderNotes()" id="btnSaveOrderNotes"
-      style="padding:8px 14px;font-size:0.82rem;white-space:nowrap;flex-shrink:0">
-      💾 Save Notes
-    </button>
+    <textarea id="omOrderNotes" rows="2" placeholder="Número PO, instruções especiais, observações para o cliente…" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);font-size:0.85rem;resize:vertical;min-height:52px"></textarea>
+    <button class="btn btn-outline" onclick="saveOrderNotes()" id="btnSaveOrderNotes" style="padding:8px 14px;font-size:0.82rem;white-space:nowrap;flex-shrink:0">💾 Save</button>
   </div>
 </div>
-
 <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center">
 <button class="btn btn-outline" style="border-color:#f59e0b;color:#f59e0b;margin-right:auto" id="btnEditItems" onclick="toggleOrderEditMode()">✏️ Edit Items</button>
 <button class="btn btn-primary" id="btnSaveItemEdits" style="display:none;background:#f59e0b;border-color:#f59e0b;color:#000" onclick="saveOrderItemEdits().catch(e => alert('ERROR: ' + e.message))">💾 Save Changes</button>
