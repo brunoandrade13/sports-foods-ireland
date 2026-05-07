@@ -194,6 +194,8 @@ Deno.serve(async (req: Request) => {
               .eq("id", existing.id);
 
             // Delete old items and re-sync to ensure correct descriptions/links
+            // NOTE: We do NOT delete inventory_movements — QB orders never decrement
+            // stock (handled by fn_decrement_stock_on_item_insert which skips QB source)
             await supabase
               .from("order_items")
               .delete()
