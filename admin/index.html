@@ -1360,6 +1360,8 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<!-- Supabase JS SDK for Realtime subscriptions -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 
 <body>
@@ -1370,6 +1372,10 @@ href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&fa
 <div class="login-box">
 <h1><span class="logo">⚡</span> SFI Admin</h1>
 <p class="subtitle">Sports Foods Ireland — Back Office</p>
+<div style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:0.72rem;color:var(--text-muted)">
+  <span id="realtimeDot" style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;transition:background 0.5s" title="Live updates: connecting..."></span>
+  <span id="realtimeLabel">Connecting...</span>
+</div>
 <div class="error" id="loginError"></div>
 <label>Email</label>
 <input type="email" id="loginEmail" placeholder="admin@sportsfoodsireland.ie" autocomplete="email">
@@ -5034,6 +5040,105 @@ Loading items...
 
     const DEV_MODE = false; // SECURITY: Must be false in production
 
+    // ============================================================
+    // SUPABASE REALTIME — live updates without page refresh
+    // ============================================================
+    let _supabaseClient = null;
+    let _realtimeChannel = null;
+    let _realtimeToastTimeout = null;
+
+    function initRealtime() {
+      if (!window.supabase) return;
+      try {
+        _supabaseClient = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+        _realtimeChannel = _supabaseClient
+          .channel('sfi-admin-live')
+
+          // ── Orders: new order arrives ──────────────────────────
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, function(payload) {
+            const newOrder = payload.new;
+            // Prepend to allOrders so it appears at the top
+            if (!allOrders.find(o => o.id === newOrder.id)) {
+              allOrders.unshift(newOrder);
+              filteredOrders = [...allOrders];
+              if (_renderedPages.has('orders')) renderOrders();
+              if (_renderedPages.has('dashboard')) renderDashboard();
+              // Update pending count badge
+              const pendOrd = allOrders.filter(o => o.fulfillment_status === 'unfulfilled').length;
+              const el = document.getElementById('pendingOrderCount');
+              if (el) { el.textContent = pendOrd; el.style.display = pendOrd > 0 ? 'inline' : 'none'; }
+              showRealtimeToast('🛒 New order: ' + (newOrder.order_number || '') + ' — ' + (newOrder.customer_name || ''));
+            }
+          })
+
+          // ── Orders: order updated ──────────────────────────────
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, function(payload) {
+            const updated = payload.new;
+            const idx = allOrders.findIndex(o => o.id === updated.id);
+            if (idx >= 0) {
+              allOrders[idx] = { ...allOrders[idx], ...updated };
+              filteredOrders = [...allOrders];
+              if (_renderedPages.has('orders')) renderOrders();
+              // Also update the open modal if it's showing this order
+              if (window._currentModalOrder && window._currentModalOrder.id === updated.id) {
+                window._currentModalOrder = { ...window._currentModalOrder, ...updated };
+              }
+            }
+          })
+
+          // ── Customers: customer updated or created ─────────────
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'customers' }, function(payload) {
+            const newCust = payload.new;
+            if (!allCustomers.find(c => c.id === newCust.id)) {
+              allCustomers.unshift(newCust);
+              if (_renderedPages.has('customers')) renderCustomers();
+            }
+          })
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'customers' }, function(payload) {
+            const updated = payload.new;
+            const idx = allCustomers.findIndex(c => c.id === updated.id);
+            if (idx >= 0) {
+              allCustomers[idx] = { ...allCustomers[idx], ...updated };
+              if (_renderedPages.has('customers')) renderCustomers();
+              // Update the customer profile modal if it's open for this customer
+              if (window._currentProfileCustomerId === updated.id) {
+                const nameEl = document.getElementById('cpName');
+                if (nameEl) nameEl.textContent = updated.name || updated.email || '';
+              }
+            }
+          })
+
+          .subscribe(function(status) {
+            console.log('[Realtime] status:', status);
+            const dot = document.getElementById('realtimeDot');
+            const label = document.getElementById('realtimeLabel');
+            if (status === 'SUBSCRIBED') {
+              if (dot) { dot.style.background = '#22c55e'; dot.title = 'Live updates active'; }
+              if (label) label.textContent = 'Live';
+            } else if (status === 'CHANNEL_ERROR' || status === 'CLOSED') {
+              if (dot) { dot.style.background = '#ef4444'; dot.title = 'Live updates: ' + status; }
+              if (label) label.textContent = 'Offline';
+            } else {
+              if (dot) { dot.style.background = '#f59e0b'; dot.title = 'Live updates: ' + status; }
+              if (label) label.textContent = 'Connecting...';
+            }
+          });
+
+        console.log('[Realtime] channel subscribed');
+      } catch(e) {
+        console.warn('[Realtime] init failed:', e);
+      }
+    }
+
+    function showRealtimeToast(msg) {
+      clearTimeout(_realtimeToastTimeout);
+      const t = document.createElement('div');
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;background:#1e293b;color:#fff;padding:12px 18px;border-radius:10px;font-size:0.85rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.3);border-left:4px solid #22c55e;max-width:320px;animation:slideInRight 0.3s ease;pointer-events:none';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      _realtimeToastTimeout = setTimeout(function() { t.remove(); }, 4000);
+    }
+
     // State
     let allProducts = [], filteredProducts = [];
     let allVendors = [];
@@ -5208,6 +5313,8 @@ Loading items...
       if (appEl) appEl.style.display = 'grid';
       if (userEl) userEl.textContent = localStorage.getItem('sfi_admin_email') || 'Admin';
       loadAllData();
+      // Start Realtime subscriptions after login
+      setTimeout(initRealtime, 1000);
     }
 
     function getAuthHeaders() {
