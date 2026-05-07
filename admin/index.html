@@ -15061,9 +15061,9 @@ const order = allOrders.find(o => String(o.order_number) === orderRef || String(
 if (!order) return alert('Order not found: ' + orderRef);
 let allItems = [];
 try {
-  // Fetch only items to be shipped (is_backorder=false OR is_backorder is null)
-  // Use fulfillment_status != backorder as secondary filter to catch all non-backorder items
-  allItems = await supaGet('order_items', `?order_id=eq.${order.id}&fulfillment_status=neq.backorder&select=id,product_name,product_sku,sku,quantity,unit_price,total_price,variant_label,is_backorder,fulfillment_status`);
+  // Fetch items to ship: exclude backorder items. Must use OR to include NULL fulfillment_status
+  // because PostgREST 'neq.backorder' excludes NULL values (SQL: NULL != 'x' = NULL, not TRUE)
+  allItems = await supaGet('order_items', `?order_id=eq.${order.id}&or=(fulfillment_status.neq.backorder,fulfillment_status.is.null)&select=id,product_name,product_sku,sku,quantity,unit_price,total_price,variant_label,is_backorder,fulfillment_status`);
   // Extra safety: exclude any that still have is_backorder=true
   allItems = (allItems || []).filter(function(i) { return i.is_backorder !== true; });
 } catch(e) { console.error(e); }
