@@ -13060,10 +13060,25 @@ Loading items...
           const line = i.unit_price * i.qty;
           const isDelivery = !!i.is_gls_delivery;
           const isFreeGift = !!i.is_free_gift;
+          // Detect backorder: check product stock in allProducts cache
+          let isBackorder = false;
+          if (!isDelivery && !isFreeGift) {
+            const pRef = (allProducts || []).find(function(x) { return x.id === i.product_id; });
+            if (pRef) {
+              let stock = 0;
+              if (i.variant_id) {
+                const vRef = (pRef.variantes || []).flatMap(g => g.options || g.opcoes || []).find(function(v) { return v.id === i.variant_id; });
+                stock = vRef ? (Number(vRef.stock) || 0) : (Number(pRef.stock || 0));
+              } else {
+                stock = Number(pRef.stock || pRef.stock_quantity || 0);
+              }
+              if (stock <= 0 && (pRef.backorder_available || pRef.manages_stock !== false)) isBackorder = true;
+            }
+          }
           const nameHtml = isDelivery
             ? `<span style="color:#92400e;font-weight:700">🚚 ${esc(i.name)}</span><div style="font-size:0.72rem;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;display:inline-block;margin-top:2px">Delivery Charge</div>`
-            : `${esc(i.name)}${i.variant_label ? `<span style="font-size:0.8rem;color:var(--accent);font-weight:600"> — ${esc(i.variant_label)}</span>` : ''}${isFreeGift ? `<span style="font-size:0.72rem;background:rgba(34,197,94,0.15);color:#22c55e;border-radius:4px;padding:1px 6px;display:inline-block;margin-left:6px;font-weight:700">🎁 FREE GIFT</span>` : ''}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div>`;
-          const rowStyle = isDelivery ? ' style="background:rgba(245,158,11,0.06)"' : isFreeGift ? ' style="background:rgba(34,197,94,0.05)"' : '';
+            : `${esc(i.name)}${i.variant_label ? `<span style="font-size:0.8rem;color:var(--accent);font-weight:600"> — ${esc(i.variant_label)}</span>` : ''}${isFreeGift ? `<span style="font-size:0.72rem;background:rgba(34,197,94,0.15);color:#22c55e;border-radius:4px;padding:1px 6px;display:inline-block;margin-left:6px;font-weight:700">🎁 FREE GIFT</span>` : ''}${isBackorder ? `<span style="font-size:0.72rem;background:rgba(220,38,38,0.15);color:#dc2626;border-radius:4px;padding:1px 6px;display:inline-block;margin-left:6px;font-weight:700">⚠️ BACKORDER</span>` : ''}<div style="font-size:0.75rem;color:var(--text-muted);">${esc(i.sku || '')}</div>`;
+          const rowStyle = isDelivery ? ' style="background:rgba(245,158,11,0.06)"' : isFreeGift ? ' style="background:rgba(34,197,94,0.05)"' : isBackorder ? ' style="background:rgba(220,38,38,0.04)"' : '';
           return `<tr data-idx="${idx}"${rowStyle}>
             <td>${nameHtml}</td>
             <td style="text-align:right">
@@ -13259,6 +13274,30 @@ Loading items...
             const p = isGls ? {} : ((allProducts || []).find(function (x) { return x.id === i.product_id; }) || {});
             const lineTotal = i.unit_price * i.qty;
             const baseName = isGls ? 'GLS Delivery' : (i.name ? i.name.split(' — ')[0] : (p.name || 'Product'));
+
+            // Determine if this item is a backorder based on current stock
+            let isBackorder = false;
+            if (!isGls) {
+              let availableStock = null;
+              if (i.variant_id) {
+                // Check variant stock
+                const variant = (p.product_variants || []).find(function(v) { return v.id === i.variant_id; });
+                availableStock = variant ? (Number(variant.stock) || 0) : null;
+                // Fallback: fetch from allProducts variant data
+                if (availableStock === null) {
+                  const pFull = (allProducts || []).find(function(x) { return x.id === i.product_id; });
+                  const vFull = (pFull?.variantes || []).flatMap(g => g.options || g.opcoes || []).find(function(v) { return v.id === i.variant_id; });
+                  if (vFull) availableStock = Number(vFull.stock) || 0;
+                }
+              } else {
+                availableStock = Number(p.stock || p.stock_quantity || 0);
+              }
+              // Mark as backorder if stock is 0 or less, and product allows backorder
+              if (availableStock !== null && availableStock <= 0 && (p.backorder_available || p.manages_stock !== false)) {
+                isBackorder = true;
+              }
+            }
+
             await supaInsert('order_items', {
               order_id: ord.id,
               product_id: isGls ? null : i.product_id,
@@ -13271,7 +13310,10 @@ Loading items...
               sku: i.sku || p.sku || null,
               product_name: baseName,
               product_image_url: isGls ? null : (p.image_url || null),
-              requires_shipping: !isGls
+              requires_shipping: !isGls,
+              is_backorder: isBackorder,
+              backorder_status: isBackorder ? 'pending' : null,
+              fulfillment_status: isBackorder ? 'backorder' : null
             });
           }
         }
