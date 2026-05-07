@@ -14788,7 +14788,11 @@ window.confirmGLSShip = async function confirmGLSShip() {
   try {
     var resp = await fetch(SUPA_URL + '/functions/v1/gls-create-shipment', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + SUPA_KEY
+      },
       body: JSON.stringify({
         order_number:   order.order_number || order.id,
         recipient_name: recipientName,
