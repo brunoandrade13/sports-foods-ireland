@@ -145,6 +145,33 @@ Deno.serve(async (req: Request) => {
       }
     }
     // ── Fim da validação de variantes ─────────────────────────────────────────
+
+    // ── B2C Out of Stock check — backorder is B2B only ───────────────────────
+    // B2C customers cannot order products with stock=0, even if backorder_available=true
+    if (!is_b2b) {
+      const uuidRx2 = /^[0-9a-f]{8}-/i;
+      const allUuids = items.map((i: { id?: string | number }) => i.id)
+        .filter((id: unknown): id is string => typeof id === "string" && uuidRx2.test(id));
+      if (allUuids.length > 0) {
+        const { data: stockRows } = await supabase
+          .from("products")
+          .select("id, name, stock_quantity")
+          .in("id", allUuids);
+        const outOfStock = (stockRows || []).filter((p: { stock_quantity: number | null }) =>
+          p.stock_quantity !== null && Number(p.stock_quantity) <= 0
+        );
+        if (outOfStock.length > 0) {
+          const names = outOfStock.map((p: { name: string }) => `"${p.name}"`).join(", ");
+          console.error(`[create-checkout] B2C OUT OF STOCK BLOCKED: ${names}`);
+          return new Response(JSON.stringify({
+            error: `The following products are currently out of stock: ${names}. Please remove them from your cart.`,
+            out_of_stock_error: true
+          }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+      }
+    }
+    // ── Fim do check de stock B2C ─────────────────────────────────────────────
+
     const priceField = currency === "GBP" ? "price_gbp" : "price_eur";
     const itemIds = items
       .map((i: { id?: string | number }) => i.id)

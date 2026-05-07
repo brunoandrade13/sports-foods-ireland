@@ -148,6 +148,23 @@ function addToCart(productId, quantity = 1, productData = null, subscriptionData
         }
     }
 
+    // ============================================================
+    // B2C Out of Stock check — backorder is B2B only
+    // ============================================================
+    const isB2BUser = localStorage.getItem('sfi_is_b2b') === 'true' || window._isB2BCustomer === true;
+    if (!isB2BUser) {
+        const productCheck2 = product || resolveProduct(id);
+        if (productCheck2) {
+            const stockQty = productCheck2.stock_quantity ?? productCheck2.estoque ?? null;
+            if (stockQty !== null && Number(stockQty) <= 0) {
+                if (typeof showCartNotification === 'function') {
+                    showCartNotification('This product is currently out of stock.');
+                }
+                return;
+            }
+        }
+    }
+
     let cart = getCart();
     const existingItem = findCartItem(cart, id, incomingVariantId);
 

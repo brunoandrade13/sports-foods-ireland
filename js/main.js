@@ -2367,11 +2367,17 @@ function openQuickView(productId) {
         discountEl.style.display = 'none';
     }
 
-    // Handle stock status
+    // Handle stock status — backorder is B2B only, B2C sees Out of Stock
     const stockEl = document.getElementById('qvStock');
+    const isB2B = localStorage.getItem('sfi_is_b2b') === 'true' || window._isB2BCustomer === true;
     if (product.stock === 0) {
-        stockEl.className = 'qv-stock backorder';
-        stockEl.querySelector('.stock-text').textContent = 'Backorder Available';
+        if (isB2B && product.backorder_available) {
+            stockEl.className = 'qv-stock backorder';
+            stockEl.querySelector('.stock-text').textContent = 'Backorder Available';
+        } else {
+            stockEl.className = 'qv-stock out-of-stock';
+            stockEl.querySelector('.stock-text').textContent = 'Out of Stock';
+        }
     } else if (product.stock && product.stock < 5) {
         stockEl.className = 'qv-stock low-stock';
         stockEl.querySelector('.stock-text').textContent = `Only ${product.stock} left!`;
@@ -2703,13 +2709,22 @@ function initNewsletterPopup() {
 // STOCK INDICATOR FUNCTIONS
 // ============================================
 
-function getStockStatus(stock) {
+function getStockStatus(stock, backorderAvailable) {
     if (stock === 0 || stock === null || stock === undefined) {
-        return {
-            class: 'backorder',
-            text: 'Backorder Available',
-            showNotify: false
-        };
+        // Only B2B customers can backorder — B2C sees "Out of Stock"
+        if (backorderAvailable === true) {
+            return {
+                class: 'backorder',
+                text: 'Backorder Available',
+                showNotify: false
+            };
+        } else {
+            return {
+                class: 'out-of-stock',
+                text: 'Out of Stock',
+                showNotify: true
+            };
+        }
     } else if (stock <= 5) {
         return {
             class: 'low-stock',
@@ -2725,8 +2740,8 @@ function getStockStatus(stock) {
     }
 }
 
-function createStockIndicator(stock) {
-    const status = getStockStatus(stock);
+function createStockIndicator(stock, backorderAvailable) {
+    const status = getStockStatus(stock, backorderAvailable);
 
     let html = `
         <div class="stock-indicator ${status.class}">
@@ -2743,11 +2758,13 @@ function createStockIndicator(stock) {
     return html;
 }
 
-function createStockBadge(stock) {
-    const status = getStockStatus(stock);
+function createStockBadge(stock, backorderAvailable) {
+    const status = getStockStatus(stock, backorderAvailable);
 
     if (status.class === 'low-stock') {
         return `<span class="product-stock-badge low-stock">Only ${stock} left!</span>`;
+    } else if (status.class === 'out-of-stock') {
+        return `<span class="product-stock-badge out-of-stock">Out of Stock</span>`;
     } else if (status.class === 'backorder') {
         return `<span class="product-stock-badge backorder">📋 Backorder</span>`;
     }
