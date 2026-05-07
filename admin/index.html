@@ -13169,6 +13169,24 @@ Loading items...
           }
         }
         toast('Manual order created');
+        // Send customer confirmation email (same as website orders)
+        if (ord && ord.id && customer_email) {
+          fetch(SUPABASE_URL + '/functions/v1/send-customer-confirmation', {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_id: ord.id })
+          }).then(function(r) {
+            return r.json();
+          }).then(function(result) {
+            if (result.sent) {
+              toast('✉️ Confirmation email sent to ' + customer_email, 'success');
+            } else {
+              console.warn('[manual order] email not sent:', result.error);
+            }
+          }).catch(function(e) {
+            console.warn('[manual order] email error:', e);
+          });
+        }
         showPage('orders');
         manualOrderItems = [];
         cancelGlsDelivery();
