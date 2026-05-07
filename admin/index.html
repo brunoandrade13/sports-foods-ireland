@@ -14699,7 +14699,7 @@ window.openGLSShipModal = function openGLSShipModal() {
   var zipCode = addr.postcode || addr.postal_code || addr.zip || '';
   var country = addr.country_code || addr.country || 'IE';
   var phone   = addr.phone || bill.phone || order.customer_phone || '';
-  var email   = order.customer_email || bill.email || ship.email || addr.email || '';
+  var email   = (order.customer_email || bill.email || ship.email || addr.email || '').split(',')[0].trim();
   if (!email && order.customer_id) {
     var c2 = (allCustomers || []).find(function(c) { return c.id === order.customer_id; });
     if (c2 && c2.email) email = c2.email;
