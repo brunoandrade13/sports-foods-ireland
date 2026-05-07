@@ -13299,15 +13299,15 @@ Loading items...
         toast('Manual order created');
         // Fire both emails simultaneously (non-blocking)
         if (ord && ord.id) {
-          const emailHeaders = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' };
+          const emailHeaders = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json' };
           const orderBody = JSON.stringify({ order_id: ord.id });
           // 1. Staff notification (to stores@, damien@, info@, ronnie@)
-          fetch(SUPABASE_URL + '/functions/v1/order-notify-staff', {
+          fetch(SUPA_URL + '/functions/v1/order-notify-staff', {
             method: 'POST', headers: emailHeaders, body: orderBody
           }).catch(function(e) { console.warn('[manual order] staff notify error:', e); });
           // 2. Customer confirmation (same email as website/B2B orders)
           if (customer_email) {
-            fetch(SUPABASE_URL + '/functions/v1/send-customer-confirmation', {
+            fetch(SUPA_URL + '/functions/v1/send-customer-confirmation', {
               method: 'POST', headers: emailHeaders, body: orderBody
             }).then(function(r) { return r.json(); }).then(function(result) {
               if (result.sent) toast('✉️ Emails sent to customer and staff', 'success');
