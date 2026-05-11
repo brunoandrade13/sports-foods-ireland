@@ -51,24 +51,41 @@
 <title>Sports Nutrition Products | Sports Foods Ireland</title>
 <meta property="og:site_name" content="Sports Foods Ireland">
 <title>Sports Nutrition Product | Sports Foods Ireland</title>
-<link rel="alternate" hreflang="en-IE" href="https://sportsfoodsireland.ie/produto.html">
-<link rel="alternate" hreflang="en-GB" href="https://sportsfoodsireland.ie/produto.html">
-<link rel="alternate" hreflang="en" href="https://sportsfoodsireland.ie/produto.html">
-<link rel="alternate" hreflang="x-default" href="https://sportsfoodsireland.ie/produto.html">
-<link rel="canonical" href="https://sportsfoodsireland.ie/produto.html">
 <script>
-// CRITICAL SEO: Fix canonical/hreflang/OG URL immediately — before any render
-// Googlebot reads these before deferred JS runs
+// ── CANONICAL & HREFLANG — injected before any static tag ──────────────────
+// Google reads <head> tags in order. By writing these via JS first (inline,
+// synchronous, no defer), the rendered DOM seen by Googlebot has the correct
+// ?id=X URL — not the generic produto.html fallback.
 (function(){
-  var id=(new URLSearchParams(window.location.search)).get('id');
-  if(!id)return;
-  var base='https://sportsfoodsireland.ie/produto.html?id='+encodeURIComponent(id);
-  var c=document.querySelector('link[rel="canonical"]');
-  if(c)c.setAttribute('href',base);
-  var alts=document.querySelectorAll('link[rel="alternate"]');
-  alts.forEach(function(a){a.setAttribute('href',base);});
-  var ogUrl=document.querySelector('meta[property="og:url"]');
-  if(ogUrl)ogUrl.setAttribute('content',base);
+  var id = (new URLSearchParams(window.location.search)).get('id');
+  var base = id
+    ? 'https://sportsfoodsireland.ie/produto.html?id=' + encodeURIComponent(id)
+    : null;
+
+  // If no ?id= → mark page as noindex (blank product shell has no SEO value)
+  if (!base) {
+    var noIdx = document.createElement('meta');
+    noIdx.name = 'robots'; noIdx.content = 'noindex,follow';
+    document.currentScript.parentNode.insertBefore(noIdx, document.currentScript.nextSibling);
+    return;
+  }
+
+  // Canonical
+  var canon = document.createElement('link');
+  canon.rel = 'canonical'; canon.href = base;
+  document.head.appendChild(canon);
+
+  // Hreflang
+  ['en-IE','en-GB','en','x-default'].forEach(function(lang){
+    var a = document.createElement('link');
+    a.rel = 'alternate'; a.setAttribute('hreflang', lang); a.href = base;
+    document.head.appendChild(a);
+  });
+
+  // OG:URL (will be overwritten again by product.js but set early for crawlers)
+  var ogMeta = document.createElement('meta');
+  ogMeta.setAttribute('property','og:url'); ogMeta.content = base;
+  document.head.appendChild(ogMeta);
 })();
 </script>
 <link rel="icon" type="image/png" href="img/favicon.webp">

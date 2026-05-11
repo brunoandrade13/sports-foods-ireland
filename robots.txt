@@ -1,21 +1,10 @@
-# Sports Foods Ireland - robots.txt
+# Sports Foods Ireland — robots.txt
 # https://sportsfoodsireland.ie
 
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://sportsfoodsireland.ie/sitemap.xml
-Sitemap: https://sportsfoodsireland.ie/sitemap-images.xml
-
-# Block dev/internal files
-Disallow: /dev-archive/
-Disallow: /admin/
-Disallow: /templates/
-Disallow: /scripts/
-Disallow: /automation/
-
-# Block utility pages from indexing (no SEO value)
+# ── Utility pages (no SEO value — logged-in users only) ──
 Disallow: /checkout.html
 Disallow: /account.html
 Disallow: /cart.html
@@ -23,21 +12,32 @@ Disallow: /register-b2b.html
 Disallow: /tracking.html
 Disallow: /wishlist.html
 Disallow: /compare.html
+Disallow: /set-password.html
+Disallow: /update-password.html
+Disallow: /vip-sale-preview.html
 
-# Block scripts and binary data files (allow dados-slim.json for product rendering)
-Disallow: /*.py$
-Disallow: /*.md$
-Disallow: /*.zip$
-Disallow: /*.sh$
-Disallow: /js/dados.json
+# ── Dev/internal directories ──
+Disallow: /dev-archive/
+Disallow: /admin/
 
-# Allow CSS/JS/images for rendering
+# ── Legacy WordPress/WooCommerce paths (migrated — all 404) ──
+Disallow: /wp-admin/
+Disallow: /wp-content/
+Disallow: /wp-includes/
+Disallow: /wp-json/
+Disallow: /wp-login.php
+Disallow: /xmlrpc.php
+
+# ── Allow all assets for rendering ──
 Allow: /css/
 Allow: /js/
 Allow: /img/
-Allow: /js/dados-slim.json
 
-# Specific bot rules
+# ── Sitemaps ──
+Sitemap: https://sportsfoodsireland.ie/sitemap.xml
+Sitemap: https://sportsfoodsireland.ie/sitemap-images.xml
+
+# ── AI crawlers ──
 User-agent: GPTBot
 Allow: /
 
