@@ -12642,19 +12642,25 @@ Loading items...
       // For unshipped orders, hide label button; for shipped orders it's already visible
       if (!order.tracking_number) lblBtn.style.display = 'none';
 
-      // QB Invoice button state
+      // QB Invoice button state — hide for B2C orders (they pay via Stripe, not Net30)
       var qbBtn = document.getElementById('btnQbInvoice');
       if (qbBtn) {
-        if (order.qb_invoice_id) {
-          qbBtn.textContent = '✅ QB #' + (order.qb_invoice_id);
-          qbBtn.disabled = true;
-          qbBtn.style.borderColor = '#16a34a';
-          qbBtn.style.color = '#16a34a';
+        var isB2C = order.order_source === 'website' && (!order.is_b2b);
+        if (isB2C) {
+          qbBtn.style.display = 'none'; // B2C orders don't go to QB
         } else {
-          qbBtn.textContent = '📤 Send to QuickBooks';
-          qbBtn.disabled = false;
-          qbBtn.style.borderColor = '#4f46e5';
-          qbBtn.style.color = '#4f46e5';
+          qbBtn.style.display = '';
+          if (order.qb_invoice_id) {
+            qbBtn.textContent = '✅ QB #' + (order.qb_invoice_id);
+            qbBtn.disabled = true;
+            qbBtn.style.borderColor = '#16a34a';
+            qbBtn.style.color = '#16a34a';
+          } else {
+            qbBtn.textContent = '📤 Send to QuickBooks';
+            qbBtn.disabled = false;
+            qbBtn.style.borderColor = '#4f46e5';
+            qbBtn.style.color = '#4f46e5';
+          }
         }
       }
 
@@ -14952,6 +14958,15 @@ window.saveOrderNotes = async function saveOrderNotes() {
 window.sendInvoiceToQB = async function sendInvoiceToQB() {
   var order = window._currentModalOrder;
   if (!order) { toast('No order open', 'error'); return; }
+
+  // Block B2C orders from being sent to QuickBooks
+  // B2C customers pay via Stripe/PayPal — they should never appear in AR
+  var isB2COrder = order.order_source === 'website' && (!order.customer_type || order.customer_type === 'b2c');
+  if (isB2COrder) {
+    toast('⚠️ This is a B2C order (paid via Stripe/PayPal). B2C orders should not be sent to QuickBooks — they do not belong in Accounts Receivable.', 'error');
+    return;
+  }
+
   var btn = document.getElementById('btnQbInvoice');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Sending to QB...'; }
   try {
