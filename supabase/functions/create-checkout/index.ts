@@ -146,31 +146,50 @@ Deno.serve(async (req: Request) => {
     }
     // ── Fim da validação de variantes ─────────────────────────────────────────
 
-    // ── B2C Out of Stock check — backorder is B2B only ───────────────────────
-    // B2C customers cannot order products with stock=0, even if backorder_available=true
+    // B2C Out of Stock — backorder is B2B only
+    // Checks BOTH product-level stock AND variant-level stock (variant is the precise check)
     if (!is_b2b) {
       const uuidRx2 = /^[0-9a-f]{8}-/i;
-      const allUuids = items.map((i: { id?: string | number }) => i.id)
-        .filter((id: unknown): id is string => typeof id === "string" && uuidRx2.test(id));
-      if (allUuids.length > 0) {
-        const { data: stockRows } = await supabase
-          .from("products")
-          .select("id, name, stock_quantity")
-          .in("id", allUuids);
-        const outOfStock = (stockRows || []).filter((p: { stock_quantity: number | null }) =>
-          p.stock_quantity !== null && Number(p.stock_quantity) <= 0
-        );
-        if (outOfStock.length > 0) {
-          const names = outOfStock.map((p: { name: string }) => `"${p.name}"`).join(", ");
-          console.error(`[create-checkout] B2C OUT OF STOCK BLOCKED: ${names}`);
-          return new Response(JSON.stringify({
-            error: `The following products are currently out of stock: ${names}. Please remove them from your cart.`,
-            out_of_stock_error: true
-          }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const outOfStockNames: string[] = [];
+
+      for (const item of items) {
+        const itemId = item.id ? String(item.id) : null;
+        const variantId = item.variant_id ? String(item.variant_id) : null;
+        if (!itemId) continue;
+
+        if (variantId && uuidRx2.test(variantId)) {
+          // Products WITH variants: check the specific variant stock
+          const { data: variantRow } = await supabase
+            .from("product_variants")
+            .select("stock, products(name)")
+            .eq("id", variantId)
+            .single();
+          if (variantRow && variantRow.stock !== null && Number(variantRow.stock) <= 0) {
+            const prodName = (variantRow as any).products?.name || item.name || itemId;
+            outOfStockNames.push(`"${item.name || prodName}"`);
+          }
+        } else if (uuidRx2.test(itemId)) {
+          // Products WITHOUT variants: check product-level stock
+          const { data: prodRow } = await supabase
+            .from("products")
+            .select("name, stock_quantity")
+            .eq("id", itemId)
+            .single();
+          if (prodRow && prodRow.stock_quantity !== null && Number(prodRow.stock_quantity) <= 0) {
+            outOfStockNames.push(`"${prodRow.name || itemId}"`);
+          }
         }
       }
+
+      if (outOfStockNames.length > 0) {
+        const names = outOfStockNames.join(", ");
+        console.error(`[create-checkout] B2C OUT OF STOCK BLOCKED (variant-level): ${names}`);
+        return new Response(JSON.stringify({
+          error: `The following products are currently out of stock: ${names}. Please remove them from your cart.`,
+          out_of_stock_error: true
+        }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
     }
-    // ── Fim do check de stock B2C ─────────────────────────────────────────────
 
     const priceField = currency === "GBP" ? "price_gbp" : "price_eur";
     const itemIds = items
@@ -399,6 +418,12 @@ Deno.serve(async (req: Request) => {
         shipping_json: JSON.stringify(shippingAddress || {}),
         coupon_code: coupon?.code || "",
         is_b2b: is_b2b ? "1" : "0",
+        // ── Attribution — source tracking ──────────────────────────
+        attr_source_type:   (attribution as any)?.source_type    || "",
+        attr_utm_source:    (attribution as any)?.utm_source     || "",
+        attr_device_type:   (attribution as any)?.device_type    || "",
+        attr_session_entry: (attribution as any)?.session_entry  || "",
+        attr_session_pages: String((attribution as any)?.session_pages || ""),
       },
       payment_method_types: ["card"],
     });

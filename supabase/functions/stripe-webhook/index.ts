@@ -153,6 +153,13 @@ async function handleCheckoutComplete(
     order_source: metadata.is_b2b === "1" ? "b2b_portal" : "website",
     is_b2b: metadata.is_b2b === "1",
     payment_method: "stripe",
+    // ── Attribution ────────────────────────────────────────────────
+    attribution_source_type:   metadata.attr_source_type    || null,
+    attribution_utm_source:    metadata.attr_utm_source     || null,
+    attribution_device_type:   metadata.attr_device_type    || null,
+    attribution_session_entry: metadata.attr_session_entry  || null,
+    attribution_session_pages: metadata.attr_session_pages
+      ? Number(metadata.attr_session_pages) : null,
   };
 
   console.log(
