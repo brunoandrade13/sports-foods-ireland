@@ -13352,7 +13352,6 @@ Loading items...
 
       const orderNum = order.order_number || order.id?.slice(0, 8);
 
-      // Confirmation — two-step to avoid accidents
       const confirm1 = confirm(
         `⚠️ DELETE ORDER ${orderNum}?\n\n` +
         `Customer: ${order.customer_name || '—'}\n` +
@@ -13371,78 +13370,29 @@ Loading items...
       if (btn) { btn.disabled = true; btn.textContent = '⏳ Deleting…'; }
 
       try {
-        const h = getAuthHeaders();
-
-        // 1. Fetch all order items (need product_id, variant_id, quantity)
-        const items = await supaGet('order_items',
-          `?order_id=eq.${order.id}&select=id,product_id,variant_id,quantity,is_backorder`
-        );
-
-        // 2. Restore stock for each item (skip QB-sourced and backorders)
-        const isQB = order.order_source === 'quickbooks';
-        if (!isQB && items && items.length > 0) {
-          for (const item of items) {
-            if (item.is_backorder) continue; // backorder items never decremented stock
-            if (!item.product_id) continue;
-
-            if (item.variant_id) {
-              // Variant product → restore product_variants.stock
-              const varRes = await fetch(
-                `${SUPA_URL}/rest/v1/product_variants?id=eq.${item.variant_id}&select=id,stock`,
-                { headers: h }
-              );
-              const varRows = await varRes.json();
-              if (varRows && varRows[0]) {
-                const newStock = (Number(varRows[0].stock) || 0) + Number(item.quantity);
-                await fetch(`${SUPA_URL}/rest/v1/product_variants?id=eq.${item.variant_id}`, {
-                  method: 'PATCH',
-                  headers: { ...h, 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ stock: newStock })
-                });
-              }
-            } else {
-              // Simple product → restore products.stock_quantity
-              const prodRes = await fetch(
-                `${SUPA_URL}/rest/v1/products?id=eq.${item.product_id}&select=id,stock_quantity,track_inventory`,
-                { headers: h }
-              );
-              const prodRows = await prodRes.json();
-              if (prodRows && prodRows[0] && prodRows[0].track_inventory) {
-                const newStock = (Number(prodRows[0].stock_quantity) || 0) + Number(item.quantity);
-                await fetch(`${SUPA_URL}/rest/v1/products?id=eq.${item.product_id}`, {
-                  method: 'PATCH',
-                  headers: { ...h, 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    stock_quantity: newStock,
-                    in_stock: newStock > 0
-                  })
-                });
-              }
-            }
-          }
-        }
-
-        // 3. Delete inventory_movements for this order
-        await fetch(`${SUPA_URL}/rest/v1/inventory_movements?order_id=eq.${order.id}`, {
-          method: 'DELETE', headers: h
+        // Use Edge Function with service role to bypass RLS for stock updates
+        const res = await fetch(`${SUPA_URL}/functions/v1/delete-order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPA_KEY,
+            'Authorization': 'Bearer ' + SUPA_KEY
+          },
+          body: JSON.stringify({ order_id: order.id })
         });
 
-        // 4. Delete order_items
-        await fetch(`${SUPA_URL}/rest/v1/order_items?order_id=eq.${order.id}`, {
-          method: 'DELETE', headers: h
-        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Delete failed');
 
-        // 5. Delete the order itself
-        const delRes = await fetch(`${SUPA_URL}/rest/v1/orders?id=eq.${order.id}`, {
-          method: 'DELETE', headers: h
-        });
-        if (!delRes.ok) throw new Error('Failed to delete order: ' + await delRes.text());
-
-        // 6. Remove from local cache and close modal
+        // Remove from local cache and close modal
         allOrders = (allOrders || []).filter(o => o.id !== order.id);
         closeOrderModal();
         renderOrders(allOrders);
-        toast(`✅ Order ${orderNum} deleted and stock restored`, 'success');
+
+        const stockMsg = result.stock_restored > 0
+          ? ` Stock restored for ${result.stock_restored} item(s).`
+          : result.skipped_qb ? ' (QB order — stock not restored).' : ' No stock to restore.';
+        toast(`✅ Order ${orderNum} deleted.${stockMsg}`, 'success');
 
       } catch (e) {
         toast('Error deleting order: ' + e.message, 'error');
