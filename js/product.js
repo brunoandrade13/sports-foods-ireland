@@ -1027,10 +1027,14 @@ function renderProductVariants(product) {
 
 // ── Simple variants: one or more groups, cascade display ──
 function renderSimpleVariants(container, variants, product) {
+    const isB2B = localStorage.getItem('sfi_is_b2b') === 'true' || window._isB2BCustomer === true || window._sfiCustomerIsB2B === true;
     container.innerHTML = variants.map((group, gi) => {
         const optionsHtml = group.options.map(opt => {
             const outOfStock = opt.stock != null && opt.stock <= 0;
+            // For B2C: hide out-of-stock variants entirely (no backorder for B2C)
+            // For B2B: show with (Backorder) label if backorder is available
             if (outOfStock && !currentProduct.backorderAvailable) return '';
+            if (outOfStock && !isB2B) return ''; // B2C: never show backorder variants
             const priceAttr = opt.price ? `data-price="${opt.price}"` : '';
             const oldPriceAttr = opt.compare_at_price ? `data-old-price="${opt.compare_at_price}"` : '';
             const skuAttr = opt.sku ? `data-sku="${opt.sku}"` : '';
@@ -1134,12 +1138,15 @@ function renderCompoundVariants(container, variants, product) {
     }
 
     // Build Level 1 HTML
+    const isB2BUser = localStorage.getItem('sfi_is_b2b') === 'true' || window._isB2BCustomer === true || window._sfiCustomerIsB2B === true;
     const level1Html = level1Values.map(val => {
         const matchingOpts = allOptions.filter(o => o.level1 === val);
         const totalStock = matchingOpts.reduce((s, o) => s + (o.stock || 0), 0);
         const outOfStock = totalStock <= 0;
-        // For parent level1: hide if ALL children out of stock AND no backorder
+        // Hide if all children out of stock AND no backorder
         if (outOfStock && !currentProduct.backorderAvailable) return '';
+        // B2C: never show backorder variants
+        if (outOfStock && !isB2BUser) return '';
         return `<button type="button" class="variant-option${outOfStock ? ' backorder-variant' : ''}"
             data-level1="${val}" data-image-url="${(matchingOpts.find(o => o.image_url) || {}).image_url || ''}" ${outOfStock ? 'data-backorder="true"' : ''}>${val}${outOfStock ? ' (Backorder)' : ''}</button>`;
     }).join('');
@@ -1193,6 +1200,8 @@ function renderCompoundVariants(container, variants, product) {
             level2Opts.innerHTML = matching.map(opt => {
                 const outOfStock = opt.stock != null && opt.stock <= 0;
                 if (outOfStock && !currentProduct.backorderAvailable) return '';
+                // B2C: never show backorder variants
+                if (outOfStock && !isB2BUser) return '';
                 const priceAttr = opt.price ? `data-price="${opt.price}"` : '';
                 const oldPriceAttr = opt.compare_at_price ? `data-old-price="${opt.compare_at_price}"` : '';
                 const imgAttr = opt.image_url ? `data-image-url="${opt.image_url}"` : '';
