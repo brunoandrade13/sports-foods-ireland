@@ -12642,10 +12642,12 @@ Loading items...
       // For unshipped orders, hide label button; for shipped orders it's already visible
       if (!order.tracking_number) lblBtn.style.display = 'none';
 
-      // QB Invoice button state — hide for B2C orders (they pay via Stripe, not Net30)
+      // QB Invoice + Send Invoice buttons — hide for B2C orders (already paid via Stripe/PayPal)
       var qbBtn = document.getElementById('btnQbInvoice');
+      var sendInvBtn = document.querySelector('[onclick*="sendInvoiceByEmail"]');
       if (qbBtn) {
         var isB2C = order.order_source === 'website' && (!order.is_b2b);
+        if (sendInvBtn) sendInvBtn.style.display = isB2C ? 'none' : '';
         if (isB2C) {
           qbBtn.style.display = 'none'; // B2C orders don't go to QB
         } else {
