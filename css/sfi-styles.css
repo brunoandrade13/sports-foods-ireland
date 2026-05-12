@@ -7047,6 +7047,22 @@ html {
     color: #92400e;
     font-weight: 600;
 }
+/* B2C out of stock variant — greyed out, not clickable */
+.variant-option.oos-variant,
+.variant-option[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+    border-color: #cbd5e1;
+    color: #94a3b8;
+    background: #f8fafc;
+    text-decoration: none;
+}
+.variant-option.oos-variant:hover,
+.variant-option[disabled]:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
 
 
 
