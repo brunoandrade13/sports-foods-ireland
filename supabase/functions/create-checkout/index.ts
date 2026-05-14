@@ -312,9 +312,7 @@ Deno.serve(async (req: Request) => {
               ...(imageUrl ? { images: [imageUrl] } : {}),
             },
             unit_amount: Math.round(item.price * 100),
-            // B2B: wholesale prices are ex-VAT → use "exclusive" so Stripe adds VAT on top
-            // B2C: retail prices are VAT-inclusive → use "inclusive"
-            tax_behavior: is_b2b ? "exclusive" : "inclusive",
+            tax_behavior: "inclusive",
           },
           quantity: item.quantity || 1,
         };
