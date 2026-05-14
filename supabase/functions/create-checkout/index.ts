@@ -92,6 +92,7 @@ Deno.serve(async (req: Request) => {
       coupon,
       is_b2b = false,
       vip_item_ids = [],
+      attribution = {},
     } = body;
     // VIP discount: 20% applied only to items in vip_item_ids list (set by vip-sale.html)
     const vipIds = new Set((Array.isArray(vip_item_ids) ? vip_item_ids : []).map(String));
@@ -311,7 +312,9 @@ Deno.serve(async (req: Request) => {
               ...(imageUrl ? { images: [imageUrl] } : {}),
             },
             unit_amount: Math.round(item.price * 100),
-            tax_behavior: "inclusive",
+            // B2B: wholesale prices are ex-VAT → use "exclusive" so Stripe adds VAT on top
+            // B2C: retail prices are VAT-inclusive → use "inclusive"
+            tax_behavior: is_b2b ? "exclusive" : "inclusive",
           },
           quantity: item.quantity || 1,
         };
