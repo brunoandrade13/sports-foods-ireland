@@ -707,6 +707,27 @@
                 city: a.city || '', postcode: a.postcode || '', country: a.country || 'IE'
             };
         }
+        // B2B: override with customer address from DB (avoids wrong branch address from user_metadata)
+        if (u?.email) {
+            const SUPABASE_URL_ADDR = 'https://styynhgzrkyoioqjssuw.supabase.co';
+            const SUPABASE_ANON_KEY_ADDR = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eXluaGd6cmt5b2lvcWpzc3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Mjg4NzcsImV4cCI6MjA4NjAwNDg3N30.Qx7g5brABFwFKnv_ZLRYteSXnGSaLTKpDFbbSUYepbE';
+            fetch(`${SUPABASE_URL_ADDR}/rest/v1/customers?email=eq.${encodeURIComponent(u.email.trim().toLowerCase())}&select=address,city,country&limit=1`, {
+                headers: { apikey: SUPABASE_ANON_KEY_ADDR, Authorization: `Bearer ${SUPABASE_ANON_KEY_ADDR}` }
+            }).then(r => r.json()).then(rows => {
+                const cust = rows && rows[0];
+                if (cust && (cust.address || cust.city)) {
+                    checkoutData.shipping = {
+                        addr1: cust.address || checkoutData.shipping.addr1 || '',
+                        addr2: checkoutData.shipping.addr2 || '',
+                        city: cust.city || checkoutData.shipping.city || '',
+                        postcode: checkoutData.shipping.postcode || '',
+                        country: cust.country || checkoutData.shipping.country || 'IE'
+                    };
+                    // Re-render step 2 if already on shipping page
+                    if (step === 2) renderCheckout();
+                }
+            }).catch(() => {});
+        }
         // Check B2B status — wait for result so Net30/COD options appear correctly
         if (sfi.b2b?.checkAccess) {
             sfi.b2b.checkAccess().then(isB2B => {

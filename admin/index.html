@@ -2199,6 +2199,11 @@ oninput="filterReviews()">
 <div class="table-toolbar">
 <input type="text" class="search-input" id="orderSearch" placeholder="Search orders..."
 oninput="filterOrders()">
+<select class="filter-select" id="orderStatusFilter" onchange="filterOrders()">
+<option value="active">Active Orders</option>
+<option value="">All Orders</option>
+<option value="cancelled">Cancelled</option>
+</select>
 <select class="filter-select" id="orderFinancialFilter" onchange="filterOrders()">
 <option value="">All Financial</option>
 <option value="pending">Pending</option>
@@ -7692,7 +7697,7 @@ Loading items...
     // ============================================================
     async function loadOrdersSmart() {
       const ords = await supaGet('orders', '?order=created_at.desc&limit=500').catch(() => []);
-      return ords || [];
+      return (ords || []).filter(o => !(o.status === 'cancelled' && o.order_source === 'quickbooks' && (o.notes || '').includes('DUPLICATE')));
     }
 
     // ============================================================
@@ -7744,8 +7749,8 @@ Loading items...
 
         allCustomers = (custs || []).sort((a,b) => (b.total_spent_eur||0) - (a.total_spent_eur||0));
         filteredCustomers = [...allCustomers];
-        allOrders = ords || [];
-        filteredOrders = [...allOrders];
+        allOrders = (ords || []).filter(o => !(o.status === 'cancelled' && o.order_source === 'quickbooks' && (o.notes || '').includes('DUPLICATE')));
+        filteredOrders = allOrders.filter(o => o.status !== 'cancelled');
 
         // Customer group aggregation (essential for dashboard revenue)
         try {
@@ -7874,8 +7879,9 @@ Loading items...
     }
 
     async function _refreshOrders() {
-      allOrders = await supaGetAll('orders', '?order=created_at.desc').catch(() => allOrders);
-      filteredOrders = [...allOrders];
+      allOrders = (await supaGetAll('orders', '?order=created_at.desc').catch(() => allOrders))
+        .filter(o => !(o.status === 'cancelled' && o.order_source === 'quickbooks' && (o.notes || '').includes('DUPLICATE')));
+      filteredOrders = allOrders.filter(o => o.status !== 'cancelled');
       const pendOrd = allOrders.filter(o => o.fulfillment_status === 'unfulfilled').length;
       const el = document.getElementById('pendingOrderCount');
       if (el) { el.textContent = pendOrd; el.style.display = pendOrd > 0 ? 'inline' : 'none'; }
@@ -10154,8 +10160,8 @@ Loading items...
         toast(`WooCommerce synced: ${s.created||0} new, ${s.updated||0} updated`, 'success');
 
         const freshOrders = await supaGetAll('orders', '?order=created_at.desc').catch(() => []);
-        allOrders = freshOrders || [];
-        filteredOrders = [...allOrders];
+        allOrders = (freshOrders || []).filter(o => !(o.status === 'cancelled' && o.order_source === 'quickbooks' && (o.notes || '').includes('DUPLICATE')));
+        filteredOrders = allOrders.filter(o => o.status !== 'cancelled');
         renderOrders();
       } catch (err) {
         status.textContent = `❌ WC Error: ${err.message}`;
@@ -10228,8 +10234,8 @@ Loading items...
 
         // Reload orders
         const freshOrders = await supaGetAll('orders', '?order=created_at.desc').catch(() => []);
-        allOrders = freshOrders || [];
-        filteredOrders = [...allOrders];
+        allOrders = (freshOrders || []).filter(o => !(o.status === 'cancelled' && o.order_source === 'quickbooks' && (o.notes || '').includes('DUPLICATE')));
+        filteredOrders = allOrders.filter(o => o.status !== 'cancelled');
         renderOrders();
 
       } catch (err) {
@@ -12017,8 +12023,11 @@ Loading items...
       const search = document.getElementById('orderSearch')?.value.toLowerCase() || '';
       const fin = document.getElementById('orderFinancialFilter')?.value || '';
       const ful = document.getElementById('orderFulfillFilter')?.value || '';
+      const statusF = document.getElementById('orderStatusFilter')?.value ?? 'active';
       filteredOrders = allOrders.filter(o => {
-        if (search && !(o.order_number || '').toLowerCase().includes(search) && !(o.customer_email || '').toLowerCase().includes(search)) return false;
+        if (statusF === 'active' && o.status === 'cancelled') return false;
+        if (statusF === 'cancelled' && o.status !== 'cancelled') return false;
+        if (search && !(o.order_number || '').toLowerCase().includes(search) && !(o.customer_email || '').toLowerCase().includes(search) && !(o.customer_name || '').toLowerCase().includes(search)) return false;
         if (fin && o.financial_status !== fin) return false;
         if (ful && o.fulfillment_status !== ful) return false;
         return true;
@@ -12698,7 +12707,7 @@ Loading items...
         if (existingDiscount > 0) {
           // Order already has a discount saved — restore it
           if (dvEl) dvEl.value = existingDiscount.toFixed(2);
-          if (dtEl) dtEl.value = 'fixed';
+          if (dtEl) dtEl.value = 'value';
           if (typeof updateDiscountPreview === 'function') updateDiscountPreview();
           const prevEl = document.getElementById('omDiscountPreview');
           // Bug #18: suportar zone3_discount_applied OU coupon_code legacy 'ZONE3'
@@ -14887,6 +14896,7 @@ window.confirmGLSShip = async function confirmGLSShip() {
     var updateData = {
       tracking_number: trackingStr,
       fulfillment_status: 'fulfilled',
+      shipped_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
     if (result.label_pdf_base64) updateData.gls_label_base64 = result.label_pdf_base64;
@@ -15291,8 +15301,13 @@ var preDiscountType = (document.getElementById('omDiscountType') || {}).value ||
 var preDiscountAmt = preDiscountVal > 0 ? (preDiscountType === 'percent' ? preSubtotal * preDiscountVal / 100 : preDiscountVal) : 0;
 preDiscountAmt = Math.min(preDiscountAmt, preSubtotal);
 var preShipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
-var preVat = Math.round((preSubtotal - preDiscountAmt + preShipping) * 23) / 100;
-var preTotal = (preSubtotal - preDiscountAmt) + preShipping + preVat;
+// Pre-detect if VAT-inclusive to calculate correct TOTAL DUE in header
+var _preTaxStored = order.tax_amount != null ? parseFloat(order.tax_amount) : null;
+var _preIsExempt = _preTaxStored !== null && _preTaxStored === 0;
+var _preIsVatInclusive = !_preIsExempt && (_preTaxStored > 0 || ['website','b2b_portal'].includes(order.order_source));
+var _preExVat = _preIsVatInclusive ? Math.round((preSubtotal - preDiscountAmt) / 1.23 * 100) / 100 : (preSubtotal - preDiscountAmt);
+var preVat = _preIsExempt ? 0 : (_preIsVatInclusive ? Math.round(_preExVat * 23) / 100 : 0);
+var preTotal = _preExVat + preShipping + preVat;
 var detF = [['INVOICE NO.', invNum], ['DATE', fmtD(invDate)], ['TOTAL DUE', 'EUR ' + fmtM(preTotal)], ['DUE DATE', fmtD(dueDate)], ['TERMS', 'Net 30'], ['ENCLOSED', '']];
 var dCW = [CW*0.22, CW*0.13, CW*0.17, CW*0.15, CW*0.13, CW*0.20];
 doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
@@ -15341,7 +15356,10 @@ var qty = parseInt(item.quantity) || 1;
       }
     }
     var desc = baseName + (cleanedVariant ? ' — ' + cleanedVariant : '');
-    var rate = parseFloat(item.unit_price) || 0, amount = qty * rate;
+    var rate = parseFloat(item.unit_price) || 0;
+    // For VAT-inclusive orders: show ex-VAT unit price on invoice (VAT shown separately at bottom)
+    if (isVatInclusive) rate = Math.round(rate / 1.23 * 100) / 100;
+    var amount = qty * rate;
 subtotal += amount;
 
 // Word wrap description
@@ -15397,11 +15415,21 @@ var shipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_tota
 // Tax-exempt orders (tax_amount explicitly stored as 0): no VAT
 var taxAmountStored = order.tax_amount != null ? parseFloat(order.tax_amount) : null;
 var isTaxExempt = taxAmountStored !== null && taxAmountStored === 0;
-var vatTotal = isTaxExempt ? 0 : Math.round(discountedSubtotal * 23) / 100;
-var total = discountedSubtotal + shipping + vatTotal;
+// B2C website / B2B portal prices are VAT-inclusive — subtotal is already VAT-inclusive
+// so we must NOT multiply by 0.23 again. Instead derive VAT from the embedded amount.
+// isVatInclusive = prices stored with VAT already inside (website/b2b_portal/tax_amount>0)
+var isVatInclusive = !isTaxExempt && (
+  taxAmountStored > 0 ||
+  ['website', 'b2b_portal'].includes(order.order_source)
+);
+// For VAT-inclusive orders: ex-VAT subtotal = discountedSubtotal (rate was already converted above)
+// For VAT-exclusive or exempt: subtotal is already ex-VAT
+var exVatSubtotal = discountedSubtotal;
+var vatTotal = isTaxExempt ? 0 : (isVatInclusive ? Math.round(exVatSubtotal * 23) / 100 : 0);
+var total = exVatSubtotal + shipping + vatTotal;
 checkPage(100);
 var tx = ML + CW - 200;
-var totalsRows = [['SUBTOTAL', fmtM(subtotal)]];
+var totalsRows = [['SUBTOTAL', fmtM(isVatInclusive ? exVatSubtotal : subtotal)]];
 if (discountAmount > 0) {
   // Bug #18: suportar zone3_discount_applied OU legacy coupon_code
   var _coupon = order.coupon_code || order.discount_code || '';
@@ -15769,8 +15797,8 @@ function renderOrderItemsTable(items, order, editMode) {
       <tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:6px 10px;color:var(--text-muted);">Subtotal (ex VAT)</td><td style="padding:6px 10px;" id="om-subtotal">€${subtotal.toFixed(2)}</td></tr>
       ${shipping > 0 ? `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping (${esc(sm)})</td><td style="padding:4px 10px;">€${shipping.toFixed(2)}</td></tr>` : `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Shipping</td><td style="padding:4px 10px;color:#22c55e;">Free</td></tr>`}
       ${discount > 0 ? `<tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">Discount${dc ? ' ('+esc(dc)+')' : ''}</td><td style="padding:4px 10px;color:#ef4444;">-€${discount.toFixed(2)}</td></tr>` : ''}
-      <tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">VAT (23%)</td><td style="padding:4px 10px;">€${(taxIsExplicit ? tax : Math.round((subtotal + shipping - discount) * 23) / 100).toFixed(2)}</td></tr>
-      <tr style="border-top:2px solid var(--border);"><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">Total (incl. VAT)</td><td style="padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">€${(taxIsExplicit ? total : (subtotal + shipping - discount) + Math.round((subtotal + shipping - discount) * 23) / 100).toFixed(2)}</td></tr>
+      <tr><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:4px 10px;color:var(--text-muted);">VAT (23%)</td><td style="padding:4px 10px;">€${(taxIsExplicit ? Math.round((subtotal - discount + shipping) * 23) / 100 : Math.round((subtotal - discount + shipping) * 23) / 100).toFixed(2)}</td></tr>
+      <tr style="border-top:2px solid var(--border);"><td colspan="${editMode ? 6 : 5}" style="text-align:right;padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">Total (incl. VAT)</td><td style="padding:10px 10px 4px;font-weight:700;font-size:1.05rem;">€${((subtotal - discount + shipping) + Math.round((subtotal - discount + shipping) * 23) / 100).toFixed(2)}</td></tr>
       <tr><td colspan="6" style="text-align:right;padding:4px 10px 8px;font-size:0.8rem;color:var(--text-muted);">💳 ${esc(pm)}</td></tr>
     </tfoot>
   </table>
@@ -16069,8 +16097,22 @@ function omRenderNewItems() {
   if (!container) return;
   const items = window._editNewItems || [];
   if (!items.length) { container.innerHTML = ''; return; }
+
+  // Check if this order has a Zone3 discount
+  const order = window._currentModalOrder;
+  const discCode = order ? (order.discount_code || order.coupon_code || '') : '';
+  const isZone3Order = discCode.includes('ZONE3');
+  let z3rule = null;
+  if (isZone3Order && typeof allZone3Discounts !== 'undefined' && allZone3Discounts && order) {
+    z3rule = allZone3Discounts.find(r => r.customer_id === order.customer_id && r.is_active !== false);
+  }
+  const z3pct = z3rule && z3rule.discount_type === 'percent' ? parseFloat(z3rule.discount_value) : 0;
+
   let html = '<div style="margin-top:10px;padding:12px;border:1px solid #16a34a;border-radius:8px;background:rgba(22,163,98,0.08)">';
   html += '<h4 style="margin:0 0 8px;font-size:0.82rem;color:#16a34a">🆕 New Items to Add (' + items.length + ')</h4>';
+  if (z3pct > 0) {
+    html += '<p style="margin:0 0 8px;font-size:0.75rem;color:#fbbf24;">⚡ Zone3 discount (' + z3pct + '%) will be recalculated on all items when saved.</p>';
+  }
   html += '<table style="width:100%;font-size:0.83rem;border-collapse:collapse">';
   items.forEach(function(ni, idx) {
     html += '<tr style="border-bottom:1px solid rgba(22,163,98,0.2)">' +
@@ -16156,9 +16198,8 @@ async function saveOrderItemEdits() {
         item.unit_price = newPrice; item.quantity = origQty; item.total_price = newTotal; item.total = newTotal;
         item.is_backorder = false; item._boQty = 0;
       } else if (boQty >= origQty) {
-        // Fully in backorder — restore full quantity to stock (if not already backordered)
+        // Fully in backorder — do NOT restore stock (backorder = we don't have it)
         totalBackorderCount += origQty;
-        if (!item.is_backorder) await restoreStock(item, origQty);
         await supaUpdate('order_items', item.id, {
           unit_price: newPrice, total_price: 0, total: 0,
           is_backorder: true, backorder_status: 'pending', fulfillment_status: 'backorder'
@@ -16166,9 +16207,9 @@ async function saveOrderItemEdits() {
         item.unit_price = newPrice; item.total_price = 0; item.total = 0;
         item.is_backorder = true; item._boQty = origQty;
       } else {
-        // Partial backorder — restore the backorder portion to stock
+        // Partial backorder — do NOT restore the backorder portion to stock
+        // (backorder = we don't have it; restoring would give false stock count)
         totalBackorderCount += boQty;
-        await restoreStock(item, boQty);
         const sendTotal = parseFloat((newPrice * sendQty).toFixed(2));
         const boTotal   = parseFloat((newPrice * boQty).toFixed(2));
         await supaUpdate('order_items', item.id, {
@@ -16216,11 +16257,33 @@ async function saveOrderItemEdits() {
     const newItemsSubtotal = newItems.reduce((s, ni) => s + (ni.unit_price * ni.qty), 0);
     const newSubtotal = parseFloat((existingSubtotal + newItemsSubtotal).toFixed(2));
     const shipping    = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
-    const newVat      = Math.round((newSubtotal + shipping) * 23) / 100;
-    const newTotal    = parseFloat((newSubtotal + shipping + newVat).toFixed(2));
-    const hasBO       = items.some(i => i.is_backorder) || totalBackorderCount > 0;
+
+    // Re-apply Zone3 discount if this order has one
+    const existingDiscCode = order.discount_code || order.coupon_code || '';
+    const isZone3Order = existingDiscCode.includes('ZONE3');
+    let newDiscount = 0;
+    if (isZone3Order && typeof allZone3Discounts !== 'undefined' && allZone3Discounts && allZone3Discounts.length > 0) {
+      const z3rule = allZone3Discounts.find(r => r.customer_id === order.customer_id && r.is_active !== false);
+      if (z3rule) {
+        if (z3rule.discount_type === 'percent') {
+          newDiscount = parseFloat((newSubtotal * parseFloat(z3rule.discount_value) / 100).toFixed(2));
+        } else {
+          newDiscount = parseFloat(parseFloat(z3rule.discount_value).toFixed(2));
+        }
+      }
+    } else if (!isZone3Order) {
+      // Preserve existing non-Zone3 discount (fixed amount)
+      newDiscount = parseFloat(order.discount_amount) || 0;
+    }
+
+    const discountedBase = newSubtotal - newDiscount;
+    const newVat   = Math.round((discountedBase + shipping) * 23) / 100;
+    const newTotal = parseFloat((discountedBase + shipping + newVat).toFixed(2));
+    const hasBO    = items.some(i => i.is_backorder) || totalBackorderCount > 0;
     await supaUpdate('orders', order.id, {
-      subtotal: newSubtotal, tax_amount: newVat, tax_total: newVat,
+      subtotal: newSubtotal,
+      discount_amount: newDiscount,
+      tax_amount: newVat, tax_total: newVat,
       total: newTotal, has_backorder_items: hasBO
     });
     order.subtotal = newSubtotal; order.tax_amount = newVat;
@@ -19425,6 +19488,35 @@ async function shipBoItems() {
 
     // 1. Pick the first order for customer/address info
     const refOrder = toShip[0].item.order || {};
+
+    // Helper: check if address object has meaningful content
+    const hasValidAddr = a => a && typeof a === 'object' && (a.addr1 || a.line1 || a.address || a.city || a.postcode);
+
+    // Get shipping/billing address — fall back to customer record if order address is empty
+    let shipAddr = hasValidAddr(refOrder.shipping_address) ? refOrder.shipping_address : null;
+    let billAddr = hasValidAddr(refOrder.billing_address)  ? refOrder.billing_address  : null;
+    if (!shipAddr || !billAddr) {
+      const custId = refOrder.customer_id;
+      if (custId) {
+        try {
+          const custRes = await fetch(`${SUPA_URL}/rest/v1/customers?id=eq.${custId}&select=address,city,postcode,country,county,address2&limit=1`, { headers: h });
+          const custData = await custRes.json();
+          const cust = custData?.[0];
+          if (cust && (cust.address || cust.city)) {
+            const custAddr = {
+              addr1:    cust.address   || '',
+              addr2:    cust.address2  || '',
+              city:     cust.city      || '',
+              county:   cust.county    || '',
+              postcode: cust.postcode  || '',
+              country:  cust.country   || 'IE'
+            };
+            if (!shipAddr) shipAddr = custAddr;
+            if (!billAddr) billAddr = custAddr;
+          }
+        } catch(e) { /* ignore — will fall back to {} */ }
+      }
+    }
     const { data: oidData } = await (async () => {
       const r = await fetch(`${SUPA_URL}/rest/v1/rpc/generate_sfi_order_number`, { method:'POST', headers:h, body:'{}' });
       return r.json().then(v => ({data: v}));
@@ -19455,8 +19547,8 @@ async function shipBoItems() {
         payment_method: refOrder.payment_method || 'account',
         item_count: toShip.reduce((s, r) => s + r.shipQty, 0),
         notes: 'Backorder fulfillment — original order(s): ' + [...c.orderNumbers].join(', '),
-        shipping_address: refOrder.shipping_address || {},
-        billing_address: refOrder.billing_address || {},
+        shipping_address: shipAddr || refOrder.shipping_address || {},
+        billing_address:  billAddr || refOrder.billing_address  || {},
       }),
     });
     if (!orderRes.ok) throw new Error('Failed to create order: ' + await orderRes.text());
@@ -19932,9 +20024,9 @@ async function loadGLSReport() {
   try {
     let q = '?select=id,order_number,created_at,shipped_at,customer_name,customer_email,shipping_address,tracking_number,tracking_url,total,total_weight_grams,status,fulfillment_status,gls_label_base64,gls_all_labels,gls_parcel_count,is_b2b';
     q += '&tracking_number=not.is.null';
-    if (from) q += '&created_at=gte.' + from + 'T00:00:00';
-    if (to)   q += '&created_at=lte.' + to   + 'T23:59:59';
-    q += '&order=created_at.desc';
+    if (from) q += '&shipped_at=gte.' + from + 'T00:00:00';
+    if (to)   q += '&shipped_at=lte.' + to   + 'T23:59:59';
+    q += '&order=shipped_at.desc';
 
     const rows = await supaGet('orders', q);
     _glsData = rows || [];
