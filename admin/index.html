@@ -7849,9 +7849,32 @@ Loading items...
       }
     }
 
-    // ============================================================
-    // TARGETED REFRESH (avoid full loadAllData after saves)
-    // ============================================================
+    // ── Optimistic update helpers ─────────────────────────────────────────
+    // Call after any local change to keep allOrders/allCustomers in sync
+    // without a DB round-trip. The Supabase realtime subscription handles
+    // external changes; these handle changes made locally in this session.
+
+    function _syncOrderToList(orderId, fields) {
+      const idx = allOrders.findIndex(o => o.id === orderId);
+      if (idx >= 0) {
+        allOrders[idx] = { ...allOrders[idx], ...fields };
+        filteredOrders = allOrders.filter(o => o.status !== 'cancelled');
+        if (_renderedPages.has('orders')) renderOrders();
+        if (_renderedPages.has('dashboard')) renderDashboard();
+      }
+    }
+
+    function _syncCustomerToList(customerId, fields) {
+      const idx = allCustomers.findIndex(c => c.id === customerId);
+      if (idx >= 0) {
+        allCustomers[idx] = { ...allCustomers[idx], ...fields };
+        filteredCustomers = [...allCustomers];
+        if (_renderedPages.has('customers')) renderCustomers();
+      }
+    }
+
+    // ── Targeted Refresh ─────────────────────────────────────────────────
+
     async function _refreshProducts() {
       const [prods, pv] = await Promise.all([
         supaGetAll('products', '?select=id,name,slug,sku,price_eur,price_gbp,compare_at_price_eur,cost_price_eur,wholesale_price_eur,brand_id,category_id,subcategory_id,sub_subcategory_id,image_url,stock_quantity,in_stock,is_active,is_new,is_featured,is_placeholder,track_inventory,backorder_available,weight_grams,low_stock_threshold,total_sold,total_revenue_eur,discount_percent,vegan,gluten_free,caffeine_free,is_taxable,vat_rate,qb_item_id,qb_id,legacy_id,woo_product_id,created_at,updated_at,brands(name),categories(name)&order=name'),
@@ -13360,7 +13383,20 @@ Loading items...
         showPage('orders');
         manualOrderItems = [];
         cancelGlsDelivery();
-        await _refreshOrders();
+        // ── Optimistic update: inject new order into local array immediately ──
+        // No DB fetch needed — the realtime subscription handles remote changes
+        if (ord && ord.id) {
+          const newOrderObj = { ...payload, id: ord.id, order_number: ord.order_number || orderNumber, created_at: new Date().toISOString() };
+          if (!allOrders.find(o => o.id === newOrderObj.id)) {
+            allOrders.unshift(newOrderObj);
+            filteredOrders = allOrders.filter(o => o.status !== 'cancelled');
+          }
+          const pendOrd = allOrders.filter(o => o.fulfillment_status === 'unfulfilled').length;
+          const pendEl = document.getElementById('pendingOrderCount');
+          if (pendEl) { pendEl.textContent = pendOrd; pendEl.style.display = pendOrd > 0 ? 'inline' : 'none'; }
+        }
+        renderOrders();
+        renderDashboard();
       } catch (e) {
         console.error('Manual order error', e);
         toast('Error creating manual order: ' + e.message, 'error');
@@ -13648,7 +13684,7 @@ Loading items...
         Object.assign(cust, { first_name: firstName, last_name: lastName, display_name: displayName, b2b_company_name: companyName, company: companyName || cust.company, email: email, phone: phone, b2b_vat_number: vatNumber, address: address, city: city, postcode: postcode, country: country, invoice_cc_emails: ccEmails, notes: notes });
         document.getElementById('cpTitle').textContent = 'Profile: ' + displayName;
         toast('Customer saved', 'success');
-        renderCustomers();
+        _syncCustomerToList(currentProfileCustomerId, { first_name: firstName, last_name: lastName, display_name: displayName, company: companyName || cust.company, email, phone, address, city, postcode, country });
       } catch(e) {
         console.error('Save customer error:', e);
         toast('Failed to save: ' + e.message, 'error');
@@ -13681,7 +13717,7 @@ Loading items...
               Block this customer from new orders
             </label>
           </div>`;
-        renderCustomers();
+        _syncCustomerToList(currentProfileCustomerId, { is_active: newStatus });
         toast(`Customer ${newStatus ? 'activated' : 'deactivated'} `);
       } catch (e) {
         toast('Error updating status', 'error');
@@ -13716,6 +13752,7 @@ Loading items...
             </label>
           </div>`;
         toast(newBlocked ? 'Customer blocked for new orders' : 'Customer unblocked');
+        _syncCustomerToList(currentProfileCustomerId, { is_blocked: newBlocked });
       } catch (e) {
         if (input) input.checked = !newBlocked;
         toast('Error updating blocked flag', 'error');
@@ -16305,6 +16342,7 @@ async function saveOrderItemEdits() {
     });
     order.subtotal = newSubtotal; order.tax_amount = newVat;
     order.tax_total = newVat; order.total = newTotal; order.has_backorder_items = hasBO;
+    _syncOrderToList(order.id, { subtotal: newSubtotal, discount_amount: newDiscount, tax_amount: newVat, total: newTotal, has_backorder_items: hasBO });
     // Reload items from DB to get newly inserted BO records
     const freshItems = await supaGet('order_items', `?order_id=eq.${order.id}`);
     window._currentModalItems = freshItems || items;
@@ -16353,6 +16391,7 @@ async function removeOrderItemFully(idx) {
       subtotal: newSubtotal, tax_amount: newVat, tax_total: newVat, total: newTotal
     });
     order.subtotal = newSubtotal; order.tax_amount = newVat; order.total = newTotal;
+    _syncOrderToList(order.id, { subtotal: newSubtotal, tax_amount: newVat, total: newTotal });
 
     renderOrderItemsTable(items, order, true);
     toast(`✅ "${itemName}" removed. Stock restored.`, 'success');
