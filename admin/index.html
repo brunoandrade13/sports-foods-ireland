@@ -7637,8 +7637,30 @@ Loading items...
       settings: () => renderSettings(),
       analytics: () => renderAnalytics(),
       suppliers: () => renderSuppliers(),
-      'purchase-orders': () => renderPurchaseOrders(),
-      invoices: () => renderInvoices(),
+      'purchase-orders': () => {
+        if (!allPurchaseOrders || allPurchaseOrders.length === 0) {
+          Promise.all([
+            supaGet('purchase_orders', '?order=txn_date.desc&limit=500').catch(() => []),
+            supaGetAll('vendors', '?order=name').catch(() => [])
+          ]).then(([pos, vends]) => {
+            allPurchaseOrders = pos || []; filteredPurchaseOrders = [...allPurchaseOrders];
+            allVendors = vends || [];
+            const statVendors = document.getElementById('statSuppliers');
+            if (statVendors) statVendors.textContent = allVendors.length;
+            renderPurchaseOrders();
+          });
+        } else { renderPurchaseOrders(); }
+      },
+      invoices: () => {
+        if (!allInvoices || allInvoices.length === 0) {
+          supaGet('v_all_sales', '?order=txn_date.desc&limit=1000').catch(() => []).then(invs => {
+            allInvoices = invs || []; filteredInvoices = [...allInvoices];
+            const statInvoices = document.getElementById('statInvoices');
+            if (statInvoices) statInvoices.textContent = allInvoices.length;
+            renderInvoices();
+          });
+        } else { renderInvoices(); }
+      },
       finance: () => updateFinanceSummary().catch(()=>{}),
       b2b: () => loadB2BData(),
       'site-analytics': () => loadSAReport(saCurrentReport),
@@ -7818,8 +7840,8 @@ Loading items...
         populateFilters();
         renderDashboard();
 
-        // ── PHASE 2: Secondary data (loads in background, doesn't block UI) ──
-        _loadSecondaryData();
+        // ── PHASE 2: Secondary data — delayed 2s so Phase 1 renders first ──
+        setTimeout(() => _loadSecondaryData(), 2000);
 
       } catch (e) {
         toast('Error loading data: ' + e.message, 'error');
@@ -7913,16 +7935,14 @@ Loading items...
 
         async function _loadSecondaryData() {
       try {
-        const [revs, coups, gcs, aban, shipZones, vends, pos, supps, invs, custPrices] = await Promise.all([
-          supaGet('reviews', '?select=*,products(name)&order=created_at.desc').catch(() => []),
+        // v_all_sales (invoices) and purchase_orders are heavy and not needed at startup
+        // They are loaded lazily when the user navigates to those pages
+        const [revs, coups, gcs, aban, shipZones, custPrices] = await Promise.all([
+          supaGet('reviews', '?select=id,product_id,rating,review_status,author_name,review_text,created_at,products(name)&order=created_at.desc').catch(() => []),
           supaGet('coupons', '?order=created_at.desc').catch(() => []),
-          supaGet('gift_cards', '?order=created_at.desc').catch(() => []),
+          supaGet('gift_cards', '?select=id,code,amount,balance,is_active,customer_email,created_at&order=created_at.desc').catch(() => []),
           supaGet('abandoned_carts', '?order=created_at.desc&limit=200').catch(() => []),
           supaGet('shipping_zones', '?order=name').catch(() => []),
-          supaGetAll('vendors', '?order=name').catch(() => []),
-          supaGet('purchase_orders', '?order=txn_date.desc&limit=500').catch(() => []),
-          Promise.resolve([]),
-          supaGet('v_all_sales', '?order=txn_date.desc&limit=1000').catch(() => []),
           supaGet('customer_product_prices', '?is_active=eq.true&select=id,product_id,customer_id,price_eur').catch(() => [])
         ]);
 
@@ -7931,10 +7951,6 @@ Loading items...
         allGiftCards = gcs || [];
         allAbandoned = aban || [];
         allShippingZones = shipZones || [];
-        allVendors = vends || [];
-        allPurchaseOrders = pos || []; filteredPurchaseOrders = [...allPurchaseOrders];
-        allSuppliers = supps || [];
-        allInvoices = invs || []; filteredInvoices = [...allInvoices];
 
         // Build customer-specific price cache
         window.customerProductPricesCache = {};
@@ -7944,20 +7960,15 @@ Loading items...
           window.customerProductPricesCache[row.product_id].push(row);
         });
 
-        // Update sidebar and dashboard counts that depend on Phase 2 data
-        const pendRev = allReviews.filter(r => r.review_status === 'pending').length;
+        // Update sidebar counts from Phase 2 data
+        const pendRev = (allReviews||[]).filter(r => r.review_status === 'pending').length;
         if (pendRev > 0) { const el = document.getElementById('pendingReviewCount'); if (el) { el.textContent = pendRev; el.style.display = 'inline'; } }
-
-        // Refresh dashboard stats that use secondary data (vendors, invoices, abandoned, reviews)
-        const statVendors = document.getElementById('statSuppliers');
-        if (statVendors) statVendors.textContent = allVendors.length;
-        const statInvoices = document.getElementById('statInvoices');
-        if (statInvoices) statInvoices.textContent = allInvoices.length;
         const statAbandoned = document.getElementById('statAbandoned');
-        if (statAbandoned) statAbandoned.textContent = allAbandoned.length;
+        if (statAbandoned) statAbandoned.textContent = (allAbandoned||[]).length;
         const statPendRev = document.getElementById('statPendingReviews');
         if (statPendRev) statPendRev.textContent = pendRev;
 
+        // Vendors and purchase_orders load lazily on demand (not at startup)
         // If user already navigated to a secondary page before data loaded, re-render it
         _renderedPages.forEach(page => {
           if (['reviews','coupons','giftcards','abandoned','shipping','suppliers','purchase-orders','invoices'].includes(page)) {
