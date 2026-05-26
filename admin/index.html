@@ -16318,36 +16318,11 @@ async function removeOrderItemFully(idx) {
 
   try {
     // 1. Delete the order_item from DB
+    // Stock is automatically restored by trg_restore_stock_on_item_delete trigger
     await fetch(`${SUPA_URL}/rest/v1/order_items?id=eq.${item.id}`, {
       method: 'DELETE',
       headers: getAuthHeaders()
     });
-
-    // 2. Restore stock
-    if (item.product_id) {
-      if (item.variant_id) {
-        const varRows = await supaGet('product_variants', '?id=eq.' + item.variant_id + '&select=id,stock');
-        if (varRows && varRows[0]) {
-          await supaUpdate('product_variants', item.variant_id, { stock: (varRows[0].stock || 0) + qty });
-        }
-      } else {
-        const prodRows = await supaGet('products', '?id=eq.' + item.product_id + '&select=id,stock_quantity,track_inventory');
-        if (prodRows && prodRows[0] && prodRows[0].track_inventory) {
-          const newStock = (prodRows[0].stock_quantity || 0) + qty;
-          await supaUpdate('products', item.product_id, { stock_quantity: newStock, in_stock: newStock > 0 });
-        }
-      }
-      // Log movement
-      await supaInsert('inventory_movements', {
-        product_id: item.product_id,
-        variant_id: item.variant_id || null,
-        movement_type: 'adjustment',
-        quantity_change: qty,
-        reason: 'Item removed from order ' + (order.order_number || order.id),
-        order_id: order.id,
-        performed_by: 'admin_remove_item'
-      });
-    }
 
     // 3. Remove from local array and recalculate order total
     items.splice(idx, 1);
