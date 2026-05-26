@@ -61,8 +61,29 @@ const B2B = (function() {
   async function init() {
     try {
       if (typeof sfi === 'undefined' || !sfi.b2b) throw new Error('API not loaded');
+
+      // Check if user is logged in at all
+      const user = sfi.auth?.getUser?.();
+
       const ok = await sfi.b2b.checkAccess();
-      if (!ok) { showDenied(); return; }
+      if (!ok) {
+        // Determine if it's "not logged in" or "logged in but not approved"
+        const attemptType = user ? 'b2b_denied' : 'b2b_not_logged_in';
+        const attemptEmail = user?.email || null;
+        try {
+          fetch((window.SUPABASE_URL || 'https://styynhgzrkyoioqjssuw.supabase.co') + '/functions/v1/notify-access-attempt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              attempt_type: attemptType,
+              email: attemptEmail,
+              page_url: window.location.href,
+              extra: user ? { user_id: user.id, b2b_status: 'not_approved' } : { reason: 'no_session' }
+            })
+          }).catch(() => {});
+        } catch(e) {}
+        showDenied(); return;
+      }
       profile = await sfi.b2b.getProfile();
       if (!profile) { showDenied(); return; }
 

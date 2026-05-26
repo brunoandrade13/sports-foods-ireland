@@ -73,6 +73,19 @@ document.getElementById('loginForm')?.addEventListener('submit', async function(
             showDashboard();
         } else {
             showToast(data.error_description || data.msg || 'Invalid email or password.', 'error');
+            // Notify SFI staff of failed login attempt
+            try {
+                fetch((window.SUPABASE_URL || 'https://styynhgzrkyoioqjssuw.supabase.co') + '/functions/v1/notify-access-attempt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        attempt_type: 'login_failed',
+                        email: email,
+                        page_url: window.location.href,
+                        extra: { error: data.error_description || data.msg || 'Invalid credentials' }
+                    })
+                }).catch(() => {});
+            } catch(e) {}
         }
     } catch (err) {
         showToast('Connection error. Please try again.', 'error');
