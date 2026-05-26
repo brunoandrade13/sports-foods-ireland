@@ -19186,7 +19186,7 @@ let _boData = [];
 async function loadBackorders() {
 try {
 // Fetch order items that are marked as backorder and not yet fulfilled
-const items = await supaGet('order_items', '?select=id,order_id,product_name,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,created_at&is_backorder=eq.true&order=created_at.desc');
+const items = await supaGet('order_items', '?select=id,order_id,product_name,variant_label,product_sku,sku,variant_id,product_id,quantity,unit_price,total_price,is_backorder,backorder_status,backorder_notes,backorder_fulfilled_at,fulfillment_status,backorder_prepaid,backorder_original_order_id,created_at&is_backorder=eq.true&order=created_at.desc');
 
 // Also fetch orders with has_backorder_items flag
 const orders = await supaGet('orders', '?select=id,order_number,customer_name,customer_email,created_at,fulfillment_status,customer_id&has_backorder_items=eq.true&order=created_at.desc');
@@ -19373,11 +19373,15 @@ function openBoCustomerModal(customerKey) {
     const qty = Number(item.quantity || 1);
     const unitPrice = Number(item.unit_price || (item.total_price / qty) || 0);
 
+    const prepaidBadge = item.backorder_prepaid
+      ? `<span style="display:inline-block;background:#16a34a;color:#fff;font-size:0.68rem;padding:1px 7px;border-radius:8px;margin-left:6px;font-weight:700">💳 PREPAID</span>`
+      : '';
     return `<tr style="border-bottom:1px solid var(--border)" id="boRow_${idx}">
       <td style="padding:10px 12px">
-        <div style="font-weight:600;font-size:0.9rem">${item.product_name || '—'}</div>
+        <div style="font-weight:600;font-size:0.9rem">${item.product_name || '—'}${prepaidBadge}</div>
         <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px">
           Order <a href="#" onclick="closeBoModal();openOrderFromList('${o.order_number||''}');return false" style="color:var(--accent)">#${o.order_number||'—'}</a> · ${orderDate}
+          ${item.backorder_prepaid ? '<span style="color:#16a34a;font-weight:600"> · Payment already collected</span>' : ''}
         </div>
       </td>
       <td style="padding:10px 12px;text-align:center;font-weight:700">${qty}</td>
@@ -19503,6 +19507,11 @@ async function shipBoItems() {
     })();
     const newOrderNum = oidData || ('SFI-BO-' + Date.now().toString().slice(-8));
 
+    // Check if all items are prepaid (payment already collected)
+    const allPrepaid = toShip.every(r => r.item.backorder_prepaid === true);
+    const anyPrepaid = toShip.some(r => r.item.backorder_prepaid === true);
+    const originalOrders = [...new Set(toShip.map(r => r.item.backorder_original_order_id).filter(Boolean))];
+
     // 2. Create new order
     const newTotal = toShip.reduce((s, r) => {
       const unitP = Number(r.item.unit_price || (r.item.total_price / (r.item.quantity||1)) || 0);
@@ -19515,18 +19524,22 @@ async function shipBoItems() {
       body: JSON.stringify({
         order_number: newOrderNum,
         status: 'processing',
-        payment_status: 'paid',
-        financial_status: 'paid',
+        // If all prepaid, mark as already paid. If partial, keep pending
+        payment_status: allPrepaid ? 'paid' : 'pending',
+        financial_status: allPrepaid ? 'paid' : 'pending',
         total: parseFloat(newTotal.toFixed(2)),
         subtotal: parseFloat(newTotal.toFixed(2)),
         currency: 'EUR',
+        customer_id: refOrder.customer_id || null,
         customer_name: c.name,
         customer_email: c.email || refOrder.customer_email || '',
         order_source: 'backorder_fulfillment',
         source: 'admin',
         payment_method: refOrder.payment_method || 'account',
         item_count: toShip.reduce((s, r) => s + r.shipQty, 0),
-        notes: 'Backorder fulfillment — original order(s): ' + [...c.orderNumbers].join(', '),
+        notes: anyPrepaid
+          ? `Backorder fulfillment \u2014 PAYMENT ALREADY COLLECTED in original order(s): ${[...c.orderNumbers].join(', ')}. No additional payment required.`
+          : `Backorder fulfillment \u2014 original order(s): ${[...c.orderNumbers].join(', ')}`,
         shipping_address: shipAddr || refOrder.shipping_address || {},
         billing_address:  billAddr || refOrder.billing_address  || {},
       }),
@@ -19539,17 +19552,28 @@ async function shipBoItems() {
     // 3. Insert order items
     for (const r of toShip) {
       const unitP = Number(r.item.unit_price || (r.item.total_price / (r.item.quantity||1)) || 0);
+      const isPrepaid = r.item.backorder_prepaid === true;
       await fetch(`${SUPA_URL}/rest/v1/order_items`, {
         method: 'POST',
         headers: h,
         body: JSON.stringify({
           order_id: newOrderId,
+          product_id: r.item.product_id || null,
+          variant_id: r.item.variant_id || null,
+          variant_label: r.item.variant_label || null,
           product_name: r.item.product_name,
+          product_sku: r.item.product_sku || r.item.sku || null,
+          sku: r.item.product_sku || r.item.sku || null,
           quantity: r.shipQty,
           unit_price: unitP,
           total_price: parseFloat((unitP * r.shipQty).toFixed(2)),
+          total: parseFloat((unitP * r.shipQty).toFixed(2)),
           is_backorder: false,
           fulfillment_status: 'unfulfilled',
+          // Mark if payment was already collected in original order
+          backorder_notes: isPrepaid
+            ? `Payment already collected in original order. Backorder original: ${r.item.backorder_original_order_id || 'N/A'}`
+            : null,
         }),
       });
     }
