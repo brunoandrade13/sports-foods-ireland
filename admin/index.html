@@ -16188,14 +16188,18 @@ async function saveOrderItemEdits() {
       if (boQty === 0) {
         // Normal item — update price and quantity
         // If quantity was REDUCED, restore the difference to stock
-        const origDbQty = item.quantity || 1;
-        const qtyDiff = origDbQty - origQty; // positive = reduction
-        const newTotal = parseFloat((newPrice * origQty).toFixed(2));
+        // BUT: only restore if item was NOT previously a backorder item
+        // (backorder items never decremented stock, so no restore needed)
+        const origDbQty  = item.quantity || 1;
+        const wasBackorder = item.is_backorder === true;
+        const qtyDiff    = origDbQty - origQty; // positive = qty reduction
+        const newTotal   = parseFloat((newPrice * origQty).toFixed(2));
         await supaUpdate('order_items', item.id, {
           unit_price: newPrice, quantity: origQty, total_price: newTotal, total: newTotal,
           is_backorder: false, backorder_status: null, fulfillment_status: item.fulfillment_status === 'backorder' ? 'unfulfilled' : item.fulfillment_status
         });
-        if (qtyDiff > 0) await restoreStock(item, qtyDiff);
+        // Only restore stock for genuine qty reductions on non-backorder items
+        if (qtyDiff > 0 && !wasBackorder) await restoreStock(item, qtyDiff);
         item.unit_price = newPrice; item.quantity = origQty; item.total_price = newTotal; item.total = newTotal;
         item.is_backorder = false; item._boQty = 0;
       } else if (boQty >= origQty) {
