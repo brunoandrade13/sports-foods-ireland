@@ -15108,6 +15108,33 @@ window.sendInvoiceToQB = async function sendInvoiceToQB() {
   }
 };
 
+// ── GLS Label Merge ──────────────────────────────────────────────────────
+// Merges multiple base64 PDF labels into a single multi-page PDF.
+// Uses pdf-lib loaded lazily from CDN on first call.
+window.mergeGlsLabels = async function mergeGlsLabels(base64Array) {
+  if (!window.PDFLib) {
+    await new Promise(function(resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+      s.onload = resolve;
+      s.onerror = function() { reject(new Error('Could not load pdf-lib')); };
+      document.head.appendChild(s);
+    });
+  }
+  var PDFDocument = window.PDFLib.PDFDocument;
+  var merged = await PDFDocument.create();
+  for (var i = 0; i < base64Array.length; i++) {
+    var b64 = base64Array[i];
+    if (!b64) continue;
+    var bytes = Uint8Array.from(atob(b64), function(c) { return c.charCodeAt(0); });
+    var srcPdf = await PDFDocument.load(bytes);
+    var indices = srcPdf.getPageIndices();
+    var copied  = await merged.copyPages(srcPdf, indices);
+    copied.forEach(function(page) { merged.addPage(page); });
+  }
+  return await merged.save();
+};
+
 window.downloadGLSLabel = async function downloadGLSLabel() {
   var order = window._currentModalOrder;
 
@@ -15154,31 +15181,34 @@ window.downloadGLSLabel = async function downloadGLSLabel() {
         setTimeout(function() { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
       }
     } else {
-      // Multi-parcel — open each label in a new tab
-      toast('Opening ' + allLabels.length + ' label(s) for printing…', 'success');
-      for (var idx = 0; idx < allLabels.length; idx++) {
-        var lb = allLabels[idx];
-        if (!lb) continue;
-        var bin = atob(lb);
-        var buf = new Uint8Array(bin.length);
-        for (var j = 0; j < bin.length; j++) buf[j] = bin.charCodeAt(j);
-        var pdfBlob = new Blob([buf], { type: 'application/pdf' });
-        var pdfUrl  = URL.createObjectURL(pdfBlob);
-        var tNum    = trackNums[idx] ? ' ' + trackNums[idx] : (' #' + (idx + 1));
-        var win = window.open(pdfUrl, '_blank');
-        if (win) {
-          win.onload = (function(w) { return function() { w.print(); }; })(win);
-          win.document.title = 'GLS Label ' + orderNum + tNum;
+      // Multi-parcel — merge all labels into a SINGLE PDF, open once, print once
+      toast('Merging ' + allLabels.length + ' labels into one file…');
+      try {
+        var mergedBytes = await mergeGlsLabels(allLabels);
+        var mergedBlob = new Blob([mergedBytes], { type: 'application/pdf' });
+        var mergedUrl  = URL.createObjectURL(mergedBlob);
+        var mw = window.open(mergedUrl);
+        if (mw) {
+          mw.onload = function() { mw.print(); };
+          mw.document && (mw.document.title = 'GLS Labels — ' + orderNum + ' (' + allLabels.length + ' parcels)');
         } else {
-          // If popup blocked, download instead
-          var dl = document.createElement('a');
-          dl.href = pdfUrl;
-          dl.download = 'GLS-label-' + orderNum + '-parcel' + (idx+1) + '.pdf';
-          document.body.appendChild(dl); dl.click();
-          setTimeout(function(u, el) { return function() { URL.revokeObjectURL(u); document.body.removeChild(el); }; }(pdfUrl, dl), 1000);
+          var dla = document.createElement('a');
+          dla.href = mergedUrl;
+          dla.download = 'GLS-labels-' + orderNum + '-' + allLabels.length + 'parcels.pdf';
+          document.body.appendChild(dla); dla.click();
+          setTimeout(function() { URL.revokeObjectURL(mergedUrl); document.body.removeChild(dla); }, 1000);
         }
-        // Small delay between tabs so browser doesn't block them
-        if (idx < allLabels.length - 1) await new Promise(r => setTimeout(r, 300));
+      } catch(mergeErr) {
+        toast('Merge failed, opening separately: ' + mergeErr.message, 'error');
+        // Fallback: open separately
+        for (var fi = 0; fi < allLabels.length; fi++) {
+          var flb = allLabels[fi]; if (!flb) continue;
+          var fbin = atob(flb), fbuf = new Uint8Array(fbin.length);
+          for (var fj = 0; fj < fbin.length; fj++) fbuf[fj] = fbin.charCodeAt(fj);
+          var furl = URL.createObjectURL(new Blob([fbuf], { type: 'application/pdf' }));
+          window.open(furl, '_blank');
+          if (fi < allLabels.length - 1) await new Promise(r => setTimeout(r, 300));
+        }
       }
     }
   } catch(e) {
@@ -20194,33 +20224,52 @@ async function glsPrintLabel(orderId, evt) {
 
   const trackNums = (order.tracking_number || '').split(',').map(s => s.trim());
 
-  // Open each label in a new tab for printing
-  if (allLabels.length > 1) toast(`Opening ${allLabels.length} labels for printing…`, 'success');
-
-  for (let i = 0; i < allLabels.length; i++) {
-    const b64 = allLabels[i];
-    if (!b64) continue;
+  if (allLabels.length > 1) {
+    // Multi-parcel — merge into single PDF
+    toast(`Merging ${allLabels.length} labels into one file…`);
     try {
-      const binary = atob(b64);
-      const bytes = new Uint8Array(binary.length);
-      for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
-      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const mergedBytes = await mergeGlsLabels(allLabels);
+      const blob = new Blob([mergedBytes], { type: 'application/pdf' });
       const url  = URL.createObjectURL(blob);
       const w    = window.open(url, '_blank');
       if (w) {
         w.onload = (function(win) { return function() { win.print(); }; })(w);
-        const tNum = trackNums[i] || ('#' + (i + 1));
-        w.document && (w.document.title = `GLS ${order.order_number} — Label ${tNum}`);
+        w.document && (w.document.title = `GLS ${order.order_number} — ${allLabels.length} labels`);
       } else {
-        // Popup blocked → download
         const a = document.createElement('a');
         a.href = url;
-        a.download = `GLS-${order.order_number}-label${allLabels.length > 1 ? '-parcel' + (i+1) : ''}.pdf`;
+        a.download = `GLS-${order.order_number}-${allLabels.length}parcels.pdf`;
         document.body.appendChild(a); a.click();
         setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
       }
-    } catch(e) { toast('Error opening label ' + (i+1) + ': ' + e.message, 'error'); }
-    if (i < allLabels.length - 1) await new Promise(r => setTimeout(r, 300));
+    } catch(mergeErr) {
+      toast('Merge failed, opening separately: ' + mergeErr.message, 'error');
+      for (let i = 0; i < allLabels.length; i++) {
+        const b64 = allLabels[i]; if (!b64) continue;
+        const binary = atob(b64), bytes = new Uint8Array(binary.length);
+        for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
+        window.open(URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' })), '_blank');
+        if (i < allLabels.length - 1) await new Promise(r => setTimeout(r, 300));
+      }
+    }
+  } else {
+    // Single label
+    const b64 = allLabels[0]; if (!b64) return;
+    const binary = atob(b64), bytes = new Uint8Array(binary.length);
+    for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url  = URL.createObjectURL(blob);
+    const w    = window.open(url, '_blank');
+    if (w) {
+      w.onload = (function(win) { return function() { win.print(); }; })(w);
+      w.document && (w.document.title = `GLS ${order.order_number} — Label`);
+    } else {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `GLS-${order.order_number}-label.pdf`;
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
+    }
   }
 }
 
