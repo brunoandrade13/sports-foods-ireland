@@ -7707,14 +7707,14 @@ Loading items...
       try {
         // ── PHASE 1: Essential data (products + catalog + orders + customers) ──
         const [prods, br, cats, subcats, dc, vt, pv, custs, ords, z3disc] = await Promise.all([
-          supaGetAll('products', '?select=*,brands(name),categories(name)&order=name'),
+          supaGetAll('products', '?select=id,name,slug,sku,price_eur,price_gbp,compare_at_price_eur,cost_price_eur,wholesale_price_eur,brand_id,category_id,subcategory_id,sub_subcategory_id,image_url,stock_quantity,in_stock,is_active,is_new,is_featured,is_placeholder,track_inventory,backorder_available,weight_grams,low_stock_threshold,total_sold,total_revenue_eur,discount_percent,vegan,gluten_free,caffeine_free,is_taxable,vat_rate,qb_item_id,qb_id,legacy_id,woo_product_id,created_at,updated_at,brands(name),categories(name)&order=name'),
           supaGet('brands', '?order=name'),
           supaGet('categories', '?order=name'),
           supaGet('subcategories', '?select=*,categories(name)&order=name').catch(() => []),
           supaGet('discount_codes', '?order=created_at.desc'),
           supaGet('variant_types', '?order=sort_order').catch(() => []),
           supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => []),
-          supaGetAll('customers', '?order=created_at.desc').catch(() => []),
+          supaGetAll('customers', '?select=id,email,first_name,last_name,name,display_name,company,phone,address,address2,city,county,postcode,country,customer_type,b2b_status,is_b2b,is_active,parent_customer_id,qb_customer_id,total_orders,total_spent_eur,avg_order_value_eur,last_order_at,accepts_marketing,created_at,updated_at&order=created_at.desc').catch(() => []),
           loadOrdersSmart(),
           supaGet('zone3_customer_discounts', '?is_active=eq.true&select=*').catch(() => [])
         ]);
@@ -7832,7 +7832,7 @@ Loading items...
     // ============================================================
     async function _refreshProducts() {
       const [prods, pv] = await Promise.all([
-        supaGetAll('products', '?select=*,brands(name),categories(name)&order=name'),
+        supaGetAll('products', '?select=id,name,slug,sku,price_eur,price_gbp,compare_at_price_eur,cost_price_eur,wholesale_price_eur,brand_id,category_id,subcategory_id,sub_subcategory_id,image_url,stock_quantity,in_stock,is_active,is_new,is_featured,is_placeholder,track_inventory,backorder_available,weight_grams,low_stock_threshold,total_sold,total_revenue_eur,discount_percent,vegan,gluten_free,caffeine_free,is_taxable,vat_rate,qb_item_id,qb_id,legacy_id,woo_product_id,created_at,updated_at,brands(name),categories(name)&order=name'),
         supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => [])
       ]);
       allProducts = prods || [];
@@ -7879,7 +7879,8 @@ Loading items...
     }
 
     async function _refreshOrders() {
-      allOrders = (await supaGetAll('orders', '?order=created_at.desc').catch(() => allOrders))
+      // Keep to 500 for performance — reports query DB directly with their own date-range queries
+      allOrders = (await supaGet('orders', '?order=created_at.desc&limit=500').catch(() => allOrders))
         .filter(o => !(o.status === 'cancelled' && o.order_source === 'quickbooks' && (o.notes || '').includes('DUPLICATE')));
       filteredOrders = allOrders.filter(o => o.status !== 'cancelled');
       const pendOrd = allOrders.filter(o => o.fulfillment_status === 'unfulfilled').length;
@@ -7919,7 +7920,7 @@ Loading items...
           supaGet('abandoned_carts', '?order=created_at.desc&limit=200').catch(() => []),
           supaGet('shipping_zones', '?order=name').catch(() => []),
           supaGetAll('vendors', '?order=name').catch(() => []),
-          supaGetAll('purchase_orders', '?order=txn_date.desc').catch(() => []),
+          supaGet('purchase_orders', '?order=txn_date.desc&limit=500').catch(() => []),
           Promise.resolve([]),
           supaGet('v_all_sales', '?order=txn_date.desc&limit=1000').catch(() => []),
           supaGet('customer_product_prices', '?is_active=eq.true&select=id,product_id,customer_id,price_eur').catch(() => [])
