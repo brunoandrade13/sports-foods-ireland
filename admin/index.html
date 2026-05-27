@@ -2886,7 +2886,7 @@ Select a financial report above to begin analysis.
 </div>
 <div class="table-wrap">
 <div class="table-toolbar">
-<input type="text" class="search-input" id="customerSearch" placeholder="Search customers..." onkeyup="filterCustomers()">
+<input type="text" class="search-input" id="customerSearch" placeholder="Search customers..." oninput="filterCustomers()" onkeyup="filterCustomers()">
 <select class="filter-select" id="customerStatusFilter" onchange="filterCustomers()">
 <option value="all">All Statuses</option>
 <option value="active">Active Only</option>
@@ -7729,7 +7729,7 @@ Loading items...
       try {
         // ── PHASE 1: Essential data (products + catalog + orders + customers) ──
         const [prods, br, cats, subcats, dc, vt, pv, custs, ords, z3disc] = await Promise.all([
-          supaGetAll('products', '?select=id,name,slug,sku,price_eur,price_gbp,compare_at_price_eur,cost_price_eur,wholesale_price_eur,brand_id,category_id,subcategory_id,sub_subcategory_id,image_url,stock_quantity,in_stock,is_active,is_new,is_featured,is_placeholder,track_inventory,backorder_available,weight_grams,low_stock_threshold,total_sold,total_revenue_eur,discount_percent,vegan,gluten_free,caffeine_free,is_taxable,vat_rate,qb_item_id,qb_id,legacy_id,woo_product_id,created_at,updated_at,brands(name),categories(name)&order=name'),
+          supaGetAll('products', '?select=id,name,slug,sku,price_eur,price_gbp,compare_at_price_eur,compare_at_price_gbp,cost_price_eur,cost_price_gbp,cost_price_usd,wholesale_price_eur,bulk_price_eur,brand_id,category_id,subcategory_id,sub_subcategory_id,image_url,stock_quantity,in_stock,is_active,is_new,is_featured,is_placeholder,track_inventory,backorder_available,weight_grams,low_stock_threshold,total_sold,total_revenue_eur,discount_percent,vegan,gluten_free,caffeine_free,is_taxable,vat_rate,qb_item_id,qb_id,qb_sales_tax_code,legacy_id,woo_product_id,woo_total_sales,description,short_description,ingredients,nutritional_info,allergens,usage_instructions,storage_instructions,shelf_life_days,certifications,barcode,meta_title,meta_description,seo_keywords,created_at,updated_at,brands(name),categories(name)&order=name'),
           supaGet('brands', '?order=name'),
           supaGet('categories', '?order=name'),
           supaGet('subcategories', '?select=*,categories(name)&order=name').catch(() => []),
@@ -7877,7 +7877,7 @@ Loading items...
 
     async function _refreshProducts() {
       const [prods, pv] = await Promise.all([
-        supaGetAll('products', '?select=id,name,slug,sku,price_eur,price_gbp,compare_at_price_eur,cost_price_eur,wholesale_price_eur,brand_id,category_id,subcategory_id,sub_subcategory_id,image_url,stock_quantity,in_stock,is_active,is_new,is_featured,is_placeholder,track_inventory,backorder_available,weight_grams,low_stock_threshold,total_sold,total_revenue_eur,discount_percent,vegan,gluten_free,caffeine_free,is_taxable,vat_rate,qb_item_id,qb_id,legacy_id,woo_product_id,created_at,updated_at,brands(name),categories(name)&order=name'),
+        supaGetAll('products', '?select=id,name,slug,sku,price_eur,price_gbp,compare_at_price_eur,compare_at_price_gbp,cost_price_eur,cost_price_gbp,cost_price_usd,wholesale_price_eur,bulk_price_eur,brand_id,category_id,subcategory_id,sub_subcategory_id,image_url,stock_quantity,in_stock,is_active,is_new,is_featured,is_placeholder,track_inventory,backorder_available,weight_grams,low_stock_threshold,total_sold,total_revenue_eur,discount_percent,vegan,gluten_free,caffeine_free,is_taxable,vat_rate,qb_item_id,qb_id,qb_sales_tax_code,legacy_id,woo_product_id,woo_total_sales,description,short_description,ingredients,nutritional_info,allergens,usage_instructions,storage_instructions,shelf_life_days,certifications,barcode,meta_title,meta_description,seo_keywords,created_at,updated_at,brands(name),categories(name)&order=name'),
         supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => [])
       ]);
       allProducts = prods || [];
