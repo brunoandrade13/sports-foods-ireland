@@ -6,6 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SFI Admin</title>
 <meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
 href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
@@ -10426,7 +10429,10 @@ Loading items...
             }
           }
           // ALWAYS show B2B or B2C badge
-          const isB2B = matchedCust ? matchedCust.customer_type === 'b2b' : (o.is_b2b === true);
+          // Priority: customer record > order source > order is_b2b flag
+          const isB2B = matchedCust
+            ? (matchedCust.customer_type === 'b2b' || matchedCust.is_b2b === true || matchedCust.b2b_status === 'approved')
+            : (o.order_source === 'b2b_portal' || o.is_b2b === true || o.payment_method === 'Net 30 (Invoice)');
           typeBadge = isB2B
             ? '<span class="stock-badge in" style="background:#4b0082;color:white;font-size:0.7rem;padding:2px 5px;margin-left:4px">B2B</span>'
             : '<span class="stock-badge out" style="font-size:0.7rem;padding:2px 5px;margin-left:4px">B2C</span>';
