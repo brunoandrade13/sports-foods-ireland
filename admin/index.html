@@ -14842,9 +14842,42 @@ window.openGLSShipModal = function openGLSShipModal() {
   }
 
   var orderNum = order.order_number || order.id || '';
+  var orderItems = window._currentModalItems || [];
+  var regularItems = orderItems.filter(function(i) { return !i.is_backorder; });
+  var backorderItems = orderItems.filter(function(i) { return i.is_backorder === true; });
+  var isBackorderFulfillment = (order.order_source === 'backorder_fulfillment');
+
+  // Build item summary for shipment notice
+  var itemSummaryHtml = '';
+  if (backorderItems.length > 0 && !isBackorderFulfillment) {
+    // Order has pending backorder — show what will be shipped now vs later
+    var regularList = regularItems.map(function(i) {
+      return '<li style="margin:2px 0">✅ ' + esc(i.product_name) + (i.variant_label ? ' — ' + esc(i.variant_label) : '') + ' × ' + i.quantity + '</li>';
+    }).join('');
+    var backorderList = backorderItems.map(function(i) {
+      return '<li style="margin:2px 0;color:#f59e0b">⏳ ' + esc(i.product_name) + (i.variant_label ? ' — ' + esc(i.variant_label) : '') + ' × ' + i.quantity + ' (backorder — ship separately when stock arrives)</li>';
+    }).join('');
+    itemSummaryHtml = '<div style="margin-bottom:16px;padding:12px 14px;border:2px solid #3b82f6;border-radius:10px;background:rgba(59,130,246,0.07)">' +
+      '<div style="font-size:0.8rem;font-weight:700;color:#3b82f6;margin-bottom:6px">📦 SHIPMENT 1 of 2 — Items to ship NOW:</div>' +
+      '<ul style="margin:0;padding-left:18px;font-size:0.82rem">' + regularList + '</ul>' +
+      '<div style="font-size:0.8rem;font-weight:700;color:#f59e0b;margin:8px 0 4px">⏳ Will ship separately (backorder):</div>' +
+      '<ul style="margin:0;padding-left:18px;font-size:0.82rem">' + backorderList + '</ul>' +
+      '<div style="margin-top:8px;font-size:0.78rem;color:var(--text-muted)">Status will be set to <strong>Partial</strong>. Create a 2nd shipment when backorder items arrive.</div>' +
+    '</div>';
+  } else if (isBackorderFulfillment) {
+    var boList = orderItems.map(function(i) {
+      return '<li style="margin:2px 0">📦 ' + esc(i.product_name) + (i.variant_label ? ' — ' + esc(i.variant_label) : '') + ' × ' + i.quantity + '</li>';
+    }).join('');
+    itemSummaryHtml = '<div style="margin-bottom:16px;padding:12px 14px;border:2px solid #10b981;border-radius:10px;background:rgba(16,185,129,0.07)">' +
+      '<div style="font-size:0.8rem;font-weight:700;color:#10b981;margin-bottom:6px">✅ BACKORDER SHIPMENT — Items to ship:</div>' +
+      '<ul style="margin:0;padding-left:18px;font-size:0.82rem">' + boList + '</ul>' +
+    '</div>';
+  }
+
   document.getElementById('glsShipModalContent').innerHTML =
     '<h3 style="margin:0 0 4px;color:var(--text)">📦 Ship via GLS</h3>' +
-    '<p style="margin:0 0 18px;color:var(--text-muted);font-size:0.85rem">Order <strong>' + esc(orderNum) + '</strong> — Review details before creating shipment</p>' +
+    '<p style="margin:0 0 14px;color:var(--text-muted);font-size:0.85rem">Order <strong>' + esc(orderNum) + '</strong> — Review details before creating shipment</p>' +
+    itemSummaryHtml +
 
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
       '<div style="grid-column:1/-1"><label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Recipient / Company Name</label>' +
@@ -14942,10 +14975,19 @@ window.confirmGLSShip = async function confirmGLSShip() {
     var allParcels = result.all_parcel_numbers || [result.parcel_number];
     var trackingStr = allParcels.join(', ');
 
+    // Determine correct fulfillment_status:
+    // - If order has pending backorder items → 'partial' (only regular items shipped now)
+    // - If order is backorder_fulfillment source → 'fulfilled' (this IS the backorder shipment)
+    // - Otherwise → 'fulfilled'
+    var orderItems = window._currentModalItems || [];
+    var hasPendingBackorder = orderItems.some(function(i) { return i.is_backorder === true; });
+    var isBackorderFulfillment = (order.order_source === 'backorder_fulfillment');
+    var newFulfillmentStatus = (hasPendingBackorder && !isBackorderFulfillment) ? 'partial' : 'fulfilled';
+
     // Save to order
     var updateData = {
       tracking_number: trackingStr,
-      fulfillment_status: 'fulfilled',
+      fulfillment_status: newFulfillmentStatus,
       shipped_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -14962,7 +15004,7 @@ window.confirmGLSShip = async function confirmGLSShip() {
     var idx = allOrders.findIndex(function(o) { return o.id === order.id; });
     if (idx >= 0) {
       allOrders[idx].tracking_number = trackingStr;
-      allOrders[idx].fulfillment_status = 'fulfilled';
+      allOrders[idx].fulfillment_status = newFulfillmentStatus;
     }
     window._currentModalOrder.tracking_number = trackingStr;
     var trackInput = document.getElementById('omTrackingNumber');
