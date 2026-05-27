@@ -10429,13 +10429,17 @@ Loading items...
             }
           }
           // ALWAYS show B2B or B2C badge
-          // Order source + order flag take priority — they reflect the actual transaction type
-          // Customer record is a fallback when the order itself doesn't indicate B2B
-          const orderIsB2B = o.order_source === 'b2b_portal' || o.is_b2b === true || o.payment_method === 'Net 30 (Invoice)';
+          // Priority: order flags → customer record → email cross-reference
+          const orderIsB2B = o.order_source === 'b2b_portal' || o.order_source === 'backorder_fulfillment' || o.is_b2b === true || o.payment_method === 'Net 30 (Invoice)';
           const custIsB2B = matchedCust
             ? (matchedCust.customer_type === 'b2b' || matchedCust.is_b2b === true || matchedCust.b2b_status === 'approved')
             : false;
-          const isB2B = orderIsB2B || custIsB2B;
+          // Final fallback: check if this email has ANY b2b_portal order (catches admin orders for B2B customers)
+          const oEmail = (o.customer_email || '').toLowerCase();
+          const emailHasB2B = !orderIsB2B && !custIsB2B && oEmail.length > 3 && allOrders.some(function(ao) {
+            return (ao.customer_email || '').toLowerCase() === oEmail && (ao.order_source === 'b2b_portal' || ao.is_b2b === true);
+          });
+          const isB2B = orderIsB2B || custIsB2B || emailHasB2B;
           typeBadge = isB2B
             ? '<span class="stock-badge in" style="background:#4b0082;color:white;font-size:0.7rem;padding:2px 5px;margin-left:4px">B2B</span>'
             : '<span class="stock-badge out" style="font-size:0.7rem;padding:2px 5px;margin-left:4px">B2C</span>';
