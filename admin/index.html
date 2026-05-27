@@ -7736,7 +7736,7 @@ Loading items...
           supaGet('discount_codes', '?order=created_at.desc'),
           supaGet('variant_types', '?order=sort_order').catch(() => []),
           supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => []),
-          supaGetAll('customers', '?select=id,email,first_name,last_name,name,display_name,company,b2b_company_name,b2b_vat_number,phone,address,address2,city,county,postcode,country,customer_type,b2b_status,is_b2b,is_active,is_blocked,parent_customer_id,qb_customer_id,total_orders,total_spent_eur,avg_order_value_eur,last_order_at,accepts_marketing,tax_exempt,invoice_cc_emails,notes,created_at,updated_at&order=created_at.desc').catch(() => []),
+          supaGetAll('customers', '?select=id,email,first_name,last_name,name,display_name,company,b2b_company_name,b2b_vat_number,phone,address,address2,city,county,postcode,country,customer_type,b2b_status,is_b2b,is_active,parent_customer_id,qb_customer_id,total_orders,total_spent_eur,avg_order_value_eur,last_order_at,accepts_marketing,tax_exempt,invoice_cc_emails,notes,created_at,updated_at&order=created_at.desc').catch(() => []),
           loadOrdersSmart(),
           supaGet('zone3_customer_discounts', '?is_active=eq.true&select=*').catch(() => [])
         ]);
