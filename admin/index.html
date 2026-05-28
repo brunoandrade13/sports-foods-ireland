@@ -7718,7 +7718,7 @@ Loading items...
         ]);
 
         allProducts = prods || [];
-        filteredProducts = [...allProducts];
+        filteredProducts = allProducts.filter(p => p.is_active !== false);
         brands = br || [];
         categories = cats || [];
         subcategories = subcats || [];
@@ -7806,7 +7806,7 @@ Loading items...
         };
 
         // Update sidebar counts (Phase 1 data)
-        document.getElementById('productCount').textContent = allProducts.length;
+        document.getElementById('productCount').textContent = allProducts.filter(p => p.is_active !== false).length;
         const lowStk = allProducts.filter(p => p.stock_quantity > 0 && p.stock_quantity < 10).length;
         if (lowStk > 0) { const el = document.getElementById('lowStockCount'); el.textContent = lowStk; el.style.display = 'inline'; }
         const pendOrd = allOrders.filter(o => o.fulfillment_status === 'unfulfilled').length;
@@ -7873,7 +7873,7 @@ Loading items...
         supaGetAll('product_variants', '?select=*,variant_types(name,slug)&order=sort_order').catch(() => [])
       ]);
       allProducts = prods || [];
-      filteredProducts = [...allProducts];
+      filteredProducts = allProducts.filter(p => p.is_active !== false);
       productVariantsCache = {};
       (pv || []).forEach(v => {
         if (!productVariantsCache[v.product_id]) productVariantsCache[v.product_id] = [];
@@ -7888,7 +7888,7 @@ Loading items...
           p.stock_quantity = leafVars.reduce((sum, v) => sum + (v.stock || 0), 0);
         }
       });
-      document.getElementById('productCount').textContent = allProducts.length;
+      document.getElementById('productCount').textContent = allProducts.filter(p => p.is_active !== false).length;
       const lowStk = allProducts.filter(p => p.stock_quantity > 0 && p.stock_quantity < 10).length;
       const el = document.getElementById('lowStockCount');
       if (el) { el.textContent = lowStk; el.style.display = lowStk > 0 ? 'inline' : 'none'; }
