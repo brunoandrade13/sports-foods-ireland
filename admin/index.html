@@ -15560,8 +15560,9 @@ var qty = parseInt(item.quantity) || 1;
     }
     var desc = baseName + (cleanedVariant ? ' — ' + cleanedVariant : '');
     var rate = parseFloat(item.unit_price) || 0;
-    // For VAT-inclusive orders: show ex-VAT unit price on invoice (VAT shown separately at bottom)
-    if (isVatInclusive) rate = Math.round(rate / 1.23 * 100) / 100;
+    // For VAT-inclusive orders: show prices AS PAID on invoice.
+    // VAT is noted as "included" at the bottom — NOT divided out and re-added.
+    // (do NOT divide by 1.23 here — that causes rounding and shows wrong totals)
     var amount = qty * rate;
 subtotal += amount;
 
@@ -15614,25 +15615,30 @@ var discountedSubtotal = subtotal - discountAmount;
 
 // ---- TOTALS ----
 var shipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
-// Shipping already includes VAT — calculate VAT on products only
-// Tax-exempt orders (tax_amount explicitly stored as 0): no VAT
 var taxAmountStored = order.tax_amount != null ? parseFloat(order.tax_amount) : null;
 var isTaxExempt = taxAmountStored !== null && taxAmountStored === 0;
-// B2C website / B2B portal prices are VAT-inclusive — subtotal is already VAT-inclusive
-// so we must NOT multiply by 0.23 again. Instead derive VAT from the embedded amount.
-// isVatInclusive = prices stored with VAT already inside (website/b2b_portal/tax_amount>0)
+// VAT-inclusive: prices are stored with VAT already inside (b2b_portal/website/stripe payments)
+// For these: total = prices as paid. VAT is extracted (shown as "included"), NOT added again.
 var isVatInclusive = !isTaxExempt && (
   taxAmountStored > 0 ||
   ['website', 'b2b_portal'].includes(order.order_source)
 );
-// For VAT-inclusive orders: ex-VAT subtotal = discountedSubtotal (rate was already converted above)
-// For VAT-exclusive or exempt: subtotal is already ex-VAT
+
 var exVatSubtotal = discountedSubtotal;
+
+// For VAT-inclusive orders: total = what was paid (no re-addition of VAT)
+// vatIncluded = informational only (extracted from inclusive price)
+var vatIncluded  = isTaxExempt ? 0 : (isVatInclusive ? Math.round(discountedSubtotal / 1.23 * 0.23 * 100) / 100 : 0);
+var vatAdded     = isTaxExempt ? 0 : (!isVatInclusive ? Math.round(exVatSubtotal * 0.23 * 100) / 100 : 0);
+var vatTotal     = isVatInclusive ? vatIncluded : vatAdded;
+var total        = isVatInclusive
+  ? (discountedSubtotal + shipping)          // total = prices paid (VAT already inside)
+  : (exVatSubtotal + shipping + vatAdded);   // total = ex-VAT + shipping + VAT
 var vatTotal = isTaxExempt ? 0 : (isVatInclusive ? Math.round(exVatSubtotal * 23) / 100 : 0);
 var total = exVatSubtotal + shipping + vatTotal;
 checkPage(100);
 var tx = ML + CW - 200;
-var totalsRows = [['SUBTOTAL', fmtM(isVatInclusive ? exVatSubtotal : subtotal)]];
+var totalsRows = [['SUBTOTAL', fmtM(discountedSubtotal)]];
 if (discountAmount > 0) {
   // Bug #18: suportar zone3_discount_applied OU legacy coupon_code
   var _coupon = order.coupon_code || order.discount_code || '';
@@ -15649,8 +15655,10 @@ if (discountAmount > 0) {
 if (shipping > 0) totalsRows.push(['SHIPPING', fmtM(shipping)]);
 if (isTaxExempt) {
   totalsRows.push(['VAT EXEMPT (Zero-Rated)', fmtM(0)]);
+} else if (isVatInclusive) {
+  totalsRows.push(['VAT @ 23% INCLUDED', fmtM(vatIncluded)]);
 } else {
-  totalsRows.push(['VAT @ 23%', fmtM(vatTotal)]);
+  totalsRows.push(['VAT @ 23%', fmtM(vatAdded)]);
 }
 totalsRows.push(['TOTAL', fmtM(total)]);
 totalsRows.forEach(function(r) {
@@ -15673,8 +15681,12 @@ doc.setDrawColor(204,204,204); doc.rect(ML, y, taxTW, 14, 'S');
 doc.setFont('helvetica','normal'); doc.setFontSize(8); txp = ML;
 if (isTaxExempt) {
   doc.text('VAT EXEMPT', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(0), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(discountedSubtotal), txp + 4, y + 10);
+} else if (isVatInclusive) {
+  // VAT is INSIDE the prices — show extracted VAT and the ex-VAT net
+  var exVatNet = Math.round(discountedSubtotal / 1.23 * 100) / 100;
+  doc.text('VAT @ 23% INCL', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(vatIncluded), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(exVatNet), txp + 4, y + 10);
 } else {
-  doc.text('VAT @ 23%', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(vatTotal), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(discountedSubtotal), txp + 4, y + 10);
+  doc.text('VAT @ 23%', txp + 4, y + 10); txp += taxCW[0]; doc.text(fmtM(vatAdded), txp + 4, y + 10); txp += taxCW[1]; doc.text(fmtM(discountedSubtotal), txp + 4, y + 10);
 }
 
 // ---- Footer on last page ----
