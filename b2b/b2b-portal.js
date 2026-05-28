@@ -2,6 +2,33 @@
    B2B Portal Controller — v3 (Fixed data flow)
    Sports Foods Ireland
    ═══════════════════════════════════════════════ */
+
+// Canonical sort: base product name A→Z, then variant A→Z
+// Same logic used in admin panel, email and qb-create-invoice
+function sortOrderItems(items) {
+  function getBase(item) {
+    let n = (item.product_name || item.name || '').toLowerCase();
+    const v = (item.variant_label || '').toLowerCase();
+    if (v) {
+      if (n.includes(' \u2014 ' + v)) n = n.replace(' \u2014 ' + v, '');
+      else if (n.includes(' - ' + v)) n = n.replace(' - ' + v, '');
+    }
+    const last = n.lastIndexOf(' \u2014 ');
+    if (last > 0) {
+      const suffix = n.substring(last + 3);
+      if (suffix.includes('/') || suffix.includes(' \u2014 ')) n = n.substring(0, last);
+    }
+    return n.trim();
+  }
+  return [...items].sort(function(a, b) {
+    const na = getBase(a), nb = getBase(b);
+    if (na < nb) return -1; if (na > nb) return 1;
+    const va = (a.variant_label || '').toLowerCase();
+    const vb = (b.variant_label || '').toLowerCase();
+    return va < vb ? -1 : va > vb ? 1 : 0;
+  });
+}
+
 const B2B = (function() {
   'use strict';
   let profile = null;
@@ -1066,6 +1093,7 @@ const B2B = (function() {
       } catch(e) { console.error(e); }
     }
     if (!items.length) { toast('No items found in this order'); return; }
+    items = sortOrderItems(items); // canonical order
 
     reorderItems = items.map(i => {
       var imgUrl = resolveItemImage(i);
@@ -1258,7 +1286,7 @@ const B2B = (function() {
   function showInvoiceFromOrder(orderId) {
     const order = allOrders.find(o => o.id === orderId);
     if (!order) return;
-    const items = (order.item_summary || []).map(i => ({
+    const items = sortOrderItems((order.item_summary || []).map(i => ({
       name: i.product_name || 'Product', qty: i.quantity||1,
       price: Number(i.unit_price)||0, total: Number(i.total)||0
     }));

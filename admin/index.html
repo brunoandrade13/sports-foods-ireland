@@ -4969,6 +4969,8 @@ Loading items...
   <span id="omDiscountPreview" style="font-size:0.82rem;color:#4ade80;font-weight:600;min-width:120px"></span>
   <button class="btn" onclick="document.getElementById('omDiscountValue').value='';updateDiscountPreview()"
     style="padding:5px 10px;font-size:0.78rem;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;border-radius:6px">Clear</button>
+  <button class="btn" id="btnSaveDiscount" onclick="saveOrderDiscount()"
+    style="padding:5px 12px;font-size:0.78rem;background:#2D6A4F;color:#fff;border:none;cursor:pointer;border-radius:6px;font-weight:600">💾 Save</button>
 </div>
 <!-- Observations field — appears in QB invoice CustomerMemo -->
 <div style="margin:12px 0">
@@ -15118,7 +15120,6 @@ window.saveOrderNotes = async function saveOrderNotes() {
       body: JSON.stringify({ notes })
     });
     if (!res.ok) throw new Error(await res.text());
-    // Update local cache
     order.notes = notes;
     const idx = allOrders.findIndex(o => o.id === order.id);
     if (idx >= 0) allOrders[idx].notes = notes;
@@ -15127,6 +15128,58 @@ window.saveOrderNotes = async function saveOrderNotes() {
     toast('Error saving notes: ' + e.message, 'error');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '💾 Save Notes'; }
+  }
+};
+
+// ── Save order discount ─────────────────────────────────────────────────────
+window.saveOrderDiscount = async function saveOrderDiscount() {
+  const order = window._currentModalOrder;
+  if (!order) { toast('No order open', 'error'); return; }
+  const valEl  = document.getElementById('omDiscountValue');
+  const typeEl = document.getElementById('omDiscountType');
+  const btn    = document.getElementById('btnSaveDiscount');
+  const rawVal = parseFloat(valEl?.value) || 0;
+  const type   = typeEl?.value || 'percent';
+
+  // Calculate the absolute discount amount to store
+  let discountAmount = 0;
+  if (rawVal > 0) {
+    if (type === 'percent') {
+      const subtotal = parseFloat(order.subtotal) || parseFloat(order.total) || 0;
+      discountAmount = Math.round(subtotal * rawVal / 100 * 100) / 100;
+    } else {
+      discountAmount = rawVal;
+    }
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  try {
+    const h = getAuthHeaders();
+    const payload = {
+      discount_amount: discountAmount > 0 ? discountAmount : null,
+      discount_total:  discountAmount > 0 ? discountAmount : null,
+    };
+    const res = await fetch(`${SUPA_URL}/rest/v1/orders?id=eq.${order.id}`, {
+      method: 'PATCH',
+      headers: { ...h, 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    // Update local cache
+    order.discount_amount = payload.discount_amount;
+    order.discount_total  = payload.discount_total;
+    const idx = allOrders.findIndex(o => o.id === order.id);
+    if (idx >= 0) { allOrders[idx].discount_amount = payload.discount_amount; allOrders[idx].discount_total = payload.discount_total; }
+    // Refresh the items table so the total updates
+    if (typeof renderOrderItemsTable === 'function' && window._currentModalItems) {
+      renderOrderItemsTable(window._currentModalItems, order, false);
+    }
+    if (typeof updateDiscountPreview === 'function') updateDiscountPreview();
+    toast(discountAmount > 0 ? `✅ Discount of €${discountAmount.toFixed(2)} saved` : '✅ Discount removed', 'success');
+  } catch (e) {
+    toast('Error saving discount: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Save'; }
   }
 };
 
@@ -15335,7 +15388,18 @@ try {
   allItems = (allItems || []).filter(function(i) { return i.is_backorder !== true; });
 } catch(e) { console.error(e); }
 if (!allItems || !allItems.length) return alert('No items to ship found for this order');
-var items = allItems;
+// ── Deduplicate: merge items with same product+variant (safety net for DB duplicates) ──
+var itemMap = {};
+(allItems || []).forEach(function(i) {
+  var key = (i.product_name || '') + '||' + (i.variant_label || '') + '||' + (i.product_sku || i.sku || '');
+  if (itemMap[key]) {
+    itemMap[key].quantity = (parseInt(itemMap[key].quantity)||0) + (parseInt(i.quantity)||0);
+    itemMap[key].total_price = (parseFloat(itemMap[key].total_price)||0) + (parseFloat(i.total_price)||0);
+  } else {
+    itemMap[key] = Object.assign({}, i);
+  }
+});
+var items = Object.values(itemMap);
 const bill = order.billing_address || {}, ship = order.shipping_address || {};
 let company = '';
 // ── For manual orders: build address fallback from customer record ──
@@ -15796,7 +15860,35 @@ async function sendInvoiceByEmail() {
 // ============================================================
 // ORDER ITEMS RENDER + EDIT MODE (v2 — partial backorder by qty)
 // ============================================================
+// ── Sort order items: alphabetically by base product name, then by variant label ──
+// This is the canonical sort used everywhere (admin, email, QB, B2B portal)
+function sortOrderItems(items) {
+  function getBaseName(item) {
+    let n = (item.product_name || '').toLowerCase();
+    const v = (item.variant_label || '').toLowerCase();
+    if (v) {
+      if (n.includes(' \u2014 ' + v)) n = n.replace(' \u2014 ' + v, '');
+      else if (n.includes(' - ' + v)) n = n.replace(' - ' + v, '');
+    }
+    const last = n.lastIndexOf(' \u2014 ');
+    if (last > 0) {
+      const suffix = n.substring(last + 3);
+      if (suffix.includes('/') || suffix.includes(' \u2014 ')) n = n.substring(0, last);
+    }
+    return n.trim();
+  }
+  return [...items].sort(function(a, b) {
+    const na = getBaseName(a), nb = getBaseName(b);
+    if (na < nb) return -1;
+    if (na > nb) return 1;
+    const va = (a.variant_label || '').toLowerCase();
+    const vb = (b.variant_label || '').toLowerCase();
+    return va < vb ? -1 : va > vb ? 1 : 0;
+  });
+}
+
 function renderOrderItemsTable(items, order, editMode) {
+  items = sortOrderItems(items); // ← consistent order everywhere
   const wrapper = document.getElementById('omItemsWrapper');
   if (!wrapper) return;
   const editBtn = document.getElementById('btnEditItems');
