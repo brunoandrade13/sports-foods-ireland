@@ -15158,6 +15158,10 @@ window.saveOrderDiscount = async function saveOrderDiscount() {
     const payload = {
       discount_amount: discountAmount > 0 ? discountAmount : null,
       discount_total:  discountAmount > 0 ? discountAmount : null,
+      // Also update total so the orders list shows the correct value
+      total: discountAmount > 0
+        ? Math.round((parseFloat(order.total) + (parseFloat(order.discount_amount) || 0) - discountAmount) * 100) / 100
+        : Math.round((parseFloat(order.total) + (parseFloat(order.discount_amount) || 0)) * 100) / 100
     };
     const res = await fetch(`${SUPA_URL}/rest/v1/orders?id=eq.${order.id}`, {
       method: 'PATCH',
