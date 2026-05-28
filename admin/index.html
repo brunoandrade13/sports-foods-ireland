@@ -15512,11 +15512,15 @@ var _preIsVatInclusive = !_preIsExempt && (_preForceInclusive || _preTaxStored >
 // forceInclusive = don't divide by 1.23, total = subtotal as-paid (no VAT addition)
 // normal inclusive = divide by 1.23, then add VAT back
 var _preExVat = _preForceInclusive
-  ? (preSubtotal - preDiscountAmt)                                                          // as-paid total
-  : (_preIsVatInclusive ? Math.round((preSubtotal - preDiscountAmt) / 1.23 * 100) / 100    // ex-VAT derived
-                        : (preSubtotal - preDiscountAmt));                                  // already ex-VAT
+  ? (preSubtotal - preDiscountAmt)
+  : (_preIsVatInclusive ? Math.round((preSubtotal - preDiscountAmt) / 1.23 * 100) / 100
+                        : (preSubtotal - preDiscountAmt));
 var preVat = _preIsExempt ? 0 : (_preIsVatInclusive && !_preForceInclusive ? Math.round(_preExVat * 23) / 100 : 0);
 var preTotal = _preExVat + preShipping + preVat;
+
+// ── Define forceVatInclusive + isVatInclusive HERE — before the items loop uses them ──
+var forceVatInclusive = _preForceInclusive;
+var isVatInclusive    = _preIsVatInclusive;
 var detF = [['INVOICE NO.', invNum], ['DATE', fmtD(invDate)], ['TOTAL DUE', 'EUR ' + fmtM(preTotal)], ['DUE DATE', fmtD(dueDate)], ['TERMS', 'Net 30'], ['ENCLOSED', '']];
 var dCW = [CW*0.22, CW*0.13, CW*0.17, CW*0.15, CW*0.13, CW*0.20];
 doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
@@ -15623,14 +15627,7 @@ var discountedSubtotal = subtotal - discountAmount;
 var shipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_total) || 0;
 var taxAmountStored = order.tax_amount != null ? parseFloat(order.tax_amount) : null;
 var isTaxExempt = taxAmountStored !== null && taxAmountStored === 0;
-// forceVatInclusive = exceptional flag: show prices exactly as paid, VAT noted as "included"
-var forceVatInclusive = order.vat_inclusive_invoice === true;
-// Normal VAT-inclusive: b2b_portal / website / tax_amount>0
-var isVatInclusive = !isTaxExempt && (
-  forceVatInclusive ||
-  taxAmountStored > 0 ||
-  ['website', 'b2b_portal'].includes(order.order_source)
-);
+// forceVatInclusive + isVatInclusive already defined above (before items loop) — do not redefine
 var exVatSubtotal = discountedSubtotal;
 
 // Totals: forceVatInclusive → total = prices as paid (no VAT re-added)
