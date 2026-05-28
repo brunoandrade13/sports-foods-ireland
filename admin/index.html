@@ -2445,8 +2445,23 @@ style="cursor:help;font-size:0.85rem">ℹ️</span></th>
         </div>
         <div>
           <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Shipping €</label>
-          <input type="number" id="moShipping" step="0.01" min="0" oninput="recalcManualOrderTotal()"
-            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="number" id="moShipping" step="0.01" min="0" oninput="recalcManualOrderTotal()"
+              style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text)">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;font-size:0.8rem;color:var(--text-muted);user-select:none"
+              title="Waive shipping cost for this order regardless of order value">
+              <input type="checkbox" id="moFreeShipping"
+                onchange="
+                  var sh = document.getElementById('moShipping');
+                  if(this.checked){ sh.value='0'; sh.disabled=true; sh.style.opacity='0.4'; }
+                  else { sh.disabled=false; sh.style.opacity='1'; }
+                  recalcManualOrderTotal();
+                "
+                style="width:15px;height:15px;cursor:pointer;accent-color:#2D6A4F">
+              <span id="moFreeShippingLabel" style="color:#2D6A4F;font-weight:600">🚚 Free shipping</span>
+            </label>
+          </div>
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-top:3px">Exception: waives delivery even if order is below €150</div>
         </div>
         <div>
           <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Tax € <span id="moTaxLabel" style="color:#f59e0b;font-size:0.7rem">(auto 23%)</span></label>
@@ -13242,6 +13257,7 @@ Loading items...
       let subtotal = parseFloat(document.getElementById('moSubtotal').value || '0') || 0;
       const discount = parseFloat(document.getElementById('moDiscount').value || '0') || 0;
       const shipping = parseFloat(document.getElementById('moShipping').value || '0') || 0;
+      const freeShipping = document.getElementById('moFreeShipping')?.checked === true;
       const tax = parseFloat(document.getElementById('moTax').value || '0') || 0;
       let total = parseFloat(document.getElementById('moTotal').value || '0');
       const notes = document.getElementById('moNotes').value.trim() || null;
@@ -13251,9 +13267,9 @@ Loading items...
 
       // Subtotal always from items
       subtotal = manualOrderItems.reduce(function (s, i) { return s + i.unit_price * i.qty; }, 0);
-      // If there's a GLS Delivery item, set shipping_cost = 0 (delivery is already in the items)
+      // If there's a GLS Delivery item OR "Free Shipping" checkbox is ticked, set shipping_cost = 0
       const hasGlsDelivery = manualOrderItems.some(function(i) { return i.is_gls_delivery; });
-      const effectiveShipping = hasGlsDelivery ? 0 : shipping;
+      const effectiveShipping = (hasGlsDelivery || freeShipping) ? 0 : shipping;
       if (!total || isNaN(total)) total = subtotal - discount + effectiveShipping + tax;
       if (total < 0) total = 0;
 
