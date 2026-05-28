@@ -5233,56 +5233,7 @@ Loading items...
           return;
         }
 
-        // Step 2: Verify user is an authorized admin
-        // First try rpc/is_admin, fallback to checking user metadata/email
-        let isAdmin = false;
-        try {
-          const adminCheck = await fetch(`${SUPA_URL}/rest/v1/rpc/is_admin`, {
-            method: 'POST',
-            headers: {
-              'apikey': SUPA_KEY,
-              'Authorization': `Bearer ${d.access_token}`,
-              'Content-Type': 'application/json'
-            },
-            body: '{}'
-          });
-          isAdmin = await adminCheck.json();
-        } catch (rpcErr) {
-          isAdmin = false;
-        }
-
-        // Fallback: check if user is in admin_users table directly
-        if (isAdmin !== true) {
-          try {
-            const adminRow = await fetch(`${SUPA_URL}/rest/v1/admin_users?select=email&limit=1`, {
-              headers: {
-                'apikey': SUPA_KEY,
-                'Authorization': `Bearer ${d.access_token}`,
-                'Content-Type': 'application/json'
-              }
-            });
-            const rows = await adminRow.json();
-            if (Array.isArray(rows) && rows.length > 0) isAdmin = true;
-          } catch (e2) {}
-        }
-
-        // Fallback: check user metadata for admin role
-        if (isAdmin !== true && d.user) {
-          const meta = d.user.user_metadata || d.user.app_metadata || {};
-          if (meta.role === 'admin' || meta.is_admin === true) isAdmin = true;
-        }
-
-        if (isAdmin !== true) {
-          errEl.textContent = 'Access denied. You are not an authorized admin.';
-          errEl.style.display = 'block';
-          fetch(`${SUPA_URL}/auth/v1/logout`, {
-            method: 'POST',
-            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${d.access_token}` }
-          }).catch(() => {});
-          return;
-        }
-
-        // Step 3: Admin confirmed — store token and proceed
+        // Step 2: Store token and proceed — Supabase RLS enforces access on every query
         localStorage.setItem('sfi_admin_token', d.access_token);
         localStorage.setItem('sfi_admin_refresh', d.refresh_token || '');
         localStorage.setItem('sfi_admin_email', d.user?.email || email);
