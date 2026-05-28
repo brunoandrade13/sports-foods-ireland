@@ -15169,11 +15169,16 @@ window.saveOrderDiscount = async function saveOrderDiscount() {
       body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error(await res.text());
-    // Update local cache
+    // Update local cache so subsequent saves / re-opens are consistent
     order.discount_amount = payload.discount_amount;
     order.discount_total  = payload.discount_total;
+    order.total           = payload.total;
     const idx = allOrders.findIndex(o => o.id === order.id);
-    if (idx >= 0) { allOrders[idx].discount_amount = payload.discount_amount; allOrders[idx].discount_total = payload.discount_total; }
+    if (idx >= 0) {
+      allOrders[idx].discount_amount = payload.discount_amount;
+      allOrders[idx].discount_total  = payload.discount_total;
+      allOrders[idx].total           = payload.total;
+    }
     // Refresh the items table so the total updates
     if (typeof renderOrderItemsTable === 'function' && window._currentModalItems) {
       renderOrderItemsTable(window._currentModalItems, order, false);
