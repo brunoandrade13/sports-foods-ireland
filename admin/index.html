@@ -15640,8 +15640,6 @@ var vatTotal = isTaxExempt ? 0 : (forceVatInclusive ? vatIncluded : (isVatInclus
 var total = forceVatInclusive
   ? (discountedSubtotal + shipping)               // total = prices as paid
   : (exVatSubtotal + shipping + (isTaxExempt ? 0 : (isVatInclusive ? vatNormal : vatExclusive)));
-var vatTotal = isTaxExempt ? 0 : (isVatInclusive ? Math.round(exVatSubtotal * 23) / 100 : 0);
-var total = exVatSubtotal + shipping + vatTotal;
 checkPage(100);
 var tx = ML + CW - 200;
 var totalsRows = [['SUBTOTAL', fmtM(forceVatInclusive ? discountedSubtotal : (isVatInclusive ? exVatSubtotal : subtotal))]];
