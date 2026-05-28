@@ -7646,11 +7646,22 @@ Loading items...
 
     function showPage(page) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => {
+        n.classList.remove('active');
+        n.style.color = '';
+        n.style.background = '';
+        n.style.backgroundColor = '';
+      });
       const el = document.getElementById('page-' + page);
       if (el) el.classList.add('active');
       const nav = document.querySelector(`.nav-item[data-page="${page}"]`);
-      if (nav) nav.classList.add('active');
+      if (nav) {
+        nav.classList.add('active');
+        // Force correct style regardless of CSS cache
+        nav.style.color = '#7a8ba8';
+        nav.style.background = 'none';
+        nav.style.backgroundColor = 'transparent';
+      }
       const titles = {
         dashboard: 'Dashboard', analytics: 'Analytics', products: 'Products', brands: 'Brands', categories: 'Categories',
         reviews: 'Reviews', orders: 'Orders', customers: 'Customers', abandoned: 'Abandoned Carts', discounts: 'Discount Codes',
@@ -18669,6 +18680,13 @@ await loadB2CData();
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
+// Force correct sidebar styles on load (bypasses CSS cache)
+document.querySelectorAll('.nav-item').forEach(function(n) {
+  n.style.color = '#7a8ba8';
+  n.style.background = 'none';
+  n.style.backgroundColor = 'transparent';
+});
+
 // Nav items
 document.querySelectorAll('.nav-item').forEach(item => {
 item.addEventListener('click', () => {
