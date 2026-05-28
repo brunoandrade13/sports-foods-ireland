@@ -18705,48 +18705,11 @@ if (page) showPage(page);
 });
 });
 
-// Check auth
+// Check auth — if token exists, show app immediately
+// Security is enforced by Supabase RLS on every API call
 if (localStorage.getItem('sfi_admin_token')) {
-try {
-const rawToken = localStorage.getItem('sfi_admin_token');
-const validToken = await getValidBearerToken();
-const tokenToCheck = (validToken === SUPA_KEY) ? rawToken : validToken;
-// null = not checked yet, true = admin, false = explicitly denied
-let adminResult = null;
-
-// Try rpc/is_admin — only mark as denied if it explicitly returns false
-try {
-  const checkRes = await fetch(`${SUPA_URL}/rest/v1/rpc/is_admin`, {
-    method: 'POST',
-    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${tokenToCheck}`, 'Content-Type': 'application/json' },
-    body: '{}'
-  });
-  if (checkRes.ok) { adminResult = await checkRes.json(); }
-  // If HTTP error (401, 500, timeout) → adminResult stays null (unknown, not denied)
-} catch(e) { /* network error — adminResult stays null */ }
-
-// Fallback: check admin_users table if still unknown
-if (adminResult !== true) {
-  try {
-    const ar = await fetch(`${SUPA_URL}/rest/v1/admin_users?select=email&limit=1`, {
-      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${tokenToCheck}` }
-    });
-    if (ar.ok) {
-      const rows = await ar.json();
-      if (Array.isArray(rows) && rows.length > 0) adminResult = true;
-      else if (Array.isArray(rows) && rows.length === 0 && adminResult === false) adminResult = false;
-    }
-  } catch(e2) { /* network error — adminResult stays as-is */ }
-}
-
-// adminResult: true=confirmed admin, false=explicitly denied, null=network/DB error
-if (adminResult === true) { _startTokenRefresh(); showApp(); }
-else if (adminResult === false) { localStorage.removeItem('sfi_admin_token'); localStorage.removeItem('sfi_admin_email'); }
-else { /* null: DB unreachable — keep token, show app */ _startTokenRefresh(); showApp(); }
-} catch(e) {
-// On unexpected error, still try to show app if token exists
-if (localStorage.getItem('sfi_admin_token')) { _startTokenRefresh(); showApp(); }
-}
+  _startTokenRefresh();
+  showApp();
 }
 
 // Login form enter key
