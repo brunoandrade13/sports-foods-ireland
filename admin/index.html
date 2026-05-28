@@ -15158,10 +15158,24 @@ window.saveOrderDiscount = async function saveOrderDiscount() {
     const payload = {
       discount_amount: discountAmount > 0 ? discountAmount : null,
       discount_total:  discountAmount > 0 ? discountAmount : null,
-      // Also update total so the orders list shows the correct value
-      total: discountAmount > 0
-        ? Math.round((parseFloat(order.total) + (parseFloat(order.discount_amount) || 0) - discountAmount) * 100) / 100
-        : Math.round((parseFloat(order.total) + (parseFloat(order.discount_amount) || 0)) * 100) / 100
+      // Update total to match what the invoice will show:
+      // B2B (is_b2b): prices are ex-VAT → total = (subtotal - discount) × 1.23
+      // B2C/website:  prices are VAT-inclusive → total = total_inc_vat - discount
+      total: (() => {
+        const sub   = parseFloat(order.subtotal) || 0;
+        const oldDi = parseFloat(order.discount_amount) || 0;
+        const origTotal = Math.round((parseFloat(order.total) + oldDi) * 100) / 100; // restore pre-discount total
+        if (order.is_b2b) {
+          // B2B: prices ex-VAT → apply discount to subtotal, add 23% VAT
+          const newExVat = Math.max(0, sub - discountAmount);
+          return Math.round(newExVat * 1.23 * 100) / 100;
+        } else {
+          // B2C: prices VAT-inclusive → subtract discount from total
+          return discountAmount > 0
+            ? Math.round((origTotal - discountAmount) * 100) / 100
+            : origTotal;
+        }
+      })()
     };
     const res = await fetch(`${SUPA_URL}/rest/v1/orders?id=eq.${order.id}`, {
       method: 'PATCH',
@@ -15517,7 +15531,9 @@ var preShipping = parseFloat(order.shipping_cost) || parseFloat(order.shipping_t
 var _preTaxStored = order.tax_amount != null ? parseFloat(order.tax_amount) : null;
 var _preIsExempt = _preTaxStored !== null && _preTaxStored === 0;
 var _preForceInclusive = order.vat_inclusive_invoice === true; // exceptional: show prices as-paid
-var _preIsVatInclusive = !_preIsExempt && (_preForceInclusive || _preTaxStored > 0 || ['website','b2b_portal'].includes(order.order_source));
+// B2B orders: prices stored are ex-VAT wholesale → NOT VAT-inclusive → do not divide by 1.23
+// Website B2C orders: prices stored are VAT-inclusive retail → IS VAT-inclusive
+var _preIsVatInclusive = !_preIsExempt && (_preForceInclusive || (!order.is_b2b && (_preTaxStored > 0 || order.order_source === 'website')));
 // forceInclusive = don't divide by 1.23, total = subtotal as-paid (no VAT addition)
 // normal inclusive = divide by 1.23, then add VAT back
 var _preExVat = _preForceInclusive
