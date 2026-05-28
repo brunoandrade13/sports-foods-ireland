@@ -18708,14 +18708,17 @@ if (page) showPage(page);
 // Check auth
 if (localStorage.getItem('sfi_admin_token')) {
 try {
+const rawToken = localStorage.getItem('sfi_admin_token');
 const validToken = await getValidBearerToken();
+// If refresh failed, validToken === SUPA_KEY (anon). Use raw token as fallback.
+const tokenToCheck = (validToken === SUPA_KEY) ? rawToken : validToken;
 let stillAdmin = false;
 
 // Try rpc/is_admin
 try {
   const checkRes = await fetch(`${SUPA_URL}/rest/v1/rpc/is_admin`, {
     method: 'POST',
-    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${validToken}`, 'Content-Type': 'application/json' },
+    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${tokenToCheck}`, 'Content-Type': 'application/json' },
     body: '{}'
   });
   stillAdmin = await checkRes.json();
@@ -18725,7 +18728,7 @@ try {
 if (stillAdmin !== true) {
   try {
     const ar = await fetch(`${SUPA_URL}/rest/v1/admin_users?select=email&limit=1`, {
-      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${validToken}` }
+      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${tokenToCheck}` }
     });
     const rows = await ar.json();
     if (Array.isArray(rows) && rows.length > 0) stillAdmin = true;
@@ -18735,8 +18738,8 @@ if (stillAdmin !== true) {
 if (stillAdmin === true) { _startTokenRefresh(); showApp(); }
 else { localStorage.removeItem('sfi_admin_token'); localStorage.removeItem('sfi_admin_email'); }
 } catch(e) {
-localStorage.removeItem('sfi_admin_token');
-localStorage.removeItem('sfi_admin_email');
+// On unexpected error, still try to show app if token exists
+if (localStorage.getItem('sfi_admin_token')) { _startTokenRefresh(); showApp(); }
 }
 }
 
