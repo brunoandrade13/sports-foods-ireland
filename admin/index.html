@@ -7869,8 +7869,24 @@ Loading items...
         setTimeout(() => _loadSecondaryData(), 2000);
 
       } catch (e) {
-        toast('Error loading data: ' + e.message, 'error');
-        console.error(e);
+        // If 401 (expired token), try to refresh and retry once
+        if (e.message && e.message.includes('401')) {
+          try {
+            const freshToken = await getValidBearerToken();
+            if (freshToken && freshToken !== SUPA_KEY) {
+              localStorage.setItem('sfi_admin_token', freshToken);
+              // Retry loading data with fresh token
+              await loadAllData();
+              return;
+            }
+          } catch (retryErr) { /* silent */ }
+          // Token truly invalid — force re-login
+          toast('Session expired. Please log in again.', 'error');
+          setTimeout(() => doLogout(), 2000);
+        } else {
+          toast('Error loading data: ' + e.message, 'error');
+          console.error(e);
+        }
       }
     }
 
