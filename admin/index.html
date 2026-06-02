@@ -15390,17 +15390,15 @@ try {
   allItems = (allItems || []).filter(function(i) { return i.is_backorder !== true; });
 } catch(e) { console.error(e); }
 if (!allItems || !allItems.length) return alert('No items to ship found for this order');
-// ── Deduplicate: merge items with same product+variant (safety net for DB duplicates) ──
+// ── Deduplicate: merge items with same product+variant+price (safety net for DB duplicates) ──
+// Note: items with same variant but different price are kept separate (e.g. free items at 0.00)
 var itemMap = {};
 (allItems || []).forEach(function(i) {
-  var key = (i.product_name || '') + '||' + (i.variant_label || '') + '||' + (i.product_sku || i.sku || '');
+  var price = parseFloat(i.unit_price) || 0;
+  var key = (i.product_name || '') + '||' + (i.variant_label || '') + '||' + (i.product_sku || i.sku || '') + '||' + price.toFixed(2);
   if (itemMap[key]) {
     itemMap[key].quantity = (parseInt(itemMap[key].quantity)||0) + (parseInt(i.quantity)||0);
     itemMap[key].total_price = (parseFloat(itemMap[key].total_price)||0) + (parseFloat(i.total_price)||0);
-    // Use the highest unit_price (non-zero price takes priority over zero)
-    var existingPrice = parseFloat(itemMap[key].unit_price) || 0;
-    var newPrice = parseFloat(i.unit_price) || 0;
-    if (newPrice > existingPrice) itemMap[key].unit_price = i.unit_price;
   } else {
     itemMap[key] = Object.assign({}, i);
   }
