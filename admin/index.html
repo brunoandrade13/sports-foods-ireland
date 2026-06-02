@@ -18682,11 +18682,28 @@ if (page) showPage(page);
 });
 });
 
-// Check auth — if token exists, show app immediately
-// Security is enforced by Supabase RLS on every API call
+// Check auth — if token exists, try to refresh first then show app
 if (localStorage.getItem('sfi_admin_token')) {
-  _startTokenRefresh();
-  showApp();
+  const refreshToken = localStorage.getItem('sfi_admin_refresh');
+  if (refreshToken) {
+    // Try to get a fresh token before loading data
+    fetch(`${SUPA_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: 'POST',
+      headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken })
+    }).then(r => r.json()).then(d => {
+      if (d.access_token) {
+        localStorage.setItem('sfi_admin_token', d.access_token);
+        if (d.refresh_token) localStorage.setItem('sfi_admin_refresh', d.refresh_token);
+      }
+    }).catch(() => {}).finally(() => {
+      _startTokenRefresh();
+      showApp();
+    });
+  } else {
+    _startTokenRefresh();
+    showApp();
+  }
 }
 
 // Login form enter key
