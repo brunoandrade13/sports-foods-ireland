@@ -5265,8 +5265,10 @@ Loading items...
     let _refreshInterval = null;
     function _startTokenRefresh() {
       if (_refreshInterval) clearInterval(_refreshInterval);
-      // Refresh every 50 minutes (JWT default expiry is 60 min)
+      // Only the visible tab refreshes the token — prevents multi-tab token conflicts
       _refreshInterval = setInterval(async () => {
+        // Skip if tab is hidden — another tab will handle it
+        if (document.visibilityState === 'hidden') return;
         const refreshToken = localStorage.getItem('sfi_admin_refresh');
         if (!refreshToken) return;
         try {
