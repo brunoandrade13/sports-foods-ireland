@@ -4,15 +4,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<script>
-// Cache buster — forces reload with version param if not present
-if (location.search.indexOf('v=20260602a') === -1) {
-  location.replace(location.pathname + '?v=20260602a' + (location.hash || ''));
-}
-</script>
 <title>SFI Admin</title>
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -7835,24 +7826,8 @@ Loading items...
         setTimeout(() => _loadSecondaryData(), 2000);
 
       } catch (e) {
-        // If 401 (expired token), try to refresh and retry once
-        if (e.message && e.message.includes('401')) {
-          try {
-            const freshToken = await getValidBearerToken();
-            if (freshToken && freshToken !== SUPA_KEY) {
-              localStorage.setItem('sfi_admin_token', freshToken);
-              // Retry loading data with fresh token
-              await loadAllData();
-              return;
-            }
-          } catch (retryErr) { /* silent */ }
-          // Token truly invalid — force re-login
-          toast('Session expired. Please log in again.', 'error');
-          setTimeout(() => doLogout(), 2000);
-        } else {
-          toast('Error loading data: ' + e.message, 'error');
-          console.error(e);
-        }
+        toast('Error loading data: ' + e.message, 'error');
+        console.error(e);
       }
     }
 
