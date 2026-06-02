@@ -5306,12 +5306,7 @@ Loading items...
       if (loginEl) loginEl.style.display = 'none';
       if (appEl) appEl.style.display = 'grid';
       if (userEl) userEl.textContent = localStorage.getItem('sfi_admin_email') || 'Admin';
-      // Refresh token before loading data — ensures fresh JWT is used for all API calls
-      getValidBearerToken().then(function(freshToken) {
-        if (freshToken && freshToken !== SUPA_KEY) {
-          localStorage.setItem('sfi_admin_token', freshToken);
-        }
-      }).catch(function(){}).finally(function(){ loadAllData(); });
+      loadAllData();
       // Start Realtime subscriptions after login
       setTimeout(initRealtime, 1000);
     }
