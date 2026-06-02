@@ -15549,8 +15549,11 @@ var _preExVat = _preForceInclusive
   ? (preSubtotal - preDiscountAmt)
   : (_preIsVatInclusive ? Math.round((preSubtotal - preDiscountAmt) / 1.23 * 100) / 100
                         : (preSubtotal - preDiscountAmt));
-var preVat = _preIsExempt ? 0 : (_preIsVatInclusive && !_preForceInclusive ? Math.round(_preExVat * 23) / 100 : 0);
-var preTotal = _preExVat + preShipping + preVat;
+var preVat = _preIsExempt ? 0
+  : _preForceInclusive ? 0
+  : _preIsVatInclusive ? Math.round(_preExVat * 23) / 100
+  : Math.round((preSubtotal - preDiscountAmt) * 0.23 * 100) / 100; // B2B: add 23% on ex-VAT
+var preTotal = _preForceInclusive ? (preSubtotal - preDiscountAmt) + preShipping : _preExVat + preShipping + preVat;
 
 // ── Define forceVatInclusive + isVatInclusive HERE — before the items loop uses them ──
 var forceVatInclusive = _preForceInclusive;
