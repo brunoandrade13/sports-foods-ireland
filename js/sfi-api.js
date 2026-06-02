@@ -494,19 +494,33 @@ const sfi = {
       if (!user) return false;
       await sfi.auth.ensureAuth();
       try {
-        // Try user_id first, fall back to email match (handles legacy customers with null user_id)
+        // 1. Try user_id first (fastest — covers all fixed accounts)
         let rows = await db.query('customers', {
           select: 'is_b2b,b2b_status,customer_type',
           filters: { user_id: user.id },
           limit: 1
         });
+        // 2. Fallback: use DB function that checks all emails in comma-separated list
+        //    This allows secondary emails (accounts@, invoices@, etc.) to also get access
         if (!rows || !rows[0]) {
-          // Fallback: match by email
-          rows = await db.query('customers', {
-            select: 'is_b2b,b2b_status,customer_type',
-            filters: { email: user.email },
-            limit: 1
-          });
+          try {
+            const res = await fetch(
+              `${db.url}/rest/v1/rpc/find_b2b_customer_by_email`,
+              {
+                method: 'POST',
+                headers: { 'apikey': db.key, 'Authorization': `Bearer ${db.token || db.key}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lookup_email: (user.email || '').trim().toLowerCase() })
+              }
+            );
+            if (res.ok) rows = await res.json();
+          } catch(e2) {
+            // Final fallback: exact email match
+            rows = await db.query('customers', {
+              select: 'is_b2b,b2b_status,customer_type',
+              filters: { email: user.email },
+              limit: 1
+            });
+          }
         }
         const p = rows && rows[0];
         if (!p) return false;
