@@ -15397,6 +15397,10 @@ var itemMap = {};
   if (itemMap[key]) {
     itemMap[key].quantity = (parseInt(itemMap[key].quantity)||0) + (parseInt(i.quantity)||0);
     itemMap[key].total_price = (parseFloat(itemMap[key].total_price)||0) + (parseFloat(i.total_price)||0);
+    // Use the highest unit_price (non-zero price takes priority over zero)
+    var existingPrice = parseFloat(itemMap[key].unit_price) || 0;
+    var newPrice = parseFloat(i.unit_price) || 0;
+    if (newPrice > existingPrice) itemMap[key].unit_price = i.unit_price;
   } else {
     itemMap[key] = Object.assign({}, i);
   }
