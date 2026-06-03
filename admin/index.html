@@ -5230,6 +5230,14 @@ Loading items...
         if (!d.access_token) {
           errEl.textContent = d.error_description || 'Invalid credentials';
           errEl.style.display = 'block';
+          // Notify of failed admin login attempt
+          try {
+            fetch(`${SUPA_URL}/functions/v1/notify-access-attempt`, {
+              method: 'POST',
+              headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ attempt_type: 'login_failed', email, page_url: 'admin/index.html' })
+            });
+          } catch(e) { /* silent */ }
           return;
         }
 
