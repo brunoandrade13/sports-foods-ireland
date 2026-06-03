@@ -8408,6 +8408,12 @@ Loading items...
         document.getElementById('editPriceGbp').value = product.price_gbp || '';
         document.getElementById('editCompareGbp').value = product.compare_at_price_gbp || '';
         document.getElementById('editStock').value = product.stock_quantity || 0;
+        // Fetch fresh stock from DB to avoid overwriting with stale cached value
+        supaGet('products', '?id=eq.' + product.id + '&select=stock_quantity').then(rows => {
+          if (rows && rows[0] && rows[0].stock_quantity != null) {
+            document.getElementById('editStock').value = rows[0].stock_quantity;
+          }
+        }).catch(() => {});
         document.getElementById('editWeight').value = product.weight_grams || '';
         document.getElementById('editImage').value = product.image_url || '';
         loadProductImages(product.id);
