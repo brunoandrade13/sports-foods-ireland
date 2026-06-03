@@ -16027,7 +16027,7 @@ function renderOrderItemsTable(items, order, editMode) {
         </td>
         <td style="padding:8px 8px;font-weight:bold;" id="om-row-total-${idx}">€${rowTotal.toFixed(2)}</td>
         <td style="padding:4px 6px;text-align:center;">
-          <button type="button" onclick="removeOrderItemFully(${idx})"
+          <button type="button" onclick="removeOrderItemFully('${item.id}')"
             title="Remove this item from the order and restore stock"
             style="background:#ef4444;color:#fff;border:none;border-radius:5px;padding:4px 9px;font-size:0.78rem;cursor:pointer;font-weight:600;white-space:nowrap">
             🗑️ Remove
@@ -16581,11 +16581,13 @@ async function saveOrderItemEdits() {
 }
 
 // Remove item completely from order + restore stock
-async function removeOrderItemFully(idx) {
+async function removeOrderItemFully(itemId) {
   const items = window._currentModalItems;
   const order = window._currentModalOrder;
   if (!items || !order) return;
-  const item = items[idx];
+  // Find by ID (not index) — index is unreliable because renderOrderItemsTable sorts items
+  const idx = items.findIndex(i => i.id === itemId);
+  const item = idx >= 0 ? items[idx] : null;
   if (!item) return;
 
   const itemName = item.product_name || 'this item';
