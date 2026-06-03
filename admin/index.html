@@ -19783,10 +19783,16 @@ async function shipBoItems() {
     const originalOrders = [...new Set(toShip.map(r => r.item.backorder_original_order_id).filter(Boolean))];
 
     // 2. Create new order
-    const newTotal = toShip.reduce((s, r) => {
+    const newSubtotal = toShip.reduce((s, r) => {
       const unitP = Number(r.item.unit_price || (r.item.total_price / (r.item.quantity||1)) || 0);
       return s + unitP * r.shipQty;
     }, 0);
+
+    // Apply VAT for B2B customers (wholesale prices are ex-VAT)
+    const custIsB2B = !!(c.is_b2b || c.customer_type === 'b2b' || c.b2b_status === 'approved');
+    const custTaxExempt = !!(c.tax_exempt);
+    const newTaxAmount = (custIsB2B && !custTaxExempt) ? Math.round(newSubtotal * 23) / 100 : 0;
+    const newTotal = parseFloat((newSubtotal + newTaxAmount).toFixed(2));
 
     const orderRes = await fetch(`${SUPA_URL}/rest/v1/orders`, {
       method: 'POST',
@@ -19798,7 +19804,10 @@ async function shipBoItems() {
         payment_status: allPrepaid ? 'paid' : 'pending',
         financial_status: allPrepaid ? 'paid' : 'pending',
         total: parseFloat(newTotal.toFixed(2)),
-        subtotal: parseFloat(newTotal.toFixed(2)),
+        subtotal: parseFloat(newSubtotal.toFixed(2)),
+        tax_amount: parseFloat(newTaxAmount.toFixed(2)),
+        tax_total: parseFloat(newTaxAmount.toFixed(2)),
+        is_b2b: custIsB2B,
         currency: 'EUR',
         customer_id: refOrder.customer_id || null,
         customer_name: c.name,
