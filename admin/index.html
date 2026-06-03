@@ -15998,7 +15998,7 @@ function renderOrderItemsTable(items, order, editMode) {
       const rowStyle = fullyBO ? 'border-bottom:1px solid var(--border-color);opacity:0.6;background:#130f1e;' : 'border-bottom:1px solid var(--border-color);';
       return `<tr style="${rowStyle}" data-item-id="${i.id}" data-idx="${idx}">
         <td style="padding:8px 6px;text-align:center">
-          <input type="checkbox" class="om-item-cb" data-idx="${idx}" ${fullyBO ? '' : 'checked'}>
+          <input type="checkbox" class="om-item-cb" data-id="${i.id}" ${fullyBO ? '' : 'checked'}>
         </td>
         <td style="padding:8px 10px;font-size:0.9rem;">
           ${esc(name)}<span style="font-size:0.78rem;color:var(--text-muted);margin-left:4px">${sub}</span>
@@ -16006,26 +16006,26 @@ function renderOrderItemsTable(items, order, editMode) {
         </td>
         <td style="padding:8px 8px;font-family:monospace;font-size:0.8rem;">${esc(i.product_sku || i.sku || '—')}</td>
         <td style="padding:6px 6px;">
-          <input type="number" class="om-edit-price" data-idx="${idx}" value="${price.toFixed(2)}" min="0" step="0.01"
+          <input type="number" class="om-edit-price" data-id="${i.id}" value="${price.toFixed(2)}" min="0" step="0.01"
             style="width:76px;padding:5px 7px;border:1px solid var(--primary-color);border-radius:6px;background:var(--bg);color:var(--text);font-size:0.85rem;"
-            oninput="omRecalcRow(${idx})">
+            oninput="omRecalcRow('${i.id}')">
         </td>
         <td style="padding:6px 6px;text-align:center;">
           <div style="display:flex;align-items:center;gap:4px;justify-content:center;margin-bottom:3px;">
             <span style="font-size:0.75rem;color:var(--text-muted);">Qty:</span>
-            <input type="number" class="om-edit-qty" data-idx="${idx}" value="${qty}" min="1" step="1"
+            <input type="number" class="om-edit-qty" data-id="${i.id}" value="${qty}" min="1" step="1"
               style="width:52px;padding:4px 6px;border:1px solid var(--primary-color);border-radius:6px;background:var(--bg);color:var(--text);font-size:0.85rem;text-align:center;"
-              oninput="omRecalcRow(${idx})" title="Total quantity for this item">
+              oninput="omRecalcRow('${i.id}')" title="Total quantity for this item">
           </div>
           <div style="display:flex;align-items:center;gap:4px;justify-content:center;">
             <span style="font-size:0.75rem;color:var(--text-muted);">BO:</span>
-            <input type="number" class="om-edit-boqty" data-idx="${idx}" value="${boQty}" min="0" max="${qty}" step="1"
+            <input type="number" class="om-edit-boqty" data-id="${i.id}" value="${boQty}" min="0" max="${qty}" step="1"
               style="width:52px;padding:4px 6px;border:1px solid #a855f7;border-radius:6px;background:var(--bg);color:#e9d5ff;font-size:0.85rem;text-align:center;"
-              oninput="omRecalcRow(${idx})" title="Quantity for backorder (0 = none)">
+              oninput="omRecalcRow('${i.id}')" title="Quantity for backorder (0 = none)">
           </div>
-          <div style="font-size:0.75rem;color:#4ade80;margin-top:2px;">Send: <span id="om-send-qty-${idx}">${sendQty}</span></div>
+          <div style="font-size:0.75rem;color:#4ade80;margin-top:2px;">Send: <span id="om-send-qty-${i.id}">${sendQty}</span></div>
         </td>
-        <td style="padding:8px 8px;font-weight:bold;" id="om-row-total-${idx}">€${rowTotal.toFixed(2)}</td>
+        <td style="padding:8px 8px;font-weight:bold;" id="om-row-total-${i.id}">€${rowTotal.toFixed(2)}</td>
         <td style="padding:4px 6px;text-align:center;">
           <button type="button" onclick="removeOrderItemFully('${i.id}')"
             title="Remove this item from the order and restore stock"
@@ -16124,14 +16124,15 @@ function renderOrderItemsTable(items, order, editMode) {
   </div>` : ''}`;
 }
 
-function omRecalcRow(idx) {
+function omRecalcRow(itemId) {
   const items = window._currentModalItems;
-  if (!items || !items[idx]) return;
-  const item  = items[idx];
-  const qtyInput   = document.querySelector(`.om-edit-qty[data-idx="${idx}"]`);
+  if (!items) return;
+  const item  = items.find(i => i.id === itemId);
+  if (!item) return;
+  const qtyInput   = document.querySelector(`.om-edit-qty[data-id="${itemId}"]`);
   const qty   = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : (item.quantity || 1);
-  const priceInput = document.querySelector(`.om-edit-price[data-idx="${idx}"]`);
-  const boInput    = document.querySelector(`.om-edit-boqty[data-idx="${idx}"]`);
+  const priceInput = document.querySelector(`.om-edit-price[data-id="${itemId}"]`);
+  const boInput    = document.querySelector(`.om-edit-boqty[data-id="${itemId}"]`);
   const price  = priceInput ? (parseFloat(priceInput.value) || 0) : (parseFloat(item.unit_price) || 0);
   let   boQty  = boInput    ? (parseInt(boInput.value) || 0)   : 0;
   // Update BO max to match new qty
@@ -16141,10 +16142,10 @@ function omRecalcRow(idx) {
   const sendQty = qty - boQty;
   const rowTotal = price * sendQty;
   // Update send qty label
-  const sendEl = document.getElementById('om-send-qty-' + idx);
+  const sendEl = document.getElementById('om-send-qty-' + itemId);
   if (sendEl) sendEl.textContent = sendQty;
   // Update row total cell
-  const totalEl = document.getElementById('om-row-total-' + idx);
+  const totalEl = document.getElementById('om-row-total-' + itemId);
   if (totalEl) totalEl.textContent = '€' + rowTotal.toFixed(2);
   // Grey out row if fully in BO
   const row = document.querySelector(`tr[data-idx="${idx}"]`) || document.querySelector(`tr[data-item-id="${item.id}"]`);
@@ -16447,9 +16448,10 @@ async function saveOrderItemEdits() {
     let totalBackorderCount = 0;
     for (let idx = 0; idx < items.length; idx++) {
       const item = items[idx];
-      const priceInput = document.querySelector(`.om-edit-price[data-idx="${idx}"]`);
-      const boInput    = document.querySelector(`.om-edit-boqty[data-idx="${idx}"]`);
-      const qtyInput   = document.querySelector(`.om-edit-qty[data-idx="${idx}"]`);
+      const itemId = item.id;
+      const priceInput = document.querySelector(`.om-edit-price[data-id="${itemId}"]`);
+      const boInput    = document.querySelector(`.om-edit-boqty[data-id="${itemId}"]`);
+      const qtyInput   = document.querySelector(`.om-edit-qty[data-id="${itemId}"]`);
       const newPrice   = priceInput ? (parseFloat(priceInput.value) || 0) : (parseFloat(item.unit_price) || 0);
       const origQty    = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : (item.quantity || 1);
       const boQty      = boInput ? Math.min(Math.max(0, parseInt(boInput.value) || 0), origQty) : 0;
