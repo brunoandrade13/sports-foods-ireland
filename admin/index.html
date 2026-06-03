@@ -8315,7 +8315,7 @@ Loading items...
       [s7, s30, s90, s180, sLife].forEach(el => { if (el) el.textContent = '...'; });
 
       try {
-        const query = `?select=order_id,quantity,unit_price,total_price,orders(order_number,created_at,financial_status)&product_id=eq.${productId}&limit=200`;
+        const query = `?select=order_id,quantity,unit_price,total_price,orders!order_id(order_number,created_at,financial_status)&product_id=eq.${productId}&limit=200`;
         let data = await supaGet('order_items', query);
 
         if (!data || data.length === 0) {
