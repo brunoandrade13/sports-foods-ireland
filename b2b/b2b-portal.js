@@ -1289,7 +1289,7 @@ const B2B = (function() {
     const items = sortOrderItems((order.item_summary || []).map(i => ({
       name: i.product_name || 'Product', qty: i.quantity||1,
       price: Number(i.unit_price)||0, total: Number(i.total)||0
-    }));
+    })));
     const total = Number(order.total)||0;
     const subtotal = +total.toFixed(2);
     const tax = +(total - subtotal).toFixed(2);
