@@ -15425,7 +15425,8 @@ let company = '';
 // ── For manual orders: build address fallback from customer record ──
 let custAddrFallback = {};
 if (order.customer_id) {
-  let shipCompany = ''; // separate company name for Ship To
+  let company = '';
+  let shipCompany = ''; // v42: separate company name for Ship To (group billing support)
   const cust = (allCustomers || []).find(c => c.id === order.customer_id);
   if (cust) {
     company = cust.b2b_company_name || cust.company || '';
