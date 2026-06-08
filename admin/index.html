@@ -15422,11 +15422,10 @@ var itemMap = {};
 var items = Object.values(itemMap);
 const bill = order.billing_address || {}, ship = order.shipping_address || {};
 let company = '';
+let shipCompany = ''; // v42: separate company name for Ship To (group billing support)
 // ── For manual orders: build address fallback from customer record ──
 let custAddrFallback = {};
 if (order.customer_id) {
-  let company = '';
-  let shipCompany = ''; // v42: separate company name for Ship To (group billing support)
   const cust = (allCustomers || []).find(c => c.id === order.customer_id);
   if (cust) {
     company = cust.b2b_company_name || cust.company || '';
