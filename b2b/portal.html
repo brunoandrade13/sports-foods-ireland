@@ -3895,6 +3895,45 @@ navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
 });
 }
 </script>
+<!-- B2B Portal GA4 Cart Event Tracking -->
+<script>
+(function(){
+  function fireGA4(event,params){
+    try{
+      if(typeof window.gtag!=='function')return;
+      if(localStorage.getItem('sfi_internal_user')==='1')return;
+      window.gtag('event',event,params);
+    }catch(e){}
+  }
+  var _check=setInterval(function(){
+    if(typeof window.addToCart!=='function'||typeof window.removeFromCart!=='function')return;
+    clearInterval(_check);
+    // Wrap addToCart
+    var _origAdd=window.addToCart;
+    window.addToCart=function(id,qty,opts){
+      var r=_origAdd.apply(this,arguments);
+      try{
+        var name=(opts&&(opts.nome||opts.name))||String(id);
+        var price=parseFloat((opts&&(opts.preco||opts.price))||0);
+        var variant=(opts&&(opts.variant_label||opts.variant))||undefined;
+        fireGA4('add_to_cart',{currency:'EUR',value:parseFloat((price*(parseInt(qty)||1)).toFixed(2)),items:[{item_id:String(id),item_name:name,price:price,quantity:parseInt(qty)||1,item_variant:variant}]});
+      }catch(e){}
+      return r;
+    };
+    // Wrap removeFromCart
+    var _origRemove=window.removeFromCart;
+    window.removeFromCart=function(id,variantId){
+      try{
+        var cart=typeof window.getCart==='function'?window.getCart():[];
+        var item=cart.find(function(c){return(c.id===id||c.id==id)&&(variantId?c.variant_id===variantId:!c.variant_id);});
+        fireGA4('remove_from_cart',{currency:'EUR',value:item?parseFloat((Number(item.preco||0)*parseInt(item.quantidade||1)).toFixed(2)):0,items:[{item_id:String(id),item_name:item?(item.nome||String(id)):String(id),price:item?parseFloat(Number(item.preco||0).toFixed(2)):0,quantity:item?parseInt(item.quantidade||1):1,item_variant:item?(item.variant_label||undefined):undefined}]});
+      }catch(e){}
+      return _origRemove.apply(this,arguments);
+    };
+  },200);
+  setTimeout(function(){clearInterval(_check);},10000);
+})();
+</script>
 </body>
 
 </html>
