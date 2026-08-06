@@ -15462,7 +15462,16 @@ const billResolved = isAddrEmpty(bill) ? custAddrFallback : bill;
 const shipResolved = isAddrEmpty(ship) ? custAddrFallback : ship;
 const invNum = (order.order_number || '').replace('WOO-', '');
 const invDate = new Date(order.created_at);
-const dueDate = new Date(invDate); dueDate.setDate(dueDate.getDate() + 30);
+// Determine TERMS and DUE DATE based on actual payment method
+var _pmRaw = (order.payment_method || '').toLowerCase();
+var _isAlreadyPaid = _pmRaw.includes('stripe') || _pmRaw.includes('card') || _pmRaw.includes('paypal');
+var _isCOD = _pmRaw.includes('cod') || _pmRaw.includes('cash on delivery');
+var _termsLabel = _isAlreadyPaid
+  ? (_pmRaw.includes('paypal') ? 'Paid by PayPal' : 'Paid by Card')
+  : _isCOD ? 'Cash on Delivery'
+  : 'Net 30';
+const dueDate = new Date(invDate);
+if (!_isAlreadyPaid && !_isCOD) dueDate.setDate(dueDate.getDate() + 30);
 const fmtD = d => d ? `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` : '';
 const fmtM = v => Number(v||0).toFixed(2);
 if (!window.jspdf) return alert('PDF library not loaded. Please refresh the page.');
@@ -15561,7 +15570,7 @@ var preTotal = _preForceInclusive ? (preSubtotal - preDiscountAmt) + preShipping
 // ── Define forceVatInclusive + isVatInclusive HERE — before the items loop uses them ──
 var forceVatInclusive = _preForceInclusive;
 var isVatInclusive    = _preIsVatInclusive;
-var detF = [['INVOICE NO.', invNum], ['DATE', fmtD(invDate)], ['TOTAL DUE', 'EUR ' + fmtM(preTotal)], ['DUE DATE', fmtD(dueDate)], ['TERMS', 'Net 30'], ['ENCLOSED', '']];
+var detF = [['INVOICE NO.', invNum], ['DATE', fmtD(invDate)], ['TOTAL DUE', 'EUR ' + fmtM(preTotal)], ['DUE DATE', fmtD(dueDate)], ['TERMS', _termsLabel], ['ENCLOSED', '']];
 var dCW = [CW*0.22, CW*0.13, CW*0.17, CW*0.15, CW*0.13, CW*0.20];
 doc.setFillColor(224,224,224); doc.rect(ML, y, CW, 14, 'F'); doc.setDrawColor(204,204,204); doc.rect(ML, y, CW, 14, 'S');
 doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(0,0,0);
