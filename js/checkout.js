@@ -735,6 +735,28 @@
                 window._sfiCustomerIsB2B = !!isB2B;
                 // If status changed, re-render checkout to show/hide B2B payment options
                 if (wasB2B !== window._sfiCustomerIsB2B && step === 3) renderCheckout();
+
+                // Session expired warning: B2B email stored but session no longer valid
+                const b2bEmail = localStorage.getItem('sfi_b2b_email') || localStorage.getItem('sfi_user_email') || '';
+                const isKnownB2BUser = b2bEmail && b2bEmail.includes('@') && !b2bEmail.includes('placeholder');
+                const BANNER_ID = 'sfi-session-expired-banner';
+                if (!isB2B && isKnownB2BUser) {
+                    if (!document.getElementById(BANNER_ID)) {
+                        const banner = document.createElement('div');
+                        banner.id = BANNER_ID;
+                        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#1B4332;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:16px;font-family:Arial,sans-serif;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,0.35);';
+                        banner.innerHTML = `
+                            <span>⚠️ <strong>Sessão expirada.</strong> Para finalizar a compra com preços B2B e opções de pagamento correctas, por favor inicie sessão novamente.</span>
+                            <a href="/b2b/portal.html" style="background:#169B62;color:#fff;padding:8px 18px;border-radius:6px;text-decoration:none;font-weight:700;white-space:nowrap;flex-shrink:0;font-size:14px;">Iniciar Sessão →</a>
+                            <button onclick="document.getElementById('${BANNER_ID}').remove();document.body.style.paddingTop='';" style="background:none;border:none;color:rgba(255,255,255,0.55);cursor:pointer;font-size:20px;padding:0 4px;flex-shrink:0;">✕</button>
+                        `;
+                        document.body.insertBefore(banner, document.body.firstChild);
+                        setTimeout(() => { document.body.style.paddingTop = banner.offsetHeight + 'px'; }, 50);
+                    }
+                } else {
+                    const existing = document.getElementById(BANNER_ID);
+                    if (existing) { existing.remove(); document.body.style.paddingTop = ''; }
+                }
             }).catch(() => {});
         }
     }
