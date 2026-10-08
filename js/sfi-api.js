@@ -429,9 +429,13 @@ const sfi = {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/b2b-reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ action: 'request_reset', email })
       });
-      return res.json();
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to send reset email');
+      }
+      return data;
     },
 
     /** Update password using the recovery access_token from URL hash */
