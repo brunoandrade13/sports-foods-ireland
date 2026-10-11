@@ -327,9 +327,11 @@ const B2B = (function() {
     try {
       var SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
       var SUPABASE_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
+      try { if (typeof sfi !== 'undefined' && sfi.auth && sfi.auth.ensureAuth) await sfi.auth.ensureAuth(); } catch(_e) {}
+      var USER_JWT = localStorage.getItem('sfi_token') || SUPABASE_KEY;
       var res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_b2b_sub_account_orders', {
         method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + USER_JWT, 'Content-Type': 'application/json' },
         body: JSON.stringify({ p_sub_customer_id: s.id, p_limit: 20 })
       });
       var orders = await res.json();
@@ -803,9 +805,11 @@ const B2B = (function() {
         try {
           var SUPABASE_URL = 'https://styynhgzrkyoioqjssuw.supabase.co';
           var SUPABASE_KEY = 'sb_publishable_tiF58FbBT9UsaEMAaJlqWA_k3dLHElH';
+          try { if (typeof sfi !== 'undefined' && sfi.auth && sfi.auth.ensureAuth) await sfi.auth.ensureAuth(); } catch(_e) {}
+          var USER_JWT = localStorage.getItem('sfi_token') || SUPABASE_KEY;
           var res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_b2b_sub_account_orders', {
             method: 'POST',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + USER_JWT, 'Content-Type': 'application/json' },
             body: JSON.stringify({ p_sub_customer_id: subAccount, p_limit: 500 })
           });
           subAccountOrdersCache[subAccount] = await res.json();
