@@ -12182,7 +12182,11 @@ Loading items...
       try {
         const res = await fetch(SUPA_URL + '/functions/v1/b2b-impersonate', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPA_KEY,
+            'Authorization': 'Bearer ' + (await getValidBearerToken())
+          },
           body: JSON.stringify({ email: email })
         });
         const data = await res.json();
@@ -13444,7 +13448,7 @@ Loading items...
           headers: {
             'Content-Type': 'application/json',
             'apikey': SUPA_KEY,
-            'Authorization': 'Bearer ' + SUPA_KEY
+            'Authorization': 'Bearer ' + (await getValidBearerToken())
           },
           body: JSON.stringify({ order_id: order.id })
         });
